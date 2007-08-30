@@ -75,7 +75,7 @@ module Warbler
       with_namespace_and_config do |name, config|
         desc "Unpack all gems into WEB-INF/gems"
         task "gems" do
-          gem_dir = "#{config.staging_dir}/WEB-INF/gems"
+          gem_dir = "#{config.staging_dir}/WEB-INF/gems/gems"
           mkdir_p gem_dir
           Dir.chdir(gem_dir) do
             config.gems.each do |gem|

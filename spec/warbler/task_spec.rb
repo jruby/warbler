@@ -32,7 +32,7 @@ describe Warbler::Task do
   end
 
   def files_should_contain(regex)
-    FileList["#{@config.staging_dir}/**/*"].detect {|f| f =~ regex }
+    FileList["#{@config.staging_dir}/**/*"].detect {|f| f =~ regex }.should_not be_nil
   end
 
   after(:each) do
@@ -57,7 +57,7 @@ describe Warbler::Task do
   it "should define a gems task for unpacking gems" do
     define_tasks "gems"
     Rake::Task["warble:gems"].invoke
-    files_should_contain %r{WEB-INF/gems/sources}
+    files_should_contain %r{WEB-INF/gems/gems/sources}
   end
 
   it "should define a webxml task for creating web.xml" do
@@ -91,7 +91,7 @@ describe Warbler::Task do
     define_tasks "app"
     Rake::Task["warble:app"].invoke
     files_should_contain %r{WEB-INF/bin/warble$}
-    files_should_contain %r{WEB-INF/generators/warbler/warbler_generator\.rb$}
+    files_should_contain %r{WEB-INF/generators/warble/warble_generator\.rb$}
     files_should_contain %r{WEB-INF/lib/warbler\.rb$}
     gems_ran.should == true
   end
