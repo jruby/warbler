@@ -2,6 +2,12 @@
 # See the file LICENSES.txt included with the distribution for
 # software license details.
 
-require File.dirname(__FILE__) + '/../lib/warbler'
+begin
+  gem 'warbler'
+  require 'warbler'
+rescue Gem::LoadError, LoadError
+  $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib')
+  require 'warbler'
+end
 
 Warbler::Task.new

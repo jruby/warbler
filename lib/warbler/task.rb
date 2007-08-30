@@ -41,15 +41,15 @@ module Warbler
       define_main_task
       define_clean_task
       define_public_task
-      define_gem_task
+      define_gems_task
       define_webxml_task
-      define_webinf_task
+      define_app_task
       define_jar_task
     end
 
     def define_main_task
-      desc "Create a .war file"
-      task @name => ["#{@name}:webinf", "#{@name}:public", "#{@name}:jar"]
+      desc "Create #{@name}.war"
+      task @name => ["#{@name}:app", "#{@name}:public", "#{@name}:jar"]
     end
 
     def define_clean_task
@@ -70,7 +70,7 @@ module Warbler
       end
     end
 
-    def define_gem_task
+    def define_gems_task
       with_namespace_and_config do |name, config|
         desc "Unpack all gems into WEB-INF/gems"
         task "gems" do
@@ -87,7 +87,8 @@ module Warbler
 
     def define_webxml_task
       with_namespace_and_config do |name, config|
-        task "webxml" => ["#{config.staging_dir}/WEB-INF"] do
+        task "webxml" do
+          mkdir_p "#{config.staging_dir}/WEB-INF"
           if File.exist?("config/web.xml")
             cp "config/web.xml", "#{config.staging_dir}/WEB-INF"
           else
@@ -106,11 +107,23 @@ module Warbler
       end
     end
 
-    def define_webinf_task
+    def define_java_libs_task
+      target_files = @config.java_libs.map do |lib|
+        define_file_task(lib,
+          "#{@config.staging_dir}/WEB-INF/lib/#{File.basename(lib)}")
+      end
+      with_namespace_and_config do |name, config|
+        desc "Copy all java libraries into the .war"
+        task "java_libs" => target_files
+      end
+      target_files
+    end
+
+    def define_app_task
       webinf_target_files = define_webinf_file_tasks
       with_namespace_and_config do |name, config|
         desc "Copy all application files into the .war"
-        task "webinf" => ["#{name}:gems", *webinf_target_files]
+        task "app" => ["#{name}:gems", *webinf_target_files]
       end
     end
 
@@ -136,10 +149,7 @@ module Warbler
       target_files = files.map do |f|
         define_file_task(f, "#{@config.staging_dir}/WEB-INF/#{f}")
       end
-      @config.java_libs.each do |lib|
-        target_files << define_file_task(lib,
-        "#{@config.staging_dir}/WEB-INF/lib/#{File.basename(lib)}")
-      end
+      target_files += define_java_libs_task
       target_files
     end
 
