@@ -1,0 +1,71 @@
+<!DOCTYPE web-app PUBLIC
+  "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+  "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+
+	<context-param>
+		<param-name>jruby.standalone</param-name>
+		<param-value><%= webxml.standalone %></param-value>
+	</context-param>
+
+	<% if !webxml.standalone && webxml.jruby_home %>
+	<!-- jruby.home can be set either here, or as the system property jruby.home -->
+	<context-param>
+		<param-name>jruby.home</param-name>
+		<param-value><%= webxml.jruby_home %></param-value>
+	</context-param>
+	<% end %>
+
+	<context-param>
+		<param-name>rails.root</param-name>
+		<param-value>/WEB-INF</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>rails.env</param-name>
+		<param-value><%= webxml.rails_env || 'production' %></param-value>
+	</context-param>
+
+  <% webxml.pool.marshal_dump.each do |k,v| %>
+	<context-param>
+		<param-name>jruby.pool.<%= k %></param-name>
+		<param-value><%= v %></param-value>
+	</context-param>
+  <% end %>
+
+	<context-param>
+		<param-name>files.default</param-name>
+		<param-value>rails</param-value>
+		<description>
+		  The files servlet should forward to the rails servlet if no file could be found
+    </description>
+	</context-param>
+
+	<listener>
+		<listener-class>org.jruby.webapp.RailsContextListener</listener-class>
+	</listener>
+
+	<servlet>
+		<servlet-name>rails</servlet-name>
+		<servlet-class>org.jruby.webapp.RailsServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>files</servlet-name>
+		<servlet-class>org.jruby.webapp.FileServlet</servlet-class>
+	</servlet>
+
+	<!-- Allow all requests to go to the files servlet first -->
+	<servlet-mapping>
+		<servlet-name><%= webxml.servlet_name || 'files' %></servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<% if webxml.jndi %>
+	<resource-ref>
+		<res-ref-name><%= webxml.jndi %></res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+	<% end %>
+
+</web-app>

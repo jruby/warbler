@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+#
+# (c) Copyright 2007 Nick Sieger <nicksieger@gmail.com>
+# See the file LICENSES.txt included with the distribution for
+# software license details.
+
+require 'rake'
+require 'warbler'
+
+application = Rake.application
+application.standard_exception_handling do
+  application.init
+  Warbler::Task.new
+  task :default => :war
+  task :config do
+    cp "#{Warbler::WARBLER_HOME}/generators/warbler/templates/warbler.rb", "config/warbler.rb"
+  end
+  application.top_level
+end
