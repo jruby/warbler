@@ -11,7 +11,6 @@ module Warbler
   class Config
     TOP_DIRS = %w(app config lib log vendor tmp)
     FILE = "config/warble.rb"
-    RAILS_GEMS = %w(actionpack activerecord actionmailer activesupport actionwebservice rails)
 
     # Directory where files will be staged, defaults to tmp/war
     attr_accessor :staging_dir
@@ -33,6 +32,9 @@ module Warbler
     # Rubygems to install into the webapp at WEB-INF/gems
     attr_accessor :gems
 
+    # Whether to include dependent gems (default true)
+    attr_accessor :gem_dependencies
+
     # Public HTML directory file list, to be copied into the root of the war
     attr_accessor :public_html
 
@@ -50,6 +52,7 @@ module Warbler
       @excludes    = FileList["#{WARBLER_HOME}/**/*"]
       @java_libs   = FileList["#{WARBLER_HOME}/lib/*.jar"]
       @gems        = default_gems
+      @gem_dependencies = true
       @public_html = FileList["public/**/*"]
       @webxml      = default_webxml_config
       @war_name    = if defined?(RAILS_ROOT)
@@ -59,6 +62,10 @@ module Warbler
       end
       yield self if block_given?
       @excludes << @staging_dir
+    end
+
+    def gem_target_path
+      "#{@staging_dir}/WEB-INF/gems"
     end
 
     private
@@ -71,11 +78,7 @@ module Warbler
     end
 
     def default_gems
-      if File.directory?("vendor/rails")
-        []
-      else
-        RAILS_GEMS
-      end
+      File.directory?("vendor/rails") ? [] : ["rails"]
     end
   end
 end

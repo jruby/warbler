@@ -21,6 +21,9 @@ Warbler::Config.new do |config|
   # config.gems = ["ActiveRecord-JDBC", "jruby-openssl"]
   # config.gems << "tzinfo"
 
+  # Include gem dependencies not mentioned specifically
+  config.gem_dependencies = true
+
   # Files to be included in the root of the webapp
   # config.public_html = FileList["public/**/*", "doc/**/*"]
 
