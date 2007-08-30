@@ -1,6 +1,8 @@
+#--
 # (c) Copyright 2007 Nick Sieger <nicksieger@gmail.com>
 # See the file LICENSES.txt included with the distribution for
 # software license details.
+#++
 
 require 'rake'
 require 'rake/tasklib'
@@ -60,6 +62,7 @@ module Warbler
           rm_rf config.staging_dir
           rm_f "#{config.war_name}.war"
         end
+        task "clear" => "#{name}:clean"
       end
     end
 
@@ -72,22 +75,17 @@ module Warbler
     end
 
     def define_gems_task
-      with_namespace_and_config do |name, config|
+      directory "#{@config.gem_target_path}/gems"
+      targets = define_copy_gems_tasks
+      with_namespace_and_config do
         desc "Unpack all gems into WEB-INF/gems"
-        task "gems" do
-          gem_dir = "#{config.staging_dir}/WEB-INF/gems"
-          mkdir_p gem_dir
-          Dir.chdir(gem_dir) do
-            config.gems.each do |gem|
-              ruby "-S", "gem", "unpack", gem
-            end
-          end
-        end
+        task "gems" => targets
       end
     end
 
     def define_webxml_task
       with_namespace_and_config do |name, config|
+        desc "Generate a web.xml file for the webapp"
         task "webxml" do
           mkdir_p "#{config.staging_dir}/WEB-INF"
           if File.exist?("config/web.xml")
@@ -179,6 +177,42 @@ module Warbler
       name, config = @name, @config
       namespace name do
         yield name, config
+      end
+    end
+
+    def define_copy_gems_tasks
+      targets = []
+      @config.gems.each do |gem|
+        define_single_gem_tasks(gem, targets)
+      end
+      targets
+    end
+
+    def define_single_gem_tasks(gem, targets, version = nil)
+      matched = Gem.source_index.search(gem, version)
+      fail "gem '#{gem}' not installed" if matched.empty?
+      spec = matched.last
+      
+      gem_unpack_task_name = "gem:#{spec.name}-#{spec.version}"
+      return if Rake::Task.task_defined?(gem_unpack_task_name)
+
+      targets << define_file_task(spec.loaded_from, 
+        "#{config.gem_target_path}/specifications/#{File.basename(spec.loaded_from)}")
+
+      task targets.last do
+        Rake::Task[gem_unpack_task_name].invoke
+      end
+
+      task gem_unpack_task_name => ["#{config.gem_target_path}/gems"] do |t|
+        Dir.chdir(t.prerequisites.last) do
+          ruby "-S", "gem", "unpack", "-v", spec.version.to_s, spec.name
+        end
+      end
+
+      if @config.gem_dependencies
+        spec.dependencies.each do |dep|
+          define_single_gem_tasks(dep.name, targets, dep.version_requirements)
+        end
       end
     end
 

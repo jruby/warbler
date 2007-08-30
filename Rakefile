@@ -17,6 +17,7 @@ begin
     p.description = p.paragraphs_of('README.txt', 0...1).join("\n\n")
     p.extra_deps.reject!{|d| d.first == "hoe"}
     p.test_globs = ["spec/**/*_spec.rb"]
+    p.rdoc_pattern = /\.(rb|txt)/
   end
   hoe.spec.files = MANIFEST
   hoe.spec.dependencies.delete_if { |dep| dep.name == "hoe" }

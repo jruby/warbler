@@ -1,6 +1,8 @@
+#--
 # (c) Copyright 2007 Nick Sieger <nicksieger@gmail.com>
 # See the file LICENSES.txt included with the distribution for
 # software license details.
+#++
 
 require File.dirname(__FILE__) + '/../spec_helper'
 
@@ -11,7 +13,7 @@ describe Warbler::Task do
     @config = Warbler::Config.new do |config|
       config.staging_dir = "pkg/tmp/war"
       config.war_name = "warbler"
-      config.gems = ["sources"]
+      config.gems = ["rake"]
       config.dirs = %w(bin generators lib)
       config.public_html = FileList["tasks/**/*"]
       config.webxml.pool.maxActive = 5
@@ -32,7 +34,7 @@ describe Warbler::Task do
   end
 
   def files_should_contain(regex)
-    FileList["#{@config.staging_dir}/**/*"].detect {|f| f =~ regex }
+    FileList["#{@config.staging_dir}/**/*"].detect {|f| f =~ regex }.should_not be_nil
   end
 
   after(:each) do
@@ -57,7 +59,8 @@ describe Warbler::Task do
   it "should define a gems task for unpacking gems" do
     define_tasks "gems"
     Rake::Task["warble:gems"].invoke
-    files_should_contain %r{WEB-INF/gems/sources}
+    files_should_contain %r{WEB-INF/gems/gems/rake.*/lib/rake.rb}
+    files_should_contain %r{WEB-INF/gems/specifications/rake.*\.gemspec}
   end
 
   it "should define a webxml task for creating web.xml" do
@@ -91,7 +94,7 @@ describe Warbler::Task do
     define_tasks "app"
     Rake::Task["warble:app"].invoke
     files_should_contain %r{WEB-INF/bin/warble$}
-    files_should_contain %r{WEB-INF/generators/warbler/warbler_generator\.rb$}
+    files_should_contain %r{WEB-INF/generators/warble/warble_generator\.rb$}
     files_should_contain %r{WEB-INF/lib/warbler\.rb$}
     gems_ran.should == true
   end
@@ -128,10 +131,18 @@ describe Warbler::Task do
         File.open("#{Warbler::WARBLER_HOME}/generators/warble/templates/warble.rb") do |src|
           src.read
         end
-      dest << contents.sub(/# config\.war_name/, 'config.war_name')
+      dest << contents.sub(/# config\.war_name/, 'config.war_name'
+        ).sub(/# config.gems << "tzinfo"/, 'config.gems = []')
     end
     t = Warbler::Task.new "warble"
     t.config.war_name.should == "mywar"
+  end
+
+  it "should fail if a gem is requested that is not installed" do
+    @config.gems = ["nonexistent-gem"]
+    lambda {
+      Warbler::Task.new "warble", @config
+    }.should raise_error
   end
 end
 

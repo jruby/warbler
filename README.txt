@@ -1,11 +1,15 @@
 = Warbler
 
 Warbler is a gem to make a .war file out of a Rails project. The intent is to provide a minimal,
-flexible, ruby-like, way to bundle up all of your application files for deployment to a Java
+flexible, ruby-like way to bundle up all of your application files for deployment to a Java
 application server.
 
 Warbler provides a sane set of out-of-the box defaults that should allow most Rails applications
 without external gem dependencies (aside from Rails itself) to assemble and Just Work.
+
+Warbler bundles JRuby and the Goldspike servlet for dispatching requests to your application inside
+the java application server, and assembles all jar files in WARBLER_HOME/lib/*.jar into
+your application. No external dependencies are downloaded.
 
 == Getting Started
 
@@ -16,7 +20,7 @@ without external gem dependencies (aside from Rails itself) to assemble and Just
 == Usage
 
 Warbler's +warble+ command is just a small wrapper around Rake with internally defined tasks. (Notice
-+rake+ still prints out in the message, but you should substitute +warble+ for +rake+ on the command
+"rake" still prints out in the message, but you should substitute "warble" for "rake" on the command
 line when running this way.)
 
     $ warble -T
@@ -29,6 +33,10 @@ line when running this way.)
     rake war:jar        # Run the jar command to create the .war
     rake war:java_libs  # Copy all java libraries into the .war
     rake war:public     # Copy all public HTML files to the root of the .war
+    rake war:webxml     # Generate a web.xml file for the webapp
+
+Warble makes heavy use of Rake's file and directory tasks, so only recently updated files will be
+copied, making repeated assemblies much faster.
 
 == Configuration
 
@@ -46,38 +54,19 @@ If you have Warbler installed as a plugin, use the generator:
 
     script/generate warble
     
-If you install the gem but later decide you'd like to have it as a plugin, use the +pluginize+ command:
+Finally, edit the config/warble.rb to your taste. If you install the gem but later decide you'd like to have it as a plugin, use the +pluginize+ command:
 
     warble pluginize
 
-Once Warbler is installed as a plugin, simply use rake to build the war.
+If you wish to upgrade or switch one or more java libraries from what's bundled in the Warbler gem, simply change the jars in WARBLER_HOME/lib, or modify the +java_libs+ attribute of Warbler::Config to include the files you need.
 
-    $ rake -T
-    rake war                    # Create tender.war
-    rake war:app                # Copy all application files into the .war
-    rake war:clean              # Clean up the .war file and the staging area
-    rake war:gems               # Unpack all gems into WEB-INF/gems
-    rake war:jar                # Run the jar command to create the .war
-    rake war:java_libs          # Copy all java libraries into the .war
-    rake war:public             # Copy all public HTML files to the root of the .war
+Once Warbler is installed as a plugin, you can use +rake+ to build the war (with the same set of tasks as above).
 
-=== Web.xml configuration
-
-These options are particular to Goldspike's Rails servlet and web.xml file.
-
-* <tt>config.webxml.standalone</tt> -- whether the .war file is "standalone", meaning JRuby, all java and gem dependencies are completely embedded in file.  One of +true+ (default) or +false+.
-* <tt>config.webxml.jruby_home</tt> -- required if standalone is false.  The directory containing the JRuby installation to use when the app is running.
-* <tt>config.webxml.rails_env</tt> -- the Rails environment to use for the running application, usually either development or production (the default).
-* <tt>config.webxml.pool.maxActive</tt> -- maximum number of pooled Rails application runtimes (default 4)
-* <tt>config.webxml.pool.minIdle</tt> -- minimum number of pooled runtimes to keep around during idle time (default 2)
-* <tt>config.webxml.pool.checkInterval</tt> -- how often to check whether the pool size is within minimum and maximum limits, in milliseconds (default 0)
-* <tt>config.webxml.pool.maxWait</tt> -- how long a waiting thread should wait for a runtime before giving up, in milliseconds (default 30000)
-* <tt>config.webxml.jndi</tt> -- the name of a JNDI data source name to be available to the application
-* <tt>config.webxml.servlet_name</tt> -- the name of the servlet to receive all requests.  One of +files+ or +rails+.  Goldspike's default behavior is to route first through the FileServlet, and if the file isn't found, it is forwarded to the RailsServlet.  Use +rails+ if your application server is fronted by Apache or something else that will handle static files.
+For more information on configuration, see Warbler::Config.
 
 === Caveats
 
-Warbler requires that RAILS_ROOT will effectively be set to war/WEB-INF when running inside the war, while the application public files will be in the war root.  The purpose is to make the application structure match the Java webapp archive structure, where WEB-INF is a protected directory not visible to the webserver.  Because of this change, features of Rails that expect the public assets directory to live in RAILS_ROOT/public may not function properly.  However, we feel that the added security of conforming to the webapp structure is worth these minor inconveniences.
+Warbler requires that RAILS_ROOT will effectively be set to /WEB-INF when running inside the war, while the application public files will be in the root directory.  The purpose is to make the application structure match the Java webapp archive structure, where WEB-INF is a protected directory not visible to the web server.  Because of this change, features of Rails that expect the public assets directory to live in RAILS_ROOT/public may not function properly.  However, we feel that the added security of conforming to the webapp structure is worth these minor inconveniences.
 
 For Rails 1.2.3, the items that may need your attention are:
 
