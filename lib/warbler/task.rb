@@ -85,6 +85,7 @@ module Warbler
 
     def define_webxml_task
       with_namespace_and_config do |name, config|
+        desc "Generate a web.xml file for the webapp"
         task "webxml" do
           mkdir_p "#{config.staging_dir}/WEB-INF"
           if File.exist?("config/web.xml")
