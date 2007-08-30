@@ -121,11 +121,11 @@ describe Warbler::Task do
     Warbler::Task.new "warble", @config
   end
 
-  it "should read configuration from config/warble.rb" do
+  it "should read configuration from #{Warbler::Config::FILE}" do
     mkdir_p "config"
-    File.open("config/warble.rb", "w") do |dest|
+    File.open(Warbler::Config::FILE, "w") do |dest|
       contents = 
-        File.open("#{Warbler::WARBLER_HOME}/generators/warbler/templates/warble.rb") do |src|
+        File.open("#{Warbler::WARBLER_HOME}/generators/warble/templates/warble.rb") do |src|
           src.read
         end
       dest << contents.sub(/# config\.war_name/, 'config.war_name')

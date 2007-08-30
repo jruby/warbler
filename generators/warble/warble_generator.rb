@@ -2,7 +2,7 @@
 # See the file LICENSES.txt included with the distribution for
 # software license details.
 
-class WarblerGenerator < Rails::Generator::Base
+class WarbleGenerator < Rails::Generator::Base
   def manifest
     record do |m|
       m.directory 'config'
@@ -12,6 +12,6 @@ class WarblerGenerator < Rails::Generator::Base
   
   protected
   def banner
-    "Usage: #{$0} warbler"
+    "Usage: #{$0} warble"
   end  
 end
