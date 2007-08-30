@@ -4,6 +4,7 @@
 # See the file LICENSES.txt included with the distribution for
 # software license details.
 
+require 'rubygems'
 require 'rake'
 require 'warbler'
 

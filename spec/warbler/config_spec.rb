@@ -5,13 +5,16 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Warbler::Config do
+  after(:each) do
+    rm_rf "vendor"
+  end
+
   it "should have suitable default values" do
     config = Warbler::Config.new
     config.staging_dir.should == "tmp/war"
     config.dirs.should include(*Warbler::Config::TOP_DIRS)
     config.includes.should be_empty
     config.java_libs.should_not be_empty
-    config.gems.should be_empty
     config.war_name.size.should > 0
     config.webxml.should be_kind_of(OpenStruct)
     config.webxml.pool.should be_kind_of(OpenStruct)
@@ -24,5 +27,15 @@ describe Warbler::Config do
     end
     config.staging_dir.should == "/var/tmp"
     config.war_name.should == "mywar"
+  end
+
+  it "should provide Rails gems by default, unless vendor/rails is present" do
+    config = Warbler::Config.new
+    config.gems.should include("rails", "activesupport", 
+      "activerecord", "actionpack", "actionmailer", "actionwebservice")
+
+    mkdir_p "vendor/rails"
+    config = Warbler::Config.new
+    config.gems.should be_empty
   end
 end

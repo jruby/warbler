@@ -11,7 +11,7 @@ describe Warbler::Task do
     @config = Warbler::Config.new do |config|
       config.staging_dir = "pkg/tmp/war"
       config.war_name = "warbler"
-      config.gems << "sources"
+      config.gems = ["sources"]
       config.dirs = %w(bin generators lib)
       config.public_html = FileList["tasks/**/*"]
       config.webxml.pool.maxActive = 5

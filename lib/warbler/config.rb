@@ -9,6 +9,7 @@ module Warbler
   class Config
     TOP_DIRS = %w(app config lib log vendor tmp)
     FILE = "config/warble.rb"
+    RAILS_GEMS = %w(actionpack activerecord actionmailer activesupport actionwebservice rails)
 
     # Directory where files will be staged, defaults to tmp/war
     attr_accessor :staging_dir
@@ -46,7 +47,7 @@ module Warbler
       @includes    = FileList[]
       @excludes    = FileList["#{WARBLER_HOME}/**/*"]
       @java_libs   = FileList["#{WARBLER_HOME}/lib/*.jar"]
-      @gems        = []
+      @gems        = default_gems
       @public_html = FileList["public/**/*"]
       @webxml      = default_webxml_config
       @war_name    = if defined?(RAILS_ROOT)
@@ -65,6 +66,14 @@ module Warbler
       c.rails_env  = "production"
       c.pool       = OpenStruct.new
       c
+    end
+
+    def default_gems
+      if File.directory?("vendor/rails")
+        []
+      else
+        RAILS_GEMS
+      end
     end
   end
 end
