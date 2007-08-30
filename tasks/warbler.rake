@@ -1,6 +1,8 @@
+#--
 # (c) Copyright 2007 Nick Sieger <nicksieger@gmail.com>
 # See the file LICENSES.txt included with the distribution for
 # software license details.
+#++
 
 begin
   # First, try w/o activating gem or touching load path
