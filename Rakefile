@@ -1,7 +1,7 @@
 require 'spec/rake/spectask'
 
 MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt", "LICENSES.txt", "Rakefile",
-  "*.erb", "bin/*", "generators/**/*", "lib/**/*.rb", "spec/**/*.rb", "tasks/**/*.rake"]
+  "*.erb", "bin/*", "generators/**/*", "lib/**/*", "spec/**/*.rb", "tasks/**/*.rake"]
 
 begin
   File.open("Manifest.txt", "w") {|f| MANIFEST.each {|n| f << "#{n}\n"} }

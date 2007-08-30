@@ -107,11 +107,13 @@ describe Warbler::Task do
     app_ran = false; task "warble:app" do; app_ran = true; end
     public_ran = false; task "warble:public" do; public_ran = true; end
     jar_ran = false; task "warble:jar" do; jar_ran = true; end
+    webxml_ran = false; task "warble:webxml" do; webxml_ran = true; end
     define_tasks "main"
     Rake::Task["warble"].invoke
     app_ran.should == true
     public_ran.should == true
     jar_ran.should == true
+    webxml_ran.should == true
   end
 
   it "should be able to define all tasks successfully" do

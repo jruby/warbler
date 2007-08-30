@@ -4,10 +4,13 @@
 
 begin
   gem 'warbler'
-  require 'warbler'
-rescue Gem::LoadError, LoadError
-  $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib')
-  require 'warbler'
+rescue Gem::LoadError
+  begin
+    require 'warbler'
+  rescue LoadError
+    $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib')
+    require 'warbler'
+  end
 end
 
 Warbler::Task.new

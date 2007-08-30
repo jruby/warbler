@@ -45,11 +45,12 @@ module Warbler
       define_webxml_task
       define_app_task
       define_jar_task
+      define_debug_task
     end
 
     def define_main_task
-      desc "Create #{@name}.war"
-      task @name => ["#{@name}:app", "#{@name}:public", "#{@name}:jar"]
+      desc "Create #{@config.war_name}.war"
+      task @name => ["#{@name}:app", "#{@name}:public", "#{@name}:webxml", "#{@name}:jar"]
     end
 
     def define_clean_task
@@ -132,6 +133,15 @@ module Warbler
         desc "Run the jar command to create the .war"
         task "jar" do
           sh "jar", "cf", "#{config.war_name}.war", "-C", config.staging_dir, "."
+        end
+      end
+    end
+
+    def define_debug_task
+      with_namespace_and_config do |name, config|
+        task "debug" do
+          require 'pp'
+          pp config
         end
       end
     end
