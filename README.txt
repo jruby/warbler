@@ -7,6 +7,10 @@ application server.
 Warbler provides a sane set of out-of-the box defaults that should allow most Rails applications
 without external gem dependencies (aside from Rails itself) to assemble and Just Work.
 
+Warbler bundles JRuby and the Goldspike servlet for dispatching requests to your application inside
+the java application server, and assembles all jar files in WARBLER_HOME/lib/*.jar into
+your application. No external dependencies are downloaded.
+
 == Getting Started
 
 1. Install the gem: <tt>gem install warbler</tt>.
@@ -53,6 +57,8 @@ If you have Warbler installed as a plugin, use the generator:
 Finally, edit the config/warble.rb to your taste. If you install the gem but later decide you'd like to have it as a plugin, use the +pluginize+ command:
 
     warble pluginize
+
+If you wish to upgrade or switch one or more java libraries from what's bundled in the Warbler gem, simply change the jars in WARBLER_HOME/lib, or modify the +java_libs+ attribute of Warbler::Config to include the files you need.
 
 Once Warbler is installed as a plugin, you can use +rake+ to build the war (with the same set of tasks as above).
 
