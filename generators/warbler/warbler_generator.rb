@@ -6,7 +6,7 @@ class WarblerGenerator < Rails::Generator::Base
   def manifest
     record do |m|
       m.directory 'config'
-      m.template 'warbler.rb', File.join('config', 'warbler.rb')
+      m.template 'warble.rb', File.join('config', 'warble.rb')
     end
   end
   

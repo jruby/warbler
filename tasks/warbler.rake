@@ -3,11 +3,15 @@
 # software license details.
 
 begin
-  gem 'warbler'
-rescue Gem::LoadError
+  # First, try w/o activating gem or touching load path
+  require 'warbler'
+rescue LoadError
   begin
+    # Next, try activating the gem
+    gem 'warbler'
     require 'warbler'
-  rescue LoadError
+  rescue Gem::LoadError
+    # Last, add our lib dir to the load path, and try again
     $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib')
     require 'warbler'
   end

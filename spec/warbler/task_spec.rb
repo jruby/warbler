@@ -38,6 +38,7 @@ describe Warbler::Task do
   after(:each) do
     define_tasks "clean"
     Rake::Task["warble:clean"].invoke
+    rm_rf "config"
   end
 
   it "should define a clean task for removing the staging directory" do
@@ -118,6 +119,19 @@ describe Warbler::Task do
 
   it "should be able to define all tasks successfully" do
     Warbler::Task.new "warble", @config
+  end
+
+  it "should read configuration from config/warble.rb" do
+    mkdir_p "config"
+    File.open("config/warble.rb", "w") do |dest|
+      contents = 
+        File.open("#{Warbler::WARBLER_HOME}/generators/warbler/templates/warble.rb") do |src|
+          src.read
+        end
+      dest << contents.sub(/# config\.war_name/, 'config.war_name')
+    end
+    t = Warbler::Task.new "warble"
+    t.config.war_name.should == "mywar"
   end
 end
 

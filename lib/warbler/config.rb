@@ -8,6 +8,7 @@ module Warbler
   # Warbler assembly configuration.
   class Config
     TOP_DIRS = %w(app config lib log vendor tmp)
+    FILE = "config/warble.rb"
 
     # Directory where files will be staged, defaults to tmp/war
     attr_accessor :staging_dir

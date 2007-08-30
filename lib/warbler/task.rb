@@ -24,12 +24,12 @@ module Warbler
     def initialize(name = :war, config = nil, tasks = :define_tasks)
       @name   = name
       @config = config
-      if @config.nil? && File.exists?("config/warbler.rb")
-        @config = eval(File.open("config/warbler.rb") {|f| f.read})
+      if @config.nil? && File.exists?(Config::FILE)
+        @config = eval(File.open(Config::FILE) {|f| f.read})
       end
       @config ||= Config.new
       unless @config.kind_of? Config
-        warn "War::Config not provided by override in initializer or config/war.rb; using defaults"
+        warn "War::Config not provided by override in initializer or #{Config::FILE}; using defaults"
         @config = Config.new
       end
       yield self if block_given?

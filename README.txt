@@ -16,7 +16,21 @@ Warbler provides an out-of-the box set of defaults that
 
 The default configuration puts application files (+app+, +config+, +lib+, +log+, +vendor+, +tmp+) under the .war file's WEB-INF directory, and files in +public+ in the root of the .war file.  Any Java .jar files stored in lib will automatically be placed in WEB-INF/lib for placement on the web app's classpath.
 
-To customize files, libraries, and gems included in the .war file, run the +warbler+ generator, which will create a config/warbler.rb file.
+To customize files, libraries, and gems included in the .war file, you'll need a config/warble.rb file.  There a two ways of doing this.  With the gem, simply run
+
+    warble config
+
+If you have Warbler installed as a plugin, use the generator:
+
+    script/generate warble
+    
+If you install the gem but later decide you'd like to have it as a plugin, use the +pluginize+ command:
+
+    warble pluginize
+
+Once Warbler is installed as a plugin, simply use rake to build the war.
+
+    rake -T
 
 === Web.xml configuration
 
