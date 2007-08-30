@@ -10,10 +10,30 @@ require 'warbler'
 application = Rake.application
 application.standard_exception_handling do
   application.init
+
   Warbler::Task.new
+
   task :default => :war
+
+  desc "Generate a configuration file to customize your war assembly"
   task :config do
-    cp "#{Warbler::WARBLER_HOME}/generators/warbler/templates/warbler.rb", "config/warbler.rb"
+    if File.exists?("config/warbler.rb") && ENV["FORCE"].nil?
+      warn "config/warbler.rb: file already exists. Use FORCE=1 to override"
+    else
+      cp "#{Warbler::WARBLER_HOME}/generators/warbler/templates/warbler.rb", "config/warbler.rb"
+    end
   end
+
+  desc "Unpack warbler as a plugin in your Rails application"
+  task :pluginize do
+    unless Dir["vendor/plugins/warbler*"].empty?
+      warn "warbler is already installed as a plugin; please remove before re-installing"
+    else
+      Dir.chdir("vendor/plugins") do
+        ruby "-S", "gem", "unpack", "warbler"
+      end
+    end
+  end
+
   application.top_level
 end
