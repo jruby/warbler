@@ -62,9 +62,16 @@ If you wish to upgrade or switch one or more java libraries from what's bundled 
 
 Once Warbler is installed as a plugin, you can use +rake+ to build the war (with the same set of tasks as above).
 
+=== Web.xml
+
+Java web applications are configured mainly through this file, and Warbler creates a suitable default file for you for use with the bundled Goldspike bits.  However, if you need to customize it in any way, you have two options.
+
+1. If you just want a static web.xml file whose contents you manually control, you may copy the one generated for you in <tt>tmp/war/WEB-INF/web.xml</tt> to <tt>config/web.xml</tt>.  It will be copied into the webapp for you.
+2. If you want to inject some dynamic information into the file, copy the <tt>WARBLER_HOME/web.xml.erb</tt> to <tt>config/web.xml.erb</tt>.  Its contents will be evaluated for you and put in the webapp.  Note that you can also pass arbitrary properties to the ERb template by setting <tt>config.webxml.customkey</tt> values in your <tt>config/warble.rb</tt> file.
+
 For more information on configuration, see Warbler::Config.
 
-=== Caveats
+== Caveats
 
 Warbler requires that RAILS_ROOT will effectively be set to /WEB-INF when running inside the war, while the application public files will be in the root directory.  The purpose is to make the application structure match the Java webapp archive structure, where WEB-INF is a protected directory not visible to the web server.  Because of this change, features of Rails that expect the public assets directory to live in RAILS_ROOT/public may not function properly.  However, we feel that the added security of conforming to the webapp structure is worth these minor inconveniences.
 
@@ -78,7 +85,7 @@ For Rails 1.2.3, the items that may need your attention are:
 
 Warbler is provided under the terms of the MIT license.
 
-    Warbler (c) 2007 Nick Sieger <nicksieger@gmail.com>.
+    Warbler (c) 2007 Nick Sieger <nicksieger@gmail.com>
 
 Warbler also bundles several other pieces of software. Please read the file LICENSES.txt to ensure
 that you agree with the terms of all the components.
