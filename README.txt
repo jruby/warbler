@@ -81,6 +81,12 @@ For Rails 1.2.3, the items that may need your attention are:
 * Asset tag timestamp calculation (e.g., <tt>javascripts/prototype.js?1188482864</tt>) will not happen.  The workaround is to control this manually by setting the RAILS_ASSET_ID environment variable.
 * Automatic inclusion of <tt>application.js</tt> through <tt>javascript_include_tag :defaults</tt> will not work.  The workaround is to include it yourself with <tt>javascript_include_tag "application"</tt>.
 
+== Source
+
+Warbler source is not currently located in Rubyforge's SVN.  To get the source:
+
+    svn co http://svn.caldersphere.net/svn/main/rubyforge/warbler/trunk warbler
+
 == License
 
 Warbler is provided under the terms of the MIT license.
