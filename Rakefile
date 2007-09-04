@@ -15,7 +15,7 @@ begin
     p.summary = "Warbler chirpily constructs .war files of your Rails applications."
     p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
     p.description = p.paragraphs_of('README.txt', 0...1).join("\n\n")
-    p.extra_deps.reject!{|d| d.first == "hoe"}
+    p.extra_deps << ['rake', '>= 0.7.3']
     p.test_globs = ["spec/**/*_spec.rb"]
     p.rdoc_pattern = /\.(rb|txt)/
   end
