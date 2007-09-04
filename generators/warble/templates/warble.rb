@@ -14,17 +14,21 @@ Warbler::Config.new do |config|
 
   # Additional Java .jar files to include.  Note that if .jar files are placed
   # in lib (and not otherwise excluded) then they need not be mentioned here
-  # config.java_libs = FileList["lib/java/*.jar"]
-  # config.java_libs << "lib/java/*.jar"
+  # JRuby and Goldspike are pre-loaded in this list.  Be sure to include your
+  # own versions if you directly set the value
+  # config.java_libs += FileList["lib/java/*.jar"]
 
-  # External gems to be packaged in the webapp.
+  # Gems to be packaged in the webapp.  Note that Rails gems are added to this
+  # list if vendor/rails is not present, so be sure to include rails if you
+  # overwrite the value
   # config.gems = ["ActiveRecord-JDBC", "jruby-openssl"]
   # config.gems << "tzinfo"
 
   # Include gem dependencies not mentioned specifically
   config.gem_dependencies = true
 
-  # Files to be included in the root of the webapp
+  # Files to be included in the root of the webapp.  Note that files in public
+  # will have the leading 'public/' part of the path stripped during staging.
   # config.public_html = FileList["public/**/*", "doc/**/*"]
 
   # Name of the war file (without the .war) -- defaults to the basename
