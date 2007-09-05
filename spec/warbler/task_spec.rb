@@ -33,8 +33,8 @@ describe Warbler::Task do
     end
   end
 
-  def files_should_contain(regex)
-    FileList["#{@config.staging_dir}/**/*"].detect {|f| f =~ regex }.should_not be_nil
+  def file_list(regex)
+    FileList["#{@config.staging_dir}/**/*"].select {|f| f =~ regex }
   end
 
   after(:each) do
@@ -53,20 +53,20 @@ describe Warbler::Task do
   it "should define a public task for copying the public files" do
     define_tasks "public"
     Rake::Task["warble:public"].invoke
-    files_should_contain %r{tasks/warbler\.rake}
+    file_list(%r{tasks/warbler\.rake}).should_not be_nil
   end
 
   it "should define a gems task for unpacking gems" do
     define_tasks "gems"
     Rake::Task["warble:gems"].invoke
-    files_should_contain %r{WEB-INF/gems/gems/rake.*/lib/rake.rb}
-    files_should_contain %r{WEB-INF/gems/specifications/rake.*\.gemspec}
+    file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
+    file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
   end
 
   it "should define a webxml task for creating web.xml" do
     define_tasks "webxml"
     Rake::Task["warble:webxml"].invoke
-    files_should_contain %r{WEB-INF/web.xml$}
+    file_list(%r{WEB-INF/web.xml$}).should_not be_empty
     require 'rexml/document'
     
     elements = File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
@@ -83,7 +83,7 @@ describe Warbler::Task do
   it "should define a java_libs task for copying java libraries" do
     define_tasks "java_libs"
     Rake::Task["warble:java_libs"].invoke
-    files_should_contain %r{WEB-INF/lib/jruby-complete.*\.jar$}
+    file_list(%r{WEB-INF/lib/jruby-complete.*\.jar$}).should_not be_empty
   end
 
   it "should define an app task for copying application files" do
@@ -93,9 +93,9 @@ describe Warbler::Task do
     end
     define_tasks "app"
     Rake::Task["warble:app"].invoke
-    files_should_contain %r{WEB-INF/bin/warble$}
-    files_should_contain %r{WEB-INF/generators/warble/warble_generator\.rb$}
-    files_should_contain %r{WEB-INF/lib/warbler\.rb$}
+    file_list(%r{WEB-INF/bin/warble$}).should_not be_empty
+    file_list(%r{WEB-INF/generators/warble/warble_generator\.rb$}).should_not be_empty
+    file_list(%r{WEB-INF/lib/warbler\.rb$}).should_not be_empty
     gems_ran.should == true
   end
 
@@ -118,6 +118,15 @@ describe Warbler::Task do
     public_ran.should == true
     jar_ran.should == true
     webxml_ran.should == true
+  end
+
+  it "should be able to exclude files from the .war" do
+    @config.dirs << "spec"
+    @config.excludes += FileList['spec/spec_helper.rb']
+    task "warble:gems" do; end
+    define_tasks "app"
+    Rake::Task["warble:app"].invoke
+    file_list(%r{spec/spec_helper.rb}).should be_empty
   end
 
   it "should be able to define all tasks successfully" do

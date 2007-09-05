@@ -71,6 +71,10 @@ module Warbler
       with_namespace_and_config do
         desc "Copy all public HTML files to the root of the .war"
         task "public" => public_target_files
+        task "debug:public" do
+          puts "", "public files:"
+          puts *public_target_files
+        end
       end
     end
 
@@ -80,6 +84,10 @@ module Warbler
       with_namespace_and_config do
         desc "Unpack all gems into WEB-INF/gems"
         task "gems" => targets
+        task "debug:gems" do
+          puts "", "gems files:"
+          puts *targets
+        end
       end
     end
 
@@ -114,6 +122,10 @@ module Warbler
       with_namespace_and_config do |name, config|
         desc "Copy all java libraries into the .war"
         task "java_libs" => target_files
+        task "debug:java_libs" do
+          puts "", "java_libs files:"
+          puts *target_files
+        end
       end
       target_files
     end
@@ -123,6 +135,10 @@ module Warbler
       with_namespace_and_config do |name, config|
         desc "Copy all application files into the .war"
         task "app" => ["#{name}:gems", *webinf_target_files]
+        task "debug:app" do
+          puts "", "app files:"
+          puts *webinf_target_files
+        end
       end
     end
 
