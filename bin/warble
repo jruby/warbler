@@ -38,5 +38,10 @@ application.standard_exception_handling do
     end
   end
 
+  desc "Display version of warbler"
+  task :version do
+    puts "Warbler version #{Warbler::VERSION}"
+  end
+
   application.top_level
 end
