@@ -157,6 +157,10 @@ module Warbler
           require 'yaml'
           puts YAML::dump(config)
         end
+        all_debug_tasks = %w(: app java_libs gems public includes excludes).map do |n|
+          n.sub(/^:?/, "#{name}:debug:").sub(/:$/, '')
+        end
+        task "debug:all" => all_debug_tasks
       end
     end
 
