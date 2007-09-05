@@ -154,8 +154,8 @@ module Warbler
     def define_debug_task
       with_namespace_and_config do |name, config|
         task "debug" do
-          require 'pp'
-          pp config
+          require 'yaml'
+          puts YAML::dump(config)
         end
       end
     end
@@ -174,9 +174,13 @@ module Warbler
         define_file_task(f, "#{@config.staging_dir}/WEB-INF/#{f}")
       end
       target_files += define_java_libs_task
-      task "#@name:debug:files" do
-        puts "included", *files.include
-        puts "excluded", *files.exclude
+      task "#@name:debug:includes" do
+        puts "", "included files:"
+        puts *files.include
+      end
+      task "#@name:debug:excludes" do
+        puts "", "excluded files:"
+        puts *files.exclude
       end
       target_files
     end

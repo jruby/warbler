@@ -71,6 +71,15 @@ Java web applications are configured mainly through this file, and Warbler creat
 
 For more information on configuration, see Warbler::Config.
 
+=== Troubleshooting
+
+If Warbler isn't packaging the files you were expecting, there are several debug tasks available to give you more insight into what's going on.
+
+* <tt>war:debug</tt> prints a YAML dump of the current configuration
+* <tt>war:debug:X</tt> prints a list of files that Warbler will include during that stage of
+  assembly. Valid values of <tt>X</tt> are <tt>app, java_libs, gems, public, includes,
+  excludes</tt>.
+
 == Caveats
 
 Warbler requires that RAILS_ROOT will effectively be set to /WEB-INF when running inside the war, while the application public files will be in the root directory.  The purpose is to make the application structure match the Java webapp archive structure, where WEB-INF is a protected directory not visible to the web server.  Because of this change, features of Rails that expect the public assets directory to live in RAILS_ROOT/public may not function properly.  However, we feel that the added security of conforming to the webapp structure is worth these minor inconveniences.

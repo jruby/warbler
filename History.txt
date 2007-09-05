@@ -1,3 +1,11 @@
+== 0.9.1
+
+* Bundle Bouncy Castle JCE provider so that Digests work properly. See LICENSES.txt for details of
+  the distribution.
+* Add rake >= 0.7.3 as a dependency in the gem specification.
+* Add debug tasks: war:debug, war:debug:gems, war:debug:public, war:debug:app, war:debug:includes,
+  war:debug:excludes, war:debug:java_libs gives you a breakdown of what Warbler expects to package.
+
 == 0.9
 
 * Birthday! Warbler is a gem to make a .war file out of a Rails project. The intent is to provide a
