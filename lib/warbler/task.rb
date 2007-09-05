@@ -167,13 +167,17 @@ module Warbler
     end
 
     def define_webinf_file_tasks
-      files = FileList[*@config.dirs.map{|d| "#{d}/**/*"}]
-      files.include(*@config.includes.to_a)
-      files.exclude(*@config.excludes.to_a)
+      files = FileList[*(@config.dirs.map{|d| "#{d}/**/*"})]
+      files.include *(@config.includes.to_a)
+      files.exclude *(@config.excludes.to_a)
       target_files = files.map do |f|
         define_file_task(f, "#{@config.staging_dir}/WEB-INF/#{f}")
       end
       target_files += define_java_libs_task
+      task "#@name:debug:files" do
+        puts "included", *files.include
+        puts "excluded", *files.exclude
+      end
       target_files
     end
 

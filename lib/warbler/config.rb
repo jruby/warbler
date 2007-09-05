@@ -77,18 +77,16 @@ module Warbler
       @staging_dir = "tmp/war"
       @dirs        = TOP_DIRS
       @includes    = FileList[]
-      @excludes    = FileList["#{WARBLER_HOME}/**/*"]
+      @excludes    = FileList[]
       @java_libs   = FileList["#{WARBLER_HOME}/lib/*.jar"]
       @gems        = default_gems
       @gem_dependencies = true
       @public_html = FileList["public/**/*"]
       @webxml      = default_webxml_config
-      @war_name    = if defined?(RAILS_ROOT)
-        File.basename(File.expand_path(RAILS_ROOT))
-      else
-        File.basename(File.expand_path(Dir.getwd))  
-      end
+      @rails_root  = File.expand_path(defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)
+      @war_name    = File.basename(@rails_root)
       yield self if block_given?
+      @excludes += warbler_vendor_excludes
       @excludes << @staging_dir
     end
 
@@ -97,6 +95,15 @@ module Warbler
     end
 
     private
+    def warbler_vendor_excludes
+      warbler = File.expand_path(WARBLER_HOME)
+      if warbler =~ %r{^#{@rails_root}/(.*)}
+        FileList["#{$1}"]
+      else
+        []
+      end
+    end
+
     def default_webxml_config
       c = OpenStruct.new
       c.standalone = true
