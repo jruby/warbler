@@ -1,6 +1,8 @@
+#--
 # (c) Copyright 2007 Nick Sieger <nicksieger@gmail.com>
 # See the file LICENSES.txt included with the distribution for
 # software license details.
+#++
 
 require File.dirname(__FILE__) + '/../spec_helper'
 
@@ -31,8 +33,7 @@ describe Warbler::Config do
 
   it "should provide Rails gems by default, unless vendor/rails is present" do
     config = Warbler::Config.new
-    config.gems.should include("rails", "activesupport", 
-      "activerecord", "actionpack", "actionmailer", "actionwebservice")
+    config.gems.should include("rails")
 
     mkdir_p "vendor/rails"
     config = Warbler::Config.new

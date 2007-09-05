@@ -1,6 +1,8 @@
+#--
 # (c) Copyright 2007 Nick Sieger <nicksieger@gmail.com>
 # See the file LICENSES.txt included with the distribution for
 # software license details.
+#++
 
 require 'rake'
 require 'rake/tasklib'
@@ -60,6 +62,7 @@ module Warbler
           rm_rf config.staging_dir
           rm_f "#{config.war_name}.war"
         end
+        task "clear" => "#{name}:clean"
       end
     end
 
@@ -68,26 +71,29 @@ module Warbler
       with_namespace_and_config do
         desc "Copy all public HTML files to the root of the .war"
         task "public" => public_target_files
+        task "debug:public" do
+          puts "", "public files:"
+          puts *public_target_files
+        end
       end
     end
 
     def define_gems_task
-      with_namespace_and_config do |name, config|
+      directory "#{@config.gem_target_path}/gems"
+      targets = define_copy_gems_tasks
+      with_namespace_and_config do
         desc "Unpack all gems into WEB-INF/gems"
-        task "gems" do
-          gem_dir = "#{config.staging_dir}/WEB-INF/gems"
-          mkdir_p gem_dir
-          Dir.chdir(gem_dir) do
-            config.gems.each do |gem|
-              ruby "-S", "gem", "unpack", gem
-            end
-          end
+        task "gems" => targets
+        task "debug:gems" do
+          puts "", "gems files:"
+          puts *targets
         end
       end
     end
 
     def define_webxml_task
       with_namespace_and_config do |name, config|
+        desc "Generate a web.xml file for the webapp"
         task "webxml" do
           mkdir_p "#{config.staging_dir}/WEB-INF"
           if File.exist?("config/web.xml")
@@ -116,6 +122,10 @@ module Warbler
       with_namespace_and_config do |name, config|
         desc "Copy all java libraries into the .war"
         task "java_libs" => target_files
+        task "debug:java_libs" do
+          puts "", "java_libs files:"
+          puts *target_files
+        end
       end
       target_files
     end
@@ -125,6 +135,10 @@ module Warbler
       with_namespace_and_config do |name, config|
         desc "Copy all application files into the .war"
         task "app" => ["#{name}:gems", *webinf_target_files]
+        task "debug:app" do
+          puts "", "app files:"
+          puts *webinf_target_files
+        end
       end
     end
 
@@ -140,9 +154,13 @@ module Warbler
     def define_debug_task
       with_namespace_and_config do |name, config|
         task "debug" do
-          require 'pp'
-          pp config
+          require 'yaml'
+          puts YAML::dump(config)
         end
+        all_debug_tasks = %w(: app java_libs gems public includes excludes).map do |n|
+          n.sub(/^:?/, "#{name}:debug:").sub(/:$/, '')
+        end
+        task "debug:all" => all_debug_tasks
       end
     end
 
@@ -153,13 +171,21 @@ module Warbler
     end
 
     def define_webinf_file_tasks
-      files = FileList[*@config.dirs.map{|d| "#{d}/**/*"}]
-      files.include(*@config.includes.to_a)
-      files.exclude(*@config.excludes.to_a)
+      files = FileList[*(@config.dirs.map{|d| "#{d}/**/*"})]
+      files.include *(@config.includes.to_a)
+      files.exclude *(@config.excludes.to_a)
       target_files = files.map do |f|
         define_file_task(f, "#{@config.staging_dir}/WEB-INF/#{f}")
       end
       target_files += define_java_libs_task
+      task "#@name:debug:includes" do
+        puts "", "included files:"
+        puts *files.include
+      end
+      task "#@name:debug:excludes" do
+        puts "", "excluded files:"
+        puts *files.exclude
+      end
       target_files
     end
 
@@ -179,6 +205,42 @@ module Warbler
       name, config = @name, @config
       namespace name do
         yield name, config
+      end
+    end
+
+    def define_copy_gems_tasks
+      targets = []
+      @config.gems.each do |gem|
+        define_single_gem_tasks(gem, targets)
+      end
+      targets
+    end
+
+    def define_single_gem_tasks(gem, targets, version = nil)
+      matched = Gem.source_index.search(gem, version)
+      fail "gem '#{gem}' not installed" if matched.empty?
+      spec = matched.last
+      
+      gem_unpack_task_name = "gem:#{spec.name}-#{spec.version}"
+      return if Rake::Task.task_defined?(gem_unpack_task_name)
+
+      targets << define_file_task(spec.loaded_from, 
+        "#{config.gem_target_path}/specifications/#{File.basename(spec.loaded_from)}")
+
+      task targets.last do
+        Rake::Task[gem_unpack_task_name].invoke
+      end
+
+      task gem_unpack_task_name => ["#{config.gem_target_path}/gems"] do |t|
+        Dir.chdir(t.prerequisites.last) do
+          ruby "-S", "gem", "unpack", "-v", spec.version.to_s, spec.name
+        end
+      end
+
+      if @config.gem_dependencies
+        spec.dependencies.each do |dep|
+          define_single_gem_tasks(dep.name, targets, dep.version_requirements)
+        end
       end
     end
 
