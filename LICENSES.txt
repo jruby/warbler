@@ -33,5 +33,3 @@ JRuby (jruby-complete-*.jar) is distrubuted under the terms of the Common Public
 JavaBeans Activation Framework (activation-*.jar) is distributed under the terms of the Common Development and Distribution License (CDDL) v1.0, see http://www.sun.com/cddl/cddl.html for details.
 
 Commons-pool (commons-pool-*.jar) is distributed under the terms of the Apache Software License, version 2.0. See http://www.apache.org/licenses/LICENSE-2.0 for details.
-
-The Bouncy Castle JCE provider (bcprov-jdk15-*.jar) is distributed according to the Bouncy Castle License.  See http://www.bouncycastle.org/licence.html for details.
