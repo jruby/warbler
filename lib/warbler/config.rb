@@ -76,12 +76,12 @@ module Warbler
     #   files.
     attr_accessor :webxml
 
-    def initialize
+    def initialize(warbler_home = WARBLER_HOME)
       @staging_dir = "tmp/war"
       @dirs        = TOP_DIRS
       @includes    = FileList[]
       @excludes    = FileList[]
-      @java_libs   = FileList["#{WARBLER_HOME}/lib/*.jar"]
+      @java_libs   = FileList["#{warbler_home}/lib/*.jar"]
       @java_classes = FileList[]
       @gems        = default_gems
       @gem_dependencies = true
@@ -90,7 +90,7 @@ module Warbler
       @rails_root  = File.expand_path(defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)
       @war_name    = File.basename(@rails_root)
       yield self if block_given?
-      @excludes += warbler_vendor_excludes
+      @excludes += warbler_vendor_excludes(warbler_home)
       @excludes << @staging_dir
     end
 
@@ -99,8 +99,8 @@ module Warbler
     end
 
     private
-    def warbler_vendor_excludes
-      warbler = File.expand_path(WARBLER_HOME)
+    def warbler_vendor_excludes(warbler_home)
+      warbler = File.expand_path(warbler_home)
       if warbler =~ %r{^#{@rails_root}/(.*)}
         FileList["#{$1}"]
       else

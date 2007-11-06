@@ -172,7 +172,7 @@ module Warbler
           require 'yaml'
           puts YAML::dump(config)
         end
-        all_debug_tasks = %w(: app java_libs gems public includes excludes).map do |n|
+        all_debug_tasks = %w(: app java_libs java_classes gems public includes excludes).map do |n|
           n.sub(/^:?/, "#{name}:debug:").sub(/:$/, '')
         end
         task "debug:all" => all_debug_tasks
@@ -237,7 +237,8 @@ module Warbler
       fail "gem '#{gem}' not installed" if matched.empty?
       spec = matched.last
       
-      gem_unpack_task_name = "gem:#{spec.name}-#{spec.version}"
+      gem_name = "#{spec.name}-#{spec.version}"
+      gem_unpack_task_name = "gem:#{gem_name}"
       return if Rake::Task.task_defined?(gem_unpack_task_name)
 
       targets << define_file_task(spec.loaded_from, 
@@ -248,9 +249,9 @@ module Warbler
       end
 
       task gem_unpack_task_name => ["#{config.gem_target_path}/gems"] do |t|
-        Dir.chdir(t.prerequisites.last) do
-          ruby "-S", "gem", "unpack", "-v", spec.version.to_s, spec.name
-        end
+        path = File.join(Gem.dir, 'cache', "#{gem_name}.gem")
+        require 'rubygems/installer'
+        Gem::Installer.new(path).unpack(File.join(t.prerequisites.last, gem_name))
       end
 
       if @config.gem_dependencies

@@ -20,10 +20,12 @@ describe Warbler::Task do
     end
     mkdir_p "public"
     touch "public/index.html"
+    verbose(false)
   end
 
   after(:each) do
     rm_rf "public"
+    rm_rf "config"
   end
 
   def define_tasks(*tasks)
@@ -85,6 +87,26 @@ describe Warbler::Task do
     elements.to_a(
       "context-param/param-name[text()='jruby.pool.maxActive']/../param-value"
       ).first.text.should == "5"
+  end
+
+  it "should use a config/web.xml if it exists" do
+    define_tasks "webxml"
+    mkdir_p "config"
+    File.open("config/web.xml", "w") {|f| f << "Hi there" }
+    Rake::Task["warble:webxml"].invoke
+    files = file_list(%r{WEB-INF/web.xml$})
+    files.should_not be_empty
+    File.open(files.first) {|f| f.read}.should == "Hi there"
+  end
+
+  it "should use a config/web.xml.erb if it exists" do
+    define_tasks "webxml"
+    mkdir_p "config"
+    File.open("config/web.xml.erb", "w") {|f| f << "Hi <%= webxml.standalone %>" }
+    Rake::Task["warble:webxml"].invoke
+    files = file_list(%r{WEB-INF/web.xml$})
+    files.should_not be_empty
+    File.open(files.first) {|f| f.read}.should == "Hi true"
   end
 
   it "should define a java_libs task for copying java libraries" do
@@ -180,5 +202,25 @@ describe "The warbler.rake file" do
     output.should =~ /war:java_libs/
     output.should =~ /war:java_classes/
     output.should =~ /war:public/
+  end
+end
+
+describe "Debug targets" do
+  before(:each) do
+    @rake = Rake::Application.new
+    Rake.application = @rake
+    verbose(false)
+    silence { Warbler::Task.new :war, Object.new }
+  end
+
+  it "should print out lists of files" do
+    capture { Rake::Task["war:debug:public"].invoke }.should =~ /public/
+    capture { Rake::Task["war:debug:gems"].invoke }.should =~ /gems/
+    capture { Rake::Task["war:debug:java_libs"].invoke }.should =~ /java_libs/
+    capture { Rake::Task["war:debug:java_classes"].invoke }.should =~ /java_classes/
+    capture { Rake::Task["war:debug:app"].invoke }.should =~ /app/
+    capture { Rake::Task["war:debug:includes"].invoke }.should =~ /include/
+    capture { Rake::Task["war:debug:excludes"].invoke }.should =~ /exclude/
+    capture { Rake::Task["war:debug"].invoke }.should =~ /Config/
   end
 end

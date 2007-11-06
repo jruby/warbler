@@ -39,4 +39,11 @@ describe Warbler::Config do
     config = Warbler::Config.new
     config.gems.should be_empty
   end
+
+  it "should exclude Warbler itself when run as a plugin" do
+    config = Warbler::Config.new
+    config.excludes.include?("vendor/plugins/warbler").should == false
+    config = Warbler::Config.new File.join(Dir.getwd, "vendor", "plugins", "warbler")
+    config.excludes.include?("vendor/plugins/warbler").should == true
+  end
 end

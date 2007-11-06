@@ -33,5 +33,14 @@ task :default => :spec
 
 Spec::Rake::SpecTask.new do |t|
   t.spec_opts ||= []
-  t.spec_opts << "--diff" << "unified"
+  t.spec_opts << "--options" << "spec/spec.opts"
 end
+
+Spec::Rake::SpecTask.new("spec:rcov") do |t|
+  t.rcov = true
+end
+# so we don't confuse autotest
+task "spec:rcov" do
+  rm_f "Manifest.txt"
+end
+task :rcov => "spec:rcov"
