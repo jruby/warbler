@@ -1,7 +1,10 @@
+== 0.9.2
+
+* Update bundled JRuby to version 1.0.2.
+* Add config.java_classes to allow you to copy loose Java classes into WEB-INF/classes.
+
 == 0.9.1
 
-* Bundle Bouncy Castle JCE provider so that Digests work properly. See LICENSES.txt for details of
-  the distribution.
 * Add rake >= 0.7.3 as a dependency in the gem specification.
 * Add debug tasks: war:debug, war:debug:gems, war:debug:public, war:debug:app, war:debug:includes,
   war:debug:excludes, war:debug:java_libs gives you a breakdown of what Warbler expects to package.

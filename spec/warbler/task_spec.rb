@@ -18,6 +18,12 @@ describe Warbler::Task do
       config.public_html = FileList["tasks/**/*"]
       config.webxml.pool.maxActive = 5
     end
+    mkdir_p "public"
+    touch "public/index.html"
+  end
+
+  after(:each) do
+    rm_rf "public"
   end
 
   def define_tasks(*tasks)
@@ -53,6 +59,7 @@ describe Warbler::Task do
   it "should define a public task for copying the public files" do
     define_tasks "public"
     Rake::Task["warble:public"].invoke
+    file_list(%r{index\.html}).should_not be_nil
     file_list(%r{tasks/warbler\.rake}).should_not be_nil
   end
 
@@ -153,6 +160,13 @@ describe Warbler::Task do
       Warbler::Task.new "warble", @config
     }.should raise_error
   end
+
+  it "should define a java_classes task for copying loose java classes" do
+    @config.java_classes = FileList["Rakefile"]
+    define_tasks "java_classes"
+    Rake::Task["warble:java_classes"].invoke
+    file_list(%r{WEB-INF/classes/Rakefile$}).should_not be_empty
+  end
 end
 
 describe "The warbler.rake file" do
@@ -164,6 +178,7 @@ describe "The warbler.rake file" do
     output.should =~ /war:gems/
     output.should =~ /war:jar/
     output.should =~ /war:java_libs/
+    output.should =~ /war:java_classes/
     output.should =~ /war:public/
   end
 end

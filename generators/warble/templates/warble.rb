@@ -18,10 +18,19 @@ Warbler::Config.new do |config|
   # own versions if you directly set the value
   # config.java_libs += FileList["lib/java/*.jar"]
 
+  # Loose Java classes and miscellaneous files to be placed in WEB-INF/classes.
+  # config.java_classes = FileList["target/classes/**.*"]
+
+  # One or more pathmaps defining how the java classes should be copied into
+  # WEB-INF/classes.
+  # See http://rake.rubyforge.org/classes/String.html#M000017 for details of
+  # how to specify a pathmap.
+  # config.java_classes_pathmaps = ["%-2p"]
+
   # Gems to be packaged in the webapp.  Note that Rails gems are added to this
   # list if vendor/rails is not present, so be sure to include rails if you
   # overwrite the value
-  # config.gems = ["ActiveRecord-JDBC", "jruby-openssl"]
+  # config.gems = ["activerecord-jdbc-adapter", "jruby-openssl"]
   # config.gems << "tzinfo"
 
   # Include gem dependencies not mentioned specifically
@@ -30,6 +39,9 @@ Warbler::Config.new do |config|
   # Files to be included in the root of the webapp.  Note that files in public
   # will have the leading 'public/' part of the path stripped during staging.
   # config.public_html = FileList["public/**/*", "doc/**/*"]
+
+  # Pathmaps for controlling how public HTML files are copied into the .war
+  # config.public_html_pathmaps = ["%{public/,}p"]
 
   # Name of the war file (without the .war) -- defaults to the basename
   # of RAILS_ROOT

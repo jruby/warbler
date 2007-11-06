@@ -26,6 +26,9 @@ module Warbler
     # Files to exclude from the WEB-INF directory
     attr_accessor :excludes
 
+    # Java classes and other files to copy to WEB-INF/classes
+    attr_accessor :java_classes
+
     # Java libraries to copy to WEB-INF/lib
     attr_accessor :java_libs
 
@@ -79,6 +82,7 @@ module Warbler
       @includes    = FileList[]
       @excludes    = FileList[]
       @java_libs   = FileList["#{WARBLER_HOME}/lib/*.jar"]
+      @java_classes = FileList[]
       @gems        = default_gems
       @gem_dependencies = true
       @public_html = FileList["public/**/*"]

@@ -130,6 +130,21 @@ module Warbler
       target_files
     end
 
+    def define_java_classes_task
+      target_files = @config.java_classes.map do |f|
+        define_file_task(f, "#{@config.staging_dir}/WEB-INF/classes/#{f}")
+      end
+      with_namespace_and_config do |name, config|
+        desc "Copy java classes into the .war"
+        task "java_classes" => target_files
+        task "debug:java_classes" do
+          puts "", "java_classes files:"
+          puts *target_files
+        end
+      end
+      target_files
+    end
+
     def define_app_task
       webinf_target_files = define_webinf_file_tasks
       with_namespace_and_config do |name, config|
@@ -178,6 +193,7 @@ module Warbler
         define_file_task(f, "#{@config.staging_dir}/WEB-INF/#{f}")
       end
       target_files += define_java_libs_task
+      target_files += define_java_classes_task
       task "#@name:debug:includes" do
         puts "", "included files:"
         puts *files.include
