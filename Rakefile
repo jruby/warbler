@@ -1,4 +1,5 @@
 require 'spec/rake/spectask'
+require 'spec/rake/verify_rcov'
 
 MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt", "LICENSES.txt", "Rakefile",
   "*.erb", "bin/*", "generators/**/*", "lib/**/*", "spec/**/*.rb", "tasks/**/*.rake"]
@@ -29,7 +30,7 @@ end
 # !@#$ no easy way to empty the default list of prerequisites
 Rake::Task['default'].send :instance_variable_set, "@prerequisites", FileList[]
 
-task :default => :spec
+task :default => :rcov
 
 Spec::Rake::SpecTask.new do |t|
   t.spec_opts ||= []
@@ -40,6 +41,10 @@ Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.rcov = true
 end
 # so we don't confuse autotest
+RCov::VerifyTask.new(:rcov) do |t|
+  t.threshold = 100
+end
+
 task "spec:rcov" do
   rm_f "Manifest.txt"
 end

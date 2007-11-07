@@ -79,7 +79,7 @@ module Warbler
     end
 
     def define_gems_task
-      directory "#{@config.gem_target_path}/gems"
+      directory "#{config.staging_dir}/#{apply_pathmaps("sources-0.0.1.gem", :gems).pathmap("%d")}"
       targets = define_copy_gems_tasks
       with_namespace_and_config do
         desc "Unpack all gems into WEB-INF/gems"
@@ -117,7 +117,7 @@ module Warbler
     def define_java_libs_task
       target_files = @config.java_libs.map do |lib|
         define_file_task(lib,
-          "#{@config.staging_dir}/WEB-INF/lib/#{File.basename(lib)}")
+          "#{@config.staging_dir}/#{apply_pathmaps(lib, :java_libs)}")
       end
       with_namespace_and_config do |name, config|
         desc "Copy all java libraries into the .war"
@@ -132,7 +132,8 @@ module Warbler
 
     def define_java_classes_task
       target_files = @config.java_classes.map do |f|
-        define_file_task(f, "#{@config.staging_dir}/WEB-INF/classes/#{f}")
+        define_file_task(f,
+          "#{@config.staging_dir}/#{apply_pathmaps(f, :java_classes)}")
       end
       with_namespace_and_config do |name, config|
         desc "Copy java classes into the .war"
@@ -181,7 +182,7 @@ module Warbler
 
     def define_public_file_tasks
       @config.public_html.map do |f|
-        define_file_task(f, "#{@config.staging_dir}/#{f.sub(%r{public/},'')}")
+        define_file_task(f, "#{@config.staging_dir}/#{apply_pathmaps(f, :public_html)}")
       end
     end
 
@@ -190,7 +191,8 @@ module Warbler
       files.include *(@config.includes.to_a)
       files.exclude *(@config.excludes.to_a)
       target_files = files.map do |f|
-        define_file_task(f, "#{@config.staging_dir}/WEB-INF/#{f}")
+        define_file_task(f,
+          "#{@config.staging_dir}/#{apply_pathmaps(f, :application)}")
       end
       target_files += define_java_libs_task
       target_files += define_java_classes_task
@@ -241,17 +243,19 @@ module Warbler
       gem_unpack_task_name = "gem:#{gem_name}"
       return if Rake::Task.task_defined?(gem_unpack_task_name)
 
-      targets << define_file_task(spec.loaded_from, 
-        "#{config.gem_target_path}/specifications/#{File.basename(spec.loaded_from)}")
+      targets << define_file_task(spec.loaded_from,
+        "#{@config.staging_dir}/#{apply_pathmaps(spec.loaded_from, :gemspecs)}")
 
       task targets.last do
         Rake::Task[gem_unpack_task_name].invoke
       end
 
-      task gem_unpack_task_name => ["#{config.gem_target_path}/gems"] do |t|
-        path = File.join(Gem.dir, 'cache', "#{gem_name}.gem")
+      src = File.join(Gem.dir, 'cache', "#{gem_name}.gem")
+      dest = "#{config.staging_dir}/#{apply_pathmaps(src, :gems)}"
+
+      task gem_unpack_task_name => [dest.pathmap("%d")] do |t|
         require 'rubygems/installer'
-        Gem::Installer.new(path).unpack(File.join(t.prerequisites.last, gem_name))
+        Gem::Installer.new(src).unpack(dest)
       end
 
       if @config.gem_dependencies
@@ -263,6 +267,14 @@ module Warbler
 
     def erb_binding(webxml)
       binding
+    end
+
+    def apply_pathmaps(file, pathmaps)
+      pathmaps = @config.pathmaps.send(pathmaps)
+      pathmaps.each do |p|
+        file = file.pathmap(p)
+      end if pathmaps
+      file
     end
   end
 end

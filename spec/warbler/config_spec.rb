@@ -20,6 +20,8 @@ describe Warbler::Config do
     config.war_name.size.should > 0
     config.webxml.should be_kind_of(OpenStruct)
     config.webxml.pool.should be_kind_of(OpenStruct)
+    config.pathmaps.should be_kind_of(OpenStruct)
+    config.pathmaps.public_html.should == ["%{public/,}p"]
   end
 
   it "should allow configuration through an initializer block" do

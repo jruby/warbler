@@ -10,20 +10,22 @@ describe Warbler::Task do
   before(:each) do
     @rake = Rake::Application.new
     Rake.application = @rake
+    mkdir_p "public"
+    touch "public/index.html"
     @config = Warbler::Config.new do |config|
       config.staging_dir = "pkg/tmp/war"
       config.war_name = "warbler"
       config.gems = ["rake"]
       config.dirs = %w(bin generators lib)
-      config.public_html = FileList["tasks/**/*"]
+      config.public_html = FileList["public/**/*", "tasks/**/*"]
       config.webxml.pool.maxActive = 5
     end
-    mkdir_p "public"
-    touch "public/index.html"
     verbose(false)
   end
 
   after(:each) do
+    define_tasks "clean"
+    Rake::Task["warble:clean"].invoke
     rm_rf "public"
     rm_rf "config"
   end
@@ -45,12 +47,6 @@ describe Warbler::Task do
     FileList["#{@config.staging_dir}/**/*"].select {|f| f =~ regex }
   end
 
-  after(:each) do
-    define_tasks "clean"
-    Rake::Task["warble:clean"].invoke
-    rm_rf "config"
-  end
-
   it "should define a clean task for removing the staging directory" do
     define_tasks "clean"
     mkdir_p @config.staging_dir
@@ -61,8 +57,8 @@ describe Warbler::Task do
   it "should define a public task for copying the public files" do
     define_tasks "public"
     Rake::Task["warble:public"].invoke
-    file_list(%r{index\.html}).should_not be_nil
-    file_list(%r{tasks/warbler\.rake}).should_not be_nil
+    file_list(%r{^#{@config.staging_dir}/index\.html}).should_not be_empty
+    file_list(%r{tasks/warbler\.rake}).should_not be_empty
   end
 
   it "should define a gems task for unpacking gems" do

@@ -41,6 +41,11 @@ module Warbler
     # Public HTML directory file list, to be copied into the root of the war
     attr_accessor :public_html
 
+    # Container of pathmaps used for specifying source-to-destination transformations
+    # under various situations (<tt>public_html</tt> and <tt>java_classes</tt> are two
+    # entries in this structure).
+    attr_accessor :pathmaps
+
     # Name of war file (without the .war), defaults to the directory name containing
     # the Rails application
     attr_accessor :war_name
@@ -86,16 +91,13 @@ module Warbler
       @gems        = default_gems
       @gem_dependencies = true
       @public_html = FileList["public/**/*"]
+      @pathmaps    = default_pathmaps
       @webxml      = default_webxml_config
       @rails_root  = File.expand_path(defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)
       @war_name    = File.basename(@rails_root)
       yield self if block_given?
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes << @staging_dir
-    end
-
-    def gem_target_path
-      "#{@staging_dir}/WEB-INF/gems"
     end
 
     private
@@ -106,6 +108,17 @@ module Warbler
       else
         []
       end
+    end
+
+    def default_pathmaps
+      p = OpenStruct.new
+      p.public_html  = ["%{public/,}p"]
+      p.java_libs    = ["WEB-INF/lib/%f"]
+      p.java_classes = ["WEB-INF/classes/%p"]
+      p.application  = ["WEB-INF/%p"]
+      p.gemspecs     = ["WEB-INF/gems/specifications/%f"]
+      p.gems         = ["WEB-INF/gems/gems/%n"]
+      p
     end
 
     def default_webxml_config

@@ -22,10 +22,10 @@ Warbler::Config.new do |config|
   # config.java_classes = FileList["target/classes/**.*"]
 
   # One or more pathmaps defining how the java classes should be copied into
-  # WEB-INF/classes.
-  # See http://rake.rubyforge.org/classes/String.html#M000017 for details of
-  # how to specify a pathmap.
-  # config.java_classes_pathmaps = ["%-2p"]
+  # WEB-INF/classes. The example pathmap below accompanies the java_classes
+  # configuration above. See http://rake.rubyforge.org/classes/String.html#M000017
+  # for details of how to specify a pathmap.
+  # config.pathmaps.java_classes << "%{target/classes/,}"
 
   # Gems to be packaged in the webapp.  Note that Rails gems are added to this
   # list if vendor/rails is not present, so be sure to include rails if you
@@ -41,7 +41,7 @@ Warbler::Config.new do |config|
   # config.public_html = FileList["public/**/*", "doc/**/*"]
 
   # Pathmaps for controlling how public HTML files are copied into the .war
-  # config.public_html_pathmaps = ["%{public/,}p"]
+  # config.pathmaps.public_html = ["%{public/,}p"]
 
   # Name of the war file (without the .war) -- defaults to the basename
   # of RAILS_ROOT
