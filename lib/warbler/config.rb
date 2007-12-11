@@ -82,7 +82,7 @@ module Warbler
     attr_accessor :webxml
 
     def initialize(warbler_home = WARBLER_HOME)
-      @staging_dir = "tmp/war"
+      @staging_dir = File.join("tmp", "war")
       @dirs        = TOP_DIRS
       @includes    = FileList[]
       @excludes    = FileList[]

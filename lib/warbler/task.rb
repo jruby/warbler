@@ -162,7 +162,7 @@ module Warbler
       with_namespace_and_config do |name, config|
         desc "Run the jar command to create the .war"
         task "jar" do
-          sh "jar", "cf", "#{config.war_name}.war", "-C", config.staging_dir, "."
+          sh "jar cf #{config.war_name}.war -C #{config.staging_dir} ."
         end
       end
     end
