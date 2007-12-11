@@ -2,6 +2,8 @@
 
 * Update bundled JRuby to version 1.0.2.
 * Add config.java_classes to allow you to copy loose Java classes into WEB-INF/classes.
+* Make jar command a single command string so that jar creation doesn't fail (works around bug in JRuby 1.0.2)
+* Use File.join to form staging directory, should produce the proper jar-command path in Windows
 
 == 0.9.1
 
