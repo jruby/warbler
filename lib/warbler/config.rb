@@ -11,6 +11,7 @@ module Warbler
   class Config
     TOP_DIRS = %w(app config lib log vendor tmp)
     FILE = "config/warble.rb"
+    BUILD_GEMS = %w(warbler rake rcov)
 
     # Directory where files will be staged, defaults to tmp/war
     attr_accessor :staging_dir
@@ -100,6 +101,10 @@ module Warbler
       @excludes << @staging_dir
     end
 
+    def gems=(value)
+      @gems = Warbler::Gems.new(value)
+    end
+
     private
     def warbler_vendor_excludes(warbler_home)
       warbler = File.expand_path(warbler_home)
@@ -130,7 +135,15 @@ module Warbler
     end
 
     def default_gems
-      File.directory?("vendor/rails") ? [] : ["rails"]
+      gems = Warbler::Gems.new
+      # Include all gems which are used by the web application, this only works when run as a plugin
+      #for gem in Gem.loaded_specs.values
+      #  next if BUILD_GEMS.include?(gem.name)
+      #  gems[gem.name] = gem.version.version
+      #end
+      gems << "rails" unless File.directory?("vendor/rails")
+      gems
     end
+    
   end
 end

@@ -48,4 +48,10 @@ describe Warbler::Config do
     config = Warbler::Config.new File.join(Dir.getwd, "vendor", "plugins", "warbler")
     config.excludes.include?("vendor/plugins/warbler").should == true
   end
+  
+  #it "should automatically gems used by the web application" do
+  #  gem "actionpack"
+  #  config = Warbler::Config.new
+  #  config.gems.should include("actionpack")
+  #end
 end

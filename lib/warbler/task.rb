@@ -228,8 +228,8 @@ module Warbler
 
     def define_copy_gems_tasks
       targets = []
-      @config.gems.each do |gem|
-        define_single_gem_tasks(gem, targets)
+      @config.gems.each do |gem, version|
+        define_single_gem_tasks(gem, targets, version)
       end
       targets
     end

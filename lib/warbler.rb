@@ -10,6 +10,7 @@ module Warbler
   WARBLER_HOME = File.expand_path(File.dirname(__FILE__) + '/..') unless defined?(WARBLER_HOME)
 end
 
+require 'warbler/gems'
 require 'warbler/config'
 require 'warbler/task'
 require 'warbler/version'
