@@ -100,7 +100,7 @@ Warbler source is not currently located in Rubyforge's SVN.  To get the source:
 
 Warbler is provided under the terms of the MIT license.
 
-    Warbler (c) 2007 Nick Sieger <nicksieger@gmail.com>
+    Warbler (c) 2007-08 Nick Sieger <nicksieger@gmail.com>
 
 Warbler also bundles several other pieces of software. Please read the file LICENSES.txt to ensure
 that you agree with the terms of all the components.
