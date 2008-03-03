@@ -240,6 +240,16 @@ module Warbler
       spec = matched.last
       
       gem_name = "#{spec.name}-#{spec.version}"
+      unless spec.platform.nil? || spec.platform == Gem::Platform::RUBY
+        [spec.platform, spec.original_platform].each do |p|
+          name = "#{gem_name}-#{p}"
+          if File.exist?(File.join(Gem.dir, 'cache', "#{name}.gem"))
+            gem_name = name
+            break
+          end
+        end
+      end
+
       gem_unpack_task_name = "gem:#{gem_name}"
       return if Rake::Task.task_defined?(gem_unpack_task_name)
 

@@ -179,6 +179,20 @@ describe Warbler::Task do
     }.should raise_error
   end
 
+  it "should handle platform-specific gems" do
+    spec = mock "gem spec"
+    spec.stub!(:name).and_return "hpricot"
+    spec.stub!(:version).and_return "0.6.157"
+    spec.stub!(:platform).and_return "java"
+    spec.stub!(:original_platform).and_return "java"
+    spec.stub!(:loaded_from).and_return "hpricot.gemspec"
+    spec.stub!(:dependencies).and_return []
+    Gem.source_index.should_receive(:search).with("hpricot", nil).and_return [spec]
+    File.should_receive(:exist?).with(File.join(Gem.dir, 'cache', "hpricot-0.6.157-java.gem")).and_return true
+    @config.gems = ["hpricot"]
+    define_tasks "gems"
+  end
+
   it "should define a java_classes task for copying loose java classes" do
     @config.java_classes = FileList["Rakefile"]
     define_tasks "java_classes"
