@@ -1,5 +1,6 @@
 == 0.9.4
 
+* Update bundled JRuby to 1.1RC3 and Goldspike to 1.6.
 * Fix inclusion of gems with platform-specific bits (e.g., Hpricot)
 
 == 0.9.3

@@ -39,7 +39,9 @@ end
 
 Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.rcov = true
+  t.rcov_opts << '--exclude gems/*'
 end
+
 # so we don't confuse autotest
 RCov::VerifyTask.new(:rcov) do |t|
   t.threshold = 100
