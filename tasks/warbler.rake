@@ -1,22 +1,18 @@
 #--
-# (c) Copyright 2007 Nick Sieger <nicksieger@gmail.com>
+# (c) Copyright 2007-2008 Nick Sieger <nicksieger@gmail.com>
 # See the file LICENSES.txt included with the distribution for
 # software license details.
 #++
 
 begin
-  # First, try w/o activating gem or touching load path
+  # First, make sure plugin directory is at the front of the load path
+  # (to avoid picking up gem-installed warbler)
+  $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib')
   require 'warbler'
 rescue LoadError
-  begin
-    # Next, try activating the gem
-    gem 'warbler'
-    require 'warbler'
-  rescue Gem::LoadError
-    # Last, add our lib dir to the load path, and try again
-    $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib')
-    require 'warbler'
-  end
+  # Next, try activating the gem
+  gem 'warbler'
+  require 'warbler'
 end
 
 Warbler::Task.new

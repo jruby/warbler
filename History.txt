@@ -1,3 +1,8 @@
+== 0.9.5
+
+* Fix bug in plugin warbler.rake task file that would favor loading warbler from gems before the version 
+  installed as a plugin
+
 == 0.9.4
 
 * Update bundled JRuby to 1.1RC3 and Goldspike to 1.6.
