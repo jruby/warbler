@@ -92,9 +92,13 @@ For Rails 1.2.3, the items that may need your attention are:
 
 == Source
 
-Warbler source is not currently located in Rubyforge's SVN.  To get the source:
+You can get the Warbler source using Git, in any of the following ways:
 
-    svn co http://svn.caldersphere.net/svn/main/rubyforge/warbler/trunk warbler
+    git clone git://git.caldersphere.net/warbler.git
+    git clone http://git.caldersphere.net/warbler.git
+    git clone git://github.com/nicksieger/warbler.git
+
+You can also download a tarball of Warbler source at http://github.com/nicksieger/warbler/tree/master.
 
 == License
 
