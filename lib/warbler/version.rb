@@ -1,5 +1,5 @@
 #--
-# (c) Copyright 2007-2008 Nick Sieger <nicksieger@gmail.com>
+# (c) Copyright 2007-2008 Sun Microsystems, Inc.
 # See the file LICENSES.txt included with the distribution for
 # software license details.
 #++

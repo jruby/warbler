@@ -2,7 +2,7 @@
 
 Warbler is provided under the terms of the MIT license.
 
-(c) Copyright 2007-08 Nick Sieger <nicksieger@gmail.com>
+(c) Copyright 2007-2008 Sun Microsystems, Inc.
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation files
@@ -26,10 +26,20 @@ SOFTWARE.
 
 = Additional Bundled Software
 
-Goldspike (goldspike-*.jar) is distributed under the terms of the MIT license.  See http://jruby-extras.rubyforge.org/svn/trunk/rails-integration/LICENSE.txt for details.
+Goldspike (goldspike-*.jar) is distributed under the terms of the MIT license.
+See http://jruby-extras.rubyforge.org/svn/trunk/rails-integration/LICENSE.txt
+for details.
 
-JRuby (jruby-complete-*.jar) is distrubuted under the terms of the Common Public License. See http://www.eclipse.org/legal/cpl-v10.html for details. At your option, JRuby is also available under the GPL or LGPL licenses.  See the file COPYING in the JRuby distribution for details (http://svn.codehaus.org/jruby/trunk/jruby/COPYING).
+JRuby (jruby-complete-*.jar) is distrubuted under the terms of the Common
+Public License. See http://www.eclipse.org/legal/cpl-v10.html for details. At
+your option, JRuby is also available under the GPL or LGPL licenses. See the
+file COPYING in the JRuby distribution for details
+(http://svn.codehaus.org/jruby/trunk/jruby/COPYING).
 
-JavaBeans Activation Framework (activation-*.jar) is distributed under the terms of the Common Development and Distribution License (CDDL) v1.0, see http://www.sun.com/cddl/cddl.html for details.
+JavaBeans Activation Framework (activation-*.jar) is distributed under the
+terms of the Common Development and Distribution License (CDDL) v1.0, see
+http://www.sun.com/cddl/cddl.html for details.
 
-Commons-pool (commons-pool-*.jar) is distributed under the terms of the Apache Software License, version 2.0. See http://www.apache.org/licenses/LICENSE-2.0 for details.
+Commons-pool (commons-pool-*.jar) is distributed under the terms of the Apache
+Software License, version 2.0. See http://www.apache.org/licenses/LICENSE-2.0
+for details.
