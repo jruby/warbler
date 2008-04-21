@@ -1,5 +1,5 @@
 #--
-# (c) Copyright 2008 Robert Egglestone <r.egglestone@auckland.ac.nz>
+# (c) Copyright 2007-2008 Sun Microsystems, Inc.
 # See the file LICENSES.txt included with the distribution for
 # software license details.
 #++
