@@ -13,8 +13,8 @@ Warbler::Config.new do |config|
   # config.excludes = FileList["lib/tasks/*"]
 
   # Additional Java .jar files to include.  Note that if .jar files are placed
-  # in lib (and not otherwise excluded) then they need not be mentioned here
-  # JRuby and Goldspike are pre-loaded in this list.  Be sure to include your
+  # in lib (and not otherwise excluded) then they need not be mentioned here.
+  # JRuby and JRuby-Rack are pre-loaded in this list.  Be sure to include your
   # own versions if you directly set the value
   # config.java_libs += FileList["lib/java/*.jar"]
 
@@ -48,21 +48,17 @@ Warbler::Config.new do |config|
   # of RAILS_ROOT
   # config.war_name = "mywar"
 
-  # True if the webapp has no external dependencies
-  config.webxml.standalone = true
-
-  # Location of JRuby, required for non-standalone apps
-  # config.webxml.jruby_home = <jruby/home>
-
   # Value of RAILS_ENV for the webapp
-  config.webxml.rails_env = 'production'
+  config.webxml.rails.env = 'production'
 
-  # Control the pool of Rails runtimes
-  # (Goldspike-specific; see README for details)
-  # config.webxml.pool.maxActive = 4
-  # config.webxml.pool.minIdle = 2
-  # config.webxml.pool.checkInterval = 0
-  # config.webxml.pool.maxWait = 30000
+  # Application booter to use, one of :rack, :rails, or :merb. (Default :rails)
+  # config.webxml.booter = :rails
+
+  # Control the pool of Rails runtimes. Leaving unspecified means
+  # the pool will grow as needed to service requests. It is recommended
+  # that you fix these values when running a production server!
+  # config.webxml.min.runtimes = 2
+  # config.webxml.max.runtimes = 4
 
   # JNDI data source name
   # config.webxml.jndi = 'jdbc/rails'

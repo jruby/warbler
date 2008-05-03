@@ -19,7 +19,6 @@ describe Warbler::Config do
     config.java_libs.should_not be_empty
     config.war_name.size.should > 0
     config.webxml.should be_kind_of(OpenStruct)
-    config.webxml.pool.should be_kind_of(OpenStruct)
     config.pathmaps.should be_kind_of(OpenStruct)
     config.pathmaps.public_html.should == ["%{public/,}p"]
   end
@@ -48,7 +47,35 @@ describe Warbler::Config do
     config = Warbler::Config.new File.join(Dir.getwd, "vendor", "plugins", "warbler")
     config.excludes.include?("vendor/plugins/warbler").should == true
   end
-  
+
+  it "should generate context parameters from the webxml openstruct" do
+    config = Warbler::Config.new
+    config.webxml.a.b.c = "123"
+    config.webxml.rails.env = 'staging'
+    config.webxml.jruby.min.runtimes = 2
+    config.webxml.jruby.max.runtimes = 4
+    params = config.webxml.context_params
+    params.should have_key('a.b.c')
+    params.should have_key('rails.env')
+    params.should have_key('jruby.min.runtimes')
+    params.should have_key('jruby.max.runtimes')
+    params['a.b.c'].should == "123"
+    params['rails.env'].should == "staging"
+    params['jruby.min.runtimes'].should == "2"
+    params['jruby.max.runtimes'].should == "4"
+  end
+
+  it "should determine the context listener from the webxml.booter parameter" do
+    config = Warbler::Config.new
+    config.webxml.booter = :rack
+    config.webxml.servlet_context_listener.should == "org.jruby.rack.RackServletContextListener"
+    config = Warbler::Config.new
+    config.webxml.booter = :merb
+    config.webxml.servlet_context_listener.should == "org.jruby.rack.merb.MerbServletContextListener"
+    config = Warbler::Config.new
+    config.webxml.servlet_context_listener.should == "org.jruby.rack.rails.RailsServletContextListener"
+  end
+
   #it "should automatically gems used by the web application" do
   #  gem "actionpack"
   #  config = Warbler::Config.new

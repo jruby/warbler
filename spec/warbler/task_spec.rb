@@ -18,7 +18,7 @@ describe Warbler::Task do
       config.gems = ["rake"]
       config.dirs = %w(bin generators lib)
       config.public_html = FileList["public/**/*", "tasks/**/*"]
-      config.webxml.pool.maxActive = 5
+      config.webxml.jruby.max.runtimes = 5
     end
     verbose(false)
   end
@@ -73,15 +73,15 @@ describe Warbler::Task do
     Rake::Task["warble:webxml"].invoke
     file_list(%r{WEB-INF/web.xml$}).should_not be_empty
     require 'rexml/document'
-    
+
     elements = File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
       REXML::Document.new(f).root.elements
     end
     elements.to_a(
-      "context-param/param-name[text()='jruby.pool.maxActive']"
+      "context-param/param-name[text()='jruby.max.runtimes']"
       ).should_not be_empty
     elements.to_a(
-      "context-param/param-name[text()='jruby.pool.maxActive']/../param-value"
+      "context-param/param-name[text()='jruby.max.runtimes']/../param-value"
       ).first.text.should == "5"
   end
 
@@ -98,11 +98,11 @@ describe Warbler::Task do
   it "should use a config/web.xml.erb if it exists" do
     define_tasks "webxml"
     mkdir_p "config"
-    File.open("config/web.xml.erb", "w") {|f| f << "Hi <%= webxml.standalone %>" }
+    File.open("config/web.xml.erb", "w") {|f| f << "Hi <%= webxml.public.root %>" }
     Rake::Task["warble:webxml"].invoke
     files = file_list(%r{WEB-INF/web.xml$})
     files.should_not be_empty
-    File.open(files.first) {|f| f.read}.should == "Hi true"
+    File.open(files.first) {|f| f.read}.should == "Hi /"
   end
 
   it "should define a java_libs task for copying java libraries" do

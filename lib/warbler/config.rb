@@ -127,10 +127,10 @@ module Warbler
     end
 
     def default_webxml_config
-      c = OpenStruct.new
-      c.standalone = true
-      c.rails_env  = "production"
-      c.pool       = OpenStruct.new
+      c = WebxmlOpenStruct.new
+      c.rails.env  = "production"
+      c.public.root = '/'
+      c.jndi = nil
       c
     end
 
@@ -144,6 +144,38 @@ module Warbler
       gems << "rails" unless File.directory?("vendor/rails")
       gems
     end
-    
+  end
+
+  class WebxmlOpenStruct < OpenStruct
+    def initialize
+      @table = Hash.new {|h,k| h[k] = WebxmlOpenStruct.new }
+    end
+
+    def servlet_context_listener
+      case self.booter
+      when :rack
+        "org.jruby.rack.RackServletContextListener"
+      when :merb
+        "org.jruby.rack.merb.MerbServletContextListener"
+      else # :rails, default
+        "org.jruby.rack.rails.RailsServletContextListener"
+      end
+    end
+
+    def context_params
+      params = {}
+      @table.each do |k,v|
+        case v
+        when WebxmlOpenStruct
+          nested_params = v.context_params
+          nested_params.each do |nk,nv|
+            params["#{k}.#{nk}"] = nv
+          end
+        else
+          params[k] = v.to_s
+        end
+      end
+      params
+    end
   end
 end
