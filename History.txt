@@ -1,3 +1,15 @@
+== 0.9.9
+
+* Now shipping with JRuby-Rack 0.9!
+* Upgrade to JRuby 1.1.1
+* warble.rb and web.xml.erb have changed as a result of the change to JRuby-Rack -- we
+  recommend comparing the new base copies with any existing configuration you have to
+  make sure you pick up the differences.
+* Config changes:
+** config.webxml.booter chooses what kind of application to use (:rails, :merb or plain :rack).
+** config.webxml.pool.* have been replaced by config.webxml.jruby.(min|max).runtimes
+** config.webxml.standalone and config.webxml.jruby_home no longer have any effect.
+
 == 0.9.5
 
 * Fix bug in plugin warbler.rake task file that would favor loading warbler from gems before the version 
