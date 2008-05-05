@@ -51,35 +51,25 @@ module Warbler
     # the Rails application
     attr_accessor :war_name
 
-    # Extra configuration for web.xml/goldspike. These options are particular
-    # to Goldspike's Rails servlet and web.xml file.
-    #  
-    # * <tt>webxml.standalone</tt> -- whether the .war file is "standalone",
-    #   meaning JRuby, all java and gem dependencies are completely embedded
-    #   in file.  One of +true+ (default) or +false+.
-    # * <tt>webxml.jruby_home</tt> -- required if standalone is false.  The
-    #   directory containing the JRuby installation to use when the app is
-    #   running.
-    # * <tt>webxml.rails_env</tt> -- the Rails environment to use for the
+    # Extra configuration for web.xml. Controls how the dynamically-generated web.xml
+    # file is generated.
+    #
+    # * <tt>webxml.jndi</tt> -- the name of one or more JNDI data sources name to be
+    #   available to the application. Places appropriate &lt;resource-ref&gt; entries
+    #   in the file.
+    # * <tt>webxml.ignored</tt> -- array of key names that will be not used to
+    #   generate a context param. Defaults to ['jndi', 'booter']
+    #
+    # Any other key/value pair placed in the open structure will be dumped as a
+    # context parameter in the web.xml file. Some of the recognized values are:
+    #
+    # * <tt>webxml.rails.env</tt> -- the Rails environment to use for the
     #   running application, usually either development or production (the
     #   default).
-    # * <tt>webxml.pool.maxActive</tt> -- maximum number of pooled Rails
-    #   application runtimes (default 4)
-    # * <tt>webxml.pool.minIdle</tt> -- minimum number of pooled runtimes to
-    #   keep around during idle time (default 2)
-    # * <tt>webxml.pool.checkInterval</tt> -- how often to check whether the
-    #   pool size is within minimum and maximum limits, in milliseconds
-    #   (default 0)
-    # * <tt>webxml.pool.maxWait</tt> -- how long a waiting thread should wait
-    #   for a runtime before giving up, in milliseconds (default 30000)
-    # * <tt>webxml.jndi</tt> -- the name of a JNDI data source name to be
-    #   available to the application
-    # * <tt>webxml.servlet_name</tt> -- the name of the servlet to receive all
-    #   requests.  One of +files+ or +rails+.  Goldspike's default behavior is
-    #   to route first through the FileServlet, and if the file isn't found,
-    #   it is forwarded to the RailsServlet.  Use +rails+ if your application
-    #   server is fronted by Apache or something else that will handle static
-    #   files.
+    # * <tt>webxml.jruby.min.runtimes</tt> -- minimum number of pooled runtimes to
+    #   keep around during idle time
+    # * <tt>webxml.jruby.max.runtimes</tt> -- maximum number of pooled Rails
+    #   application runtimes
     attr_accessor :webxml
 
     def initialize(warbler_home = WARBLER_HOME)
@@ -131,6 +121,7 @@ module Warbler
       c.rails.env  = "production"
       c.public.root = '/'
       c.jndi = nil
+      c.ignored = %w(jndi booter)
       c
     end
 
@@ -175,6 +166,8 @@ module Warbler
           params[k] = v.to_s
         end
       end
+      params.delete 'ignored'
+      self.ignored.each {|k| params.delete k }
       params
     end
   end

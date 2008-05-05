@@ -85,6 +85,51 @@ describe Warbler::Task do
       ).first.text.should == "5"
   end
 
+  it "should include custom context parameters" do
+    @config.webxml.some.custom.config = "myconfig"
+    define_tasks "webxml"
+    Rake::Task["warble:webxml"].invoke
+    require 'rexml/document'
+    elements = File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
+      REXML::Document.new(f).root.elements
+    end
+    elements.to_a(
+      "context-param/param-name[text()='some.custom.config']"
+      ).should_not be_empty
+    elements.to_a(
+      "context-param/param-name[text()='some.custom.config']/../param-value"
+      ).first.text.should == "myconfig"
+  end
+
+  it "should allow one jndi resource to be included" do
+    @config.webxml.jndi = 'jndi/rails'
+    define_tasks "webxml"
+    Rake::Task["warble:webxml"].invoke
+    require 'rexml/document'
+    elements = File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
+      REXML::Document.new(f).root.elements
+    end
+    elements.to_a(
+      "resource-ref/res-ref-name[text()='jndi/rails']"
+      ).should_not be_empty
+  end
+
+  it "should allow multiple jndi resources to be included" do
+    @config.webxml.jndi = ['jndi/rails1', 'jndi/rails2']
+    define_tasks "webxml"
+    Rake::Task["warble:webxml"].invoke
+    require 'rexml/document'
+    elements = File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
+      REXML::Document.new(f).root.elements
+    end
+    elements.to_a(
+      "resource-ref/res-ref-name[text()='jndi/rails1']"
+      ).should_not be_empty
+    elements.to_a(
+      "resource-ref/res-ref-name[text()='jndi/rails2']"
+      ).should_not be_empty
+  end
+
   it "should use a config/web.xml if it exists" do
     define_tasks "webxml"
     mkdir_p "config"

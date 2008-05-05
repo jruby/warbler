@@ -76,6 +76,11 @@ describe Warbler::Config do
     config.webxml.servlet_context_listener.should == "org.jruby.rack.rails.RailsServletContextListener"
   end
 
+  it "should not include ignored webxml keys in the context params hash" do
+    Warbler::Config.new.webxml.context_params.should_not have_key('jndi')
+    Warbler::Config.new.webxml.context_params.should_not have_key('booter')
+  end
+
   #it "should automatically gems used by the web application" do
   #  gem "actionpack"
   #  config = Warbler::Config.new
