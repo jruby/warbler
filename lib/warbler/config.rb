@@ -166,8 +166,7 @@ module Warbler
           params[k] = v.to_s
         end
       end
-      params.delete 'ignored'
-      self.ignored.each {|k| params.delete k }
+      params.delete_if {|k,v| ['ignored', *ignored].include?(k) }
       params
     end
   end

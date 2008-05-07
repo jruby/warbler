@@ -77,6 +77,7 @@ describe Warbler::Config do
   end
 
   it "should not include ignored webxml keys in the context params hash" do
+    Warbler::Config.new.webxml.context_params.should_not have_key('ignored')
     Warbler::Config.new.webxml.context_params.should_not have_key('jndi')
     Warbler::Config.new.webxml.context_params.should_not have_key('booter')
   end
