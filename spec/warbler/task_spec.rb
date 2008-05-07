@@ -68,15 +68,17 @@ describe Warbler::Task do
     file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
   end
 
-  it "should define a webxml task for creating web.xml" do
+  def expand_webxml
     define_tasks "webxml"
     Rake::Task["warble:webxml"].invoke
-    file_list(%r{WEB-INF/web.xml$}).should_not be_empty
     require 'rexml/document'
-
-    elements = File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
+    File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
       REXML::Document.new(f).root.elements
     end
+  end
+
+  it "should define a webxml task for creating web.xml" do
+    elements = expand_webxml
     elements.to_a(
       "context-param/param-name[text()='jruby.max.runtimes']"
       ).should_not be_empty
@@ -87,12 +89,7 @@ describe Warbler::Task do
 
   it "should include custom context parameters" do
     @config.webxml.some.custom.config = "myconfig"
-    define_tasks "webxml"
-    Rake::Task["warble:webxml"].invoke
-    require 'rexml/document'
-    elements = File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
-      REXML::Document.new(f).root.elements
-    end
+    elements = expand_webxml
     elements.to_a(
       "context-param/param-name[text()='some.custom.config']"
       ).should_not be_empty
@@ -103,12 +100,7 @@ describe Warbler::Task do
 
   it "should allow one jndi resource to be included" do
     @config.webxml.jndi = 'jndi/rails'
-    define_tasks "webxml"
-    Rake::Task["warble:webxml"].invoke
-    require 'rexml/document'
-    elements = File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
-      REXML::Document.new(f).root.elements
-    end
+    elements = expand_webxml
     elements.to_a(
       "resource-ref/res-ref-name[text()='jndi/rails']"
       ).should_not be_empty
@@ -116,18 +108,28 @@ describe Warbler::Task do
 
   it "should allow multiple jndi resources to be included" do
     @config.webxml.jndi = ['jndi/rails1', 'jndi/rails2']
-    define_tasks "webxml"
-    Rake::Task["warble:webxml"].invoke
-    require 'rexml/document'
-    elements = File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
-      REXML::Document.new(f).root.elements
-    end
+    elements = expand_webxml
     elements.to_a(
       "resource-ref/res-ref-name[text()='jndi/rails1']"
       ).should_not be_empty
     elements.to_a(
       "resource-ref/res-ref-name[text()='jndi/rails2']"
       ).should_not be_empty
+  end
+
+  it "should not include any ignored context parameters" do
+    @config.webxml.foo = "bar"
+    @config.webxml.ignored << "foo"
+    elements = expand_webxml
+    elements.to_a(
+      "context-param/param-name[text()='foo']"
+      ).should be_empty
+    elements.to_a(
+      "context-param/param-name[text()='ignored']"
+      ).should be_empty
+    elements.to_a(
+      "context-param/param-name[text()='jndi']"
+      ).should be_empty
   end
 
   it "should use a config/web.xml if it exists" do

@@ -166,7 +166,7 @@ module Warbler
           params[k] = v.to_s
         end
       end
-      params.delete_if {|k,v| ['ignored', *ignored].include?(k) }
+      params.delete_if {|k,v| ['ignored', *ignored].include?(k.to_s) }
       params
     end
   end
