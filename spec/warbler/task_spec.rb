@@ -179,6 +179,16 @@ describe Warbler::Task do
     File.exist?("warbler.war").should == true
   end
 
+  it "should accept an autodeploy directory where the war should be created" do
+    define_tasks "jar"
+    require 'tempfile'
+    @config.autodeploy_dir = Dir::tmpdir
+    mkdir_p @config.staging_dir
+    touch "#{@config.staging_dir}/file.txt"
+    Rake::Task["warble:jar"].invoke
+    File.exist?(File.join("#{Dir::tmpdir}","warbler.war")).should == true
+  end
+
   it "should define a war task for bundling up everything" do
     app_ran = false; task "warble:app" do; app_ran = true; end
     public_ran = false; task "warble:public" do; public_ran = true; end

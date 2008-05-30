@@ -16,6 +16,11 @@ module Warbler
     # Directory where files will be staged, defaults to tmp/war
     attr_accessor :staging_dir
 
+    # Directory where the war file will be written. Can be used to direct
+    # Warbler to place your war file directly in your application server's
+    # autodeploy directory. Defaults to the root of the Rails directory.
+    attr_accessor :autodeploy_dir
+
     # Top-level directories to be copied into WEB-INF.  Defaults to 
     # names in TOP_DIRS
     attr_accessor :dirs
