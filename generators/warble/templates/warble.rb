@@ -25,7 +25,7 @@ Warbler::Config.new do |config|
   # WEB-INF/classes. The example pathmap below accompanies the java_classes
   # configuration above. See http://rake.rubyforge.org/classes/String.html#M000017
   # for details of how to specify a pathmap.
-  # config.pathmaps.java_classes << "%{target/classes/,}"
+  # config.pathmaps.java_classes << "%{target/classes/,}p"
 
   # Gems to be packaged in the webapp.  Note that Rails gems are added to this
   # list if vendor/rails is not present, so be sure to include rails if you
