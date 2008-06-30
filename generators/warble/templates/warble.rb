@@ -27,12 +27,18 @@ Warbler::Config.new do |config|
   # for details of how to specify a pathmap.
   # config.pathmaps.java_classes << "%{target/classes/,}p"
 
-  # Gems to be packaged in the webapp.  Note that Rails gems are added to this
-  # list if vendor/rails is not present, so be sure to include rails if you
-  # overwrite the value
-  # config.gems = ["activerecord-jdbc-adapter", "jruby-openssl"]
+  # Gems to be included. You need to tell Warbler which gems your application needs
+  # so that they can be packaged in the war file.
+  # The Rails gems are included by default unless the vendor/rails directory is present.
+  # config.gems += ["activerecord-jdbcmysql-adapter", "jruby-openssl"]
   # config.gems << "tzinfo"
-  # config.gems["rails"] = "1.2.3"
+
+  # Uncomment this if you don't want to package rails gem.
+  # config.gems -= ["rails"]
+
+  # The most recent versions of gems are used.
+  # You can specify versions of gems by using a hash assignment:
+  # config.gems["rails"] = "2.0.2"
 
   # Include gem dependencies not mentioned specifically
   config.gem_dependencies = true
