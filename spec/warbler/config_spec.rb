@@ -82,6 +82,10 @@ describe Warbler::Config do
     Warbler::Config.new.webxml.context_params.should_not have_key('booter')
   end
 
+  it "should have a helpful string representation for an empty key" do
+    Warbler::Config.new.webxml.missing_key.to_s.should =~ /No value for 'missing_key' found/
+  end
+
   #it "should automatically gems used by the web application" do
   #  gem "actionpack"
   #  config = Warbler::Config.new

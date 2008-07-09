@@ -75,6 +75,12 @@ module Warbler
     #   keep around during idle time
     # * <tt>webxml.jruby.max.runtimes</tt> -- maximum number of pooled Rails
     #   application runtimes
+    #
+    # Note that if you attempt to access webxml configuration keys in a conditional,
+    # you might not obtain the result you want. For example:
+    #     <%= webxml.maybe.present.key || 'default' %>
+    # doesn't yield the right result. Instead, you need to generate the context parameters:
+    #     <%= webxml.context_params['maybe.present.key'] || 'default' %>
     attr_accessor :webxml
 
     def initialize(warbler_home = WARBLER_HOME)
@@ -143,8 +149,9 @@ module Warbler
   end
 
   class WebxmlOpenStruct < OpenStruct
-    def initialize
-      @table = Hash.new {|h,k| h[k] = WebxmlOpenStruct.new }
+    def initialize(key = 'webxml')
+      @key = key
+      @table = Hash.new {|h,k| h[k] = WebxmlOpenStruct.new(k) }
     end
 
     def servlet_context_listener
@@ -173,6 +180,10 @@ module Warbler
       end
       params.delete_if {|k,v| ['ignored', *ignored].include?(k.to_s) }
       params
+    end
+
+    def to_s
+      "No value for '#@key' found"
     end
   end
 end
