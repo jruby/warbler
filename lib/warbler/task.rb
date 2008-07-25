@@ -189,10 +189,13 @@ module Warbler
     end
 
     def define_webinf_file_tasks
+      target_files = @config.dirs.map do |d|
+        define_file_task(d, "#{@config.staging_dir}/#{apply_pathmaps(d, :application)}")
+      end
       files = FileList[*(@config.dirs.map{|d| "#{d}/**/*"})]
       files.include *(@config.includes.to_a)
       files.exclude *(@config.excludes.to_a)
-      target_files = files.map do |f|
+      target_files += files.map do |f|
         define_file_task(f,
           "#{@config.staging_dir}/#{apply_pathmaps(f, :application)}")
       end

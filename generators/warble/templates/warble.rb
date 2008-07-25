@@ -60,6 +60,12 @@ Warbler::Config.new do |config|
   # Application booter to use, one of :rack, :rails, or :merb. (Default :rails)
   # config.webxml.booter = :rails
 
+  # When using the :rack booter, "Rackup" script to use.
+  # The script is evaluated in a Rack::Builder to load the application.
+  # Examples:
+  # config.webxml.rackup = %{require './lib/demo'; run Rack::Adapter::Camping.new(Demo)}
+  # config.webxml.rackup = require 'cgi' && CGI::escapeHTML(File.read("config.ru"))
+
   # Control the pool of Rails runtimes. Leaving unspecified means
   # the pool will grow as needed to service requests. It is recommended
   # that you fix these values when running a production server!

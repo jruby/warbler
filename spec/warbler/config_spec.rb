@@ -41,6 +41,22 @@ describe Warbler::Config do
     config.gems.should be_empty
   end
 
+  it "should exclude log files by default" do
+    mkdir_p "vendor"
+    touch "vendor/test.log"
+    config = Warbler::Config.new
+    config.exclude_logs.should == true
+    config.excludes.include?("vendor/test.log").should == true
+  end
+
+  it "should include log files if exclude_logs is false" do
+    mkdir_p "vendor"
+    touch "vendor/test.log"
+    config = Warbler::Config.new {|c| c.exclude_logs = false }
+    config.exclude_logs.should == false
+    config.excludes.include?("vendor/test.log").should == false
+  end
+
   it "should exclude Warbler itself when run as a plugin" do
     config = Warbler::Config.new
     config.excludes.include?("vendor/plugins/warbler").should == false

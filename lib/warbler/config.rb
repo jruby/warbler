@@ -44,6 +44,9 @@ module Warbler
     # Whether to include dependent gems (default true)
     attr_accessor :gem_dependencies
 
+    # Whether to exclude **/*.log files (default is true)
+    attr_accessor :exclude_logs
+
     # Public HTML directory file list, to be copied into the root of the war
     attr_accessor :public_html
 
@@ -92,6 +95,7 @@ module Warbler
       @java_classes = FileList[]
       @gems        = default_gems
       @gem_dependencies = true
+      @exclude_logs = true
       @public_html = FileList["public/**/*"]
       @pathmaps    = default_pathmaps
       @webxml      = default_webxml_config
@@ -99,6 +103,7 @@ module Warbler
       @war_name    = File.basename(@rails_root)
       yield self if block_given?
       @excludes += warbler_vendor_excludes(warbler_home)
+      @excludes += FileList["**/*.log"] if @exclude_logs
       @excludes << @staging_dir
     end
 

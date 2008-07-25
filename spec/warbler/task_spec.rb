@@ -11,12 +11,14 @@ describe Warbler::Task do
     @rake = Rake::Application.new
     Rake.application = @rake
     mkdir_p "public"
+    mkdir_p "log"
     touch "public/index.html"
+    touch "log/test.log"
     @config = Warbler::Config.new do |config|
       config.staging_dir = "pkg/tmp/war"
       config.war_name = "warbler"
       config.gems = ["rake"]
-      config.dirs = %w(bin generators lib)
+      config.dirs = %w(bin generators log lib)
       config.public_html = FileList["public/**/*", "tasks/**/*"]
       config.webxml.jruby.max.runtimes = 5
     end
@@ -28,6 +30,7 @@ describe Warbler::Task do
     Rake::Task["warble:clean"].invoke
     rm_rf "public"
     rm_rf "config"
+    rm_rf "log"
   end
 
   def define_tasks(*tasks)
@@ -66,6 +69,13 @@ describe Warbler::Task do
     Rake::Task["warble:gems"].invoke
     file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
     file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
+  end
+
+  it "should define a app task for copying application files" do
+    define_tasks "app", "gems"
+    Rake::Task["warble:app"].invoke
+    file_list(%r{WEB-INF/log}).should_not be_empty
+    file_list(%r{WEB-INF/log/*.log}).should be_empty
   end
 
   def expand_webxml
