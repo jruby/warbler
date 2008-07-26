@@ -1,3 +1,14 @@
+== 0.9.10
+
+* Upgraded to JRuby-Rack 0.9.1. Fixes JRUBY-2620, JRUBY-2594, JRUBY-2507.
+* Now verified to work with Camping and Sinatra. See
+  http://github.com/nicksieger/jruby-rack/tree/master/examples for examples
+  of how to configure Warbler to package your Camping and Sinatra apps.
+* Upgraded to JRuby 1.1.3.
+* Log files are no longer packaged in the .war file.
+* Fix #<Warbler::WebxmlOpenStruct ...> appearing in web.xml and document workarounds.
+* Add config.autodeploy_dir that, when specified, will create the war there.
+
 == 0.9.9
 
 * Now shipping with JRuby-Rack 0.9!
