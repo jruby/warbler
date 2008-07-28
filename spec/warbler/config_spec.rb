@@ -41,6 +41,15 @@ describe Warbler::Config do
     config.gems.should be_empty
   end
 
+  it "should allow gems to be added/changed with =, +=, -=, <<" do
+    config = Warbler::Config.new do |c|
+      c.gems += ["activerecord-jdbc-adapter"]
+      c.gems -= ["rails"]
+      c.gems << "tzinfo"
+      c.gems = ["camping"]
+    end
+  end
+
   it "should exclude log files by default" do
     mkdir_p "vendor"
     touch "vendor/test.log"

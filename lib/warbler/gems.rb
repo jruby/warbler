@@ -22,6 +22,13 @@ module Warbler
     def <<(gem)
       self[gem] ||= ANY_VERSION
     end
-    
+
+    def +(other)
+      other.each {|g| self[g] ||= ANY_VERSION }
+    end
+
+    def -(other)
+      other.each {|g| self.delete(g)}
+    end
   end
 end
