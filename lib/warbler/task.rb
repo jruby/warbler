@@ -240,7 +240,7 @@ module Warbler
     end
 
     def define_single_gem_tasks(gem, targets, version = nil)
-      matched = Gem.source_index.search(gem, version)
+      matched = Gem.source_index.search("^#{gem}$", version)
       fail "gem '#{gem}' not installed" if matched.empty?
       spec = matched.last
       

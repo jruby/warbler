@@ -254,7 +254,7 @@ describe Warbler::Task do
     spec.stub!(:original_platform).and_return "java"
     spec.stub!(:loaded_from).and_return "hpricot.gemspec"
     spec.stub!(:dependencies).and_return []
-    Gem.source_index.should_receive(:search).with("hpricot", nil).and_return [spec]
+    Gem.source_index.should_receive(:search).with("^hpricot$", nil).and_return [spec]
     File.should_receive(:exist?).with(File.join(Gem.dir, 'cache', "hpricot-0.6.157-java.gem")).and_return true
     @config.gems = ["hpricot"]
     define_tasks "gems"
