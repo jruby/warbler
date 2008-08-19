@@ -254,9 +254,29 @@ describe Warbler::Task do
     spec.stub!(:original_platform).and_return "java"
     spec.stub!(:loaded_from).and_return "hpricot.gemspec"
     spec.stub!(:dependencies).and_return []
-    Gem.source_index.should_receive(:search).with("^hpricot$", nil).and_return [spec]
+    Gem.source_index.should_receive(:search).and_return do |gem|
+      gem.name.should == "hpricot"
+      [spec]
+    end
     File.should_receive(:exist?).with(File.join(Gem.dir, 'cache', "hpricot-0.6.157-java.gem")).and_return true
     @config.gems = ["hpricot"]
+    define_tasks "gems"
+  end
+
+  it "should allow specification of dependency by Gem::Dependency" do
+    spec = mock "gem spec"
+    spec.stub!(:name).and_return "hpricot"
+    spec.stub!(:version).and_return "0.6.157"
+    spec.stub!(:platform).and_return "java"
+    spec.stub!(:original_platform).and_return "java"
+    spec.stub!(:loaded_from).and_return "hpricot.gemspec"
+    spec.stub!(:dependencies).and_return []
+    Gem.source_index.should_receive(:search).and_return do |gem|
+      gem.name.should == "hpricot"
+      [spec]
+    end
+    File.should_receive(:exist?).with(File.join(Gem.dir, 'cache', "hpricot-0.6.157-java.gem")).and_return true
+    @config.gems = [Gem::Dependency.new("hpricot", "> 0.6")]
     define_tasks "gems"
   end
 
