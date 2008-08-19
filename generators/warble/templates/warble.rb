@@ -40,6 +40,11 @@ Warbler::Config.new do |config|
   # You can specify versions of gems by using a hash assignment:
   # config.gems["rails"] = "2.0.2"
 
+  # You can also use regexps or Gem::Dependency objects for flexibility or
+  # fine-grained control.
+  # config.gems << /^merb-/
+  # config.gems << Gem::Dependency.new("merb-core", "= 0.9.3")
+
   # Include gem dependencies not mentioned specifically
   config.gem_dependencies = true
 

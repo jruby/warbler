@@ -1,3 +1,9 @@
+== 0.9.11
+
+* Allow config.gems array to contain regexps and Gem::Dependency objects as well
+ (assist from Jani Soila)
+* Fix bug ensuring you can += and -= for config.gems
+
 == 0.9.10
 
 * Upgraded to JRuby-Rack 0.9.1. Fixes JRUBY-2620, JRUBY-2594, JRUBY-2507.
