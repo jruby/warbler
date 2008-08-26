@@ -93,7 +93,7 @@ module Warbler
       @excludes    = FileList[]
       @java_libs   = FileList["#{warbler_home}/lib/*.jar"]
       @java_classes = FileList[]
-      @gems        = default_gems
+      @gems        = Warbler::Gems.new
       @gem_dependencies = true
       @exclude_logs = true
       @public_html = FileList["public/**/*"]
@@ -101,6 +101,7 @@ module Warbler
       @webxml      = default_webxml_config
       @rails_root  = File.expand_path(defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)
       @war_name    = File.basename(@rails_root)
+      auto_detect_frameworks
       yield self if block_given?
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes += FileList["**/*.log"] if @exclude_logs
@@ -141,15 +142,26 @@ module Warbler
       c
     end
 
-    def default_gems
-      gems = Warbler::Gems.new
-      # Include all gems which are used by the web application, this only works when run as a plugin
-      #for gem in Gem.loaded_specs.values
-      #  next if BUILD_GEMS.include?(gem.name)
-      #  gems[gem.name] = gem.version.version
-      #end
-      gems << "rails" unless File.directory?("vendor/rails")
-      gems
+    def auto_detect_frameworks
+      auto_detect_rails
+      auto_detect_merb
+    end
+
+    def auto_detect_rails
+      return unless Rake.application.lookup("environment")
+      Rake::Task['environment'].invoke
+      return unless defined?(::Rails)
+      @webxml.booter = :rails
+      @gems << "rails" unless File.directory?("vendor/rails")
+      ::Rails.configuration.gems.each {|g| @gems[g.name] = g.version } if defined?(::Rails.configuration.gems)
+      @webxml.jruby.max.runtimes = 1 if defined?(::Rails.threadsafe!)
+    end
+
+    def auto_detect_merb
+      return unless Rake.application.lookup("merb_env")
+      Rake::Task['merb_env'].invoke
+      return unless defined?(::Merb)
+      @webxml.booter = :merb
     end
   end
 

@@ -65,6 +65,7 @@ describe Warbler::Task do
   end
 
   it "should define a gems task for unpacking gems" do
+    @config.gems << "rails"
     define_tasks "gems"
     Rake::Task["warble:gems"].invoke
     file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
@@ -285,6 +286,68 @@ describe Warbler::Task do
     define_tasks "java_classes"
     Rake::Task["warble:java_classes"].invoke
     file_list(%r{WEB-INF/classes/Rakefile$}).should_not be_empty
+  end
+
+  it "should auto-detect a Rails application" do
+    task :environment do
+      rails = Object.new
+      Object.const_set("Rails", rails)
+    end
+    @config = Warbler::Config.new
+    @config.webxml.booter.should == :rails
+    @config.gems.keys.should include("rails")
+  end
+
+  it "should provide Rails gems by default, unless vendor/rails is present" do
+    task :environment do
+      rails = Object.new
+      Object.const_set("Rails", rails)
+    end
+
+    config = Warbler::Config.new
+    config.gems.should include("rails")
+
+    mkdir_p "vendor/rails"
+    config = Warbler::Config.new
+    config.gems.should be_empty
+  end
+
+  it "should auto-detect a Merb application" do
+    task :merb_env do
+      merb = Object.new
+      Object.const_set("Merb", merb)
+    end
+    @config = Warbler::Config.new
+    @config.webxml.booter.should == :merb
+    @config.gems.keys.should_not include("rails")
+  end
+
+  it "should automatically add Rails.configuration.gems to the list of gems" do
+    task :environment do
+      rails = mock "rails"
+      Object.const_set("Rails", rails)
+      config = mock "config"
+      rails.stub!(:configuration).and_return(config)
+      gem = mock "gem"
+      gem.stub!(:name).and_return "hpricot"
+      gem.stub!(:version).and_return "=0.6"
+      config.stub!(:gems).and_return [gem]
+    end
+
+    @config = Warbler::Config.new
+    @config.webxml.booter.should == :rails
+    @config.gems["hpricot"].should == "=0.6"
+  end
+
+  it "should set the jruby max runtimes to 1 when MT Rails is detected" do
+    task :environment do
+      rails = Object.new
+      def rails.threadsafe!; end
+      Object.const_set("Rails", rails)
+    end
+    @config = Warbler::Config.new
+    @config.webxml.booter.should == :rails
+    @config.webxml.jruby.max.runtimes.should == 1
   end
 end
 

@@ -31,3 +31,13 @@ def capture(&block)
   silence(io, &block)
   io.string
 end
+
+Spec::Runner.configure do |config|
+  config.after(:each) do
+    class << Object
+      public :remove_const
+    end
+    Object.remove_const("Rails") rescue nil
+    rm_rf "vendor"
+  end
+end

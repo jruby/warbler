@@ -14,6 +14,15 @@ application = Rake.application
 application.standard_exception_handling do
   application.init
 
+  # Load any application rakefiles to aid in autodetecting applications
+  DEFAULT_RAKEFILES.each do |rf|
+    if File.exist?(rf)
+      load rf
+      break
+    end
+  end
+
+  # Load the main warbler tasks
   Warbler::Task.new
 
   task :default => :war
