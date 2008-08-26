@@ -9,7 +9,7 @@ require 'ostruct'
 module Warbler
   # Warbler assembly configuration.
   class Config
-    TOP_DIRS = %w(app config lib log vendor tmp)
+    TOP_DIRS = %w(app config lib log vendor)
     FILE = "config/warble.rb"
     BUILD_GEMS = %w(warbler rake rcov)
 
@@ -21,7 +21,7 @@ module Warbler
     # autodeploy directory. Defaults to the root of the Rails directory.
     attr_accessor :autodeploy_dir
 
-    # Top-level directories to be copied into WEB-INF.  Defaults to 
+    # Top-level directories to be copied into WEB-INF.  Defaults to
     # names in TOP_DIRS
     attr_accessor :dirs
 
@@ -151,6 +151,7 @@ module Warbler
       return unless Rake.application.lookup("environment")
       Rake::Task['environment'].invoke
       return unless defined?(::Rails)
+      @dirs << "tmp" if File.directory?("tmp")
       @webxml.booter = :rails
       unless (defined?(Rails.vendor_rails?) && Rails.vendor_rails?) || File.directory?("vendor/rails")
         @gems["rails"] = Rails::VERSION::STRING
@@ -166,6 +167,7 @@ module Warbler
       Rake::Task['merb_env'].invoke
       return unless defined?(::Merb)
       @webxml.booter = :merb
+      @gems["merb"] = Merb::VERSION
     end
   end
 

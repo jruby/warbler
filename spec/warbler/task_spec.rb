@@ -303,7 +303,7 @@ describe Warbler::Task do
     end
     @config = Warbler::Config.new
     @config.webxml.booter.should == :rails
-    @config.gems.keys.should include("rails")
+    @config.gems["rails"].should == "2.1.0"
   end
 
   it "should provide Rails gems by default, unless vendor/rails is present" do
@@ -327,11 +327,13 @@ describe Warbler::Task do
 
   it "should auto-detect a Merb application" do
     task :merb_env do
-      merb = Object.new
+      merb = Module.new
       Object.const_set("Merb", merb)
+      merb.const_set("VERSION", "0.9.3")
     end
     @config = Warbler::Config.new
     @config.webxml.booter.should == :merb
+    @config.gems["merb"].should == "0.9.3"
     @config.gems.keys.should_not include("rails")
   end
 
