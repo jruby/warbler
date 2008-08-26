@@ -152,9 +152,13 @@ module Warbler
       Rake::Task['environment'].invoke
       return unless defined?(::Rails)
       @webxml.booter = :rails
-      @gems << "rails" unless File.directory?("vendor/rails")
-      ::Rails.configuration.gems.each {|g| @gems[g.name] = g.version } if defined?(::Rails.configuration.gems)
-      @webxml.jruby.max.runtimes = 1 if defined?(::Rails.threadsafe!)
+      unless (defined?(Rails.vendor_rails?) && Rails.vendor_rails?) || File.directory?("vendor/rails")
+        @gems["rails"] = Rails::VERSION::STRING
+      end
+      if defined?(Rails.configuration.gems)
+        Rails.configuration.gems.each {|g| @gems[g.name] = g.version }
+      end
+      @webxml.jruby.max.runtimes = 1 if defined?(Rails.threadsafe!)
     end
 
     def auto_detect_merb

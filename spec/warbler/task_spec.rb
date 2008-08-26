@@ -288,10 +288,18 @@ describe Warbler::Task do
     file_list(%r{WEB-INF/classes/Rakefile$}).should_not be_empty
   end
 
+  def mock_rails_module
+    rails = Module.new
+    Object.const_set("Rails", rails)
+    version = Module.new
+    rails.const_set("VERSION", version)
+    version.const_set("STRING", "2.1.0")
+    rails
+  end
+
   it "should auto-detect a Rails application" do
     task :environment do
-      rails = Object.new
-      Object.const_set("Rails", rails)
+      mock_rails_module
     end
     @config = Warbler::Config.new
     @config.webxml.booter.should == :rails
@@ -299,15 +307,20 @@ describe Warbler::Task do
   end
 
   it "should provide Rails gems by default, unless vendor/rails is present" do
+    rails = nil
     task :environment do
-      rails = Object.new
-      Object.const_set("Rails", rails)
+      rails = mock_rails_module
     end
 
     config = Warbler::Config.new
     config.gems.should include("rails")
 
     mkdir_p "vendor/rails"
+    config = Warbler::Config.new
+    config.gems.should be_empty
+
+    rm_rf "vendor/rails"
+    rails.stub!(:vendor_rails?).and_return true
     config = Warbler::Config.new
     config.gems.should be_empty
   end
@@ -324,8 +337,7 @@ describe Warbler::Task do
 
   it "should automatically add Rails.configuration.gems to the list of gems" do
     task :environment do
-      rails = mock "rails"
-      Object.const_set("Rails", rails)
+      rails = mock_rails_module
       config = mock "config"
       rails.stub!(:configuration).and_return(config)
       gem = mock "gem"
@@ -341,9 +353,8 @@ describe Warbler::Task do
 
   it "should set the jruby max runtimes to 1 when MT Rails is detected" do
     task :environment do
-      rails = Object.new
+      rails = mock_rails_module
       def rails.threadsafe!; end
-      Object.const_set("Rails", rails)
     end
     @config = Warbler::Config.new
     @config.webxml.booter.should == :rails

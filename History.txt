@@ -1,5 +1,13 @@
 == 0.9.11
 
+* Auto-detect Rails and Merb and configure appropriately
+  - For Rails, set rails booter, determine max runtimes based on Rails.threadsafe!,
+    add Rails gem, detect Rails version, set gems to be packaged based on
+    Rails.configuration.gems if available
+  - Rails gems only added if Rails application detected
+  - For Merb, set merb booter automatically
+* rails.env now commented by default in config/warble.rb and internally default
+  the value to 'production'
 * Allow config.gems array to contain regexps and Gem::Dependency objects as well
  (assist from Jani Soila)
 * Fix bug ensuring you can += and -= for config.gems
