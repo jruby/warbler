@@ -10,7 +10,7 @@ describe Warbler::Config do
   it "should have suitable default values" do
     config = Warbler::Config.new
     config.staging_dir.should == "tmp/war"
-    config.dirs.should include(*Warbler::Config::TOP_DIRS)
+    config.dirs.should include(*Warbler::Config::TOP_DIRS.select{|d| File.directory?(d)})
     config.includes.should be_empty
     config.java_libs.should_not be_empty
     config.war_name.size.should > 0

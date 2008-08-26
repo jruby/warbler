@@ -88,7 +88,7 @@ module Warbler
 
     def initialize(warbler_home = WARBLER_HOME)
       @staging_dir = File.join("tmp", "war")
-      @dirs        = TOP_DIRS
+      @dirs        = TOP_DIRS.select {|d| File.directory?(d)}
       @includes    = FileList[]
       @excludes    = FileList[]
       @java_libs   = FileList["#{warbler_home}/lib/*.jar"]
