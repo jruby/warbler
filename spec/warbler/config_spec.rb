@@ -98,6 +98,12 @@ describe Warbler::Config do
     Warbler::Config.new.webxml.missing_key.to_s.should =~ /No value for 'missing_key' found/
   end
 
+  it "should HTML-escape all webxml keys and values" do
+    config = Warbler::Config.new
+    config.webxml.a.send("b&").c = "123<hi>456"
+    config.webxml.context_params['a.b&amp;.c'].should == "123&lt;hi&gt;456"
+  end
+
   #it "should automatically gems used by the web application" do
   #  gem "actionpack"
   #  config = Warbler::Config.new

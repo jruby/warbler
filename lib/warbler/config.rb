@@ -143,14 +143,13 @@ module Warbler
     end
 
     def auto_detect_frameworks
-      auto_detect_rails
-      auto_detect_merb
+      auto_detect_rails || auto_detect_merb || auto_detect_rackup
     end
 
     def auto_detect_rails
-      return unless Rake.application.lookup("environment")
+      return false unless Rake.application.lookup("environment")
       Rake::Task['environment'].invoke
-      return unless defined?(::Rails)
+      return false unless defined?(::Rails)
       @dirs << "tmp" if File.directory?("tmp")
       @webxml.booter = :rails
       unless (defined?(Rails.vendor_rails?) && Rails.vendor_rails?) || File.directory?("vendor/rails")
@@ -160,14 +159,22 @@ module Warbler
         Rails.configuration.gems.each {|g| @gems[g.name] = g.version }
       end
       @webxml.jruby.max.runtimes = 1 if defined?(Rails.threadsafe!)
+      true
     end
 
     def auto_detect_merb
-      return unless Rake.application.lookup("merb_env")
+      return false unless Rake.application.lookup("merb_env")
       Rake::Task['merb_env'].invoke
-      return unless defined?(::Merb)
+      return false unless defined?(::Merb)
       @webxml.booter = :merb
       @gems["merb"] = Merb::VERSION
+      true
+    end
+
+    def auto_detect_rackup
+      return false unless File.exist?("config.ru")
+      @webxml.booter = :rack
+      @webxml.rackup = File.read("config.ru")
     end
   end
 
@@ -189,16 +196,17 @@ module Warbler
     end
 
     def context_params
+      require 'cgi'
       params = {}
       @table.each do |k,v|
         case v
         when WebxmlOpenStruct
           nested_params = v.context_params
           nested_params.each do |nk,nv|
-            params["#{k}.#{nk}"] = nv
+            params["#{CGI::escapeHTML(k.to_s)}.#{nk}"] = nv
           end
         else
-          params[k] = v.to_s
+          params[CGI::escapeHTML(k.to_s)] = CGI::escapeHTML(v.to_s)
         end
       end
       params.delete_if {|k,v| ['ignored', *ignored].include?(k.to_s) }

@@ -31,6 +31,7 @@ describe Warbler::Task do
     rm_rf "public"
     rm_rf "config"
     rm_rf "log"
+    rm_f "config.ru"
   end
 
   def define_tasks(*tasks)
@@ -335,6 +336,14 @@ describe Warbler::Task do
     @config.webxml.booter.should == :merb
     @config.gems["merb"].should == "0.9.3"
     @config.gems.keys.should_not include("rails")
+  end
+
+  it "should auto-detect a Rack application with a config.ru file" do
+    rackup = "run Proc.new {|env| [200, {}, ['Hello World']]}"
+    File.open("config.ru", "w") {|f| f << rackup }
+    @config = Warbler::Config.new
+    @config.webxml.booter.should == :rack
+    @config.webxml.rackup.should == rackup
   end
 
   it "should automatically add Rails.configuration.gems to the list of gems" do

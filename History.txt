@@ -6,6 +6,7 @@
     Rails.configuration.gems if available
   - Rails gems only added if Rails application detected
   - For Merb, set merb booter automatically
+* Auto-detect config.ru rackup script and pass it into config.webxml.rackup
 * rails.env now commented by default in config/warble.rb and internally default
   the value to 'production'
 * Allow config.gems array to contain regexps and Gem::Dependency objects as well
