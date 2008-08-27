@@ -365,7 +365,9 @@ describe Warbler::Task do
   it "should set the jruby max runtimes to 1 when MT Rails is detected" do
     task :environment do
       rails = mock_rails_module
-      def rails.threadsafe!; end
+      config = mock "config"
+      rails.stub!(:configuration).and_return(config)
+      config.stub!(:threadsafe!)
     end
     @config = Warbler::Config.new
     @config.webxml.booter.should == :rails
