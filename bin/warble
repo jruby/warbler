@@ -34,11 +34,11 @@ application.standard_exception_handling do
   desc "Generate a configuration file to customize your war assembly"
   task :config do
     if File.exists?(Warbler::Config::FILE) && ENV["FORCE"].nil?
-      warn "There's another bird sitting on my favorite branch"
-      warn "(file '#{Warbler::Config::FILE}' already exists. Pass argument FORCE=1 to override)"
+      puts "There's another bird sitting on my favorite branch"
+      puts "(file '#{Warbler::Config::FILE}' already exists. Pass argument FORCE=1 to override)"
     elsif !File.directory?("config")
-      warn "I'm confused; my favorite branch is missing"
-      warn "(directory 'config' is missing)"
+      puts "I'm confused; my favorite branch is missing"
+      puts "(directory 'config' is missing)"
     else
       cp "#{Warbler::WARBLER_HOME}/generators/warble/templates/warble.rb", Warbler::Config::FILE
     end
@@ -47,11 +47,11 @@ application.standard_exception_handling do
   desc "Unpack warbler as a plugin in your Rails application"
   task :pluginize do
     if !Dir["vendor/plugins/warbler*"].empty?
-      warn "I found an old nest in vendor/plugins; please trash it so I can make a new one"
-      warn "(directory vendor/plugins/warbler* exists)"
+      puts "I found an old nest in vendor/plugins; please trash it so I can make a new one"
+      puts "(directory vendor/plugins/warbler* exists)"
     elsif !File.directory?("vendor/plugins")
-      warn "I can't find a place to build my nest"
-      warn "(directory 'vendor/plugins' is missing)"
+      puts "I can't find a place to build my nest"
+      puts "(directory 'vendor/plugins' is missing)"
     else
       Dir.chdir("vendor/plugins") do
         ruby "-S", "gem", "unpack", "warbler"
