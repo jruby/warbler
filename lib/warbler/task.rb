@@ -8,6 +8,13 @@ require 'rake'
 require 'rake/tasklib'
 
 module Warbler
+  class << self
+    attr_writer :project_application
+    def project_application
+      @project_application || Rake.application
+    end
+  end
+
   # Warbler Rake task.  Allows defining multiple configurations inside the same 
   # Rakefile by using different task names.
   class Task < Rake::TaskLib

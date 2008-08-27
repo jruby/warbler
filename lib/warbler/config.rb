@@ -147,8 +147,8 @@ module Warbler
     end
 
     def auto_detect_rails
-      return false unless Rake.application.lookup("environment")
-      Rake::Task['environment'].invoke
+      return false unless task = Warbler.project_application.lookup("environment")
+      task.invoke
       return false unless defined?(::Rails)
       @dirs << "tmp" if File.directory?("tmp")
       @webxml.booter = :rails
@@ -158,13 +158,13 @@ module Warbler
       if defined?(Rails.configuration.gems)
         Rails.configuration.gems.each {|g| @gems[g.name] = g.version }
       end
-      @webxml.jruby.max.runtimes = 1 if defined?(Rails.threadsafe!)
+      @webxml.jruby.max.runtimes = 1 if defined?(Rails.configuration.threadsafe!)
       true
     end
 
     def auto_detect_merb
-      return false unless Rake.application.lookup("merb_env")
-      Rake::Task['merb_env'].invoke
+      return false unless task = Warbler.project_application.lookup("merb_env")
+      task.invoke
       return false unless defined?(::Merb)
       @webxml.booter = :merb
       @gems["merb"] = Merb::VERSION
