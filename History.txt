@@ -1,7 +1,7 @@
 == 0.9.11
 
 * Auto-detect Rails and Merb and configure appropriately
-  - For Rails, set rails booter, determine max runtimes based on Rails.threadsafe!,
+  - For Rails, set rails booter, determine max runtimes based on Rails.configuration.threadsafe!,
     add Rails gem, detect Rails version, set gems to be packaged based on
     Rails.configuration.gems if available
   - Rails gems only added if Rails application detected
@@ -9,9 +9,12 @@
 * Auto-detect config.ru rackup script and pass it into config.webxml.rackup
 * rails.env now commented by default in config/warble.rb and internally default
   the value to 'production'
+* Default directories in config.dirs to only those that are found to be present
 * Allow config.gems array to contain regexps and Gem::Dependency objects as well
  (assist from Jani Soila)
 * Fix bug ensuring you can += and -= for config.gems
+* Upgrade to JRuby 1.1.4 and JRuby-Rack 0.9.2
+* add [] as a way to specify non-identifier keys, example: config.webxml['!@#$%^'] = 'haha'
 
 == 0.9.10
 
@@ -38,7 +41,7 @@
 
 == 0.9.5
 
-* Fix bug in plugin warbler.rake task file that would favor loading warbler from gems before the version 
+* Fix bug in plugin warbler.rake task file that would favor loading warbler from gems before the version
   installed as a plugin
 * Upgrade to JRuby 1.1 final and Goldspike 1.6.1
 
