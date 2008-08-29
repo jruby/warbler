@@ -179,6 +179,8 @@ module Warbler
   end
 
   class WebxmlOpenStruct < OpenStruct
+    %w(java com org javax).each {|name| undef_method name if Object.methods.include?(name) }
+
     def initialize(key = 'webxml')
       @key = key
       @table = Hash.new {|h,k| h[k] = WebxmlOpenStruct.new(k) }
@@ -193,6 +195,16 @@ module Warbler
       else # :rails, default
         "org.jruby.rack.rails.RailsServletContextListener"
       end
+    end
+
+    def [](key)
+      new_ostruct_member(key)
+      send(key)
+    end
+
+    def []=(key, value)
+      new_ostruct_member(key)
+      send("#{key}=", value)
     end
 
     def context_params

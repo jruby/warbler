@@ -63,18 +63,22 @@ describe Warbler::Config do
   it "should generate context parameters from the webxml openstruct" do
     config = Warbler::Config.new
     config.webxml.a.b.c = "123"
+    config.webxml.com.example.config = "blah"
     config.webxml.rails.env = 'staging'
     config.webxml.jruby.min.runtimes = 2
     config.webxml.jruby.max.runtimes = 4
+    config.webxml['org']['jruby']['rack'] = "rails"
     params = config.webxml.context_params
     params.should have_key('a.b.c')
     params.should have_key('rails.env')
     params.should have_key('jruby.min.runtimes')
     params.should have_key('jruby.max.runtimes')
     params['a.b.c'].should == "123"
+    params['com.example.config'].should == "blah"
     params['rails.env'].should == "staging"
     params['jruby.min.runtimes'].should == "2"
     params['jruby.max.runtimes'].should == "4"
+    params['org.jruby.rack'].should == "rails"
   end
 
   it "should determine the context listener from the webxml.booter parameter" do
@@ -100,7 +104,7 @@ describe Warbler::Config do
 
   it "should HTML-escape all webxml keys and values" do
     config = Warbler::Config.new
-    config.webxml.a.send("b&").c = "123<hi>456"
+    config.webxml.a["b&"].c = "123<hi>456"
     config.webxml.context_params['a.b&amp;.c'].should == "123&lt;hi&gt;456"
   end
 
