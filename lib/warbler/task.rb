@@ -54,6 +54,7 @@ module Warbler
       define_webxml_task
       define_app_task
       define_jar_task
+      define_exploded_task
       define_debug_task
     end
 
@@ -172,6 +173,31 @@ module Warbler
           war_path = "#{config.war_name}.war"
           war_path = File.join(config.autodeploy_dir, war_path) if config.autodeploy_dir
           sh "jar cf #{war_path} -C #{config.staging_dir} ."
+        end
+      end
+    end
+
+    def define_exploded_task
+      with_namespace_and_config do |name,config|
+        libs = define_java_libs_task
+        desc "Create an exploded war in the app's public directory"
+        task "exploded" => ["webxml", "java_classes", "gems", *libs] do
+          cp "#{@config.staging_dir}/WEB-INF/web.xml", "."
+          ln_sf "#{@config.staging_dir}/WEB-INF/gems", "."
+          if File.directory?("#{@config.staging_dir}/WEB-INF/classes")
+            ln_sf "#{@config.staging_dir}/WEB-INF/classes", "."
+          end
+          mkdir_p "lib"
+          libs.each {|l| ln_sf l, "lib/#{File.basename(l)}"}
+          Dir.chdir("public") { ln_sf "..", "WEB-INF" }
+        end
+
+        task "clean:exploded" do
+          (libs.map {|l| "lib/#{File.basename(l)}" } +
+            ["gems", "public/WEB-INF", "classes"]).each do |l|
+            rm_f l if File.symlink? l
+          end
+          rm_f "web.xml"
         end
       end
     end

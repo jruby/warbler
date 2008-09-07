@@ -32,6 +32,7 @@ describe Warbler::Task do
     rm_rf "config"
     rm_rf "log"
     rm_f "config.ru"
+    rm_f "web.xml"
   end
 
   def define_tasks(*tasks)
@@ -189,6 +190,17 @@ describe Warbler::Task do
     touch "#{@config.staging_dir}/file.txt"
     Rake::Task["warble:jar"].invoke
     File.exist?("warbler.war").should == true
+  end
+
+  it "should define an exploded task for creating an exploded Rails app" do
+    @config.java_classes = ["Rakefile"]
+    @config.java_libs = []
+    define_tasks "webxml", "exploded", "java_classes", "gems"
+    Rake::Task['warble:exploded'].invoke
+    File.exist?("web.xml").should == true
+    File.symlink?("gems").should == true
+    File.symlink?("public/WEB-INF").should == true
+    Rake::Task['warble:clean:exploded'].invoke
   end
 
   it "should accept an autodeploy directory where the war should be created" do
@@ -379,6 +391,7 @@ describe "The warbler.rake file" do
   it "should be able to list its contents" do
     output = `#{FileUtils::RUBY} -S rake -f #{Warbler::WARBLER_HOME}/tasks/warbler.rake -T`
     output.should =~ /war\s/
+    output.should =~ /war:exploded/
     output.should =~ /war:app/
     output.should =~ /war:clean/
     output.should =~ /war:gems/
