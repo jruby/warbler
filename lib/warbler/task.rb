@@ -189,13 +189,13 @@ module Warbler
           end
           mkdir_p "lib"
           libs.each {|l| ln_sf l, "lib/#{File.basename(l)}"}
-          Dir.chdir("public") { ln_sf "..", "WEB-INF" }
+          ln_sf "..", "public/WEB-INF"
         end
 
         task "clean:exploded" do
           (libs.map {|l| "lib/#{File.basename(l)}" } +
             ["gems", "public/WEB-INF", "classes"]).each do |l|
-            rm_f l if File.symlink? l
+            rm_f l if File.exist?(l) && File.symlink?(l)
           end
           rm_f "web.xml"
         end
