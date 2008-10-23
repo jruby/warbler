@@ -59,6 +59,10 @@ module Warbler
     # the Rails application
     attr_accessor :war_name
 
+    # Name of the MANIFEST.MF template.  Defaults to the MANIFEST.MF normally generated
+    # by jar -cf....
+    attr_accessor :manifest_file
+
     # Extra configuration for web.xml. Controls how the dynamically-generated web.xml
     # file is generated.
     #

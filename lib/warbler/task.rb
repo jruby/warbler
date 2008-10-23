@@ -172,7 +172,8 @@ module Warbler
         task "jar" do
           war_path = "#{config.war_name}.war"
           war_path = File.join(config.autodeploy_dir, war_path) if config.autodeploy_dir
-          sh "jar cf #{war_path} -C #{config.staging_dir} ."
+          flags, manifest = config.manifest_file ? ["cfm", config.manifest_file] : ["cf", ""]
+          sh "jar #{flags} #{war_path} #{manifest} -C #{config.staging_dir} ."
         end
       end
     end
