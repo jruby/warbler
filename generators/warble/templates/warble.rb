@@ -38,12 +38,18 @@ Warbler::Config.new do |config|
 
   # The most recent versions of gems are used.
   # You can specify versions of gems by using a hash assignment:
-  # config.gems["rails"] = "2.0.2"
+  # config.gems["hpricot"] = "0.6.161"
+  # config.gems["rails"] = RAILS_GEM_VERSION || "2.1.1"
 
   # You can also use regexps or Gem::Dependency objects for flexibility or
   # fine-grained control.
   # config.gems << /^merb-/
   # config.gems << Gem::Dependency.new("merb-core", "= 0.9.3")
+
+  # Include gem dependencies mentioned in your Rails environment.rb file
+  # config.gems += Rails.configuration.gems.map do |gem|
+  #   Gem::Dependency.new(gem.name, gem.requirement)
+  # end
 
   # Include gem dependencies not mentioned specifically
   config.gem_dependencies = true
