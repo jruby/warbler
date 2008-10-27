@@ -47,8 +47,8 @@ Warbler::Config.new do |config|
   # config.gems << Gem::Dependency.new("merb-core", "= 0.9.3")
 
   # Include gem dependencies mentioned in your Rails environment.rb file
-  # config.gems += Rails.configuration.gems.map do |gem|
-  #   Gem::Dependency.new(gem.name, gem.requirement)
+  # Rails.configuration.gems.each do |gem|
+  #   config.gems << Gem::Dependency.new(gem.name, gem.requirement)
   # end
 
   # Include gem dependencies not mentioned specifically
