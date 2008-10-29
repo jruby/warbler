@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{caldersphere}
   s.rubygems_version = %q{1.2.0}
-  s.summary = %q{Warbler chirpily constructs .war files of your Rails applications.}
+  s.summary = %q{Warbler chirpily constructs .war files of your Rails applications for the greater glory with JRuby.}
   s.test_files = ["spec/warbler/config_spec.rb", "spec/warbler/gems_spec.rb", "spec/warbler/task_spec.rb"]
 
   if s.respond_to? :specification_version then
