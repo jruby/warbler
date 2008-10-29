@@ -365,13 +365,13 @@ describe Warbler::Task do
       rails.stub!(:configuration).and_return(config)
       gem = mock "gem"
       gem.stub!(:name).and_return "hpricot"
-      gem.stub!(:version).and_return "=0.6"
+      gem.stub!(:requirement).and_return Gem::Requirement.new("=0.6")
       config.stub!(:gems).and_return [gem]
     end
 
     @config = Warbler::Config.new
     @config.webxml.booter.should == :rails
-    @config.gems["hpricot"].should == "=0.6"
+    @config.gems["hpricot"].should == Gem::Requirement.new("=0.6")
   end
 
   it "should set the jruby max runtimes to 1 when MT Rails is detected" do
