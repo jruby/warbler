@@ -156,7 +156,9 @@ module Warbler
         @gems["rails"] = Rails::VERSION::STRING
       end
       if defined?(Rails.configuration.gems)
-        Rails.configuration.gems.each {|g| @gems[g.name] = g.version }
+        Rails.configuration.gems.each do |g|
+          @gems[g.name] = g.respond_to?(:version) ? g.version : g.specification.version
+        end
       end
       @webxml.jruby.max.runtimes = 1 if defined?(Rails.configuration.threadsafe!)
       true
