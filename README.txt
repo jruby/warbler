@@ -56,7 +56,7 @@ The following items are set up for you:
 
 === Merb applications
 
-Merb applications are detected automatically, and the merb gem and its
+Merb applications are detected automatically, and the merb-core gem and its
 dependencies are packaged.
 
 === Other Rack-based applications
@@ -69,8 +69,12 @@ config/warble.rb.
 See http://github.com/nicksieger/jruby-rack/tree/master/examples for examples
 of how to configure Warbler to package Camping and Sinatra apps.
 
-=== Configuration auto-detect TODOs
+=== Configuration auto-detect notes
 
+* If you don't have database access in the environment where you package your
+  application, you may wish to set `Warbler.framework_detection` to false at
+  the top of config.rb. In this case you may need to specify additional
+  details such as booter, gems and other settings.
 * A more accurate way of detecting a Merb application's gems is needed. Until
   then, you will have to specify them in config/warble.rb. See below.
 * Is it possible to more generally detect what gems an application uses?

@@ -1,3 +1,6 @@
+# Disable automatic framework detection by uncommenting/setting to false
+# Warbler.framework_detection = false
+
 # Warbler web application assembly configuration file
 Warbler::Config.new do |config|
   # Temporary directory where the application is staged

@@ -333,6 +333,20 @@ describe Warbler::Task do
     config.gems.should be_empty
   end
 
+  it "should not try to autodetect frameworks when Warbler.framework_detection is false" do
+    begin
+      Warbler.framework_detection = false
+      task :environment
+      config = Warbler::Config.new
+      config.webxml.booter.should_not == :rails
+      t = Rake::Task['environment']
+      class << t; public :instance_variable_get; end
+      t.instance_variable_get("@already_invoked").should == false
+    ensure
+      Warbler.framework_detection = true
+    end
+  end
+
   it "should auto-detect a Merb application" do
     task :merb_env do
       merb = Module.new
@@ -341,7 +355,7 @@ describe Warbler::Task do
     end
     @config = Warbler::Config.new
     @config.webxml.booter.should == :merb
-    @config.gems["merb"].should == "0.9.3"
+    @config.gems["merb-core"].should == "0.9.3"
     @config.gems.keys.should_not include("rails")
   end
 

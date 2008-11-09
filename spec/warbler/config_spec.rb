@@ -107,10 +107,4 @@ describe Warbler::Config do
     config.webxml.a["b&"].c = "123<hi>456"
     config.webxml.context_params['a.b&amp;.c'].should == "123&lt;hi&gt;456"
   end
-
-  #it "should automatically gems used by the web application" do
-  #  gem "actionpack"
-  #  config = Warbler::Config.new
-  #  config.gems.should include("actionpack")
-  #end
 end

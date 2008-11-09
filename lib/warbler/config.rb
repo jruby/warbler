@@ -147,12 +147,12 @@ module Warbler
     end
 
     def auto_detect_frameworks
-      auto_detect_rails || auto_detect_merb || auto_detect_rackup
+      !Warbler.framework_detection || auto_detect_rails || auto_detect_merb || auto_detect_rackup
     end
 
     def auto_detect_rails
       return false unless task = Warbler.project_application.lookup("environment")
-      task.invoke
+      task.invoke rescue nil
       return false unless defined?(::Rails)
       @dirs << "tmp" if File.directory?("tmp")
       @webxml.booter = :rails
@@ -170,10 +170,10 @@ module Warbler
 
     def auto_detect_merb
       return false unless task = Warbler.project_application.lookup("merb_env")
-      task.invoke
+      task.invoke rescue nil
       return false unless defined?(::Merb)
       @webxml.booter = :merb
-      @gems["merb"] = Merb::VERSION
+      @gems["merb-core"] = Merb::VERSION # TODO: what should this be?
       true
     end
 

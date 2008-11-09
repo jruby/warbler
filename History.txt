@@ -1,3 +1,17 @@
+== 0.9.12
+
+* Allow framework auto-detection to be disabled. Set
+  `Warbler.framework_detection = false` at the top of config/warble.rb
+  or uncomment the line from a newly generated config.
+* Add configuration option to set manifest file (thanks Tommy McGuire)
+* Mitigate RubyGems 1.3 compatibility issue (thanks Jens Norrgrann)
+* Add experimental `war:exploded` task. This allows you to deploy your
+  application in an exploded mode, thus allowing continual development
+  without re-warring and re-deploying. Feedback is appreciated if you
+  try this feature; it may not work in all application servers and for
+  applications other than Rails.
+* Upgrade to JRuby 1.1.5 and JRuby-Rack 0.9.3
+
 == 0.9.11
 
 * Auto-detect Rails and Merb and configure appropriately

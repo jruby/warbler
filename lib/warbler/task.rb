@@ -13,9 +13,12 @@ module Warbler
     def project_application
       @project_application || Rake.application
     end
-  end
 
-  # Warbler Rake task.  Allows defining multiple configurations inside the same 
+    attr_accessor :framework_detection
+  end
+  self.framework_detection = true
+
+  # Warbler Rake task.  Allows defining multiple configurations inside the same
   # Rakefile by using different task names.
   class Task < Rake::TaskLib
     COPY_PROC = proc {|t| cp t.prerequisites.last, t.name }
@@ -114,7 +117,7 @@ module Warbler
             end
             require 'erb'
             erb = ERB.new(File.open(erb) {|f| f.read })
-            File.open("#{config.staging_dir}/WEB-INF/web.xml", "w") do |f| 
+            File.open("#{config.staging_dir}/WEB-INF/web.xml", "w") do |f|
               f << erb.result(erb_binding(config.webxml))
             end
           end
@@ -284,7 +287,7 @@ module Warbler
       matched = Gem.source_index.search(gem)
       fail "gem '#{gem}' not installed" if matched.empty?
       spec = matched.last
-      
+
       gem_name = "#{spec.name}-#{spec.version}"
       unless spec.platform.nil? || spec.platform == Gem::Platform::RUBY
         [spec.platform, spec.original_platform].each do |p|
