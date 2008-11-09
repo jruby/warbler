@@ -184,6 +184,7 @@ module Warbler
         desc "Create an exploded war in the app's public directory"
         task "exploded" => ["webxml", "java_classes", "gems", *libs] do
           cp "#{@config.staging_dir}/WEB-INF/web.xml", "."
+          cp File.join(WARBLER_HOME, "sun-web.xml"), "." unless File.exists?("sun-web.xml")
           ln_sf "#{@config.staging_dir}/WEB-INF/gems", "."
           if File.directory?("#{@config.staging_dir}/WEB-INF/classes")
             ln_sf "#{@config.staging_dir}/WEB-INF/classes", "."
@@ -198,7 +199,7 @@ module Warbler
             ["gems", "public/WEB-INF", "classes"]).each do |l|
             rm_f l if File.exist?(l) && File.symlink?(l)
           end
-          rm_f "web.xml"
+          rm_f "*web.xml"
         end
       end
     end

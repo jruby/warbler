@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sun-web-app
+        PUBLIC "-//Sun Microsystems, Inc.//DTD Application Server 8.1 Servlet 2.4//EN"
+        "http://www.sun.com/software/appserver/dtds/sun-web-app_2_4-1.dtd">
+<!-- See: http://wiki.glassfish.java.net/Wiki.jsp?page=FaqActivateSymbolicLinks -->
+<sun-web-app>
+    <property name="allowLinking" value="true"/>
+</sun-web-app>
+

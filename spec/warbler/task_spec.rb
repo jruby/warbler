@@ -10,29 +10,25 @@ describe Warbler::Task do
   before(:each) do
     @rake = Rake::Application.new
     Rake.application = @rake
-    mkdir_p "public"
+    verbose(false)
+    @pwd = Dir.getwd
+    Dir.chdir("spec/sample")
     mkdir_p "log"
-    touch "public/index.html"
     touch "log/test.log"
     @config = Warbler::Config.new do |config|
-      config.staging_dir = "pkg/tmp/war"
+      config.staging_dir = "tmp/war"
       config.war_name = "warbler"
       config.gems = ["rake"]
-      config.dirs = %w(bin generators log lib)
-      config.public_html = FileList["public/**/*", "tasks/**/*"]
       config.webxml.jruby.max.runtimes = 5
     end
-    verbose(false)
   end
 
   after(:each) do
     define_tasks "clean"
     Rake::Task["warble:clean"].invoke
-    rm_rf "public"
-    rm_rf "config"
     rm_rf "log"
-    rm_f "config.ru"
-    rm_f "web.xml"
+    rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb"]
+    Dir.chdir(@pwd)
   end
 
   def define_tasks(*tasks)
@@ -63,7 +59,6 @@ describe Warbler::Task do
     define_tasks "public"
     Rake::Task["warble:public"].invoke
     file_list(%r{^#{@config.staging_dir}/index\.html}).should_not be_empty
-    file_list(%r{tasks/warbler\.rake}).should_not be_empty
   end
 
   it "should define a gems task for unpacking gems" do
@@ -178,9 +173,9 @@ describe Warbler::Task do
     end
     define_tasks "app"
     Rake::Task["warble:app"].invoke
-    file_list(%r{WEB-INF/bin/warble$}).should_not be_empty
-    file_list(%r{WEB-INF/generators/warble/warble_generator\.rb$}).should_not be_empty
-    file_list(%r{WEB-INF/lib/warbler\.rb$}).should_not be_empty
+    file_list(%r{WEB-INF/app$}).should_not be_empty
+    file_list(%r{WEB-INF/config$}).should_not be_empty
+    file_list(%r{WEB-INF/lib$}).should_not be_empty
     gems_ran.should == true
   end
 
@@ -198,6 +193,7 @@ describe Warbler::Task do
     define_tasks "webxml", "exploded", "java_classes", "gems"
     Rake::Task['warble:exploded'].invoke
     File.exist?("web.xml").should == true
+    File.exist?("sun-web.xml").should == true
     File.symlink?("gems").should == true
     File.symlink?("public/WEB-INF").should == true
     Rake::Task['warble:clean:exploded'].invoke
@@ -227,12 +223,11 @@ describe Warbler::Task do
   end
 
   it "should be able to exclude files from the .war" do
-    @config.dirs << "spec"
-    @config.excludes += FileList['spec/spec_helper.rb']
+    @config.excludes += FileList['lib/tasks/utils.rake']
     task "warble:gems" do; end
     define_tasks "app"
     Rake::Task["warble:app"].invoke
-    file_list(%r{spec/spec_helper.rb}).should be_empty
+    file_list(%r{lib/tasks/utils.rake}).should be_empty
   end
 
   it "should be able to define all tasks successfully" do
