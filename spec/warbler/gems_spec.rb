@@ -29,4 +29,11 @@ describe Warbler::Gems do
     gems << "actionpack"
     gems.should include("actionpack")
   end  
+
+  it "should allow to add gems" do
+    gems = Warbler::Gems.new
+    gems << "rails"
+    gems += ["activerecord-jdbcmysql-adapter", "jdbc-mysql", "jruby-openssl"]
+    gems.should include("rails", "activerecord-jdbcmysql-adapter", "jdbc-mysql", "jruby-openssl")
+  end
 end
