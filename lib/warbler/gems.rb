@@ -25,10 +25,12 @@ module Warbler
 
     def +(other)
       other.each {|g| self[g] ||= ANY_VERSION }
+      self
     end
 
     def -(other)
       other.each {|g| self.delete(g)}
+      self
     end
   end
 end
