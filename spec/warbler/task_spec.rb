@@ -321,7 +321,7 @@ describe Warbler::Task do
     end
 
     config = Warbler::Config.new
-    config.gems.should include("rails")
+    config.gems.should have_key("rails")
 
     mkdir_p "vendor/rails"
     config = Warbler::Config.new
