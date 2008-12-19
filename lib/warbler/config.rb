@@ -160,9 +160,7 @@ module Warbler
         @gems["rails"] = Rails::VERSION::STRING
       end
       if defined?(Rails.configuration.gems)
-        Rails.configuration.gems.each do |g|
-          @gems[g.name] = Gem::Dependency.new(g.name, g.requirement)
-        end
+        Rails.configuration.gems.each {|g| @gems << Gem::Dependency.new(g.name, g.requirement) }
       end
       @webxml.jruby.max.runtimes = 1 if defined?(Rails.configuration.threadsafe!)
       true
@@ -173,7 +171,11 @@ module Warbler
       task.invoke rescue nil
       return false unless defined?(::Merb)
       @webxml.booter = :merb
-      @gems["merb-core"] = Merb::VERSION # TODO: what should this be?
+      if defined?(Merb::BootLoader::Dependencies.dependencies)
+        Merb::BootLoader::Dependencies.dependencies.each {|g| @gems << g }
+      else
+        warn "unable to auto-detect Merb dependencies; upgrade to Merb 1.0 or greater"
+      end
       true
     end
 

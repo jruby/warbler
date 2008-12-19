@@ -91,7 +91,7 @@ module Warbler
 
     def define_gems_task
       directory "#{config.staging_dir}/#{apply_pathmaps("sources-0.0.1.gem", :gems).pathmap("%d")}"
-      targets = define_copy_gems_tasks
+      targets = define_copy_gems_task
       with_namespace_and_config do
         desc "Unpack all gems into WEB-INF/gems"
         task "gems" => targets
@@ -269,7 +269,7 @@ module Warbler
       end
     end
 
-    def define_copy_gems_tasks
+    def define_copy_gems_task
       targets = []
       @config.gems.each do |gem, version|
         define_single_gem_tasks(gem, targets, version)
@@ -284,6 +284,10 @@ module Warbler
       else
         Gem::Dependency.new(gem_pattern, Gem::Requirement.create(version))
       end
+
+      # skip development dependencies
+      return if gem.respond_to?(:type) and gem.type != :runtime
+
       matched = Gem.source_index.search(gem)
       fail "gem '#{gem}' not installed" if matched.empty?
       spec = matched.last
@@ -319,7 +323,7 @@ module Warbler
 
       if @config.gem_dependencies
         spec.dependencies.each do |dep|
-          define_single_gem_tasks(dep.name, targets, dep.version_requirements)
+          define_single_gem_tasks(dep, targets)
         end
       end
     end

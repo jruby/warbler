@@ -305,6 +305,25 @@ describe Warbler::Task do
     rails
   end
 
+  def mock_merb_module
+    merb = Module.new
+    Object.const_set("Merb", merb)
+    boot_loader = Module.new
+    merb.const_set("BootLoader", boot_loader)
+    merb.const_set("VERSION", "1.0")
+    dependencies = Class.new do
+      @@dependencies = []
+      def self.dependencies
+        @@dependencies
+      end
+      def self.dependencies=(deps)
+        @@dependencies = deps
+      end
+    end
+    boot_loader.const_set("Dependencies", dependencies)
+    dependencies
+  end
+
   it "should auto-detect a Rails application" do
     task :environment do
       mock_rails_module
@@ -349,13 +368,10 @@ describe Warbler::Task do
 
   it "should auto-detect a Merb application" do
     task :merb_env do
-      merb = Module.new
-      Object.const_set("Merb", merb)
-      merb.const_set("VERSION", "0.9.3")
+      mock_merb_module
     end
     @config = Warbler::Config.new
     @config.webxml.booter.should == :merb
-    @config.gems["merb-core"].should == "0.9.3"
     @config.gems.keys.should_not include("rails")
   end
 
@@ -380,7 +396,35 @@ describe Warbler::Task do
 
     @config = Warbler::Config.new
     @config.webxml.booter.should == :rails
-    @config.gems["hpricot"].should == Gem::Dependency.new("hpricot", Gem::Requirement.new("=0.6"))
+    @config.gems.keys.should include(Gem::Dependency.new("hpricot", Gem::Requirement.new("=0.6")))
+  end
+
+  it "should automatically add Merb::BootLoader::Dependencies.dependencies to the list of gems" do
+    task :merb_env do
+      deps = mock_merb_module
+      deps.dependencies = [Gem::Dependency.new("merb-core", ">= 1.0.6.1")]
+    end
+    @config = Warbler::Config.new
+    @config.webxml.booter.should == :merb
+    @config.gems.keys.should include(Gem::Dependency.new("merb-core", ">= 1.0.6.1"))
+  end
+
+  it "should skip Merb development dependencies" do
+    task :merb_env do
+      deps = mock_merb_module
+      deps.dependencies = [Gem::Dependency.new("rake", "= #{RAKEVERSION}", :development)]
+    end
+    @config = Warbler::Config.new
+    define_tasks "copy_gems"
+    Rake.application.lookup("gem:rake-#{RAKEVERSION}").should be_nil
+  end
+
+  it "should warn about using Merb < 1.0" do
+    task :merb_env do
+      Object.const_set("Merb", Module.new)
+    end
+    @config = Warbler::Config.new
+    @config.webxml.booter.should == :merb
   end
 
   it "should set the jruby max runtimes to 1 when MT Rails is detected" do
