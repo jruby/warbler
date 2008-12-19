@@ -161,7 +161,7 @@ module Warbler
       end
       if defined?(Rails.configuration.gems)
         Rails.configuration.gems.each do |g|
-          @gems[g.name] = g.respond_to?(:version) ? g.version : g.specification.version
+          @gems[g.name] = Gem::Dependency.new(g.name, g.requirement)
         end
       end
       @webxml.jruby.max.runtimes = 1 if defined?(Rails.configuration.threadsafe!)

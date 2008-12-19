@@ -282,7 +282,7 @@ module Warbler
       when Gem::Dependency
         gem_pattern
       else
-        Gem::Dependency.new(gem_pattern, version)
+        Gem::Dependency.new(gem_pattern, Gem::Requirement.create(version))
       end
       matched = Gem.source_index.search(gem)
       fail "gem '#{gem}' not installed" if matched.empty?
