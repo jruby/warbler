@@ -1,5 +1,5 @@
 #--
-# (c) Copyright 2007-2008 Sun Microsystems, Inc.
+# (c) Copyright 2007-2009 Sun Microsystems, Inc.
 # See the file LICENSES.txt included with the distribution for
 # software license details.
 #++
@@ -36,7 +36,9 @@ describe Warbler::Task do
     @defined_tasks ||= []
     tasks.each do |task|
       unless @defined_tasks.include?(task)
-        Warbler::Task.new "warble", @config, "define_#{task}_task".to_sym do |t|
+        meth = "define_#{task}_task"
+        meth = "define_#{task}_tasks" unless Warbler::Task.private_instance_methods.include?(meth)
+        Warbler::Task.new "warble", @config, meth.to_sym do |t|
           options.each {|k,v| t.send "#{k}=", v }
         end
         @defined_tasks << task
@@ -437,6 +439,14 @@ describe Warbler::Task do
     @config = Warbler::Config.new
     @config.webxml.booter.should == :rails
     @config.webxml.jruby.max.runtimes.should == 1
+  end
+
+  it "should skip directories that don't exist in config.dirs and print a warning" do
+    @config = Warbler::Config.new
+    @config.dirs = %w(lib notexist)
+    define_tasks "webinf_file"
+    Rake.application.lookup("#{@config.staging_dir}/WEB-INF/lib").should_not be_nil
+    Rake.application.lookup("#{@config.staging_dir}/WEB-INF/notexist").should be_nil
   end
 end
 

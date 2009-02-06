@@ -1,5 +1,5 @@
 #--
-# (c) Copyright 2007-2008 Sun Microsystems, Inc.
+# (c) Copyright 2007-2009 Sun Microsystems, Inc.
 # See the file LICENSES.txt included with the distribution for
 # software license details.
 #++
@@ -227,7 +227,11 @@ module Warbler
     end
 
     def define_webinf_file_tasks
-      target_files = @config.dirs.map do |d|
+      target_files = @config.dirs.select do |d|
+        exists = File.directory?(d)
+        warn "warning: application directory `#{d}' does not exist or is not a directory; skipping" unless exists
+        exists
+      end.map do |d|
         define_file_task(d, "#{@config.staging_dir}/#{apply_pathmaps(d, :application)}")
       end
       files = FileList[*(@config.dirs.map{|d| "#{d}/**/*"})]
