@@ -322,7 +322,7 @@ module Warbler
 
       task gem_unpack_task_name => [dest.pathmap("%d")] do |t|
         require 'rubygems/installer'
-        Gem::Installer.new(src).unpack(dest)
+        Gem::Installer.new(src, :unpack => true).unpack(dest)
       end
 
       if @config.gem_dependencies
