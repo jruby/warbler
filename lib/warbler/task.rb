@@ -296,6 +296,9 @@ module Warbler
       fail "gem '#{gem}' not installed" if matched.empty?
       spec = matched.last
 
+      # skip gems with no load path
+      return if spec.loaded_from == ""
+
       gem_name = "#{spec.name}-#{spec.version}"
       unless spec.platform.nil? || spec.platform == Gem::Platform::RUBY
         [spec.platform, spec.original_platform].each do |p|
