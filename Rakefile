@@ -18,7 +18,6 @@ begin
     p.description = p.paragraphs_of('README.txt', 0...1).join("\n\n")
     p.extra_deps << ['rake', '>= 0.7.3']
     p.test_globs = ["spec/**/*_spec.rb"]
-    p.rdoc_pattern = /\.(rb|txt)/
   end
   hoe.spec.files = MANIFEST
   hoe.spec.dependencies.delete_if { |dep| dep.name == "hoe" }
@@ -35,7 +34,11 @@ end
 # !@#$ no easy way to empty the default list of prerequisites
 Rake::Task['default'].send :instance_variable_set, "@prerequisites", FileList[]
 
-task :default => :rcov
+if defined?(JRUBY_VERSION)
+  task :default => :spec
+else
+  task :default => :rcov
+end
 
 Spec::Rake::SpecTask.new do |t|
   t.spec_opts ||= []
