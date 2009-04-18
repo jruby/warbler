@@ -26,19 +26,19 @@ Warbler's +warble+ command is just a small wrapper around Rake with internally
 defined tasks. (Notice "rake" still prints out in the message, but you should
 substitute "warble" for "rake" on the command line when running this way.)
 
-    $ warble -T
-    rake config         # Generate a configuration file to customize your war assembly
-    rake pluginize      # Unpack warbler as a plugin in your Rails application
-    rake war            # Create trunk.war
-    rake war:app        # Copy all application files into the .war
-    rake war:clean      # Clean up the .war file and the staging area
-    rake war:gems       # Unpack all gems into WEB-INF/gems
-    rake war:jar        # Run the jar command to create the .war
-    rake war:java_libs  # Copy all java libraries into the .war
-    rake war:public     # Copy all public HTML files to the root of the .war
-    rake war:webxml     # Generate a web.xml file for the webapp
+   $ warble -T
+   rake config         # Generate a configuration file to customize your war assembly
+   rake pluginize      # Unpack warbler as a plugin in your Rails application
+   rake war            # Create trunk.war
+   rake war:app        # Copy all application files into the .war
+   rake war:clean      # Clean up the .war file and the staging area
+   rake war:gems       # Unpack all gems into WEB-INF/gems
+   rake war:jar        # Run the jar command to create the .war
+   rake war:java_libs  # Copy all java libraries into the .war
+   rake war:public     # Copy all public HTML files to the root of the .war
+   rake war:webxml     # Generate a web.xml file for the webapp
 
-Warble makes heavy use of Rake's file and directory tasks, so only recently
+Warbler makes heavy use of Rake's file and directory tasks, so only recently
 updated files will be copied, making repeated assemblies much faster.
 
 == Configuration
@@ -49,10 +49,10 @@ Rails applications are detected automatically and configured appropriately.
 The following items are set up for you:
 
 * The Rails gem is packaged if you haven't vendored Rails.
-* Other gems configured in Rails.configuration.gems are packaged (Rails 2.1 or
-  later)
-* Multi-thread-safe execution (as introduced in Rails 2.2) is detected and
-  runtime pooling is disabled.
+* Other gems configured in Rails.configuration.gems are packaged
+  (Rails 2.1 or later)
+* Multi-thread-safe execution (as introduced in Rails 2.2) is detected
+  and runtime pooling is disabled.
 
 === Merb applications
 
@@ -66,20 +66,22 @@ contents will be used as the rackup script for your Rack-based application.
 You will probably need to specify framework and application gems in
 config/warble.rb.
 
-See http://github.com/nicksieger/jruby-rack/tree/master/examples for examples
+See <a href="http://jruby-rack.kenai.com/sources/main/show/examples">the examples in the jruby-rack project</a>
 of how to configure Warbler to package Camping and Sinatra apps.
 
 === Configuration auto-detect notes
 
-* If you don't have database access in the environment where you package your
-  application, you may wish to set `Warbler.framework_detection` to false at
-  the top of config.rb. In this case you may need to specify additional
-  details such as booter, gems and other settings.
-* A more accurate way of detecting a Merb application's gems is needed. Until
-  then, you will have to specify them in config/warble.rb. See below.
-* Is it possible to more generally detect what gems an application uses?
-  Gem.loaded_specs is available, but the application needs to be loaded first
-  before its contents are reliable.
+* If you don't have database access in the environment where you
+  package your application, you may wish to set
+  `Warbler.framework_detection` to false at the top of config.rb. In
+  this case you may need to specify additional details such as booter,
+  gems and other settings.
+* A more accurate way of detecting a Merb application's gems is
+  needed. Until then, you will have to specify them in
+  config/warble.rb. See below.
+* Is it possible to more generally detect what gems an application
+  uses? Gem.loaded_specs is available, but the application needs to be
+  loaded first before its contents are reliable.
 
 === Custom configuration
 
@@ -98,7 +100,7 @@ doing this. With the gem, simply run
 
 If you have Warbler installed as a plugin, use the generator:
 
-    script/generate warble
+ script/generate warble
 
 Finally, edit the config/warble.rb to your taste. If you install the gem but
 later decide you'd like to have it as a plugin, use the +pluginize+ command:
@@ -122,16 +124,17 @@ Java web applications are configured mainly through this file, and Warbler
 creates a suitable default file for you for use. However, if you need to
 customize it in any way, you have two options.
 
-1. If you just want a static web.xml file whose contents you manually control,
-   you may copy the one generated for you in <tt>tmp/war/WEB-INF/web.xml</tt>
-   to <tt>config/web.xml</tt> and modify as needed. It will be copied into the
-   webapp for you.
-2. If you want to inject some dynamic information into the file, copy the
-   <tt>WARBLER_HOME/web.xml.erb</tt> to <tt>config/web.xml.erb</tt>. Its
-   contents will be evaluated for you and put in the webapp. Note that you can
-   also pass arbitrary properties to the ERb template by setting
-   <tt>config.webxml.customkey</tt> values in your <tt>config/warble.rb</tt>
-   file.
+1. If you just want a static web.xml file whose contents you manually
+   control, you may copy the one generated for you in
+   <tt>tmp/war/WEB-INF/web.xml</tt> to <tt>config/web.xml</tt> and
+   modify as needed. It will be copied into the webapp for you.
+2. If you want to inject some dynamic information into the file, copy
+   the <tt>WARBLER_HOME/web.xml.erb</tt> to
+   <tt>config/web.xml.erb</tt>. Its contents will be evaluated for you
+   and put in the webapp. Note that you can also pass arbitrary
+   properties to the ERb template by setting
+   <tt>config.webxml.customkey</tt> values in your
+   <tt>config/warble.rb</tt> file.
 
 For more information on configuration, see Warbler::Config.
 
@@ -141,17 +144,17 @@ If Warbler isn't packaging the files you were expecting, there are several
 debug tasks available to give you more insight into what's going on.
 
 * <tt>war:debug</tt> prints a YAML dump of the current configuration
-* <tt>war:debug:X</tt> prints a list of files that Warbler will include during
-  that stage of assembly. Valid values of <tt>X</tt> are <tt>app, java_libs,
-  gems, public, includes, excludes</tt>.
+* <tt>war:debug:X</tt> prints a list of files that Warbler will
+  include during that stage of assembly. Valid values of <tt>X</tt>
+  are <tt>app, java_libs, gems, public, includes, excludes</tt>.
 
 == Source
 
 You can get the Warbler source using Git, in any of the following ways:
 
-    git clone git://git.caldersphere.net/warbler.git
-    git clone http://git.caldersphere.net/warbler.git
-    git clone git://github.com/nicksieger/warbler.git
+   git clone git://kenai.com/warbler~main
+   git clone git://git.caldersphere.net/warbler.git
+   git clone git://github.com/nicksieger/warbler.git
 
 You can also download a tarball of Warbler source at
 http://github.com/nicksieger/warbler/tree/master.
@@ -160,8 +163,8 @@ http://github.com/nicksieger/warbler/tree/master.
 
 Warbler is provided under the terms of the MIT license.
 
-    Warbler (c) 2007-08 Sun Microsystems, Inc.
+Warbler (c) 2007-2009 Sun Microsystems, Inc.
 
-Warbler also bundles several other pieces of software for convenience. Please
-read the file LICENSES.txt to ensure that you agree with the terms of all the
-components.
+Warbler also bundles several other pieces of software for convenience.
+Please read the file LICENSES.txt to ensure that you agree with the
+terms of all the components.
