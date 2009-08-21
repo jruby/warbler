@@ -8,7 +8,8 @@ begin
   File.open("Manifest.txt", "w") {|f| MANIFEST.each {|n| f << "#{n}\n"} }
   require 'hoe'
   require File.dirname(__FILE__) + '/lib/warbler/version'
-  hoe = Hoe.new("warbler", Warbler::VERSION) do |p|
+  hoe = Hoe.spec("warbler") do |p|
+    p.version = Warbler::VERSION
     p.rubyforge_name = "caldersphere"
     p.url = "http://caldersphere.rubyforge.org/warbler"
     p.author = "Nick Sieger"
@@ -33,11 +34,12 @@ end
 # Hoe insists on setting task :default => :test
 # !@#$ no easy way to empty the default list of prerequisites
 Rake::Task['default'].send :instance_variable_set, "@prerequisites", FileList[]
+Rake::Task['default'].send :instance_variable_set, "@actions", []
 
 if defined?(JRUBY_VERSION)
   task :default => :spec
 else
-  task :default => :rcov
+  task :default => :rcov_verify
 end
 
 Spec::Rake::SpecTask.new do |t|
@@ -47,15 +49,11 @@ end
 
 Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.rcov = true
-  t.rcov_opts << '--exclude gems/*'
 end
 
 # so we don't confuse autotest
-RCov::VerifyTask.new(:rcov) do |t|
+RCov::VerifyTask.new(:rcov_verify) do |t|
   t.threshold = 100
 end
 
-task "spec:rcov" do
-  rm_f "Manifest.txt"
-end
-task :rcov => "spec:rcov"
+task :rcov_verify => "spec:rcov"
