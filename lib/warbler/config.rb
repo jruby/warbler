@@ -1,5 +1,5 @@
 #--
-# (c) Copyright 2007-2008 Sun Microsystems, Inc.
+# (c) Copyright 2007-2009 Sun Microsystems, Inc.
 # See the file LICENSES.txt included with the distribution for
 # software license details.
 #++
@@ -91,11 +91,12 @@ module Warbler
     attr_accessor :webxml
 
     def initialize(warbler_home = WARBLER_HOME)
+      @warbler_home = warbler_home
       @staging_dir = File.join("tmp", "war")
       @dirs        = TOP_DIRS.select {|d| File.directory?(d)}
       @includes    = FileList[]
       @excludes    = FileList[]
-      @java_libs   = FileList["#{warbler_home}/lib/*.jar"]
+      @java_libs   = default_jar_files
       @java_classes = FileList[]
       @gems        = Warbler::Gems.new
       @gem_dependencies = true
@@ -144,6 +145,11 @@ module Warbler
       c.jndi = nil
       c.ignored = %w(jndi booter)
       c
+    end
+
+    def default_jar_files
+      require 'jruby-jars'
+      FileList["#{@warbler_home}/lib/*.jar", JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path]
     end
 
     def auto_detect_frameworks

@@ -165,7 +165,7 @@ describe Warbler::Task do
   it "should define a java_libs task for copying java libraries" do
     define_tasks "java_libs"
     Rake::Task["warble:java_libs"].invoke
-    file_list(%r{WEB-INF/lib/jruby-complete.*\.jar$}).should_not be_empty
+    file_list(%r{WEB-INF/lib/jruby-.*\.jar$}).should_not be_empty
   end
 
   it "should define an app task for copying application files" do
