@@ -1,9 +1,9 @@
 #--
-# (c) Copyright 2007-2008 Sun Microsystems, Inc.
+# (c) Copyright 2007-2009 Sun Microsystems, Inc.
 # See the file LICENSES.txt included with the distribution for
 # software license details.
 #++
 
 module Warbler
-  VERSION = "0.9.13"
+  VERSION = "0.9.14"
 end

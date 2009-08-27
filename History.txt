@@ -1,3 +1,14 @@
+== 0.9.14
+
+* So, jruby-rack is bundled for one more release. 1.0 will not contain
+  any jar files, I promise!
+* Upgraded jruby-rack to 0.9.5.
+* Unbundled jruby-complete jar in favor of new jruby-jars gem, which
+  can be upgraded separately.
+* Skip gems which have no loaded_from attribute set
+  (this happened with the Authlogic gem on Edge Rails)
+  (thanks Laszlo Bacsi)
+
 == 0.9.13
 
 * RailsConf 2009 edition.

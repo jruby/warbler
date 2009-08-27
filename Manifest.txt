@@ -9,7 +9,6 @@ generators/warble
 generators/warble/templates
 generators/warble/templates/warble.rb
 generators/warble/warble_generator.rb
-lib/jruby-rack-0.9.4.jar
 lib/warbler
 lib/warbler/config.rb
 lib/warbler/gems.rb
