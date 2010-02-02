@@ -78,6 +78,7 @@ module Warbler
     # * <tt>webxml.rails.env</tt> -- the Rails environment to use for the
     #   running application, usually either development or production (the
     #   default).
+    # * <tt>webxml.gem.home</tt> -- the path to your bundled gem directory
     # * <tt>webxml.jruby.min.runtimes</tt> -- minimum number of pooled runtimes to
     #   keep around during idle time
     # * <tt>webxml.jruby.max.runtimes</tt> -- maximum number of pooled Rails

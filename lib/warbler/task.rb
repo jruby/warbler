@@ -160,8 +160,11 @@ module Warbler
     def define_app_task
       webinf_target_files = define_webinf_file_tasks
       with_namespace_and_config do |name, config|
+        task "webinf_target_files" => [*webinf_target_files]
+        task "webinf_target_files" => "#{name}:gems" unless config.webxml.gem.home.is_a? String
+        
         desc "Copy all application files into the .war"
-        task "app" => ["#{name}:gems", *webinf_target_files]
+        task "app" => "webinf_target_files"
         task "debug:app" do
           puts "", "app files:"
           puts *webinf_target_files
