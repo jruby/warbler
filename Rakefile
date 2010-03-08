@@ -17,7 +17,7 @@ begin
     p.summary = "Warbler chirpily constructs .war files of your Rails applications."
     p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
     p.description = p.paragraphs_of('README.txt', 1...2).join("\n\n")
-    p.extra_deps += [['rake', '>= 0.7.3'], ['jruby-jars', '>= 1.3.1']]
+    p.extra_deps += [['rake', '>= 0.7.3'], ['jruby-jars', '>= 1.3.1'], ['jruby-rack', '>= 0.9.7']]
     p.test_globs = ["spec/**/*_spec.rb"]
   end
   hoe.spec.files = MANIFEST

@@ -150,7 +150,8 @@ module Warbler
 
     def default_jar_files
       require 'jruby-jars'
-      FileList["#{@warbler_home}/lib/*.jar", JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path]
+      require 'jruby-rack'
+      FileList[JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path, JRubyJars.jruby_rack_jar_path]
     end
 
     def auto_detect_frameworks
