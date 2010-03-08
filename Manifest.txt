@@ -1,7 +1,7 @@
 History.txt
 Manifest.txt
 README.txt
-LICENSES.txt
+LICENSE.txt
 Rakefile
 web.xml.erb
 bin/warble

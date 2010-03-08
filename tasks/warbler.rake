@@ -1,7 +1,8 @@
 #--
-# (c) Copyright 2007-2008 Sun Microsystems, Inc.
-# See the file LICENSES.txt included with the distribution for
-# software license details.
+# Copyright (c) 2010 Engine Yard, Inc.
+# Copyright (c) 2007-2009 Sun Microsystems, Inc.
+# This source code is available under the MIT license.
+# See the file LICENSE.txt for details.
 #++
 
 begin

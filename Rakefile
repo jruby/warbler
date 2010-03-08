@@ -1,7 +1,14 @@
+#--
+# Copyright (c) 2010 Engine Yard, Inc.
+# Copyright (c) 2007-2009 Sun Microsystems, Inc.
+# This source code is available under the MIT license.
+# See the file LICENSE.txt for details.
+#++
+
 require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
 
-MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt", "LICENSES.txt", "Rakefile",
+MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt", "LICENSE.txt", "Rakefile",
   "*.erb", "bin/*", "generators/**/*", "lib/**/*", "spec/**/*.rb", "tasks/**/*.rake"]
 
 begin
