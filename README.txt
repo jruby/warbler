@@ -163,6 +163,7 @@ http://github.com/nicksieger/warbler/tree/master.
 
 Warbler is provided under the terms of the MIT license.
 
+Warbler (c) 2010 Engine Yard, Inc.
 Warbler (c) 2007-2009 Sun Microsystems, Inc.
 
 Warbler also bundles several other pieces of software for convenience.

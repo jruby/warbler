@@ -2,7 +2,8 @@
 
 Warbler is provided under the terms of the MIT license.
 
-(c) Copyright 2007-2008 Sun Microsystems, Inc.
+Warbler (c) 2010 Engine Yard, Inc.
+Warbler (c) 2007-2009 Sun Microsystems, Inc.
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation files
@@ -23,15 +24,3 @@ BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
 ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-= Additional Bundled Software
-
-JRuby-Rack (jruby-rack-*.jar) is distributed under the terms of the MIT license.
-See http://svn.codehaus.org/jruby-contrib/trunk/rack/LICENSE.txt
-for details.
-
-JRuby (jruby-complete-*.jar) is distrubuted under the terms of the Common
-Public License. See http://www.eclipse.org/legal/cpl-v10.html for details. At
-your option, JRuby is also available under the GPL or LGPL licenses. See the
-file COPYING in the JRuby distribution for details
-(http://svn.codehaus.org/jruby/trunk/jruby/COPYING).
