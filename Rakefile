@@ -26,6 +26,7 @@ begin
     p.description = p.paragraphs_of('README.txt', 1...2).join("\n\n")
     p.extra_deps += [['rake', '>= 0.7.3'], ['jruby-jars', '>= 1.3.1'], ['jruby-rack', '>= 0.9.7']]
     p.test_globs = ["spec/**/*_spec.rb"]
+    p.rspec_options = ["--options", "spec/spec.opts"]
   end
   hoe.spec.files = MANIFEST
   hoe.spec.dependencies.delete_if { |dep| dep.name == "hoe" }
@@ -38,29 +39,18 @@ rescue LoadError
   puts "You really need Hoe installed to be able to package this gem"
 end
 
-# Hoe insists on setting task :default => :test
-# !@#$ no easy way to empty the default list of prerequisites
-Rake::Task['default'].send :instance_variable_set, "@prerequisites", FileList[]
-Rake::Task['default'].send :instance_variable_set, "@actions", []
-
-if defined?(JRUBY_VERSION)
-  task :default => :spec
-else
+unless defined?(JRUBY_VERSION)
   task :default => :rcov_verify
 end
 
-Spec::Rake::SpecTask.new do |t|
+Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.spec_opts ||= []
   t.spec_opts << "--options" << "spec/spec.opts"
-end
-
-Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.rcov = true
 end
 
 # so we don't confuse autotest
-RCov::VerifyTask.new(:rcov_verify) do |t|
+RCov::VerifyTask.new(:rcov) do |t|
   t.threshold = 100
 end
-
-task :rcov_verify => "spec:rcov"
+task :rcov => "spec:rcov"
