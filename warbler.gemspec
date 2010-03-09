@@ -20,7 +20,7 @@ server.}
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{caldersphere}
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{Warbler chirpily constructs .war files of your Rails applications.}
 
   if s.respond_to? :specification_version then

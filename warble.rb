@@ -3,9 +3,6 @@
 
 # Warbler web application assembly configuration file
 Warbler::Config.new do |config|
-  # Temporary directory where the application is staged
-  # config.staging_dir = "tmp/war"
-
   # Application directories to be included in the webapp.
   config.dirs = %w(app config lib log vendor tmp)
 

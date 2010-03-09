@@ -14,6 +14,8 @@ module Warbler
     FILE = "config/warble.rb"
     BUILD_GEMS = %w(warbler rake rcov)
 
+    # Deprecated: No longer has any effect.
+    attr_accessor :staging_dir
 
     # A hash of files that Warbler will build into the .war file. Keys
     # to the hash are filenames in the .war, values are either nil
