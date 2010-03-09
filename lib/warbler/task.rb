@@ -34,7 +34,7 @@ module Warbler
     # to see what is getting included
     attr_accessor :verbose
 
-    def initialize(name = :war, config = nil, tasks = :define_tasks)
+    def initialize(name = :war, config = nil)
       @name   = name
       @config = config
       if @config.nil? && File.exists?(Config::FILE)
@@ -42,30 +42,29 @@ module Warbler
       end
       @config ||= Config.new
       unless @config.kind_of? Config
-        warn "War::Config not provided by override in initializer or #{Config::FILE}; using defaults"
+        warn "Warbler::Config not provided by override in initializer or #{Config::FILE}; using defaults"
         @config = Config.new
       end
       yield self if block_given?
-      send tasks
+      define_tasks
     end
 
     private
     def define_tasks
       define_main_task
       define_clean_task
-      define_public_task
-      define_gems_task
-      define_webxml_task
-      define_app_task
-      define_java_classes_task
-      define_java_libs_task
+      define_files_task
       define_jar_task
       define_debug_task
     end
 
     def define_main_task
       desc "Create #{@config.war_name}.war"
-      task @name => ["#{@name}:app", "#{@name}:public", "#{@name}:webxml", "#{@name}:jar"]
+      task @name do
+        ["#{@name}:files", "#{@name}:jar"].each do |t|
+          Rake::Task[t].invoke
+        end
+      end
     end
 
     def define_clean_task
@@ -78,67 +77,28 @@ module Warbler
       end
     end
 
-    def define_public_task
-      public_target_files = nil
-      with_namespace_and_config do
-        desc "Collect all public HTML files to be placed in the root of the .war"
-        task "public" do
-          public_target_files = find_public_files
-        end
-        task "debug:public" => "public"do
-          puts "", "public files:"
-          puts *public_target_files
-        end
+    def add_webxml
+      webxml = nil
+      if File.exist?("config/web.xml")
+        webxml = "config/web.xml"
+      else
+        erb = if File.exist?("config/web.xml.erb")
+                "config/web.xml.erb"
+              else
+                "#{WARBLER_HOME}/web.xml.erb"
+              end
+        require 'erb'
+        erb = ERB.new(File.open(erb) {|f| f.read })
+        webxml = StringIO.new(erb.result(erb_binding(@config.webxml)))
       end
+      @config.add_file("WEB-INF/web.xml", webxml)
     end
 
-    def define_gems_task
-      targets = nil
-      with_namespace_and_config do
-        desc "Look for gems to package into WEB-INF/gems"
-        task "gems" do
-          targets = find_gems_files
-        end
-        task "debug:gems" => "gems" do
-          puts "", "gems files:"
-          puts *targets
-        end
-      end
-    end
-
-    def define_webxml_task
-      with_namespace_and_config do |name, config|
-        desc "Generate a web.xml file for the webapp"
-        task "webxml" do
-          webxml = nil
-          if File.exist?("config/web.xml")
-            webxml = "config/web.xml"
-          else
-            erb = if File.exist?("config/web.xml.erb")
-              "config/web.xml.erb"
-            else
-              "#{WARBLER_HOME}/web.xml.erb"
-            end
-            require 'erb'
-            erb = ERB.new(File.open(erb) {|f| f.read })
-            webxml = StringIO.new(erb.result(erb_binding(config.webxml)))
-          end
-          config.add_file("WEB-INF/web.xml", webxml)
-        end
-      end
-    end
-
-    def define_java_libs_task
-      target_files = nil
-      with_namespace_and_config do |name, config|
-        desc "Collect all java libraries for the .war"
-        task "java_libs" do
-          target_files = find_java_libs
-        end
-        task "debug:java_libs" => "java_libs" do
-          puts "", "java_libs files:"
-          puts *target_files
-        end
+    def add_manifest
+      if @config.manifest_file
+        @config.add_file 'META-INF/MANIFEST.MF', @config.manifest_file
+      else
+        @config.add_file 'META-INF/MANIFEST.MF', StringIO.new(%{Manifest-Version: 1.0\nCreated-By: Warbler #{VERSION}\n\n})
       end
     end
 
@@ -148,65 +108,9 @@ module Warbler
       end
     end
 
-    def define_java_classes_task
-      target_files = nil
-      with_namespace_and_config do |name, config|
-        desc "Collect java classes for the .war"
-        task "java_classes" do
-          target_files = find_java_classes
-        end
-        task "debug:java_classes" => "java_classes" do
-          puts "", "java_classes files:"
-          puts *target_files
-        end
-      end
-      target_files
-    end
-
     def find_java_classes
       @config.java_classes.map do |f|
         @config.add_file(apply_pathmaps(f, :java_classes), f)
-      end
-    end
-
-    def define_app_task
-      webinf_target_files = nil
-      with_namespace_and_config do |name, config|
-        desc "Collect all application files for the .war"
-        task "app" do
-          webinf_target_files = find_webinf_files
-        end
-        task "debug:app" => "app" do
-          puts "", "app files:"
-          puts *webinf_target_files
-        end
-      end
-    end
-
-    def define_jar_task
-      with_namespace_and_config do |name, config|
-        desc "Create the .war"
-        task "jar" do
-          if config.manifest_file
-            config.add_file 'META-INF/MANIFEST.MF', config.manifest_file
-          end
-          war_path = "#{config.war_name}.war"
-          war_path = File.join(config.autodeploy_dir, war_path) if config.autodeploy_dir
-          create_war war_path, config.files
-        end
-      end
-    end
-
-    def define_debug_task
-      with_namespace_and_config do |name, config|
-        task "debug" do
-          require 'yaml'
-          puts YAML::dump(config)
-        end
-        all_debug_tasks = %w(: app java_libs java_classes gems public includes excludes).map do |n|
-          n.sub(/^:?/, "#{name}:debug:").sub(/:$/, '')
-        end
-        task "debug:all" => all_debug_tasks
       end
     end
 
@@ -216,49 +120,13 @@ module Warbler
       end
     end
 
-    def find_webinf_files
-      target_files = @config.dirs.select do |d|
-        exists = File.directory?(d)
-        warn "warning: application directory `#{d}' does not exist or is not a directory; skipping" unless exists
-        exists
-      end.map do |d|
-        @config.add_file apply_pathmaps(d, :application), nil
-      end
-      files = FileList[*(@config.dirs.map{|d| "#{d}/**/*"})]
-      files.include *(@config.includes.to_a)
-      files.exclude *(@config.excludes.to_a)
-      target_files += files.map do |f|
-        @config.add_file apply_pathmaps(f, :application), f
-      end
-      target_files += find_java_libs
-      target_files += find_java_classes
-      task "#@name:debug:includes" do
-        puts "", "included files:"
-        puts *files.include
-      end
-      task "#@name:debug:excludes" do
-        puts "", "excluded files:"
-        puts *files.exclude
-      end
-      target_files
-    end
-
-    def with_namespace_and_config
-      name, config = @name, @config
-      namespace name do
-        yield name, config
-      end
-    end
-
     def find_gems_files
-      files = []
       @config.gems.each do |gem, version|
-        find_single_gem_files(gem, files, version)
+        find_single_gem_files(gem, version)
       end
-      files
     end
 
-    def find_single_gem_files(gem_pattern, targets, version = nil)
+    def find_single_gem_files(gem_pattern, version = nil)
       gem = case gem_pattern
       when Gem::Dependency
         gem_pattern
@@ -276,16 +144,88 @@ module Warbler
       # skip gems with no load path
       return if spec.loaded_from == ""
 
-      targets << @config.add_file(apply_pathmaps(spec.loaded_from, :gemspecs), spec.loaded_from)
+      @config.add_file(apply_pathmaps(spec.loaded_from, :gemspecs), spec.loaded_from)
       spec.files.each do |f|
-        src = File.join(spec.full_name, f)
-        targets << @config.add_file(apply_pathmaps(src, :gems), src)
+        src = File.join(spec.full_gem_path, f)
+        # some gemspecs may have incorrect file listings
+        next unless File.exist?(src)
+        @config.add_file(apply_pathmaps(File.join(spec.full_name, f), :gems), src)
       end
 
       if @config.gem_dependencies
         spec.dependencies.each do |dep|
-          find_single_gem_files(dep, targets)
+          find_single_gem_files(dep)
         end
+      end
+    end
+
+    def find_webinf_files
+      @config.dirs.select do |d|
+        exists = File.directory?(d)
+        warn "warning: application directory `#{d}' does not exist or is not a directory; skipping" unless exists
+        exists
+      end.each do |d|
+        @config.add_file apply_pathmaps(d, :application), nil
+      end
+      files = FileList[*(@config.dirs.map{|d| "#{d}/**/*"})]
+      files.include *(@config.includes.to_a)
+      files.exclude *(@config.excludes.to_a)
+      files.map do |f|
+        @config.add_file apply_pathmaps(f, :application), f
+      end
+      task "#@name:debug:includes" do
+        puts "", "included files:"
+        puts *files.include
+      end
+      task "#@name:debug:excludes" do
+        puts "", "excluded files:"
+        puts *files.exclude
+      end
+    end
+
+    def define_files_task
+      webinf_target_files = nil
+      with_namespace_and_config do |name, config|
+        desc "Collect all application files for the .war"
+        task "files" do
+          find_webinf_files
+          find_java_libs
+          find_java_classes
+          find_gems_files
+          find_public_files
+          add_webxml
+          add_manifest
+        end
+      end
+    end
+
+    def define_jar_task
+      with_namespace_and_config do |name, config|
+        desc "Create the .war"
+        task "jar" do
+          war_path = "#{config.war_name}.war"
+          war_path = File.join(config.autodeploy_dir, war_path) if config.autodeploy_dir
+          create_war war_path, config.files
+        end
+      end
+    end
+
+    def define_debug_task
+      with_namespace_and_config do |name, config|
+        task "debug" => "files" do
+          require 'yaml'
+          puts YAML::dump(config)
+          config.files.each {|k,v| puts "#{k} -> #{String === v ? v : '<blob>'}"}
+        end
+        task "debug:includes" => "files"
+        task "debug:excludes" => "files"
+      end
+    end
+
+    def with_namespace_and_config
+      name, config = @name, @config
+      namespace name do
+        yield name, config
       end
     end
 
@@ -306,20 +246,15 @@ module Warbler
       Zip::ZipFile.open(war_file, Zip::ZipFile::CREATE) do |zipfile|
         entries.keys.sort.each do |entry|
           src = entries[entry]
-          case src
-          when nil
+          if src.nil?
             zipfile.mkdir(entry)
-          when IO
+          elsif src.respond_to?(:read)
             zipfile.get_output_stream(entry) {|f| f << src.read }
           else
             zipfile.add(entry, src)
           end
         end
       end
-    rescue => e
-      puts "PWD: #{Dir.getwd}"
-      puts e, *e.backtrace
-      raise
     end
   end
 end

@@ -39,9 +39,8 @@ rescue LoadError
   puts "You really need Hoe installed to be able to package this gem"
 end
 
-unless defined?(JRUBY_VERSION)
-  task :default => :rcov_verify
-end
+Rake::Task['rcov'].instance_variable_set("@prerequisites", [])
+Rake::Task['rcov'].instance_variable_set("@actions", [])
 
 Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.spec_opts ||= []
@@ -49,8 +48,7 @@ Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.rcov = true
 end
 
-# so we don't confuse autotest
-RCov::VerifyTask.new(:rcov) do |t|
+RCov::VerifyTask.new(:rcov => "spec:rcov") do |t|
   t.threshold = 100
 end
-task :rcov => "spec:rcov"
+

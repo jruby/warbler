@@ -21,26 +21,14 @@ describe Warbler::Task do
       config.gems = ["rake"]
       config.webxml.jruby.max.runtimes = 5
     end
+    @task = Warbler::Task.new "warble", @config
   end
 
   after(:each) do
-    define_tasks "clean"
     Rake::Task["warble:clean"].invoke
     rm_rf "log"
-    rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb", "file.txt"]
+    rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb", "file.txt", 'manifest']
     Dir.chdir(@pwd)
-  end
-
-  def define_tasks(*tasks)
-    @defined_tasks ||= []
-    tasks.each do |task|
-      unless @defined_tasks.include?(task)
-        meth = "define_#{task}_task"
-        meth = "define_#{task}_tasks" unless Warbler::Task.private_instance_methods.include?(meth)
-        Warbler::Task.new "warble", @config, meth.to_sym
-        @defined_tasks << task
-      end
-    end
   end
 
   def file_list(regex)
@@ -48,43 +36,38 @@ describe Warbler::Task do
   end
 
   it "should define a clean task for removing the war file" do
-    define_tasks "clean"
     war_file = "#{@config.war_name}.war"
     touch war_file
     Rake::Task["warble:clean"].invoke
     File.exist?(war_file).should == false
   end
 
-  it "should define a public task for collecting the public files" do
-    define_tasks "public"
-    Rake::Task["warble:public"].invoke
+  it "should collect files in public" do
+    Rake::Task["warble:files"].invoke
     file_list(%r{^index\.html}).should_not be_empty
   end
 
-  it "should define a gems task for collecting gem files" do
+  it "should collect gem files" do
     @config.gems << "rails"
-    define_tasks "gems"
-    Rake::Task["warble:gems"].invoke
+    Rake::Task["warble:files"].invoke
     file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
     file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
   end
 
-  it "should define a app task for collecting application files" do
-    define_tasks "app", "gems"
-    Rake::Task["warble:app"].invoke
+  it "should not include log files by default" do
+    Rake::Task["warble:files"].invoke
     file_list(%r{WEB-INF/log}).should_not be_empty
     file_list(%r{WEB-INF/log/.*\.log}).should be_empty
   end
 
   def expand_webxml
-    define_tasks "webxml"
-    Rake::Task["warble:webxml"].invoke
+    Rake::Task["warble:files"].invoke
     require 'rexml/document'
     @config.files.should include("WEB-INF/web.xml")
     REXML::Document.new(@config.files["WEB-INF/web.xml"]).root.elements
   end
 
-  it "should define a webxml task for creating web.xml" do
+  it "should create a web.xml file" do
     elements = expand_webxml
     elements.to_a(
       "context-param/param-name[text()='jruby.max.runtimes']"
@@ -94,7 +77,7 @@ describe Warbler::Task do
       ).first.text.should == "5"
   end
 
-  it "should include custom context parameters" do
+  it "should include custom context parameters in web.xml" do
     @config.webxml.some.custom.config = "myconfig"
     elements = expand_webxml
     elements.to_a(
@@ -140,38 +123,33 @@ describe Warbler::Task do
   end
 
   it "should use a config/web.xml if it exists" do
-    define_tasks "webxml"
     mkdir_p "config"
     touch "config/web.xml"
-    Rake::Task["warble:webxml"].invoke
+    Rake::Task["warble:files"].invoke
     @config.files["WEB-INF/web.xml"].should == "config/web.xml"
   end
 
   it "should use a config/web.xml.erb if it exists" do
-    define_tasks "webxml"
     mkdir_p "config"
     File.open("config/web.xml.erb", "w") {|f| f << "Hi <%= webxml.public.root %>" }
-    Rake::Task["warble:webxml"].invoke
+    Rake::Task["warble:files"].invoke
     @config.files["WEB-INF/web.xml"].should_not be_nil
     @config.files["WEB-INF/web.xml"].read.should == "Hi /"
   end
 
-  it "should define a java_libs task for copying java libraries" do
-    define_tasks "java_libs"
-    Rake::Task["warble:java_libs"].invoke
+  it "should collect java libraries" do
+    Rake::Task["warble:files"].invoke
     file_list(%r{WEB-INF/lib/jruby-.*\.jar$}).should_not be_empty
   end
 
-  it "should define an app task for copying application files" do
-    define_tasks "app"
-    Rake::Task["warble:app"].invoke
+  it "should collect application files" do
+    Rake::Task["warble:files"].invoke
     file_list(%r{WEB-INF/app$}).should_not be_empty
     file_list(%r{WEB-INF/config$}).should_not be_empty
     file_list(%r{WEB-INF/lib$}).should_not be_empty
   end
 
   it "should define a jar task for creating the .war" do
-    define_tasks "jar"
     touch "file.txt"
     @config.files["file.txt"] = "file.txt"
     Rake::Task["warble:jar"].invoke
@@ -179,7 +157,6 @@ describe Warbler::Task do
   end
 
   it "should accept an autodeploy directory where the war should be created" do
-    define_tasks "jar"
     require 'tmpdir'
     @config.autodeploy_dir = Dir::tmpdir
     touch "file.txt"
@@ -188,24 +165,24 @@ describe Warbler::Task do
     File.exist?(File.join("#{Dir::tmpdir}","warbler.war")).should == true
   end
 
+  it "should accept a custom manifest file" do
+    touch 'manifest'
+    @config.manifest_file = 'manifest'
+    Rake::Task["warble:files"].invoke
+    @config.files['META-INF/MANIFEST.MF'].should == "manifest"
+  end
+
   it "should define a war task for bundling up everything" do
-    app_ran = false; task "warble:app" do; app_ran = true; end
-    public_ran = false; task "warble:public" do; public_ran = true; end
+    files_ran = false; task "warble:files" do; files_ran = true; end
     jar_ran = false; task "warble:jar" do; jar_ran = true; end
-    webxml_ran = false; task "warble:webxml" do; webxml_ran = true; end
-    define_tasks "main"
     Rake::Task["warble"].invoke
-    app_ran.should == true
-    public_ran.should == true
+    files_ran.should == true
     jar_ran.should == true
-    webxml_ran.should == true
   end
 
   it "should be able to exclude files from the .war" do
     @config.excludes += FileList['lib/tasks/utils.rake']
-    task "warble:gems" do; end
-    define_tasks "app"
-    Rake::Task["warble:app"].invoke
+    Rake::Task["warble:files"].invoke
     file_list(%r{lib/tasks/utils.rake}).should be_empty
   end
 
@@ -216,7 +193,7 @@ describe Warbler::Task do
   it "should read configuration from #{Warbler::Config::FILE}" do
     mkdir_p "config"
     File.open(Warbler::Config::FILE, "w") do |dest|
-      contents = 
+      contents =
         File.open("#{Warbler::WARBLER_HOME}/generators/warble/templates/warble.rb") do |src|
           src.read
         end
@@ -231,13 +208,14 @@ describe Warbler::Task do
     @config.gems = ["nonexistent-gem"]
     lambda {
       Warbler::Task.new "warble", @config
-      Rake::Task["warble:gems"].invoke
+      Rake::Task["warble:files"].invoke
     }.should raise_error
   end
 
   it "should allow specification of dependency by Gem::Dependency" do
     spec = mock "gem spec"
     spec.stub!(:full_name).and_return "hpricot-0.6.157"
+    spec.stub!(:full_gem_path).and_return "hpricot-0.6.157"
     spec.stub!(:loaded_from).and_return "hpricot.gemspec"
     spec.stub!(:files).and_return ["Rakefile"]
     spec.stub!(:dependencies).and_return []
@@ -246,14 +224,12 @@ describe Warbler::Task do
       [spec]
     end
     @config.gems = [Gem::Dependency.new("hpricot", "> 0.6")]
-    define_tasks "gems"
-    Rake::Task["warble:gems"].invoke
+    Rake::Task["warble:files"].invoke
   end
 
   it "should define a java_classes task for copying loose java classes" do
     @config.java_classes = FileList["Rakefile"]
-    define_tasks "java_classes"
-    Rake::Task["warble:java_classes"].invoke
+    Rake::Task["warble:files"].invoke
     file_list(%r{WEB-INF/classes/Rakefile$}).should_not be_empty
   end
 
@@ -375,9 +351,8 @@ describe Warbler::Task do
       deps = mock_merb_module
       deps.dependencies = [Gem::Dependency.new("rake", "= #{RAKEVERSION}", :development)]
     end
-    @config = Warbler::Config.new
-    define_tasks "gems"
-    Rake::Task["warble:gems"].invoke
+    @task.config = @config = Warbler::Config.new
+    Rake::Task["warble:files"].invoke
     file_list(/rake-#{RAKEVERSION}/).should be_empty
   end
 
@@ -402,10 +377,8 @@ describe Warbler::Task do
   end
 
   it "should skip directories that don't exist in config.dirs and print a warning" do
-    @config = Warbler::Config.new
     @config.dirs = %w(lib notexist)
-    define_tasks "app"
-    Rake::Task["warble:app"].invoke
+    Rake::Task["warble:files"].invoke
     file_list(%r{WEB-INF/lib}).should_not be_empty
     file_list(%r{WEB-INF/notexist}).should be_empty
   end
@@ -415,13 +388,9 @@ describe "The warbler.rake file" do
   it "should be able to list its contents" do
     output = `#{FileUtils::RUBY} -S rake -f #{Warbler::WARBLER_HOME}/tasks/warbler.rake -T`
     output.should =~ /war\s/
-    output.should =~ /war:app/
-    output.should =~ /war:java_libs/
-    output.should =~ /war:java_classes/
+    output.should =~ /war:files/
     output.should =~ /war:clean/
-    output.should =~ /war:gems/
     output.should =~ /war:jar/
-    output.should =~ /war:public/
   end
 end
 
@@ -434,11 +403,6 @@ describe "Debug targets" do
   end
 
   it "should print out lists of files" do
-    capture { Rake::Task["war:debug:public"].invoke }.should =~ /public/
-    capture { Rake::Task["war:debug:gems"].invoke }.should =~ /gems/
-    capture { Rake::Task["war:debug:java_libs"].invoke }.should =~ /java_libs/
-    capture { Rake::Task["war:debug:java_classes"].invoke }.should =~ /java_classes/
-    capture { Rake::Task["war:debug:app"].invoke }.should =~ /app/
     capture { Rake::Task["war:debug:includes"].invoke }.should =~ /include/
     capture { Rake::Task["war:debug:excludes"].invoke }.should =~ /exclude/
     capture { Rake::Task["war:debug"].invoke }.should =~ /Config/
