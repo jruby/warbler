@@ -33,7 +33,7 @@ class Warbler::Application < Rake::Application
         puts "I'm confused; my favorite branch is missing"
         puts "(directory 'config' is missing)"
       else
-        cp "#{Warbler::WARBLER_HOME}/generators/warble/templates/warble.rb", Warbler::Config::FILE
+        cp "#{Warbler::WARBLER_HOME}/warble.rb", Warbler::Config::FILE
       end
     end
 

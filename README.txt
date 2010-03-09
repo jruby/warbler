@@ -27,6 +27,14 @@ defined tasks.
     warble war:clean  # Remove the .war file
     warble war:debug  # Dump diagnostic information
 
+If you'd like to control Warbler from your own project's Rakefile,
+simply add the following code somewhere in the Rakefile:
+
+    require 'warbler'
+    Warbler::Task.new
+
+Now you should be able to invoke "rake war" to create your war file.
+
 == Configuration
 
 === Rails applications
