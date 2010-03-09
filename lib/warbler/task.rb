@@ -59,7 +59,7 @@ module Warbler
     end
 
     def define_main_task
-      desc "Create #{@config.war_name}.war"
+      desc "Create the project .war file"
       task @name do
         ["#{@name}:files", "#{@name}:jar"].each do |t|
           Rake::Task[t].invoke
@@ -69,7 +69,7 @@ module Warbler
 
     def define_clean_task
       with_namespace_and_config do |name, config|
-        desc "Clean up the .war file"
+        desc "Remove the .war file"
         task "clean" do
           rm_f "#{config.war_name}.war"
         end
@@ -186,7 +186,6 @@ module Warbler
     def define_files_task
       webinf_target_files = nil
       with_namespace_and_config do |name, config|
-        desc "Collect all application files for the .war"
         task "files" do
           find_webinf_files
           find_java_libs
@@ -201,7 +200,6 @@ module Warbler
 
     def define_jar_task
       with_namespace_and_config do |name, config|
-        desc "Create the .war"
         task "jar" do
           war_path = "#{config.war_name}.war"
           war_path = File.join(config.autodeploy_dir, war_path) if config.autodeploy_dir
@@ -212,6 +210,7 @@ module Warbler
 
     def define_debug_task
       with_namespace_and_config do |name, config|
+        desc "Dump diagnostic information"
         task "debug" => "files" do
           require 'yaml'
           puts YAML::dump(config)

@@ -11,7 +11,38 @@ require 'rubygems'
 require 'rake'
 require 'warbler'
 
-application = Rake.application
+class Warbler::Application < Rake::Application
+  def initialize
+    super
+  end
+
+  def load_rakefile
+    @name = 'warble'
+
+    # Load the main warbler tasks
+    Warbler::Task.new
+
+    task :default => :war
+
+    desc "Generate a configuration file to customize your war assembly"
+    task :config do
+      if File.exists?(Warbler::Config::FILE) && ENV["FORCE"].nil?
+        puts "There's another bird sitting on my favorite branch"
+        puts "(file '#{Warbler::Config::FILE}' already exists. Pass argument FORCE=1 to override)"
+      elsif !File.directory?("config")
+        puts "I'm confused; my favorite branch is missing"
+        puts "(directory 'config' is missing)"
+      else
+        cp "#{Warbler::WARBLER_HOME}/generators/warble/templates/warble.rb", Warbler::Config::FILE
+      end
+    end
+
+    desc "Display version of warbler"
+    task :version do
+      puts "Warbler version #{Warbler::VERSION}"
+    end
+  end
+end
 
 # Load any application rakefiles to aid in autodetecting applications
 Warbler.project_application = Rake::Application.new
@@ -23,47 +54,5 @@ Rake::Application::DEFAULT_RAKEFILES.each do |rf|
   end
 end
 
-Rake.application = application
-application.standard_exception_handling do
-  application.init
-
-  # Load the main warbler tasks
-  Warbler::Task.new
-
-  task :default => :war
-
-  desc "Generate a configuration file to customize your war assembly"
-  task :config do
-    if File.exists?(Warbler::Config::FILE) && ENV["FORCE"].nil?
-      puts "There's another bird sitting on my favorite branch"
-      puts "(file '#{Warbler::Config::FILE}' already exists. Pass argument FORCE=1 to override)"
-    elsif !File.directory?("config")
-      puts "I'm confused; my favorite branch is missing"
-      puts "(directory 'config' is missing)"
-    else
-      cp "#{Warbler::WARBLER_HOME}/generators/warble/templates/warble.rb", Warbler::Config::FILE
-    end
-  end
-
-  desc "Unpack warbler as a plugin in your Rails application"
-  task :pluginize do
-    if !Dir["vendor/plugins/warbler*"].empty?
-      puts "I found an old nest in vendor/plugins; please trash it so I can make a new one"
-      puts "(directory vendor/plugins/warbler* exists)"
-    elsif !File.directory?("vendor/plugins")
-      puts "I can't find a place to build my nest"
-      puts "(directory 'vendor/plugins' is missing)"
-    else
-      Dir.chdir("vendor/plugins") do
-        ruby "-S", "gem", "unpack", "warbler"
-      end
-    end
-  end
-
-  desc "Display version of warbler"
-  task :version do
-    puts "Warbler version #{Warbler::VERSION}"
-  end
-
-  application.top_level
-end
+Rake.application = Warbler::Application.new
+Rake.application.run

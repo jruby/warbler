@@ -9,11 +9,6 @@ Warbler provides a sane set of out-of-the box defaults that should allow most
 Rails applications without external gem dependencies (aside from Rails itself)
 to assemble and Just Work.
 
-Warbler bundles JRuby and the JRuby-Rack servlet adapter for dispatching
-requests to your application inside the java application server, and assembles
-all jar files in WARBLER_HOME/lib/*.jar into your application. No external
-dependencies are downloaded.
-
 == Getting Started
 
 1. Install the gem: <tt>gem install warbler</tt>.
@@ -23,23 +18,14 @@ dependencies are downloaded.
 == Usage
 
 Warbler's +warble+ command is just a small wrapper around Rake with internally
-defined tasks. (Notice "rake" still prints out in the message, but you should
-substitute "warble" for "rake" on the command line when running this way.)
+defined tasks.
 
-   $ warble -T
-   rake config         # Generate a configuration file to customize your war assembly
-   rake pluginize      # Unpack warbler as a plugin in your Rails application
-   rake war            # Create trunk.war
-   rake war:app        # Copy all application files into the .war
-   rake war:clean      # Clean up the .war file and the staging area
-   rake war:gems       # Unpack all gems into WEB-INF/gems
-   rake war:jar        # Run the jar command to create the .war
-   rake war:java_libs  # Copy all java libraries into the .war
-   rake war:public     # Copy all public HTML files to the root of the .war
-   rake war:webxml     # Generate a web.xml file for the webapp
-
-Warbler makes heavy use of Rake's file and directory tasks, so only recently
-updated files will be copied, making repeated assemblies much faster.
+    $ warble -T
+    warble config     # Generate a configuration file to customize your war assembly
+    warble version    # Display version of warbler
+    warble war        # Create the project .war file
+    warble war:clean  # Remove the .war file
+    warble war:debug  # Dump diagnostic information
 
 == Configuration
 
@@ -98,25 +84,9 @@ doing this. With the gem, simply run
 
     warble config
 
-If you have Warbler installed as a plugin, use the generator:
-
- script/generate warble
-
-Finally, edit the config/warble.rb to your taste. If you install the gem but
-later decide you'd like to have it as a plugin, use the +pluginize+ command:
-
-    warble pluginize
-
-If you wish to upgrade or switch one or more java libraries from what's
-bundled in the Warbler gem, simply change the jars in WARBLER_HOME/lib, or
-modify the +java_libs+ attribute of Warbler::Config to include the files you
-need.
-
-Once Warbler is installed as a plugin, you can use +rake+ to build the war
-(with the same set of tasks as above).
-
-The generated config/warble.rb file is fully-documented with the available
-options and default values.
+Finally, edit the config/warble.rb to your taste. The generated
+config/warble.rb file is fully-documented with the available options
+and default values.
 
 === Web.xml
 
@@ -140,13 +110,8 @@ For more information on configuration, see Warbler::Config.
 
 === Troubleshooting
 
-If Warbler isn't packaging the files you were expecting, there are several
-debug tasks available to give you more insight into what's going on.
-
-* <tt>war:debug</tt> prints a YAML dump of the current configuration
-* <tt>war:debug:X</tt> prints a list of files that Warbler will
-  include during that stage of assembly. Valid values of <tt>X</tt>
-  are <tt>app, java_libs, gems, public, includes, excludes</tt>.
+If Warbler isn't packaging the files you were expecting, use the
+war:debug task to give you more insight into what's going on.
 
 == Source
 

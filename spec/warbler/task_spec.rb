@@ -244,7 +244,7 @@ describe Warbler::Task do
 
   def mock_merb_module
     merb = Module.new
-    Object.const_set("Merb", merb)
+    silence { Object.const_set("Merb", merb) }
     boot_loader = Module.new
     merb.const_set("BootLoader", boot_loader)
     merb.const_set("VERSION", "1.0")
@@ -358,9 +358,9 @@ describe Warbler::Task do
 
   it "should warn about using Merb < 1.0" do
     task :merb_env do
-      Object.const_set("Merb", Module.new)
+      silence { Object.const_set("Merb", Module.new) }
     end
-    @config = Warbler::Config.new
+    @config = silence { Warbler::Config.new }
     @config.webxml.booter.should == :merb
   end
 
@@ -378,7 +378,7 @@ describe Warbler::Task do
 
   it "should skip directories that don't exist in config.dirs and print a warning" do
     @config.dirs = %w(lib notexist)
-    Rake::Task["warble:files"].invoke
+    silence { Rake::Task["warble:files"].invoke }
     file_list(%r{WEB-INF/lib}).should_not be_empty
     file_list(%r{WEB-INF/notexist}).should be_empty
   end
@@ -388,9 +388,8 @@ describe "The warbler.rake file" do
   it "should be able to list its contents" do
     output = `#{FileUtils::RUBY} -S rake -f #{Warbler::WARBLER_HOME}/tasks/warbler.rake -T`
     output.should =~ /war\s/
-    output.should =~ /war:files/
     output.should =~ /war:clean/
-    output.should =~ /war:jar/
+    output.should =~ /war:debug/
   end
 end
 

@@ -8,6 +8,10 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Warbler::Config do
+  before :each do
+    verbose(false)
+  end
+
   it "should have suitable default values" do
     config = Warbler::Config.new
     config.dirs.should include(*Warbler::Config::TOP_DIRS.select{|d| File.directory?(d)})

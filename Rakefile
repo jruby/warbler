@@ -24,7 +24,7 @@ begin
     p.summary = "Warbler chirpily constructs .war files of your Rails applications."
     p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
     p.description = p.paragraphs_of('README.txt', 1...2).join("\n\n")
-    p.extra_deps += [['rake', '>= 0.7.3'], ['jruby-jars', '>= 1.3.1'], ['jruby-rack', '>= 0.9.7'], ['rubyzip', '>= 0.9.4']]
+    p.extra_deps += [['rake', '>= 0.8.7'], ['jruby-jars', '>= 1.4.0'], ['jruby-rack', '>= 0.9.7'], ['rubyzip', '>= 0.9.4']]
     p.test_globs = ["spec/**/*_spec.rb"]
     p.rspec_options = ["--options", "spec/spec.opts"]
   end
