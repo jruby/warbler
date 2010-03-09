@@ -9,7 +9,7 @@ require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
 
 MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt", "LICENSE.txt", "Rakefile",
-  "*.erb", "*.rb", "bin/*", "lib/**/*", "spec/**/*.rb"]
+  "*.erb", "*.rb", "bin/*", "lib/**/*", "spec/**/*.rb", "spec/sample/**/*.*"]
 
 begin
   File.open("Manifest.txt", "w") {|f| MANIFEST.each {|n| f << "#{n}\n"} }
@@ -27,6 +27,7 @@ begin
     p.extra_deps += [['rake', '>= 0.8.7'], ['jruby-jars', '>= 1.4.0'], ['jruby-rack', '>= 0.9.7'], ['rubyzip', '>= 0.9.4']]
     p.test_globs = ["spec/**/*_spec.rb"]
     p.rspec_options = ["--options", "spec/spec.opts"]
+    p.clean_globs += ['spec/sample/MANIFEST*', 'spec/sample/web.xml*']
   end
   hoe.spec.files = MANIFEST
   hoe.spec.dependencies.delete_if { |dep| dep.name == "hoe" }
@@ -51,4 +52,3 @@ end
 RCov::VerifyTask.new(:rcov => "spec:rcov") do |t|
   t.threshold = 100
 end
-

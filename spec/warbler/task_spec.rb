@@ -194,7 +194,7 @@ describe Warbler::Task do
     mkdir_p "config"
     File.open(Warbler::Config::FILE, "w") do |dest|
       contents =
-        File.open("#{Warbler::WARBLER_HOME}/generators/warble/templates/warble.rb") do |src|
+        File.open("#{Warbler::WARBLER_HOME}/warble.rb") do |src|
           src.read
         end
       dest << contents.sub(/# config\.war_name/, 'config.war_name'
@@ -381,15 +381,6 @@ describe Warbler::Task do
     silence { Rake::Task["warble:files"].invoke }
     file_list(%r{WEB-INF/lib}).should_not be_empty
     file_list(%r{WEB-INF/notexist}).should be_empty
-  end
-end
-
-describe "The warbler.rake file" do
-  it "should be able to list its contents" do
-    output = `#{FileUtils::RUBY} -S rake -f #{Warbler::WARBLER_HOME}/tasks/warbler.rake -T`
-    output.should =~ /war\s/
-    output.should =~ /war:clean/
-    output.should =~ /war:debug/
   end
 end
 

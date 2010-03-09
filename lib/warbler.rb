@@ -14,4 +14,5 @@ end
 require 'warbler/gems'
 require 'warbler/config'
 require 'warbler/task'
+require 'warbler/application'
 require 'warbler/version'
