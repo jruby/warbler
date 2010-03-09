@@ -8,8 +8,10 @@
 require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
 
-MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt", "LICENSE.txt", "Rakefile",
-  "*.erb", "*.rb", "bin/*", "lib/**/*", "spec/**/*.rb", "spec/sample/**/*.*"].to_a.sort.uniq
+MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt",
+                    "LICENSE.txt", "Rakefile", "*.erb", "*.rb", "bin/*",
+                    "lib/**/*", "spec/**/*.rb", "spec/sample/**/*.*"
+                   ].to_a.reject{|f| f=~%r{spec/sample/(MANIFEST|web.xml)}}.sort.uniq
 
 begin
   File.open("Manifest.txt", "w") {|f| MANIFEST.each {|n| f << "#{n}\n"} }
