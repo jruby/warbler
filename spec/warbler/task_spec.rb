@@ -416,6 +416,8 @@ describe "The warbler.rake file" do
     output = `#{FileUtils::RUBY} -S rake -f #{Warbler::WARBLER_HOME}/tasks/warbler.rake -T`
     output.should =~ /war\s/
     output.should =~ /war:app/
+    output.should =~ /war:java_libs/
+    output.should =~ /war:java_classes/
     output.should =~ /war:clean/
     output.should =~ /war:gems/
     output.should =~ /war:jar/

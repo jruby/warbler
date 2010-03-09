@@ -57,6 +57,8 @@ module Warbler
       define_gems_task
       define_webxml_task
       define_app_task
+      define_java_classes_task
+      define_java_libs_task
       define_jar_task
       define_debug_task
     end
@@ -97,7 +99,7 @@ module Warbler
         task "gems" do
           targets = find_gems_files
         end
-        task "debug:gems" => "gems "do
+        task "debug:gems" => "gems" do
           puts "", "gems files:"
           puts *targets
         end
