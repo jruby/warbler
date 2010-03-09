@@ -17,7 +17,6 @@ describe Warbler::Task do
     mkdir_p "log"
     touch "log/test.log"
     @config = Warbler::Config.new do |config|
-      config.staging_dir = "tmp/war"
       config.war_name = "warbler"
       config.gems = ["rake"]
       config.webxml.jruby.max.runtimes = 5
@@ -28,43 +27,41 @@ describe Warbler::Task do
     define_tasks "clean"
     Rake::Task["warble:clean"].invoke
     rm_rf "log"
-    rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb"]
+    rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb", "file.txt"]
     Dir.chdir(@pwd)
   end
 
   def define_tasks(*tasks)
-    options = tasks.last.kind_of?(Hash) ? tasks.pop : {}
     @defined_tasks ||= []
     tasks.each do |task|
       unless @defined_tasks.include?(task)
         meth = "define_#{task}_task"
         meth = "define_#{task}_tasks" unless Warbler::Task.private_instance_methods.include?(meth)
-        Warbler::Task.new "warble", @config, meth.to_sym do |t|
-          options.each {|k,v| t.send "#{k}=", v }
-        end
+        Warbler::Task.new "warble", @config, meth.to_sym
         @defined_tasks << task
       end
     end
   end
 
   def file_list(regex)
-    FileList["#{@config.staging_dir}/**/*"].select {|f| f =~ regex }
+    @config.files.keys.select {|f| f =~ regex }
   end
 
-  it "should define a clean task for removing the staging directory" do
+  it "should define a clean task for removing the war file" do
     define_tasks "clean"
-    mkdir_p @config.staging_dir
+    war_file = "#{@config.war_name}.war"
+    touch war_file
     Rake::Task["warble:clean"].invoke
-    File.exist?(@config.staging_dir).should == false
+    File.exist?(war_file).should == false
   end
 
-  it "should define a public task for copying the public files" do
+  it "should define a public task for collecting the public files" do
     define_tasks "public"
     Rake::Task["warble:public"].invoke
-    file_list(%r{^#{@config.staging_dir}/index\.html}).should_not be_empty
+    file_list(%r{^index\.html}).should_not be_empty
   end
 
-  it "should define a gems task for unpacking gems" do
+  it "should define a gems task for collecting gem files" do
     @config.gems << "rails"
     define_tasks "gems"
     Rake::Task["warble:gems"].invoke
@@ -72,20 +69,19 @@ describe Warbler::Task do
     file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
   end
 
-  it "should define a app task for copying application files" do
+  it "should define a app task for collecting application files" do
     define_tasks "app", "gems"
     Rake::Task["warble:app"].invoke
     file_list(%r{WEB-INF/log}).should_not be_empty
-    file_list(%r{WEB-INF/log/*.log}).should be_empty
+    file_list(%r{WEB-INF/log/.*\.log}).should be_empty
   end
 
   def expand_webxml
     define_tasks "webxml"
     Rake::Task["warble:webxml"].invoke
     require 'rexml/document'
-    File.open("#{@config.staging_dir}/WEB-INF/web.xml") do |f|
-      REXML::Document.new(f).root.elements
-    end
+    @config.files.should include("WEB-INF/web.xml")
+    REXML::Document.new(@config.files["WEB-INF/web.xml"]).root.elements
   end
 
   it "should define a webxml task for creating web.xml" do
@@ -146,11 +142,9 @@ describe Warbler::Task do
   it "should use a config/web.xml if it exists" do
     define_tasks "webxml"
     mkdir_p "config"
-    File.open("config/web.xml", "w") {|f| f << "Hi there" }
+    touch "config/web.xml"
     Rake::Task["warble:webxml"].invoke
-    files = file_list(%r{WEB-INF/web.xml$})
-    files.should_not be_empty
-    File.open(files.first) {|f| f.read}.should == "Hi there"
+    @config.files["WEB-INF/web.xml"].should == "config/web.xml"
   end
 
   it "should use a config/web.xml.erb if it exists" do
@@ -158,9 +152,8 @@ describe Warbler::Task do
     mkdir_p "config"
     File.open("config/web.xml.erb", "w") {|f| f << "Hi <%= webxml.public.root %>" }
     Rake::Task["warble:webxml"].invoke
-    files = file_list(%r{WEB-INF/web.xml$})
-    files.should_not be_empty
-    File.open(files.first) {|f| f.read}.should == "Hi /"
+    @config.files["WEB-INF/web.xml"].should_not be_nil
+    @config.files["WEB-INF/web.xml"].read.should == "Hi /"
   end
 
   it "should define a java_libs task for copying java libraries" do
@@ -170,44 +163,27 @@ describe Warbler::Task do
   end
 
   it "should define an app task for copying application files" do
-    gems_ran = false
-    task "warble:gems" do
-      gems_ran = true
-    end
     define_tasks "app"
     Rake::Task["warble:app"].invoke
     file_list(%r{WEB-INF/app$}).should_not be_empty
     file_list(%r{WEB-INF/config$}).should_not be_empty
     file_list(%r{WEB-INF/lib$}).should_not be_empty
-    gems_ran.should == true
   end
 
   it "should define a jar task for creating the .war" do
     define_tasks "jar"
-    mkdir_p @config.staging_dir
-    touch "#{@config.staging_dir}/file.txt"
+    touch "file.txt"
+    @config.files["file.txt"] = "file.txt"
     Rake::Task["warble:jar"].invoke
-    File.exist?("warbler.war").should == true
-  end
-
-  it "should define an exploded task for creating an exploded Rails app" do
-    @config.java_classes = ["Rakefile"]
-    @config.java_libs = []
-    define_tasks "webxml", "exploded", "java_classes", "gems"
-    Rake::Task['warble:exploded'].invoke
-    File.exist?("web.xml").should == true
-    File.exist?("sun-web.xml").should == true
-    File.symlink?("gems").should == true
-    File.symlink?("public/WEB-INF").should == true
-    Rake::Task['warble:clean:exploded'].invoke
+    File.exist?("#{@config.war_name}.war").should == true
   end
 
   it "should accept an autodeploy directory where the war should be created" do
     define_tasks "jar"
-    require 'tempfile'
+    require 'tmpdir'
     @config.autodeploy_dir = Dir::tmpdir
-    mkdir_p @config.staging_dir
-    touch "#{@config.staging_dir}/file.txt"
+    touch "file.txt"
+    @config.files["file.txt"] = "file.txt"
     Rake::Task["warble:jar"].invoke
     File.exist?(File.join("#{Dir::tmpdir}","warbler.war")).should == true
   end
@@ -418,8 +394,9 @@ describe Warbler::Task do
       deps.dependencies = [Gem::Dependency.new("rake", "= #{RAKEVERSION}", :development)]
     end
     @config = Warbler::Config.new
-    define_tasks "copy_gems"
-    Rake.application.lookup("gem:rake-#{RAKEVERSION}").should be_nil
+    define_tasks "gems"
+    Rake::Task["warble:gems"].invoke
+    file_list(/rake-#{RAKEVERSION}/).should be_nil
   end
 
   it "should warn about using Merb < 1.0" do
@@ -445,9 +422,10 @@ describe Warbler::Task do
   it "should skip directories that don't exist in config.dirs and print a warning" do
     @config = Warbler::Config.new
     @config.dirs = %w(lib notexist)
-    define_tasks "webinf_file"
-    Rake.application.lookup("#{@config.staging_dir}/WEB-INF/lib").should_not be_nil
-    Rake.application.lookup("#{@config.staging_dir}/WEB-INF/notexist").should be_nil
+    define_tasks "app"
+    Rake::Task["warble:app"].invoke
+    file_list(%r{WEB-INF/lib}).should_not be_nil
+    file_list(%r{WEB-INF/notexist}).should be_nil
   end
 end
 
@@ -455,7 +433,6 @@ describe "The warbler.rake file" do
   it "should be able to list its contents" do
     output = `#{FileUtils::RUBY} -S rake -f #{Warbler::WARBLER_HOME}/tasks/warbler.rake -T`
     output.should =~ /war\s/
-    output.should =~ /war:exploded/
     output.should =~ /war:app/
     output.should =~ /war:clean/
     output.should =~ /war:gems/

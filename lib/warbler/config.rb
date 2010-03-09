@@ -14,8 +14,14 @@ module Warbler
     FILE = "config/warble.rb"
     BUILD_GEMS = %w(warbler rake rcov)
 
-    # Directory where files will be staged, defaults to tmp/war
-    attr_accessor :staging_dir
+
+    # A hash of files that Warbler will build into the .war file. Keys
+    # to the hash are filenames in the .war, values are either nil
+    # (for a directory entry), the source filenames or IO objects for
+    # temporary file contents. This will be filled with files by the
+    # various Warbler tasks as they run. You can add arbitrary
+    # filenames to this hash if you wish.
+    attr_accessor :files
 
     # Directory where the war file will be written. Can be used to direct
     # Warbler to place your war file directly in your application server's
@@ -94,7 +100,7 @@ module Warbler
 
     def initialize(warbler_home = WARBLER_HOME)
       @warbler_home = warbler_home
-      @staging_dir = File.join("tmp", "war")
+      @files       = {}
       @dirs        = TOP_DIRS.select {|d| File.directory?(d)}
       @includes    = FileList[]
       @excludes    = FileList[]
@@ -112,11 +118,20 @@ module Warbler
       yield self if block_given?
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes += FileList["**/*.log"] if @exclude_logs
-      @excludes << @staging_dir
     end
 
     def gems=(value)
       @gems = Warbler::Gems.new(value)
+    end
+
+    def add_file(dest, src)
+      dir = File.dirname(dest)
+      while dir != "." && !@files.include?(dir)
+        @files[dir] = nil
+        dir = File.dirname(dir)
+      end
+      @files[dest] = src
+      dest
     end
 
     private
@@ -136,7 +151,7 @@ module Warbler
       p.java_classes = ["WEB-INF/classes/%p"]
       p.application  = ["WEB-INF/%p"]
       p.gemspecs     = ["WEB-INF/gems/specifications/%f"]
-      p.gems         = ["WEB-INF/gems/gems/%n"]
+      p.gems         = ["WEB-INF/gems/gems/%p"]
       p
     end
 
