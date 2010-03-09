@@ -33,7 +33,6 @@ describe Warbler::Application do
     output = capture do
       Warbler::Application.new.run
     end
-    output = `#{FileUtils::RUBY} -rubygems -I#{Warbler::WARBLER_HOME}/lib -S #{Warbler::WARBLER_HOME}/bin/warble -T 2>&1`
     output.should =~ /warble war\s/
     output.should =~ /warble war:clean/
     output.should =~ /warble war:debug/
