@@ -231,41 +231,23 @@ describe Warbler::Task do
     @config.gems = ["nonexistent-gem"]
     lambda {
       Warbler::Task.new "warble", @config
+      Rake::Task["warble:gems"].invoke
     }.should raise_error
-  end
-
-  it "should handle platform-specific gems" do
-    spec = mock "gem spec"
-    spec.stub!(:name).and_return "hpricot"
-    spec.stub!(:version).and_return "0.6.157"
-    spec.stub!(:platform).and_return "java"
-    spec.stub!(:original_platform).and_return "java"
-    spec.stub!(:loaded_from).and_return "hpricot.gemspec"
-    spec.stub!(:dependencies).and_return []
-    Gem.source_index.should_receive(:search).and_return do |gem|
-      gem.name.should == "hpricot"
-      [spec]
-    end
-    File.should_receive(:exist?).with(File.join(Gem.dir, 'cache', "hpricot-0.6.157-java.gem")).and_return true
-    @config.gems = ["hpricot"]
-    define_tasks "gems"
   end
 
   it "should allow specification of dependency by Gem::Dependency" do
     spec = mock "gem spec"
-    spec.stub!(:name).and_return "hpricot"
-    spec.stub!(:version).and_return "0.6.157"
-    spec.stub!(:platform).and_return "java"
-    spec.stub!(:original_platform).and_return "java"
+    spec.stub!(:full_name).and_return "hpricot-0.6.157"
     spec.stub!(:loaded_from).and_return "hpricot.gemspec"
+    spec.stub!(:files).and_return ["Rakefile"]
     spec.stub!(:dependencies).and_return []
     Gem.source_index.should_receive(:search).and_return do |gem|
       gem.name.should == "hpricot"
       [spec]
     end
-    File.should_receive(:exist?).with(File.join(Gem.dir, 'cache', "hpricot-0.6.157-java.gem")).and_return true
     @config.gems = [Gem::Dependency.new("hpricot", "> 0.6")]
     define_tasks "gems"
+    Rake::Task["warble:gems"].invoke
   end
 
   it "should define a java_classes task for copying loose java classes" do
@@ -396,7 +378,7 @@ describe Warbler::Task do
     @config = Warbler::Config.new
     define_tasks "gems"
     Rake::Task["warble:gems"].invoke
-    file_list(/rake-#{RAKEVERSION}/).should be_nil
+    file_list(/rake-#{RAKEVERSION}/).should be_empty
   end
 
   it "should warn about using Merb < 1.0" do
@@ -424,8 +406,8 @@ describe Warbler::Task do
     @config.dirs = %w(lib notexist)
     define_tasks "app"
     Rake::Task["warble:app"].invoke
-    file_list(%r{WEB-INF/lib}).should_not be_nil
-    file_list(%r{WEB-INF/notexist}).should be_nil
+    file_list(%r{WEB-INF/lib}).should_not be_empty
+    file_list(%r{WEB-INF/notexist}).should be_empty
   end
 end
 
@@ -437,8 +419,6 @@ describe "The warbler.rake file" do
     output.should =~ /war:clean/
     output.should =~ /war:gems/
     output.should =~ /war:jar/
-    output.should =~ /war:java_libs/
-    output.should =~ /war:java_classes/
     output.should =~ /war:public/
   end
 end

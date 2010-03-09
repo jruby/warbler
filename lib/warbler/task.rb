@@ -7,6 +7,7 @@
 
 require 'rake'
 require 'rake/tasklib'
+require 'stringio'
 require 'zip/zip'
 
 module Warbler
@@ -118,9 +119,7 @@ module Warbler
             end
             require 'erb'
             erb = ERB.new(File.open(erb) {|f| f.read })
-            webxml = StringIO.new
-            webxml << erb.result(erb_binding(config.webxml))
-            webxml.rewind
+            webxml = StringIO.new(erb.result(erb_binding(config.webxml)))
           end
           config.add_file("WEB-INF/web.xml", webxml)
         end
@@ -301,6 +300,7 @@ module Warbler
     end
 
     def create_war(war_file, entries)
+      rm_f(war_file)
       Zip::ZipFile.open(war_file, Zip::ZipFile::CREATE) do |zipfile|
         entries.keys.sort.each do |entry|
           src = entries[entry]
