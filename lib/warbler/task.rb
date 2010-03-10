@@ -11,16 +11,6 @@ require 'stringio'
 require 'zip/zip'
 
 module Warbler
-  class << self
-    attr_writer :project_application
-    def project_application
-      @project_application || Rake.application
-    end
-
-    attr_accessor :framework_detection
-  end
-  self.framework_detection = true
-
   # Warbler Rake task.  Allows defining multiple configurations inside the same
   # Rakefile by using different task names.
   class Task < Rake::TaskLib
@@ -203,6 +193,8 @@ module Warbler
         task "jar" do
           war_path = "#{config.war_name}.war"
           war_path = File.join(config.autodeploy_dir, war_path) if config.autodeploy_dir
+          rm_f war_path
+          puts "Creating #{war_path}"
           create_war war_path, config.files
         end
       end
@@ -241,19 +233,21 @@ module Warbler
     end
 
     def create_war(war_file, entries)
-      rm_f(war_file)
       Zip::ZipFile.open(war_file, Zip::ZipFile::CREATE) do |zipfile|
         entries.keys.sort.each do |entry|
           src = entries[entry]
-          if src.nil?
-            zipfile.mkdir(entry)
-          elsif src.respond_to?(:read)
+          if src.respond_to?(:read)
             zipfile.get_output_stream(entry) {|f| f << src.read }
+          elsif src.nil? || File.directory?(src)
+            zipfile.mkdir(entry)
           else
             zipfile.add(entry, src)
           end
         end
       end
     end
+
+    # Java-boosted war creation for JRuby; replaces #create_war with Java version
+    require 'warbler_task' if defined?(JRUBY_VERSION)
   end
 end

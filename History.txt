@@ -1,5 +1,7 @@
-== 0.9.x
+== 0.9.15
 
+* Warbler now uses RubyZip to create the war file in-place, without
+  copying files to a tmp/war staging area.
 * Allow override of gem.home which prevents Warbler from doing its own
   gem bundling. For stop-gap use with Bundler (Daniel Harrington).
 * Stop bundling jruby-rack, as promised.

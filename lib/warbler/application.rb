@@ -10,6 +10,8 @@ require 'rake'
 class Warbler::Application < Rake::Application
   def initialize
     super
+    Warbler.application = self
+    @project_loaded = false
   end
 
   def load_rakefile
@@ -39,17 +41,22 @@ class Warbler::Application < Rake::Application
     end
   end
 
-  def run
+  def load_project_rakefile
+    return if @project_loaded
     # Load any application rakefiles to aid in autodetecting applications
-    Warbler.project_application = Rake::Application.new
-    Rake.application = Warbler.project_application
+    app = Warbler.project_application = Rake::Application.new
+    Rake.application = app
     Rake::Application::DEFAULT_RAKEFILES.each do |rf|
       if File.exist?(rf)
         load rf
         break
       end
     end
+    Rake.application = self
+    @project_loaded = true
+  end
 
+  def run
     Rake.application = self
     super
   end

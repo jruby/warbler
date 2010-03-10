@@ -152,7 +152,7 @@ describe Warbler::Task do
   it "should define a jar task for creating the .war" do
     touch "file.txt"
     @config.files["file.txt"] = "file.txt"
-    Rake::Task["warble:jar"].invoke
+    silence { Rake::Task["warble:jar"].invoke }
     File.exist?("#{@config.war_name}.war").should == true
   end
 
@@ -161,7 +161,7 @@ describe Warbler::Task do
     @config.autodeploy_dir = Dir::tmpdir
     touch "file.txt"
     @config.files["file.txt"] = "file.txt"
-    Rake::Task["warble:jar"].invoke
+    silence { Rake::Task["warble:jar"].invoke }
     File.exist?(File.join("#{Dir::tmpdir}","warbler.war")).should == true
   end
 
@@ -175,7 +175,7 @@ describe Warbler::Task do
   it "should define a war task for bundling up everything" do
     files_ran = false; task "warble:files" do; files_ran = true; end
     jar_ran = false; task "warble:jar" do; jar_ran = true; end
-    Rake::Task["warble"].invoke
+    silence { Rake::Task["warble"].invoke }
     files_ran.should == true
     jar_ran.should == true
   end

@@ -9,6 +9,18 @@
 # into .war files.
 module Warbler
   WARBLER_HOME = File.expand_path(File.dirname(__FILE__) + '/..') unless defined?(WARBLER_HOME)
+
+  class << self
+    attr_accessor :application
+    attr_accessor :framework_detection
+    attr_writer :project_application
+  end
+
+  def self.project_application
+    application.load_project_rakefile if application
+    @project_application || Rake.application
+  end
+  self.framework_detection = true
 end
 
 require 'warbler/gems'

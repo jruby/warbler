@@ -173,7 +173,7 @@ module Warbler
     end
 
     def auto_detect_frameworks
-      !Warbler.framework_detection || auto_detect_rails || auto_detect_merb || auto_detect_rackup
+      !Warbler.framework_detection || auto_detect_rackup || auto_detect_rails || auto_detect_merb
     end
 
     def auto_detect_rails
@@ -209,6 +209,7 @@ module Warbler
       return false unless File.exist?("config.ru")
       @webxml.booter = :rack
       @webxml.rackup = File.read("config.ru")
+      true
     end
   end
 

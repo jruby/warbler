@@ -10,7 +10,7 @@ require 'spec/rake/verify_rcov'
 
 MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt",
                     "LICENSE.txt", "Rakefile", "*.erb", "*.rb", "bin/*",
-                    "lib/**/*", "spec/**/*.rb", "spec/sample/**/*.*"
+                    "ext/**/*", "lib/**/*", "spec/**/*.rb", "spec/sample/**/*.*"
                    ].to_a.reject{|f| f=~%r{spec/sample/(MANIFEST|web.xml)}}.sort.uniq
 
 begin
@@ -62,3 +62,24 @@ RCov::VerifyTask.new(:rcov => "spec:rcov") do |t|
 end
 
 task :default => :spec
+
+if defined?(JRUBY_VERSION)
+  require 'ant'
+  directory "pkg/classes"
+  task :compile => "pkg/classes" do |t|
+    ant.javac :srcdir => "ext", :destdir => t.prerequisites.first,
+    :source => "1.5", :target => "1.5", :debug => true,
+    :classpath => "${java.class.path}:${sun.boot.class.path}"
+  end
+
+  task :jar => :compile do
+    ant.jar :basedir => "pkg/classes", :destfile => "lib/warbler_task.jar", :includes => "*.class"
+  end
+
+else
+  task :jar do
+    puts "Run 'jar' with JRuby to re-compile the java war booster"
+  end
+end
+
+task :package => :jar

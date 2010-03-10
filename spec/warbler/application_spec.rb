@@ -23,6 +23,7 @@ describe Warbler::Application do
   after :each do
     Rake.application = @app
     Warbler.project_application = nil
+    Warbler.application = nil
     Warbler.framework_detection = @detection
     @argv.reverse.each {|a| ARGV.unshift a}
     Dir.chdir(@pwd)
@@ -64,5 +65,9 @@ describe Warbler::Application do
     ensure
       mv "config-tmp", "config"
     end
+  end
+
+  it "should provide a means to load the project Rakefile" do
+    Warbler::Application.new.load_project_rakefile
   end
 end
