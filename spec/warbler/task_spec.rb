@@ -382,6 +382,12 @@ describe Warbler::Task do
     file_list(%r{WEB-INF/lib}).should_not be_empty
     file_list(%r{WEB-INF/notexist}).should be_empty
   end
+
+  it "should write gems to location specified by webxml.gem.home" do
+    @task.config = @config = Warbler::Config.new {|c| c.webxml.gem.home = "/WEB-INF/jewels"; c.gems << 'rake' }
+    Rake::Task["warble:files"].invoke
+    file_list(%r{WEB-INF/jewels}).should_not be_empty
+  end
 end
 
 describe "Debug targets" do

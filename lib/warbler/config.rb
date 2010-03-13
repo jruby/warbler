@@ -118,6 +118,7 @@ module Warbler
       @war_name    = File.basename(@rails_root)
       auto_detect_frameworks
       yield self if block_given?
+      detect_gem_home
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes += FileList["**/*.log"] if @exclude_logs
     end
@@ -164,6 +165,13 @@ module Warbler
       c.jndi = nil
       c.ignored = %w(jndi booter)
       c
+    end
+
+    def detect_gem_home
+      if String === @webxml.gem.home
+        @pathmaps.gemspecs.each{|p| p.sub!(%r{WEB-INF/gems}, @webxml.gem.home)}
+        @pathmaps.gems.each{|p| p.sub!(%r{WEB-INF/gems}, @webxml.gem.home)}
+      end
     end
 
     def default_jar_files
