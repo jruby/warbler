@@ -72,6 +72,9 @@ module Warbler
     # by jar -cf....
     attr_accessor :manifest_file
 
+    # Use Bundler to locate gems if Gemfile is found. Default is true.
+    attr_accessor :bundler
+
     # Extra configuration for web.xml. Controls how the dynamically-generated web.xml
     # file is generated.
     #
@@ -102,7 +105,6 @@ module Warbler
 
     def initialize(warbler_home = WARBLER_HOME)
       @warbler_home = warbler_home
-      @files       = {}
       @dirs        = TOP_DIRS.select {|d| File.directory?(d)}
       @includes    = FileList[]
       @excludes    = FileList[]
@@ -116,8 +118,10 @@ module Warbler
       @webxml      = default_webxml_config
       @rails_root  = File.expand_path(defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)
       @war_name    = File.basename(@rails_root)
+      @bundler     = true
       auto_detect_frameworks
       yield self if block_given?
+      detect_bundler_gems
       detect_gem_home
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes += FileList["**/*.log"] if @exclude_logs
@@ -125,16 +129,6 @@ module Warbler
 
     def gems=(value)
       @gems = Warbler::Gems.new(value)
-    end
-
-    def add_file(dest, src)
-      dir = File.dirname(dest)
-      while dir != "." && !@files.include?(dir)
-        @files[dir] = nil
-        dir = File.dirname(dir)
-      end
-      @files[dest] = src
-      dest
     end
 
     private
@@ -171,6 +165,20 @@ module Warbler
       if String === @webxml.gem.home
         @pathmaps.gemspecs.each{|p| p.sub!(%r{WEB-INF/gems}, @webxml.gem.home)}
         @pathmaps.gems.each{|p| p.sub!(%r{WEB-INF/gems}, @webxml.gem.home)}
+      end
+    end
+
+    def detect_bundler_gems
+      if @bundler && File.exist?("Gemfile")
+        @gems.clear
+        require 'bundler'
+        env = Bundler.load
+        env.extend Warbler::Runtime
+        env.gem_home = @webxml.gem.home if String === @webxml.gem.home
+        env.write_war_environment
+        env.war_specs.each {|spec| @gems << spec }
+      else
+        @bundler = false
       end
     end
 

@@ -73,7 +73,7 @@ if defined?(JRUBY_VERSION)
   end
 
   task :jar => :compile do
-    ant.jar :basedir => "pkg/classes", :destfile => "lib/warbler_task.jar", :includes => "*.class"
+    ant.jar :basedir => "pkg/classes", :destfile => "lib/warbler_war.jar", :includes => "*.class"
   end
 
 else

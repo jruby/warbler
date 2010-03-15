@@ -23,10 +23,10 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.util.JRubyFile;
 
-public class WarblerTask {
+public class WarblerWar {
     public static void create(Ruby runtime) {
-        RubyModule task = runtime.getClassFromPath("Warbler::Task");
-        task.defineAnnotatedMethods(WarblerTask.class);
+        RubyModule task = runtime.getClassFromPath("Warbler::War");
+        task.defineAnnotatedMethods(WarblerWar.class);
     }
 
     @JRubyMethod

@@ -8,9 +8,9 @@ import java.io.IOException;
 import org.jruby.Ruby;
 import org.jruby.runtime.load.BasicLibraryService;
 
-public class WarblerTaskService implements BasicLibraryService {
+public class WarblerWarService implements BasicLibraryService {
     public boolean basicLoad(final Ruby runtime) throws IOException {
-        WarblerTask.create(runtime);
+        WarblerWar.create(runtime);
         return true;
     }
 }

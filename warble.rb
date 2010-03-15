@@ -31,9 +31,17 @@ Warbler::Config.new do |config|
   # Specify path if gems are bundled before creating the .war file.
   # config.webxml.gem.home = "/WEB-INF/vendor/bundler_gems"
 
-  # Gems to be included. You need to tell Warbler which gems your application needs
-  # so that they can be packaged in the war file.
-  # The Rails gems are included by default unless the vendor/rails directory is present.
+  # Bundler support is built-in. If Warbler finds a Gemfile in the
+  # project directory, it will be used to collect the gems to bundle
+  # in your application. If you wish to explicitly disable this
+  # functionality, uncomment here.
+  # config.bundler = false
+
+  # Other gems to be included. You need to tell Warbler which gems
+  # your application needs so that they can be packaged in the war
+  # file.
+  # The Rails gems are included by default unless the vendor/rails
+  # directory is present.
   # config.gems += ["activerecord-jdbcmysql-adapter", "jruby-openssl"]
   # config.gems << "tzinfo"
 
