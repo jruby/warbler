@@ -370,6 +370,8 @@ describe Warbler::Task do
       config = mock "config"
       rails.stub!(:configuration).and_return(config)
       config.stub!(:threadsafe!)
+      config.should_receive(:allow_concurrency).and_return true
+      config.should_receive(:preload_frameworks).and_return true
     end
     @config = Warbler::Config.new
     @config.webxml.booter.should == :rails

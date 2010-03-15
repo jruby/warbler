@@ -196,7 +196,10 @@ module Warbler
       if defined?(Rails.configuration.gems)
         Rails.configuration.gems.each {|g| @gems << Gem::Dependency.new(g.name, g.requirement) }
       end
-      @webxml.jruby.max.runtimes = 1 if defined?(Rails.configuration.threadsafe!)
+      if defined?(Rails.configuration.threadsafe!) &&
+          Rails.configuration.allow_concurrency && Rails.configuration.preload_frameworks
+        @webxml.jruby.max.runtimes = 1
+      end
       true
     end
 
