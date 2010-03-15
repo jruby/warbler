@@ -181,7 +181,7 @@ module Warbler
     end
 
     def auto_detect_frameworks
-      !Warbler.framework_detection || auto_detect_rackup || auto_detect_rails || auto_detect_merb
+      !Warbler.framework_detection || auto_detect_rails || auto_detect_merb || auto_detect_rackup
     end
 
     def auto_detect_rails
