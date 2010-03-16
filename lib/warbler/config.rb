@@ -12,7 +12,7 @@ module Warbler
   class Config
     TOP_DIRS = %w(app config lib log vendor)
     FILE = "config/warble.rb"
-    DEFAULT_GEM_HOME = '/WEB-INF/gems'
+    DEFAULT_GEM_PATH = '/WEB-INF/gems'
     BUILD_GEMS = %w(warbler rake rcov)
 
     # Deprecated: No longer has any effect.
@@ -77,7 +77,8 @@ module Warbler
     attr_accessor :bundler
 
     # Path to the pre-bundled gem directory inside the war file. Default is '/WEB-INF/gems'.
-    attr_accessor :gem_home
+    # This also sets 'gem.path' inside web.xml.
+    attr_accessor :gem_path
 
     # Extra configuration for web.xml. Controls how the dynamically-generated web.xml
     # file is generated.
@@ -94,7 +95,7 @@ module Warbler
     # * <tt>webxml.rails.env</tt> -- the Rails environment to use for the
     #   running application, usually either development or production (the
     #   default).
-    # * <tt>webxml.gem.home</tt> -- the path to your bundled gem directory
+    # * <tt>webxml.gem.path</tt> -- the path to your bundled gem directory
     # * <tt>webxml.jruby.min.runtimes</tt> -- minimum number of pooled runtimes to
     #   keep around during idle time
     # * <tt>webxml.jruby.max.runtimes</tt> -- maximum number of pooled Rails
@@ -115,7 +116,7 @@ module Warbler
       @java_libs   = default_jar_files
       @java_classes = FileList[]
       @gems        = Warbler::Gems.new
-      @gem_home    = DEFAULT_GEM_HOME
+      @gem_path    = DEFAULT_GEM_PATH
       @gem_dependencies = true
       @exclude_logs = true
       @public_html = FileList["public/**/*"]
@@ -126,7 +127,7 @@ module Warbler
       @bundler     = true
       auto_detect_frameworks
       yield self if block_given?
-      update_gem_home
+      update_gem_path
       detect_bundler_gems
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes += FileList["**/*.log"] if @exclude_logs
@@ -152,8 +153,8 @@ module Warbler
       p.java_libs    = ["WEB-INF/lib/%f"]
       p.java_classes = ["WEB-INF/classes/%p"]
       p.application  = ["WEB-INF/%p"]
-      p.gemspecs     = ["#{@gem_home[1..-1]}/specifications/%f"]
-      p.gems         = ["#{@gem_home[1..-1]}/gems/%p"]
+      p.gemspecs     = ["#{@gem_path[1..-1]}/specifications/%f"]
+      p.gems         = ["#{@gem_path[1..-1]}/gems/%p"]
       p
     end
 
@@ -166,13 +167,13 @@ module Warbler
       c
     end
 
-    def update_gem_home
-      if @gem_home != DEFAULT_GEM_HOME
-        @gem_home = "/#{@gem_home}" unless @gem_home =~ %r{^/}
-        sub_gem_home = @gem_home[1..-1]
-        @pathmaps.gemspecs.each {|p| p.sub!(DEFAULT_GEM_HOME[1..-1], sub_gem_home)}
-        @pathmaps.gems.each {|p| p.sub!(DEFAULT_GEM_HOME[1..-1], sub_gem_home)}
-        @webxml["gem"]["home"] = @gem_home
+    def update_gem_path
+      if @gem_path != DEFAULT_GEM_PATH
+        @gem_path = "/#{@gem_path}" unless @gem_path =~ %r{^/}
+        sub_gem_path = @gem_path[1..-1]
+        @pathmaps.gemspecs.each {|p| p.sub!(DEFAULT_GEM_PATH[1..-1], sub_gem_path)}
+        @pathmaps.gems.each {|p| p.sub!(DEFAULT_GEM_PATH[1..-1], sub_gem_path)}
+        @webxml["gem"]["path"] = @gem_path
       end
     end
 
@@ -183,7 +184,7 @@ module Warbler
         require 'bundler'
         env = Bundler.load
         env.extend Warbler::Runtime
-        env.gem_home = @gem_home
+        env.gem_path = @gem_path
         env.write_war_environment
         env.war_specs.each {|spec| @gems << spec }
       else

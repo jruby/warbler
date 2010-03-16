@@ -29,8 +29,8 @@ Warbler::Config.new do |config|
 
   # Path to the pre-bundled gem directory inside the war file. Default
   # is 'WEB-INF/gems'. Specify path if gems are already bundled
-  # before running Warbler.
-  # config.gem_home = "WEB-INF/vendor/bundler_gems"
+  # before running Warbler. This also sets 'gem.path' inside web.xml.
+  # config.gem_path = "WEB-INF/vendor/bundler_gems"
 
   # Bundler support is built-in. If Warbler finds a Gemfile in the
   # project directory, it will be used to collect the gems to bundle
@@ -58,8 +58,9 @@ Warbler::Config.new do |config|
   # config.gems << /^merb-/
   # config.gems << Gem::Dependency.new("merb-core", "= 0.9.3")
 
-  # Include gem dependencies not mentioned specifically
-  config.gem_dependencies = true
+  # Include gem dependencies not mentioned specifically. Default is true, uncomment
+  # to turn off.
+  # config.gem_dependencies = false
 
   # Files to be included in the root of the webapp.  Note that files in public
   # will have the leading 'public/' part of the path stripped during staging.
@@ -67,6 +68,9 @@ Warbler::Config.new do |config|
 
   # Pathmaps for controlling how public HTML files are copied into the .war
   # config.pathmaps.public_html = ["%{public/,}p"]
+
+  # Pathmaps for controlling how application files are copied into the .war
+  # config.pathmaps.application = ["WEB-INF/%p"]
 
   # Name of the war file (without the .war) -- defaults to the basename
   # of RAILS_ROOT
@@ -79,7 +83,7 @@ Warbler::Config.new do |config|
   # Value of RAILS_ENV for the webapp -- default as shown below
   # config.webxml.rails.env = ENV['RAILS_ENV'] || 'production'
 
-  # Application booter to use, one of :rack, :rails, or :merb. (Default :rails)
+  # Application booter to use, one of :rack, :rails, or :merb (autodetected by default)
   # config.webxml.booter = :rails
 
   # When using the :rack booter, "Rackup" script to use.

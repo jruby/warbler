@@ -2,17 +2,17 @@ module Warbler
   # Extension module for a Bundler::Runtime instance, to add methods
   # to create a Bundler environment file specific to war packaging.
   module Runtime
-    attr_writer :gem_home
-    def gem_home
-      @gem_home || '/WEB-INF/gems'
+    attr_writer :gem_path
+    def gem_path
+      @gem_path || Config::DEFAULT_GEM_PATH
     end
 
     class Spec
-      def initialize(spec, gem_home)
+      def initialize(spec, gem_path)
         location = spec[:loaded_from][%r{(.*)/specifications}, 1]
         spec = spec.dup
-        spec[:loaded_from] = spec[:loaded_from].sub(location, gem_home)
-        spec[:load_paths] = spec[:load_paths].map {|p| p.sub(location, gem_home)}
+        spec[:loaded_from] = spec[:loaded_from].sub(location, gem_path)
+        spec[:load_paths] = spec[:load_paths].map {|p| p.sub(location, gem_path)}
         @spec = spec
       end
 
@@ -27,7 +27,7 @@ module Warbler
     end
 
     def specs_for_lock_file
-      super.map {|s| Spec.new(s, gem_home)}
+      super.map {|s| Spec.new(s, gem_path)}
     end
 
     def write_war_environment

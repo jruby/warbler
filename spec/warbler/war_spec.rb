@@ -358,15 +358,15 @@ describe Warbler::War do
     file_list(%r{WEB-INF/notexist}).should be_empty
   end
 
-  it "should write gems to location specified by gem_home" do
-    @config = Warbler::Config.new {|c| c.gem_home = "/WEB-INF/jewels"; c.gems << 'rake' }
+  it "should write gems to location specified by gem_path" do
+    @config = Warbler::Config.new {|c| c.gem_path = "/WEB-INF/jewels"; c.gems << 'rake' }
     elements = expand_webxml
     file_list(%r{WEB-INF/jewels}).should_not be_empty
     elements.to_a(
-      "context-param/param-name[text()='gem.home']"
+      "context-param/param-name[text()='gem.path']"
       ).should_not be_empty
     elements.to_a(
-      "context-param/param-name[text()='gem.home']/../param-value"
+      "context-param/param-name[text()='gem.path']/../param-value"
       ).first.text.should == "/WEB-INF/jewels"
 
   end
@@ -385,9 +385,9 @@ describe Warbler::War do
     file_list(%r{WEB-INF/\.bundle/environment\.rb}).should_not be_empty
   end
 
-  it "should allow overriding of the gem home when using Bundler" do
+  it "should allow overriding of the gem path when using Bundler" do
     File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
-    @war.apply(Warbler::Config.new {|c| c.gem_home = '/WEB-INF/jewels' })
+    @war.apply(Warbler::Config.new {|c| c.gem_path = '/WEB-INF/jewels' })
     file_list(%r{WEB-INF/jewels/specifications/rspec}).should_not be_empty
     IO.readlines(".bundle/war-environment.rb").grep(/rspec/).last.should =~ %r{jewels/specifications}m
   end
