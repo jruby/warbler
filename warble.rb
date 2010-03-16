@@ -27,9 +27,10 @@ Warbler::Config.new do |config|
   # for details of how to specify a pathmap.
   # config.pathmaps.java_classes << "%{target/classes/,}p"
 
-  # Path to the bundler (http://github.com/wycats/bundler) gem directory.
-  # Specify path if gems are bundled before creating the .war file.
-  # config.webxml.gem.home = "/WEB-INF/vendor/bundler_gems"
+  # Path to the pre-bundled gem directory inside the war file. Default
+  # is 'WEB-INF/gems'. Specify path if gems are already bundled
+  # before running Warbler.
+  # config.gem_home = "WEB-INF/vendor/bundler_gems"
 
   # Bundler support is built-in. If Warbler finds a Gemfile in the
   # project directory, it will be used to collect the gems to bundle

@@ -10,8 +10,9 @@ module Warbler
     class Spec
       def initialize(spec, gem_home)
         location = spec[:loaded_from][%r{(.*)/specifications}, 1]
-        spec[:loaded_from].sub!(location, gem_home)
-        spec[:load_paths].each {|p| p.sub!(location, gem_home)}
+        spec = spec.dup
+        spec[:loaded_from] = spec[:loaded_from].sub(location, gem_home)
+        spec[:load_paths] = spec[:load_paths].map {|p| p.sub(location, gem_home)}
         @spec = spec
       end
 

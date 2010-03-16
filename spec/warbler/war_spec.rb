@@ -27,7 +27,7 @@ describe Warbler::War do
     rm_rf "log"
     rm_rf ".bundle"
     rm_f FileList["*.war", "config.ru", "*web.xml", "config/web.xml*",
-                  "config/warble.rb", "file.txt", 'manifest', 'Gemfile']
+                  "config/warble.rb", "file.txt", 'manifest', 'Gemfile*']
     Dir.chdir(@pwd)
   end
 
@@ -358,10 +358,17 @@ describe Warbler::War do
     file_list(%r{WEB-INF/notexist}).should be_empty
   end
 
-  it "should write gems to location specified by webxml.gem.home" do
-    config = Warbler::Config.new {|c| c.webxml.gem.home = "/WEB-INF/jewels"; c.gems << 'rake' }
-    @war.apply(config)
+  it "should write gems to location specified by gem_home" do
+    @config = Warbler::Config.new {|c| c.gem_home = "/WEB-INF/jewels"; c.gems << 'rake' }
+    elements = expand_webxml
     file_list(%r{WEB-INF/jewels}).should_not be_empty
+    elements.to_a(
+      "context-param/param-name[text()='gem.home']"
+      ).should_not be_empty
+    elements.to_a(
+      "context-param/param-name[text()='gem.home']/../param-value"
+      ).first.text.should == "/WEB-INF/jewels"
+
   end
 
   it "should detect a Bundler Gemfile and process only its gems" do
@@ -380,8 +387,22 @@ describe Warbler::War do
 
   it "should allow overriding of the gem home when using Bundler" do
     File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
-    @war.apply(Warbler::Config.new {|c| c.webxml.gem.home = '/WEB-INF/jewels' })
+    @war.apply(Warbler::Config.new {|c| c.gem_home = '/WEB-INF/jewels' })
     file_list(%r{WEB-INF/jewels/specifications/rspec}).should_not be_empty
-    File.read(".bundle/war-environment.rb").should =~ %r{jewels/specifications}m
+    IO.readlines(".bundle/war-environment.rb").grep(/rspec/).last.should =~ %r{jewels/specifications}m
+  end
+
+  it "should not let the framework load Bundler from the locked environment" do
+    task :environment do
+      File.exist?('.bundle/environment.rb').should_not be_true
+      mock_rails_module
+    end
+
+    File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
+    `ruby -S bundle lock`
+    File.exist?('.bundle/environment.rb').should be_true
+    @war.apply(Warbler::Config.new)
+    hash = eval("[" + IO.readlines(".bundle/environment.rb").grep(/rspec/).last + "]").first
+    hash[:load_paths].each {|p| File.exist?(p).should be_true }
   end
 end

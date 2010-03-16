@@ -12,6 +12,7 @@ module Warbler
   class Config
     TOP_DIRS = %w(app config lib log vendor)
     FILE = "config/warble.rb"
+    DEFAULT_GEM_HOME = '/WEB-INF/gems'
     BUILD_GEMS = %w(warbler rake rcov)
 
     # Deprecated: No longer has any effect.
@@ -47,7 +48,7 @@ module Warbler
     # Java libraries to copy to WEB-INF/lib
     attr_accessor :java_libs
 
-    # Rubygems to install into the webapp at WEB-INF/gems
+    # Rubygems to install into the webapp.
     attr_accessor :gems
 
     # Whether to include dependent gems (default true)
@@ -74,6 +75,9 @@ module Warbler
 
     # Use Bundler to locate gems if Gemfile is found. Default is true.
     attr_accessor :bundler
+
+    # Path to the pre-bundled gem directory inside the war file. Default is '/WEB-INF/gems'.
+    attr_accessor :gem_home
 
     # Extra configuration for web.xml. Controls how the dynamically-generated web.xml
     # file is generated.
@@ -111,6 +115,7 @@ module Warbler
       @java_libs   = default_jar_files
       @java_classes = FileList[]
       @gems        = Warbler::Gems.new
+      @gem_home    = DEFAULT_GEM_HOME
       @gem_dependencies = true
       @exclude_logs = true
       @public_html = FileList["public/**/*"]
@@ -121,8 +126,8 @@ module Warbler
       @bundler     = true
       auto_detect_frameworks
       yield self if block_given?
+      update_gem_home
       detect_bundler_gems
-      detect_gem_home
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes += FileList["**/*.log"] if @exclude_logs
     end
@@ -147,8 +152,8 @@ module Warbler
       p.java_libs    = ["WEB-INF/lib/%f"]
       p.java_classes = ["WEB-INF/classes/%p"]
       p.application  = ["WEB-INF/%p"]
-      p.gemspecs     = ["WEB-INF/gems/specifications/%f"]
-      p.gems         = ["WEB-INF/gems/gems/%p"]
+      p.gemspecs     = ["#{@gem_home[1..-1]}/specifications/%f"]
+      p.gems         = ["#{@gem_home[1..-1]}/gems/%p"]
       p
     end
 
@@ -161,20 +166,24 @@ module Warbler
       c
     end
 
-    def detect_gem_home
-      if String === @webxml.gem.home
-        @pathmaps.gemspecs.each{|p| p.sub!(%r{WEB-INF/gems}, @webxml.gem.home)}
-        @pathmaps.gems.each{|p| p.sub!(%r{WEB-INF/gems}, @webxml.gem.home)}
+    def update_gem_home
+      if @gem_home != DEFAULT_GEM_HOME
+        @gem_home = "/#{@gem_home}" unless @gem_home =~ %r{^/}
+        sub_gem_home = @gem_home[1..-1]
+        @pathmaps.gemspecs.each {|p| p.sub!(DEFAULT_GEM_HOME[1..-1], sub_gem_home)}
+        @pathmaps.gems.each {|p| p.sub!(DEFAULT_GEM_HOME[1..-1], sub_gem_home)}
+        @webxml["gem"]["home"] = @gem_home
       end
     end
 
     def detect_bundler_gems
       if @bundler && File.exist?("Gemfile")
         @gems.clear
+        @gem_dependencies = false # Bundler takes care of these
         require 'bundler'
         env = Bundler.load
         env.extend Warbler::Runtime
-        env.gem_home = @webxml.gem.home if String === @webxml.gem.home
+        env.gem_home = @gem_home
         env.write_war_environment
         env.war_specs.each {|spec| @gems << spec }
       else
@@ -189,7 +198,17 @@ module Warbler
     end
 
     def auto_detect_frameworks
-      !Warbler.framework_detection || auto_detect_rails || auto_detect_merb || auto_detect_rackup
+      return unless Warbler.framework_detection
+      if File.exist?(".bundle/environment.rb")
+        begin                     # Don't want Bundler to load from .bundle/environment
+          mv(".bundle/environment.rb",".bundle/environment-save.rb", :verbose => false)
+          auto_detect_rails || auto_detect_merb || auto_detect_rackup
+        ensure
+          mv(".bundle/environment-save.rb",".bundle/environment.rb", :verbose => false)
+        end
+      else
+        auto_detect_rails || auto_detect_merb || auto_detect_rackup
+      end
     end
 
     def auto_detect_rails
