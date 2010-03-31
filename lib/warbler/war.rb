@@ -25,6 +25,7 @@ module Warbler
         war_path = File.join(config_or_path.autodeploy_dir, war_path) if config_or_path.autodeploy_dir
       end
       rm_f war_path
+      ensure_directory_entries
       puts "Creating #{war_path}"
       create_war war_path, @files
     end
@@ -143,6 +144,16 @@ module Warbler
         file = file.pathmap(p)
       end if pathmaps
       file
+    end
+
+    def ensure_directory_entries
+      files.select {|k,v| !v.nil? }.each do |k,v|
+        dir = File.dirname(k)
+        while dir != "." && !files.has_key?(dir)
+          files[dir] = nil
+          dir = File.dirname(dir)
+        end
+      end
     end
 
     def create_war(war_file, entries)
