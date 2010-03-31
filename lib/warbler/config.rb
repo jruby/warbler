@@ -222,7 +222,9 @@ module Warbler
         @gems["rails"] = Rails::VERSION::STRING
       end
       if defined?(Rails.configuration.gems)
-        Rails.configuration.gems.each {|g| @gems << Gem::Dependency.new(g.name, g.requirement) }
+        Rails.configuration.gems.each do |g|
+          @gems << Gem::Dependency.new(g.name, g.requirement) if Dir["vendor/gems/#{g.name}*"].empty?
+        end
       end
       if defined?(Rails.configuration.threadsafe!) &&
         (defined?(Rails.configuration.allow_concurrency) && # Rails 3
