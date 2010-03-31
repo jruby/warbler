@@ -31,20 +31,16 @@ module Warbler
     end
 
     def add_webxml(config)
-      webxml = nil
-      if File.exist?("config/web.xml")
-        webxml = "config/web.xml"
-      else
-        erb = if File.exist?("config/web.xml.erb")
-                "config/web.xml.erb"
-              else
-                "#{WARBLER_HOME}/web.xml.erb"
-              end
-        require 'erb'
-        erb = ERB.new(File.open(erb) {|f| f.read })
-        webxml = StringIO.new(erb.result(erb_binding(config.webxml)))
+      config.webinf_files.each do |wf|
+        if wf =~ /\.erb$/
+          require 'erb'
+          erb = ERB.new(File.open(wf) {|f| f.read })
+          contents = StringIO.new(erb.result(erb_binding(config.webxml)))
+          @files[apply_pathmaps(config, wf, :webinf)] = contents
+        else
+          @files[apply_pathmaps(config, wf, :webinf)] = wf
+        end
       end
-      @files["WEB-INF/web.xml"] = webxml
     end
 
     def add_manifest(config)

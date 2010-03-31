@@ -73,6 +73,10 @@ module Warbler
     # by jar -cf....
     attr_accessor :manifest_file
 
+    # Files for WEB-INF directory (next to web.xml). Contains web.xml by default.
+    # If there are .erb files they will be processed with webxml config.
+    attr_accessor :webinf_files
+
     # Use Bundler to locate gems if Gemfile is found. Default is true.
     attr_accessor :bundler
 
@@ -125,6 +129,7 @@ module Warbler
       @rails_root  = File.expand_path(defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)
       @war_name    = File.basename(@rails_root)
       @bundler     = true
+      @webinf_files = default_webinf_files
       auto_detect_frameworks
       yield self if block_given?
       update_gem_path
@@ -153,6 +158,7 @@ module Warbler
       p.java_libs    = ["WEB-INF/lib/%f"]
       p.java_classes = ["WEB-INF/classes/%p"]
       p.application  = ["WEB-INF/%p"]
+      p.webinf       = ["WEB-INF/%{.erb$,}f"]
       p.gemspecs     = ["#{@gem_path[1..-1]}/specifications/%f"]
       p.gems         = ["#{@gem_path[1..-1]}/gems/%p"]
       p
@@ -165,6 +171,17 @@ module Warbler
       c.jndi = nil
       c.ignored = %w(jndi booter)
       c
+    end
+
+    def default_webinf_files
+      webxml = if File.exist?("config/web.xml")
+        "config/web.xml"
+      elsif File.exist?("config/web.xml.erb")
+        "config/web.xml.erb"
+      else
+        "#{WARBLER_HOME}/web.xml.erb"
+      end
+      FileList[webxml]
     end
 
     def update_gem_path

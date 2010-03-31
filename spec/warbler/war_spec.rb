@@ -26,7 +26,7 @@ describe Warbler::War do
   after(:each) do
     rm_rf "log"
     rm_rf ".bundle"
-    rm_f FileList["*.war", "config.ru", "*web.xml", "config/web.xml*",
+    rm_f FileList["*.war", "config.ru", "*web.xml*", "config/web.xml*",
                   "config/warble.rb", "file.txt", 'manifest', 'Gemfile*']
     Dir.chdir(@pwd)
   end
@@ -118,14 +118,14 @@ describe Warbler::War do
   it "should use a config/web.xml if it exists" do
     mkdir_p "config"
     touch "config/web.xml"
-    @war.apply(@config)
+    @war.apply(Warbler::Config.new)
     @war.files["WEB-INF/web.xml"].should == "config/web.xml"
   end
 
   it "should use a config/web.xml.erb if it exists" do
     mkdir_p "config"
     File.open("config/web.xml.erb", "w") {|f| f << "Hi <%= webxml.public.root %>" }
-    @war.apply(@config)
+    @war.apply(Warbler::Config.new)
     @war.files["WEB-INF/web.xml"].should_not be_nil
     @war.files["WEB-INF/web.xml"].read.should == "Hi /"
   end
@@ -404,5 +404,22 @@ describe Warbler::War do
     @war.apply(Warbler::Config.new)
     hash = eval("[" + IO.readlines(".bundle/environment.rb").grep(/rspec/).last + "]").first
     hash[:load_paths].each {|p| File.exist?(p).should be_true }
+  end
+
+  it "should allow adding additional WEB-INF files via config.webinf_files" do
+    File.open("myserver-web.xml", "w") do |f|
+      f << "<web-app></web-app>"
+    end
+    @war.apply(Warbler::Config.new {|c| c.webinf_files = FileList['myserver-web.xml'] })
+    file_list(%r{WEB-INF/myserver-web.xml}).should_not be_empty
+  end
+
+  it "should allow expanding of additional WEB-INF files via config.webinf_files" do
+    File.open("myserver-web.xml.erb", "w") do |f|
+      f << "<web-app><%= webxml.rails.env %></web-app>"
+    end
+    @war.apply(Warbler::Config.new {|c| c.webinf_files = FileList['myserver-web.xml.erb'] })
+    file_list(%r{WEB-INF/myserver-web.xml}).should_not be_empty
+    @war.files['WEB-INF/myserver-web.xml'].read.should =~ /web-app.*production/
   end
 end

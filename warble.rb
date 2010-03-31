@@ -38,6 +38,12 @@ Warbler::Config.new do |config|
   # functionality, uncomment here.
   # config.bundler = false
 
+  # Files for WEB-INF directory (next to web.xml). This contains
+  # web.xml by default. If there is an .erb-File it will be processed
+  # with webxml-config. You may want to exclude this file via
+  # config.excludes.
+  # config.webinf_files += FileList["jboss-web.xml"]
+
   # Other gems to be included. You need to tell Warbler which gems
   # your application needs so that they can be packaged in the war
   # file.
