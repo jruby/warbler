@@ -1,9 +1,14 @@
-== 0.9.15
+== 1.0
 
+* Warbler hits 1.0! There are enough structural changes in Warbler
+  that I feel it's time to roll the major version over to 1.0.
+* Add support for Bundler. Detect Gemfiles, make sure gems are
+  included in the war file and rewrite .bundle/environment.rb inside
+  the war file.
 * Warbler now uses RubyZip to create the war file in-place, without
-  copying files to a tmp/war staging area.
-* Allow override of gem.home which prevents Warbler from doing its own
-  gem bundling. For stop-gap use with Bundler (Daniel Harrington).
+  copying files to a tmp/war staging area. When run in JRuby it uses a
+  Java ZipOutputStream for a modest performance boost.
+* Add config option to allow override of gem_home (Daniel Harrington).
 * Stop bundling jruby-rack, as promised.
 
 == 0.9.14
