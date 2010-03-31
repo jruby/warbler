@@ -10,6 +10,9 @@
   Java ZipOutputStream for a modest performance boost.
 * Add config option to allow override of gem_home (Daniel Harrington).
 * Stop bundling jruby-rack, as promised.
+* WARBLER-3: don't add from Rails config.gems if they are frozen
+* WARBLER-7: Add config.webinf_files option with more support for
+  custom web.xml files
 
 == 0.9.14
 
