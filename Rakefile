@@ -5,6 +5,9 @@
 # See the file LICENSE.txt for details.
 #++
 
+require 'bundler'
+Bundler.setup
+
 require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
 
@@ -63,7 +66,7 @@ end
 
 task :default => :spec
 
-if defined?(JRUBY_VERSION)
+begin
   require 'ant'
   directory "pkg/classes"
   task :compile => "pkg/classes" do |t|
@@ -75,10 +78,9 @@ if defined?(JRUBY_VERSION)
   task :jar => :compile do
     ant.jar :basedir => "pkg/classes", :destfile => "lib/warbler_war.jar", :includes => "*.class"
   end
-
-else
+rescue LoadError
   task :jar do
-    puts "Run 'jar' with JRuby to re-compile the java war booster"
+    puts "Run 'jar' with JRuby >= 1.5 to re-compile the java war booster"
   end
 end
 

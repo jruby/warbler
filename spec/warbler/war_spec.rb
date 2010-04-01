@@ -41,7 +41,7 @@ describe Warbler::War do
   end
 
   it "should collect gem files" do
-    @config.gems << "rails"
+    @config.gems << "rake"
     @war.apply(@config)
     file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
     file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty

@@ -37,6 +37,13 @@ Now you should be able to invoke "rake war" to create your war file.
 
 == Configuration
 
+=== Bundler
+
+Applications that use Bundler (http://gembundler.com/), detected via
+presence of a +Gemfile+, will have the gems packaged up into the war
+file. The .bundle/environment.rb file will be included for you, and
+rewritten to use the paths to the gems inside the war.
+
 === Rails applications
 
 Rails applications are detected automatically and configured appropriately.
@@ -44,7 +51,7 @@ The following items are set up for you:
 
 * The Rails gem is packaged if you haven't vendored Rails.
 * Other gems configured in Rails.configuration.gems are packaged
-  (Rails 2.1 or later)
+  (Rails 2.1 - 2.3)
 * Multi-thread-safe execution (as introduced in Rails 2.2) is detected
   and runtime pooling is disabled.
 
@@ -131,6 +138,14 @@ You can get the Warbler source using Git, in any of the following ways:
 
 You can also download a tarball of Warbler source at
 http://github.com/nicksieger/warbler/tree/master.
+
+== Development
+
+You can develop Warbler with any implementation of Ruby. To write
+Warbler code and run specs, you need to have Bundler installed
+and run "bundle install" once.
+
+After that, simply run "rake".
 
 == License
 

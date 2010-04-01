@@ -1,0 +1,59 @@
+--- 
+dependencies: 
+  diff-lcs: 
+    group: 
+    - :default
+    version: ">= 0"
+  jruby-rack: 
+    group: 
+    - :default
+    version: ">= 0"
+  rake: 
+    group: 
+    - :default
+    version: ">= 0.8.7"
+  rspec: 
+    group: 
+    - :default
+    version: ">= 0"
+  jruby-jars: 
+    group: 
+    - :default
+    version: ">= 0"
+  rcov: 
+    group: 
+    - :default
+    version: ">= 0.9.8"
+  hoe: 
+    group: 
+    - :default
+    version: ">= 2.3.2"
+  rubyzip: 
+    group: 
+    - :default
+    version: ">= 0"
+specs: 
+- rake: 
+    version: 0.8.7
+- diff-lcs: 
+    version: 1.1.2
+- json_pure: 
+    version: 1.2.3
+- rubyforge: 
+    version: 2.0.4
+- hoe: 
+    version: 2.6.0
+- jruby-jars: 
+    version: 1.4.0
+- jruby-rack: 
+    version: 0.9.7
+- rcov: 
+    version: 0.9.8
+- rspec: 
+    version: 1.3.0
+- rubyzip: 
+    version: 0.9.4
+hash: 41cb3c1b5d497ff51c3d2e1b0529058c96c949ff
+sources: 
+- Rubygems: 
+    uri: http://rubygems.org/
