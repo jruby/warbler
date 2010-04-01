@@ -1,3 +1,4 @@
+Gemfile
 History.txt
 LICENSE.txt
 Manifest.txt

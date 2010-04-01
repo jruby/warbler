@@ -45,6 +45,7 @@ module Warbler
       namespace name do
         define_clean_task
         define_files_task
+        define_gemjar_task
         define_jar_task
         define_debug_task
       end
@@ -72,6 +73,21 @@ module Warbler
     def define_files_task
       task "files" do
         war.apply(config)
+      end
+    end
+
+    def define_gemjar_task
+      gem_jar = Warbler::War.new
+      task "gemjar" => "files" do
+        gem_path = Regexp::quote(config.relative_gem_path)
+        gems = war.files.select{|k,v| k =~ %r{#{gem_path}/} }
+        gems.each do |k,v|
+          gem_jar.files[k.sub(%r{#{gem_path}/}, '')] = v
+        end
+        war.files["WEB-INF/lib/gems.jar"] = "tmp/gems.jar"
+        war.files.reject!{|k,v| k =~ /#{gem_path}/ }
+        mkdir_p "tmp"
+        gem_jar.create("tmp/gems.jar")
       end
     end
 

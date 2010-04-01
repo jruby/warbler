@@ -142,6 +142,10 @@ module Warbler
       @gems = Warbler::Gems.new(value)
     end
 
+    def relative_gem_path
+      @gem_path[1..-1]
+    end
+
     private
     def warbler_vendor_excludes(warbler_home)
       warbler = File.expand_path(warbler_home)
@@ -159,8 +163,8 @@ module Warbler
       p.java_classes = ["WEB-INF/classes/%p"]
       p.application  = ["WEB-INF/%p"]
       p.webinf       = ["WEB-INF/%{.erb$,}f"]
-      p.gemspecs     = ["#{@gem_path[1..-1]}/specifications/%f"]
-      p.gems         = ["#{@gem_path[1..-1]}/gems/%p"]
+      p.gemspecs     = ["#{relative_gem_path}/specifications/%f"]
+      p.gems         = ["#{relative_gem_path}/gems/%p"]
       p
     end
 

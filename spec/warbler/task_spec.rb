@@ -27,7 +27,8 @@ describe Warbler::Task do
   after(:each) do
     Rake::Task["warble:clean"].invoke
     rm_rf "log"
-    rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb", "file.txt", 'manifest', 'Gemfile']
+    rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb",
+                  "tmp/gems.jar", "file.txt", 'manifest', 'Gemfile']
     Dir.chdir(@pwd)
   end
 
@@ -36,6 +37,13 @@ describe Warbler::Task do
     touch war_file
     Rake::Task["warble:clean"].invoke
     File.exist?(war_file).should == false
+  end
+
+  it "should define a gemjar task for storing gems in a jar file" do
+    silence { Rake::Task["warble:gemjar"].invoke }
+    File.exist?("tmp/gems.jar").should == true
+    @task.war.files.keys.should_not include(%r{WEB-INF\/gems})
+    @task.war.files.keys.should include("WEB-INF/lib/gems.jar")
   end
 
   it "should define a war task for bundling up everything" do

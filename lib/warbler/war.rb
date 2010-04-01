@@ -97,11 +97,7 @@ module Warbler
         @files[apply_pathmaps(config, File.join(spec.full_name, f), :gems)] = src
       end
 
-      if config.gem_dependencies
-        spec.dependencies.each do |dep|
-          find_single_gem_files(config, dep)
-        end
-      end
+      spec.dependencies.each {|dep| find_single_gem_files(config, dep) } if config.gem_dependencies
     end
 
     def find_webinf_files(config)
