@@ -5,13 +5,17 @@
 # See the file LICENSE.txt for details.
 #++
 
-require 'bundler'
-Bundler.setup
+begin
+  require 'bundler'
+  Bundler.setup
+rescue LoadError
+  puts "Please install Bundler and run 'bundle install' to ensure you have all dependencies"
+end
 
 require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
 
-MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt",
+MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt", "Gemfile",
                     "LICENSE.txt", "Rakefile", "*.erb", "*.rb", "bin/*",
                     "ext/**/*", "lib/**/*", "spec/**/*.rb", "spec/sample/**/*.*"
                    ].to_a.reject{|f| f=~%r{spec/sample/(MANIFEST|web.xml)}}.sort.uniq
