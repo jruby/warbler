@@ -203,7 +203,8 @@ module Warbler
         @gems.clear
         @gem_dependencies = false # Bundler takes care of these
         require 'bundler'
-        env = Bundler.load
+        env = Bundler.respond_to?(:runtime) ? Bundler.runtime : Bundler.load
+        def Bundler.env_file; root.join(::Warbler::Runtime::WAR_ENV); end
         env.extend Warbler::Runtime
         env.gem_path = @gem_path
         env.write_war_environment

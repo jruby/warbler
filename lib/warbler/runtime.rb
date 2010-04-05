@@ -2,6 +2,8 @@ module Warbler
   # Extension module for a Bundler::Runtime instance, to add methods
   # to create a Bundler environment file specific to war packaging.
   module Runtime
+    WAR_ENV = ".bundle/war-environment.rb"
+
     attr_writer :gem_path
     def gem_path
       @gem_path || Config::DEFAULT_GEM_PATH
@@ -23,7 +25,7 @@ module Warbler
     end
 
     def rb_lock_file
-      root.join(".bundle/war-environment.rb")
+      root.join(WAR_ENV)
     end
 
     def specs_for_lock_file
