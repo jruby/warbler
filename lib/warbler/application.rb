@@ -7,6 +7,9 @@
 
 require 'rake'
 
+# Extension of Rake::Application that allows the +warble+ command to
+# report its name properly and inject its own tasks without a
+# Rakefile.
 class Warbler::Application < Rake::Application
   def initialize
     super
@@ -14,6 +17,7 @@ class Warbler::Application < Rake::Application
     @project_loaded = false
   end
 
+  # Sets the application name and loads Warbler's own tasks
   def load_rakefile
     @name = 'warble'
 
@@ -41,6 +45,7 @@ class Warbler::Application < Rake::Application
     end
   end
 
+  # Loads the project Rakefile in a separate application
   def load_project_rakefile
     return if @project_loaded
     # Load any application rakefiles to aid in autodetecting applications
@@ -56,6 +61,8 @@ class Warbler::Application < Rake::Application
     @project_loaded = true
   end
 
+  # Run the application: The equivalent code for the +warble+ command
+  # is simply <tt>Warbler::Application.new.run</tt>.
   def run
     Rake.application = self
     super

@@ -1,4 +1,10 @@
 module Warbler
+  # Class that holds the files that will be stored in the war file.
+  # The #files attribute contains a hash of pathnames inside the war
+  # file to their contents. Contents can be one of:
+  # * +nil+ representing a directory entry
+  # * Any object responding to +read+ representing an in-memory blob
+  # * A String filename pointing to a file on disk
   class War
     attr_reader :files
     attr_reader :webinf_filelist
@@ -7,6 +13,8 @@ module Warbler
       @files = {}
     end
 
+    # Apply the information in a Warbler::Config object in order to
+    # look for files to put into this war file.
     def apply(config)
       find_webinf_files(config)
       find_java_libs(config)
@@ -18,6 +26,8 @@ module Warbler
       add_bundler_files(config)
     end
 
+    # Create the war file. The single argument can either be a
+    # Warbler::Config or a filename of the war file to create.
     def create(config_or_path)
       war_path = config_or_path
       if Warbler::Config === config_or_path
@@ -30,6 +40,8 @@ module Warbler
       create_war war_path, @files
     end
 
+    # Add web.xml and other WEB-INF configuration files from
+    # config.webinf_files to the war file.
     def add_webxml(config)
       config.webinf_files.each do |wf|
         if wf =~ /\.erb$/
@@ -43,6 +55,7 @@ module Warbler
       end
     end
 
+    # Add a manifest file either from config or by making a default manifest.
     def add_manifest(config)
       if config.manifest_file
         @files['META-INF/MANIFEST.MF'] = config.manifest_file
@@ -51,22 +64,27 @@ module Warbler
       end
     end
 
+    # Add java libraries to WEB-INF/lib.
     def find_java_libs(config)
       config.java_libs.map {|lib| add_with_pathmaps(config, lib, :java_libs) }
     end
 
+    # Add java classes to WEB-INF/classes.
     def find_java_classes(config)
       config.java_classes.map {|f| add_with_pathmaps(config, f, :java_classes) }
     end
 
+    # Add public/static assets to the root of the war file.
     def find_public_files(config)
       config.public_html.map {|f| add_with_pathmaps(config, f, :public_html) }
     end
 
+    # Add gems to WEB-INF/gems
     def find_gems_files(config)
       config.gems.each {|gem, version| find_single_gem_files(config, gem, version) }
     end
 
+    # Add a single gem to WEB-INF/gems
     def find_single_gem_files(config, gem_pattern, version = nil)
       if Gem::Specification === gem_pattern
         spec = gem_pattern
@@ -100,6 +118,7 @@ module Warbler
       spec.dependencies.each {|dep| find_single_gem_files(config, dep) } if config.gem_dependencies
     end
 
+    # Add all application directories and files to WEB-INF.
     def find_webinf_files(config)
       config.dirs.select do |d|
         exists = File.directory?(d)
@@ -114,6 +133,7 @@ module Warbler
       @webinf_filelist.map {|f| add_with_pathmaps(config, f, :application) }
     end
 
+    # Add Bundler Gemfile and .bundle/environment.rb to the war file.
     def add_bundler_files(config)
       if config.bundler
         @files[apply_pathmaps(config, 'Gemfile', :application)] = 'Gemfile'

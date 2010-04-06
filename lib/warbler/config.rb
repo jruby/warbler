@@ -8,7 +8,7 @@
 require 'ostruct'
 
 module Warbler
-  # Warbler assembly configuration.
+  # Warbler war file assembly configuration class.
   class Config
     TOP_DIRS = %w(app config lib log vendor)
     FILE = "config/warble.rb"
@@ -69,8 +69,7 @@ module Warbler
     # the Rails application
     attr_accessor :war_name
 
-    # Name of the MANIFEST.MF template.  Defaults to the MANIFEST.MF normally generated
-    # by jar -cf....
+    # Name of a MANIFEST.MF template to use.
     attr_accessor :manifest_file
 
     # Files for WEB-INF directory (next to web.xml). Contains web.xml by default.
@@ -279,6 +278,7 @@ module Warbler
     end
   end
 
+  # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.
   class WebxmlOpenStruct < OpenStruct
     %w(java com org javax).each {|name| undef_method name if Object.methods.include?(name) }
 

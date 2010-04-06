@@ -13,6 +13,21 @@ require 'zip/zip'
 module Warbler
   # Warbler Rake task.  Allows defining multiple configurations inside the same
   # Rakefile by using different task names.
+  #
+  # To define multiple Warbler configurations in a single project, use
+  # code like the following in a Rakefile:
+  #
+  #     Warbler::Task.new("war1", Warbler::Config.new do |config|
+  #       config.war_name = "war1"
+  #       # ...
+  #     end
+  #     Warbler::Task.new("war2", Warbler::Config.new do |config|
+  #       config.war_name = "war2"
+  #       # ...
+  #     end
+  #
+  # With this setup, you can create two separate war files two
+  # different configurations by running <tt>rake war1 war2</tt>.
   class Task < Rake::TaskLib
     # Task name
     attr_accessor :name
