@@ -184,6 +184,6 @@ module Warbler
     end
 
     # Java-boosted war creation for JRuby; replaces #create_war with Java version
-    require 'warbler_war' if defined?(JRUBY_VERSION)
+    require 'warbler_war' if defined?(JRUBY_VERSION) && JRUBY_VERSION >= "1.5"
   end
 end

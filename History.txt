@@ -1,3 +1,7 @@
+== 1.0.1
+
+* Fix careless bug where Warbler doesn't work with JRuby 1.4
+
 == 1.0
 
 * Warbler hits 1.0! There are enough structural changes in Warbler
