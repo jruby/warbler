@@ -39,7 +39,7 @@ Now you should be able to invoke "rake war" to create your war file.
 
 === Bundler
 
-Applications that use Bundler (http://gembundler.com/), detected via
+Applications that use Bundler[http://gembundler.com/], detected via
 presence of a +Gemfile+, will have the gems packaged up into the war
 file. The .bundle/environment.rb file will be included for you, and
 rewritten to use the paths to the gems inside the war.
@@ -67,16 +67,18 @@ contents will be used as the rackup script for your Rack-based application.
 You will probably need to specify framework and application gems in
 config/warble.rb.
 
-See <a href="http://jruby-rack.kenai.com/sources/main/show/examples">the examples in the jruby-rack project</a>
+See {the examples in the jruby-rack project}[http://github.com/nicksieger/jruby-rack/tree/master/examples/]
 of how to configure Warbler to package Camping and Sinatra apps.
 
 === Configuration auto-detect notes
 
-* If you don't have database access in the environment where you
-  package your application, you may wish to set
-  `Warbler.framework_detection` to false at the top of config.rb. In
-  this case you may need to specify additional details such as booter,
-  gems and other settings.
+* Warbler will load the "environment" Rake task in a Rails application
+  to try to detect some configuration. If you don't have database
+  access in the environment where you package your application, you
+  may wish to set `Warbler.framework_detection` to false at the top of
+  config.rb. In this case you may need to specify additional details
+  such as booter, gems and other settings that would normally be
+  gleaned from the application configuration.
 * A more accurate way of detecting a Merb application's gems is
   needed. Until then, you will have to specify them in
   config/warble.rb. See below.
@@ -110,9 +112,10 @@ creates a suitable default file for you for use. However, if you need to
 customize it in any way, you have two options.
 
 1. If you just want a static web.xml file whose contents you manually
-   control, you may copy the one generated for you in
-   <tt>tmp/war/WEB-INF/web.xml</tt> to <tt>config/web.xml</tt> and
-   modify as needed. It will be copied into the webapp for you.
+   control, you may unzip the one generated for you in
+   <tt>yourapp.war:WEB-INF/web.xml</tt> to <tt>config/web.xml</tt> and
+   modify as needed. It will be copied into subsequent copies of the
+   war file for you.
 2. If you want to inject some dynamic information into the file, copy
    the <tt>WARBLER_HOME/web.xml.erb</tt> to
    <tt>config/web.xml.erb</tt>. Its contents will be evaluated for you

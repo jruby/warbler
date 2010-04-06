@@ -1,6 +1,7 @@
 source "http://rubygems.org/"
 
 gem "rake", ">= 0.8.7"
+gem "rdoc"
 gem "rubyzip"
 gem "jruby-jars"
 gem "jruby-rack"
