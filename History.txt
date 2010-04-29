@@ -1,3 +1,9 @@
+== 1.0.2
+
+* Add 'warble pluginize' task back. This task now just creates a
+  vendor/plugins/warbler/tasks/warbler.rake file. There's no need to
+  "vendor" all of Warbler into your application anymore.
+
 == 1.0.1
 
 * Fix careless bug where Warbler doesn't work with JRuby 1.4
