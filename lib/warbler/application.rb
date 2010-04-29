@@ -27,37 +27,13 @@ class Warbler::Application < Rake::Application
     task :default => :war
 
     desc "Generate a configuration file to customize your war assembly"
-    task :config do
-      if File.exists?(Warbler::Config::FILE) && ENV["FORCE"].nil?
-        puts "There's another bird sitting on my favorite branch"
-        puts "(file '#{Warbler::Config::FILE}' already exists. Pass argument FORCE=1 to override)"
-      elsif !File.directory?("config")
-        puts "I'm confused; my favorite branch is missing"
-        puts "(directory 'config' is missing)"
-      else
-        cp "#{Warbler::WARBLER_HOME}/warble.rb", Warbler::Config::FILE
-      end
-    end
+    task :config => "war:config"
 
     desc "Install Warbler tasks in your Rails application for use by Rake"
-    task :pluginize do
-      if !Dir["vendor/plugins/warbler*"].empty? && ENV["FORCE"].nil?
-        puts "I found an old nest in vendor/plugins; please trash it so I can make a new one"
-        puts "(directory vendor/plugins/warbler* exists)"
-      else
-        rm_rf FileList["vendor/plugins/warbler*"], :verbose => false
-        mkdir_p "vendor/plugins/warbler/tasks"
-        File.open("vendor/plugins/warbler/tasks/warbler.rake", "w") do |f|
-          f.puts "require 'warbler'"
-          f.puts "Warbler::Task.new"
-        end
-      end
-    end
+    task :pluginize => "war:pluginize"
 
     desc "Display version of Warbler"
-    task :version do
-      puts "Warbler version #{Warbler::VERSION}"
-    end
+    task :version => "war:version"
   end
 
   # Loads the project Rakefile in a separate application

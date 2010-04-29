@@ -60,9 +60,12 @@ module Warbler
       namespace name do
         define_clean_task
         define_files_task
-        define_gemjar_task
         define_jar_task
         define_debug_task
+        define_gemjar_task
+        define_config_task
+        define_pluginize_task
+        define_version_task
       end
     end
 
@@ -91,21 +94,6 @@ module Warbler
       end
     end
 
-    def define_gemjar_task
-      gem_jar = Warbler::War.new
-      task "gemjar" => "files" do
-        gem_path = Regexp::quote(config.relative_gem_path)
-        gems = war.files.select{|k,v| k =~ %r{#{gem_path}/} }
-        gems.each do |k,v|
-          gem_jar.files[k.sub(%r{#{gem_path}/}, '')] = v
-        end
-        war.files["WEB-INF/lib/gems.jar"] = "tmp/gems.jar"
-        war.files.reject!{|k,v| k =~ /#{gem_path}/ }
-        mkdir_p "tmp"
-        gem_jar.create("tmp/gems.jar")
-      end
-    end
-
     def define_jar_task
       task "jar" do
         war.create(config)
@@ -126,6 +114,57 @@ module Warbler
       task "debug:excludes" => "files" do
         puts "", "excluded files:"
         puts *war.webinf_filelist.exclude
+      end
+    end
+
+    def define_gemjar_task
+      gem_jar = Warbler::War.new
+      task "gemjar" => "files" do
+        gem_path = Regexp::quote(config.relative_gem_path)
+        gems = war.files.select{|k,v| k =~ %r{#{gem_path}/} }
+        gems.each do |k,v|
+          gem_jar.files[k.sub(%r{#{gem_path}/}, '')] = v
+        end
+        war.files["WEB-INF/lib/gems.jar"] = "tmp/gems.jar"
+        war.files.reject!{|k,v| k =~ /#{gem_path}/ }
+        mkdir_p "tmp"
+        gem_jar.create("tmp/gems.jar")
+      end
+    end
+
+    def define_config_task
+      task "config" do
+        if File.exists?(Warbler::Config::FILE) && ENV["FORCE"].nil?
+          puts "There's another bird sitting on my favorite branch"
+          puts "(file '#{Warbler::Config::FILE}' already exists. Pass argument FORCE=1 to override)"
+        elsif !File.directory?("config")
+          puts "I'm confused; my favorite branch is missing"
+          puts "(directory 'config' is missing)"
+        else
+          cp "#{Warbler::WARBLER_HOME}/warble.rb", Warbler::Config::FILE
+        end
+      end
+    end
+
+    def define_pluginize_task
+      task "pluginize" do
+        if !Dir["vendor/plugins/warbler*"].empty? && ENV["FORCE"].nil?
+          puts "I found an old nest in vendor/plugins; please trash it so I can make a new one"
+          puts "(directory vendor/plugins/warbler* exists)"
+        else
+          rm_rf FileList["vendor/plugins/warbler*"], :verbose => false
+          mkdir_p "vendor/plugins/warbler/tasks"
+          File.open("vendor/plugins/warbler/tasks/warbler.rake", "w") do |f|
+            f.puts "require 'warbler'"
+            f.puts "Warbler::Task.new"
+          end
+        end
+      end
+    end
+
+    def define_version_task
+      task "version" do
+        puts "Warbler version #{Warbler::VERSION}"
       end
     end
   end
