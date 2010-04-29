@@ -39,7 +39,22 @@ class Warbler::Application < Rake::Application
       end
     end
 
-    desc "Display version of warbler"
+    desc "Install Warbler tasks in your Rails application for use by Rake"
+    task :pluginize do
+      if !Dir["vendor/plugins/warbler*"].empty? && ENV["FORCE"].nil?
+        puts "I found an old nest in vendor/plugins; please trash it so I can make a new one"
+        puts "(directory vendor/plugins/warbler* exists)"
+      else
+        rm_rf FileList["vendor/plugins/warbler*"], :verbose => false
+        mkdir_p "vendor/plugins/warbler/tasks"
+        File.open("vendor/plugins/warbler/tasks/warbler.rake", "w") do |f|
+          f.puts "require 'warbler'"
+          f.puts "Warbler::Task.new"
+        end
+      end
+    end
+
+    desc "Display version of Warbler"
     task :version do
       puts "Warbler version #{Warbler::VERSION}"
     end

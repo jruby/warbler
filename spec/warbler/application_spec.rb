@@ -26,6 +26,7 @@ describe Warbler::Application do
     Warbler.application = nil
     Warbler.framework_detection = @detection
     @argv.reverse.each {|a| ARGV.unshift a}
+    rm_rf FileList['vendor/plugins/warbler']
     Dir.chdir(@pwd)
   end
 
@@ -65,6 +66,20 @@ describe Warbler::Application do
     ensure
       mv "config-tmp", "config"
     end
+  end
+
+  it "should refuse to pluginize if the vendor/plugins/warbler directory exists" do
+    mkdir_p "vendor/plugins/warbler"
+    ARGV.unshift "pluginize"
+    silence { Warbler::Application.new.run }
+    File.exist?("vendor/plugins/warbler/tasks/warbler.rake").should_not be_true
+  end
+
+  it "should define a pluginize task for adding the tasks to a Rails application" do
+    ARGV.unshift "pluginize"
+#     silence { Warbler::Application.new.run }
+    Warbler::Application.new.run
+    File.exist?("vendor/plugins/warbler/tasks/warbler.rake").should be_true
   end
 
   it "should provide a means to load the project Rakefile" do
