@@ -57,10 +57,12 @@ module Warbler
 
     # Add a manifest file either from config or by making a default manifest.
     def add_manifest(config)
-      if config.manifest_file
-        @files['META-INF/MANIFEST.MF'] = config.manifest_file
-      else
-        @files['META-INF/MANIFEST.MF'] = StringIO.new(%{Manifest-Version: 1.0\nCreated-By: Warbler #{VERSION}\n\n})
+      unless @files.keys.detect{|k| k =~ /^META-INF\/MANIFEST\.MF$/i}
+        if config.manifest_file
+          @files['META-INF/MANIFEST.MF'] = config.manifest_file
+        else
+          @files['META-INF/MANIFEST.MF'] = StringIO.new(%{Manifest-Version: 1.0\nCreated-By: Warbler #{VERSION}\n\n})
+        end
       end
     end
 

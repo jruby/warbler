@@ -158,6 +158,12 @@ describe Warbler::War do
     @war.files['META-INF/MANIFEST.MF'].should == "manifest"
   end
 
+  it "should not add a manifest if one already exists" do
+    @war.files['META-INF/MANIFEST.MF'] = 'manifest'
+    @war.add_manifest(@config)
+    @war.files['META-INF/MANIFEST.MF'].should == "manifest"
+  end
+
   it "should be able to exclude files from the .war" do
     @config.excludes += FileList['lib/tasks/utils.rake']
     @war.apply(@config)
