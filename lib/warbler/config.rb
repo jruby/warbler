@@ -15,6 +15,11 @@ module Warbler
     DEFAULT_GEM_PATH = '/WEB-INF/gems'
     BUILD_GEMS = %w(warbler rake rcov)
 
+    # Features: additional options controlling how the jar is built.
+    # Currently the following features are supported:
+    # - gemjar: package the gem repository in a jar file in WEB-INF/lib
+    attr_accessor :features
+
     # Deprecated: No longer has any effect.
     attr_accessor :staging_dir
 
@@ -113,6 +118,7 @@ module Warbler
 
     def initialize(warbler_home = WARBLER_HOME)
       @warbler_home = warbler_home
+      @features    = []
       @dirs        = TOP_DIRS.select {|d| File.directory?(d)}
       @includes    = FileList[]
       @excludes    = FileList[]

@@ -72,6 +72,16 @@ module Warbler
     def define_main_task
       desc "Create the project .war file"
       task @name do
+        unless @config.features.empty?
+          @config.features.each do |feature|
+            t = "#@name:#{feature}"
+            unless Rake.application.lookup(t)
+              warn "unknown feature `#{feature}', ignoring"
+              next
+            end
+            Rake::Task[t].invoke
+          end
+        end
         # Invoke this way so custom dependencies can be defined before
         # the file find routine is run
         ["#{@name}:files", "#{@name}:jar"].each do |t|
@@ -118,8 +128,12 @@ module Warbler
     end
 
     def define_gemjar_task
+      task "gemjar" do
+        task "#@name:jar" => "#@name:make_gemjar"
+      end
+
       gem_jar = Warbler::War.new
-      task "gemjar" => "files" do
+      task "make_gemjar" => "files" do
         gem_path = Regexp::quote(config.relative_gem_path)
         gems = war.files.select{|k,v| k =~ %r{#{gem_path}/} }
         gems.each do |k,v|

@@ -88,6 +88,6 @@ describe Warbler::Application do
   it "should define a gemjar task for setting up gem packaging inside a jar" do
     ARGV.unshift "gemjar"
     Warbler::Application.new.run
-    Rake::Task['war:jar'].prerequisites.should include('war:gemjar')
+    Rake::Task['war:jar'].prerequisites.should include('war:make_gemjar')
   end
 end

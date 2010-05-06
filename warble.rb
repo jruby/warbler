@@ -3,6 +3,11 @@
 
 # Warbler web application assembly configuration file
 Warbler::Config.new do |config|
+  # Features: additional options controlling how the jar is built.
+  # Currently the following features are supported:
+  # - gemjar: package the gem repository in a jar file in WEB-INF/lib
+  # config.features = %w(gemjar)
+
   # Application directories to be included in the webapp.
   config.dirs = %w(app config lib log vendor tmp)
 

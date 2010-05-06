@@ -33,9 +33,7 @@ class Warbler::Application < Rake::Application
     task :pluginize => "war:pluginize"
 
     desc "Option: package gem repository inside a jar"
-    task :gemjar do
-      task "war:jar" => "war:gemjar"
-    end
+    task :gemjar => "war:gemjar"
 
     desc "Display version of Warbler"
     task :version => "war:version"

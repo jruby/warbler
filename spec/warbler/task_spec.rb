@@ -39,8 +39,8 @@ describe Warbler::Task do
     File.exist?(war_file).should == false
   end
 
-  it "should define a gemjar task for storing gems in a jar file" do
-    silence { Rake::Task["warble:gemjar"].invoke }
+  it "should define a make_gemjar task for storing gems in a jar file" do
+    silence { Rake::Task["warble:make_gemjar"].invoke }
     File.exist?("tmp/gems.jar").should == true
     @task.war.files.keys.should_not include(%r{WEB-INF\/gems})
     @task.war.files.keys.should include("WEB-INF/lib/gems.jar")
@@ -59,6 +59,17 @@ describe Warbler::Task do
     @task.war.files["file.txt"] = "file.txt"
     silence { Rake::Task["warble:jar"].invoke }
     File.exist?("#{@config.war_name}.war").should == true
+  end
+
+  it "should invoke feature tasks configured in config.features" do
+    @config.features << "gemjar"
+    silence { Rake::Task["warble"].invoke }
+    @task.war.files.keys.should include("WEB-INF/lib/gems.jar")
+  end
+
+  it "should warn and skip unknown features configured in config.features" do
+    @config.features << "bogus"
+    capture { Rake::Task["warble"].invoke }.should =~ /unknown feature `bogus'/
   end
 
   it "should be able to define all tasks successfully" do
