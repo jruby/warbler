@@ -52,10 +52,9 @@ public class Main {
         URLClassLoader loader = new URLClassLoader(new URL[] {jar});
         Class klass = Class.forName("winstone.Launcher", true, loader);
         Method main = klass.getDeclaredMethod("main", new Class[] {String[].class});
-        String[] newargs = new String[args.length + 2];
-        newargs[0] = "--warfile";
-        newargs[1] = warfile;
-        System.arraycopy(args, 0, newargs, 2, args.length);
+        String[] newargs = new String[args.length + 1];
+        newargs[0] = "--warfile=" + warfile;
+        System.arraycopy(args, 0, newargs, 1, args.length);
         debug("invoking Winstone with: " + Arrays.deepToString(newargs));
         main.invoke(null, new Object[] {newargs});
     }
