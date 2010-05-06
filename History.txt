@@ -1,3 +1,8 @@
+== 1.1
+
+* Add 'gemjar' feature
+* Add 'executable' feature
+
 == 1.0.2
 
 * Add 'warble pluginize' task back. This task now just creates a
