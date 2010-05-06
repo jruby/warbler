@@ -28,7 +28,7 @@ describe Warbler::Task do
     Rake::Task["warble:clean"].invoke
     rm_rf "log"
     rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb",
-                  "tmp/gems.jar", "file.txt", 'manifest', 'Gemfile']
+                  "tmp/gems.jar", "file.txt", 'Gemfile']
     Dir.chdir(@pwd)
   end
 
@@ -70,6 +70,11 @@ describe Warbler::Task do
   it "should warn and skip unknown features configured in config.features" do
     @config.features << "bogus"
     capture { Rake::Task["warble"].invoke }.should =~ /unknown feature `bogus'/
+  end
+
+  it "should define an executable task for embedding a server in the war file" do
+    silence { Rake::Task["warble:executable"].invoke }
+    @task.war.files.keys.should include('winstone/Launcher.class')
   end
 
   it "should be able to define all tasks successfully" do

@@ -65,6 +65,7 @@ module Warbler
         define_gemjar_task
         define_config_task
         define_pluginize_task
+        define_executable_task
         define_version_task
       end
     end
@@ -172,6 +173,32 @@ module Warbler
             f.puts "require 'warbler'"
             f.puts "Warbler::Task.new"
           end
+        end
+      end
+    end
+
+    def define_executable_task
+      winstone_version = ENV["WINSTONE_VERSION"] || "0.9.10"
+      winstone_path = "net/sourceforge/winstone/winstone-lite/#{winstone_version}/winstone-lite-#{winstone_version}.jar"
+      winstone_jar = File.expand_path("~/.m2/repository/#{winstone_path}")
+      file winstone_jar do |t|
+        # Not always covered in tests as these lines may not get
+        # executed every time if the jar is cached.
+        puts "Downloading winstone-lite.jar" #:nocov:
+        mkdir_p File.dirname(t.name)         #:nocov:
+        require 'open-uri'                   #:nocov:
+        open("http://repo2.maven.org/maven2/#{winstone_path}") do |stream| #:nocov:
+          File.open(t.name, "wb") do |f|  #:nocov:
+            while buf = stream.read(4096) #:nocov:
+              f << buf                    #:nocov:
+            end                           #:nocov:
+          end                             #:nocov:
+        end                               #:nocov:
+      end
+
+      task "executable" => winstone_jar do
+        Zip::ZipFile.foreach(winstone_jar) do |entry|
+          war.files[entry.name] = entry.directory? ? nil: StringIO.new(entry.get_input_stream {|io| io.read })
         end
       end
     end
