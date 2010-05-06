@@ -143,6 +143,7 @@ module Warbler
     def add_bundler_files(config)
       if config.bundler
         @files[apply_pathmaps(config, 'Gemfile', :application)] = 'Gemfile'
+        @files[apply_pathmaps(config, 'Gemfile.lock', :application)] = 'Gemfile.lock'
         @files[apply_pathmaps(config, '.bundle/environment.rb', :application)] = '.bundle/war-environment.rb'
       end
     end
