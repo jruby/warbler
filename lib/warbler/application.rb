@@ -32,6 +32,11 @@ class Warbler::Application < Rake::Application
     desc "Install Warbler tasks in your Rails application for use by Rake"
     task :pluginize => "war:pluginize"
 
+    desc "Option: package gem repository inside a jar"
+    task :gemjar do
+      task "war:jar" => "war:gemjar"
+    end
+
     desc "Display version of Warbler"
     task :version => "war:version"
   end
