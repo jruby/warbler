@@ -1,3 +1,5 @@
+require 'warbler/version'
+
 module Warbler
   # Class that holds the files that will be stored in the war file.
   # The #files attribute contains a hash of pathnames inside the war
@@ -6,6 +8,8 @@ module Warbler
   # * Any object responding to +read+ representing an in-memory blob
   # * A String filename pointing to a file on disk
   class War
+    DEFAULT_MANIFEST = %{Manifest-Version: 1.0\nCreated-By: Warbler #{Warbler::VERSION}\n\n}
+
     attr_reader :files
     attr_reader :webinf_filelist
 
@@ -61,7 +65,7 @@ module Warbler
         if config.manifest_file
           @files['META-INF/MANIFEST.MF'] = config.manifest_file
         else
-          @files['META-INF/MANIFEST.MF'] = StringIO.new(%{Manifest-Version: 1.0\nCreated-By: Warbler #{VERSION}\n\n})
+          @files['META-INF/MANIFEST.MF'] = StringIO.new(DEFAULT_MANIFEST)
         end
       end
     end

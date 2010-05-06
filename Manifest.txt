@@ -5,6 +5,7 @@ Manifest.txt
 README.txt
 Rakefile
 bin/warble
+ext/Main.java
 ext/WarblerWar.java
 ext/WarblerWarService.java
 lib/warbler

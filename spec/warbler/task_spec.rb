@@ -74,7 +74,7 @@ describe Warbler::Task do
 
   it "should define an executable task for embedding a server in the war file" do
     silence { Rake::Task["warble:executable"].invoke }
-    @task.war.files.keys.should include('winstone/Launcher.class')
+    @task.war.files.keys.should include('WEB-INF/winstone.jar')
   end
 
   it "should be able to define all tasks successfully" do
