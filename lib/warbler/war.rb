@@ -183,6 +183,8 @@ module Warbler
             zipfile.get_output_stream(entry) {|f| f << src.read }
           elsif src.nil? || File.directory?(src)
             zipfile.mkdir(entry)
+          elsif File.symlink?(src)
+            zipfile.get_output_stream(entry) {|f| f << File.read(src) }
           else
             zipfile.add(entry, src)
           end

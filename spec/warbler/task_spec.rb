@@ -28,7 +28,8 @@ describe Warbler::Task do
     Rake::Task["warble:clean"].invoke
     rm_rf "log"
     rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb",
-                  "tmp/gems.jar", "file.txt", 'Gemfile']
+                  "config/special.txt", "config/link.txt", "tmp/gems.jar",
+                  "file.txt", 'Gemfile']
     Dir.chdir(@pwd)
   end
 
@@ -79,6 +80,17 @@ describe Warbler::Task do
 
   it "should be able to define all tasks successfully" do
     Warbler::Task.new "warble", @config
+  end
+
+  it "should process symlinks by storing a file in the archive that has the same contents as the source" do
+    File.open("config/special.txt", "wb") {|f| f << "special"}
+    Dir.chdir("config") { ln_s "special.txt", "link.txt" }
+    silence { Rake::Task["warble"].invoke }
+    Zip::ZipFile.open("#{@config.war_name}.war") do |zf|
+      special = zf.get_input_stream('WEB-INF/config/special.txt') {|io| io.read }
+      link = zf.get_input_stream('WEB-INF/config/link.txt') {|io| io.read }
+      link.should == special
+    end
   end
 end
 
