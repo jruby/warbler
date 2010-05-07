@@ -13,13 +13,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 
-public class Main {
+public class Main implements Runnable {
     public static final String MAIN = "/" + Main.class.getName().replace('.', '/') + ".class";
     public static final String WINSTONE_JAR = "/WEB-INF/winstone.jar";
 
     private String[] args;
     private String path, warfile;
     private boolean debug;
+    private File webroot;
 
     public Main(String[] args) throws Exception {
         this.args = args;
@@ -27,9 +28,14 @@ public class Main {
         this.path = mainClass.toURI().getSchemeSpecificPart();
         this.warfile = mainClass.getFile().replace("!" + MAIN, "").replace("file:", "");
         this.debug = isDebug();
+        this.webroot = File.createTempFile("winstone", "webroot");
+        this.webroot.delete();
+        this.webroot.mkdirs();
+        this.webroot = new File(this.webroot, new File(warfile).getName());
+        Runtime.getRuntime().addShutdownHook(new Thread(this));
     }
 
-    public URL extractWinstone() throws Exception {
+    private URL extractWinstone() throws Exception {
         InputStream jarStream = new URL("jar:" + path.replace(MAIN, WINSTONE_JAR)).openStream();
         File jarFile = File.createTempFile("winstone", ".jar");
         jarFile.deleteOnExit();
@@ -44,35 +50,50 @@ public class Main {
             jarStream.close();
             outStream.close();
         }
-        debug("winstone-lite.jar extracted to " + jarFile.getPath());
+        debug("winstone.jar extracted to " + jarFile.getPath());
         return jarFile.toURI().toURL();
     }
 
-    public void launchWinstone(URL jar) throws Exception {
+    private void launchWinstone(URL jar) throws Exception {
         URLClassLoader loader = new URLClassLoader(new URL[] {jar});
         Class klass = Class.forName("winstone.Launcher", true, loader);
         Method main = klass.getDeclaredMethod("main", new Class[] {String[].class});
-        String[] newargs = new String[args.length + 1];
+        String[] newargs = new String[args.length + 2];
         newargs[0] = "--warfile=" + warfile;
-        System.arraycopy(args, 0, newargs, 1, args.length);
+        newargs[1] = "--webroot=" + webroot;
+        System.arraycopy(args, 0, newargs, 2, args.length);
         debug("invoking Winstone with: " + Arrays.deepToString(newargs));
         main.invoke(null, new Object[] {newargs});
     }
 
-    public void run() throws Exception {
+    private void start() throws Exception {
         URL u = extractWinstone();
         launchWinstone(u);
     }
 
-    public void debug(String msg) {
+    private void debug(String msg) {
         if (debug) {
             System.out.println(msg);
         }
     }
 
+    private void delete(File f) {
+        if (f.isDirectory()) {
+            File[] children = f.listFiles();
+            for (int i = 0; i < children.length; i++) {
+                delete(children[i]);
+            }
+        }
+        f.delete();
+    }
+
+    public void run() {
+        delete(webroot.getParentFile());
+    }
+
     public static void main(String[] args) {
         try {
-            new Main(args).run();
+            new Main(args).start();
         } catch (Exception e) {
             System.err.println("error: " + e.toString());
             if (isDebug()) {
