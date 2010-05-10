@@ -388,6 +388,16 @@ describe Warbler::War do
   it "should write a Bundler environment file into the war" do
     File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
     @war.apply(Warbler::Config.new)
+    file_list(%r{WEB-INF/Gemfile}).should_not be_empty
+    file_list(%r{WEB-INF/Gemfile.lock}).should be_empty
+    file_list(%r{WEB-INF/\.bundle/environment\.rb}).should be_empty
+  end
+
+  it "should only include Bundler lockfiles if Gemfile.lock exists" do
+    File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
+    `ruby -S bundle lock`
+    @war.apply(Warbler::Config.new)
+    file_list(%r{WEB-INF/Gemfile.lock}).should_not be_empty
     file_list(%r{WEB-INF/\.bundle/environment\.rb}).should_not be_empty
   end
 

@@ -102,6 +102,17 @@ describe Warbler::Task do
       zf.find_entry("WEB-INF/lib/rakelib/utils.rake").should_not be_nil if defined?(JRUBY_VERSION)
     end
   end
+
+  it "should use a Bundler Gemfile to include gems" do
+    File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
+    @config.bundler = true
+    @config.send(:detect_bundler_gems)
+    silence { Rake::Task["warble"].invoke }
+    Zip::ZipFile.open("#{@config.war_name}.war") do |zf|
+      rspec_version = @config.gems.keys.detect {|k| k.name == 'rspec'}.version
+      zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec_version}.gemspec").should_not be_nil
+    end
+  end
 end
 
 describe "Debug targets" do
