@@ -48,7 +48,9 @@ public class WarblerWar {
                 close(file);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            if (runtime.isDebug()) {
+                e.printStackTrace();
+            }
             throw runtime.newIOErrorFromException(e);
         }
 
