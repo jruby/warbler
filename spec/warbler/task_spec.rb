@@ -29,7 +29,7 @@ describe Warbler::Task do
     rm_rf "log"
     rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb",
                   "config/special.txt", "config/link.txt", "tmp/gems.jar",
-                  "file.txt", 'Gemfile']
+                  "file.txt", 'Gemfile', 'lib/rakelib']
     Dir.chdir(@pwd)
   end
 
@@ -90,6 +90,16 @@ describe Warbler::Task do
       special = zf.get_input_stream('WEB-INF/config/special.txt') {|io| io.read }
       link = zf.get_input_stream('WEB-INF/config/link.txt') {|io| io.read }
       link.should == special
+    end
+  end
+
+  it "should process directory symlinks by copying the whole subdirectory" do
+    Dir.chdir("lib") { ln_s "tasks", "rakelib" }
+    silence { Rake::Task["warble"].invoke }
+    Zip::ZipFile.open("#{@config.war_name}.war") do |zf|
+      zf.find_entry("WEB-INF/lib/tasks/utils.rake").should_not be_nil
+      zf.find_entry("WEB-INF/lib/rakelib/").should_not be_nil
+      zf.find_entry("WEB-INF/lib/rakelib/utils.rake").should_not be_nil if defined?(JRUBY_VERSION)
     end
   end
 end

@@ -182,6 +182,8 @@ module Warbler
           if src.respond_to?(:read)
             zipfile.get_output_stream(entry) {|f| f << src.read }
           elsif src.nil? || File.directory?(src)
+            warn "directory symlinks are not followed unless using JRuby; #{entry} contents not in archive" \
+              if File.symlink?(entry) && !defined?(JRUBY_VERSION)
             zipfile.mkdir(entry)
           elsif File.symlink?(src)
             zipfile.get_output_stream(entry) {|f| f << File.read(src) }
