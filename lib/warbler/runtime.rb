@@ -24,9 +24,10 @@ module Warbler
       end
     end
 
-    def rb_lock_file
-      root.join(WAR_ENV)
-    end
+    # deprecated; compatibility with Bundler <= 0.9.14
+    def rb_lock_file            #:nocov:
+      root.join(WAR_ENV)        #:nocov:
+    end                         #:nocov:
 
     def specs_for_lock_file
       super.map {|s| Spec.new(s, gem_path)}
