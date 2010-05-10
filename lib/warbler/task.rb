@@ -188,7 +188,8 @@ module Warbler
         puts "Downloading #{winstone_type}.jar" #:nocov:
         mkdir_p File.dirname(t.name)            #:nocov:
         require 'open-uri'                      #:nocov:
-        open("http://repo2.maven.org/maven2/#{winstone_path}") do |stream| #:nocov:
+        maven_repo = ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2" #:nocov:
+        open("#{maven_repo}/#{winstone_path}") do |stream| #:nocov:
           File.open(t.name, "wb") do |f|  #:nocov:
             while buf = stream.read(4096) #:nocov:
               f << buf                    #:nocov:
