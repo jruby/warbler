@@ -207,13 +207,22 @@ module Warbler
       if @bundler && File.exist?("Gemfile")
         @gems.clear
         @gem_dependencies = false # Bundler takes care of these
-        require 'bundler'
-        env = Bundler.respond_to?(:runtime) ? Bundler.runtime : Bundler.load
-        def Bundler.env_file; root.join(::Warbler::Runtime::WAR_ENV); end
-        env.extend Warbler::Runtime
-        env.gem_path = @gem_path
-        env.write_war_environment
-        env.war_specs.each {|spec| @gems << spec }
+        begin
+          require 'bundler'
+          env = Bundler::Runtime.new(Bundler.root, Bundler.definition)
+          class << Bundler
+            alias orig_env_file env_file
+            def env_file; root.join(::Warbler::Runtime::WAR_ENV); end
+          end
+          env.extend Warbler::Runtime
+          env.gem_path = @gem_path
+          env.write_war_environment
+          env.war_specs.each {|spec| @gems << spec }
+        ensure
+          class << Bundler
+            alias env_file orig_env_file
+          end
+        end
       else
         @bundler = false
       end
