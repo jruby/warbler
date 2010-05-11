@@ -3,6 +3,13 @@
 * Add 'gemjar' feature
 * Add 'executable' feature
 
+== 1.0.3
+
+* Tracking recent Bundler changes - handle locked Gemfiles differently
+  than unlocked ones
+* Handle file-based symlinks, and warn about inoperational directory
+  symlinks under non-JRuby versions of Ruby.
+
 == 1.0.2
 
 * Add 'warble pluginize' task back. This task now just creates a
