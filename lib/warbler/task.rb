@@ -143,6 +143,7 @@ module Warbler
         war.files["WEB-INF/lib/gems.jar"] = "tmp/gems.jar"
         war.files.reject!{|k,v| k =~ /#{gem_path}/ }
         mkdir_p "tmp"
+        gem_jar.add_manifest
         gem_jar.create("tmp/gems.jar")
       end
     end

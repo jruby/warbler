@@ -60,9 +60,9 @@ module Warbler
     end
 
     # Add a manifest file either from config or by making a default manifest.
-    def add_manifest(config)
+    def add_manifest(config = nil)
       unless @files.keys.detect{|k| k =~ /^META-INF\/MANIFEST\.MF$/i}
-        if config.manifest_file
+        if config && config.manifest_file
           @files['META-INF/MANIFEST.MF'] = config.manifest_file
         else
           @files['META-INF/MANIFEST.MF'] = StringIO.new(DEFAULT_MANIFEST)
