@@ -296,8 +296,8 @@ describe Warbler::War do
     rackup = "run Proc.new {|env| [200, {}, ['Hello World']]}"
     File.open("config.ru", "w") {|f| f << rackup }
     @config = Warbler::Config.new
-    @config.webxml.booter.should == :rack
-    @config.webxml.rackup.should == rackup
+    @war.apply(@config)
+    @war.files['WEB-INF/config.ru'].should == 'config.ru'
   end
 
   it "should automatically add Rails.configuration.gems to the list of gems" do

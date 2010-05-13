@@ -282,9 +282,9 @@ module Warbler
     end
 
     def auto_detect_rackup
-      return false unless File.exist?("config.ru")
+      return false unless File.exist?("config.ru") || !Dir['*/config.ru'].empty?
       @webxml.booter = :rack
-      @webxml.rackup = File.read("config.ru")
+      @webinf_files += [FileList['config.ru', '*/config.ru'].detect {|f| File.exist?(f)}]
       true
     end
   end

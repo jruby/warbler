@@ -98,8 +98,15 @@ Warbler::Config.new do |config|
   # config.webxml.booter = :rails
 
   # When using the :rack booter, "Rackup" script to use.
+  # - For 'rackup.path', the value points to the location of the rackup
+  # script in the web archive file. You need to make sure this file
+  # gets included in the war, possibly by adding it to config.includes
+  # or config.webinf_files above.
+  # - For 'rackup', the rackup script you provide as an inline string
+  #   is simply embedded in web.xml.
   # The script is evaluated in a Rack::Builder to load the application.
   # Examples:
+  # config.webxml.rackup.path = 'WEB-INF/hello.ru'
   # config.webxml.rackup = %{require './lib/demo'; run Rack::Adapter::Camping.new(Demo)}
   # config.webxml.rackup = require 'cgi' && CGI::escapeHTML(File.read("config.ru"))
 
