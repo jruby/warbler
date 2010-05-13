@@ -23,14 +23,6 @@ module Warbler
     # Deprecated: No longer has any effect.
     attr_accessor :staging_dir
 
-    # A hash of files that Warbler will build into the .war file. Keys
-    # to the hash are filenames in the .war, values are either nil
-    # (for a directory entry), the source filenames or IO objects for
-    # temporary file contents. This will be filled with files by the
-    # various Warbler tasks as they run. You can add arbitrary
-    # filenames to this hash if you wish.
-    attr_accessor :files
-
     # Directory where the war file will be written. Can be used to direct
     # Warbler to place your war file directly in your application server's
     # autodeploy directory. Defaults to the root of the Rails directory.
