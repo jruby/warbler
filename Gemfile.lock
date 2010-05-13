@@ -1,65 +1,65 @@
 --- 
-dependencies: 
-  diff-lcs: 
-    group: 
-    - :default
-    version: ">= 0"
-  jruby-rack: 
-    group: 
-    - :default
-    version: ">= 0"
-  rake: 
-    group: 
-    - :default
-    version: ">= 0.8.7"
-  rspec: 
-    group: 
-    - :default
-    version: ">= 0"
-  jruby-jars: 
-    group: 
-    - :default
-    version: ">= 0"
-  rcov: 
-    group: 
-    - :default
-    version: ">= 0.9.8"
-  hoe: 
-    group: 
-    - :default
-    version: ">= 2.3.2"
-  rubyzip: 
-    group: 
-    - :default
-    version: ">= 0"
-  rdoc: 
-    group: 
-    - :default
-    version: ">= 0"
-specs: 
-- rake: 
-    version: 0.8.7
-- diff-lcs: 
-    version: 1.1.2
-- jruby-rack: 
-    version: 0.9.7
-- rubyforge: 
-    version: 2.0.4
-- rspec: 
-    version: 1.3.0
-- jruby-jars: 
-    version: 1.4.0
-- rcov: 
-    version: 0.9.8
-- json_pure: 
-    version: 1.2.3
-- hoe: 
-    version: 2.6.0
-- rubyzip: 
-    version: 0.9.4
-- rdoc: 
-    version: "2.5"
 hash: 8f82c6b60dddd0684b4c02af386b7461f1ba8973
 sources: 
-- Rubygems: 
-    uri: http://rubygems.org/
+  - Rubygems: 
+      uri: http://rubygems.org/
+specs: 
+  - rake: 
+      version: 0.8.7
+  - diff-lcs: 
+      version: 1.1.2
+  - json_pure: 
+      version: 1.4.3
+  - rubyforge: 
+      version: 2.0.4
+  - hoe: 
+      version: 2.6.0
+  - jruby-jars: 
+      version: 1.5.0
+  - jruby-rack: 
+      version: 0.9.7
+  - rcov: 
+      version: 0.9.8
+  - rdoc: 
+      version: 2.5.8
+  - rspec: 
+      version: 1.3.0
+  - rubyzip: 
+      version: 0.9.4
+dependencies: 
+  rake: 
+    version: ">= 0.8.7"
+    group: 
+      - :default
+  rdoc: 
+    version: ">= 0"
+    group: 
+      - :default
+  rubyzip: 
+    version: ">= 0"
+    group: 
+      - :default
+  jruby-jars: 
+    version: ">= 0"
+    group: 
+      - :default
+  jruby-rack: 
+    version: ">= 0"
+    group: 
+      - :default
+  rspec: 
+    version: ">= 0"
+    group: 
+      - :default
+  diff-lcs: 
+    version: ">= 0"
+    group: 
+      - :default
+  rcov: 
+    version: ">= 0.9.8"
+    group: 
+      - :default
+  hoe: 
+    version: ">= 2.3.2"
+    group: 
+      - :default
