@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{warbler}
-  s.version = "1.1"
+  s.version = "1.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sieger"]
-  s.date = %q{2010-05-06}
+  s.date = %q{2010-05-13}
   s.default_executable = %q{warble}
   s.description = %q{Warbler is a gem to make a .war file out of a Rails, Merb, or Rack-based
 application. The intent is to provide a minimal, flexible, ruby-like way to
@@ -30,20 +30,20 @@ server.}
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<rake>, [">= 0.8.7"])
       s.add_runtime_dependency(%q<jruby-jars>, [">= 1.4.0"])
-      s.add_runtime_dependency(%q<jruby-rack>, [">= 0.9.7"])
+      s.add_runtime_dependency(%q<jruby-rack>, [">= 0.9.8"])
       s.add_runtime_dependency(%q<rubyzip>, [">= 0.9.4"])
       s.add_development_dependency(%q<rubyforge>, [">= 2.0.4"])
     else
       s.add_dependency(%q<rake>, [">= 0.8.7"])
       s.add_dependency(%q<jruby-jars>, [">= 1.4.0"])
-      s.add_dependency(%q<jruby-rack>, [">= 0.9.7"])
+      s.add_dependency(%q<jruby-rack>, [">= 0.9.8"])
       s.add_dependency(%q<rubyzip>, [">= 0.9.4"])
       s.add_dependency(%q<rubyforge>, [">= 2.0.4"])
     end
   else
     s.add_dependency(%q<rake>, [">= 0.8.7"])
     s.add_dependency(%q<jruby-jars>, [">= 1.4.0"])
-    s.add_dependency(%q<jruby-rack>, [">= 0.9.7"])
+    s.add_dependency(%q<jruby-rack>, [">= 0.9.8"])
     s.add_dependency(%q<rubyzip>, [">= 0.9.4"])
     s.add_dependency(%q<rubyforge>, [">= 2.0.4"])
   end

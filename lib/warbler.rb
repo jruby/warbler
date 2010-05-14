@@ -28,10 +28,10 @@ module Warbler
   self.framework_detection = true
 end
 
+require 'warbler/version'
 require 'warbler/gems'
 require 'warbler/config'
 require 'warbler/war'
 require 'warbler/task'
 require 'warbler/application'
 require 'warbler/runtime'
-require 'warbler/version'

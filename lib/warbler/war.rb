@@ -1,4 +1,4 @@
-require 'warbler/version'
+require 'zip/zip'
 
 module Warbler
   # Class that holds the files that will be stored in the war file.

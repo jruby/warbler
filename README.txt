@@ -13,7 +13,7 @@ to assemble and Just Work.
 
 1. Install the gem: <tt>gem install warbler</tt>.
 2. Run warbler in the top directory of your Rails application: <tt>warble</tt>.
-3. Deploy your railsapp.war file to your favorite Java application server.
+3. Deploy your myapp.war file to your favorite Java application server.
 
 == Usage
 
@@ -21,11 +21,14 @@ Warbler's +warble+ command is just a small wrapper around Rake with internally
 defined tasks.
 
     $ warble -T
-    warble config     # Generate a configuration file to customize your war assembly
-    warble version    # Display version of warbler
-    warble war        # Create the project .war file
-    warble war:clean  # Remove the .war file
-    warble war:debug  # Dump diagnostic information
+    warble config      # Generate a configuration file to customize your war
+    warble executable  # Feature: make an executable archive
+    warble gemjar      # Feature: package gem repository inside a jar
+    warble pluginize   # Install Warbler tasks in your Rails application
+    warble version     # Display version of Warbler
+    warble war         # Create the project .war file
+    warble war:clean   # Remove the .war file
+    warble war:debug   # Dump diagnostic information
 
 If you'd like to control Warbler from your own project's Rakefile,
 simply add the following code somewhere in the Rakefile:
@@ -34,6 +37,31 @@ simply add the following code somewhere in the Rakefile:
     Warbler::Task.new
 
 Now you should be able to invoke "rake war" to create your war file.
+
+== Features
+
+Warbler "features" are small Rake tasks that run before the creation
+of the war file and make manipulations to the war file structure.
+
+You can either add features to the warbler command line:
+
+    warble FEATURE war
+
+or configure them in config/warble.rb to always be used.
+
+   config.features = %w(FEATURE)
+
+Currently, two features are available.
+
+* +gemjar+: This bundles all gems into a single gem file to reduce the
+  number of files in the .war. This is mostly useful for Google
+  AppEngine where the number of files per application has a limit.
+* +executable+: This bundles an embedded web server into the .war so
+  that it can either be deployed into a traditional java web server or
+  run as a standalone application using 'java -jar myapp.war'.
+
+Features may form the basis for a third-party plugin system in the
+future if there is demand.
 
 == Configuration
 
@@ -62,10 +90,11 @@ dependencies are packaged.
 
 === Other Rack-based applications
 
-If you have a 'config.ru' file in the top directory of your application, its
-contents will be used as the rackup script for your Rack-based application.
-You will probably need to specify framework and application gems in
-config/warble.rb.
+If you have a 'config.ru' file in the top directory or one of the
+immediate subdirectories of your application, it will be included and
+used as the rackup script for your Rack-based application. You will
+probably need to specify framework and application gems in
+config/warble.rb unless you're using Bundler to manage your gems.
 
 See {the examples in the jruby-rack project}[http://github.com/nicksieger/jruby-rack/tree/master/examples/]
 of how to configure Warbler to package Camping and Sinatra apps.

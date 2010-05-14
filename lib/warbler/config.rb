@@ -18,6 +18,7 @@ module Warbler
     # Features: additional options controlling how the jar is built.
     # Currently the following features are supported:
     # - gemjar: package the gem repository in a jar file in WEB-INF/lib
+    # - executable: embed a web server and make the war executable
     attr_accessor :features
 
     # Deprecated: No longer has any effect.

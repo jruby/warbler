@@ -26,10 +26,10 @@ class Warbler::Application < Rake::Application
 
     task :default => :war
 
-    desc "Generate a configuration file to customize your war assembly"
+    desc "Generate a configuration file to customize your war"
     task :config => "war:config"
 
-    desc "Install Warbler tasks in your Rails application for use by Rake"
+    desc "Install Warbler tasks in your Rails application"
     task :pluginize => "war:pluginize"
 
     desc "Feature: package gem repository inside a jar"

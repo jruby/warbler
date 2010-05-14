@@ -1,152 +1,167 @@
-== 1.1
+== 1.1.0
 
-* Add 'gemjar' feature
-* Add 'executable' feature
+- Add concept of "features" -- small Rake tasks that run before the
+  creation of the war file and make manipulations to the war file
+  structure.
+- Add 'gemjar' feature: Bundle all gems into a gems.jar to reduce the
+  number of files in the archive (mostly useful for Google AppEngine).
+  Usage: run "warble gemjar war" or set config.features = %w(gemjar) in
+  warble.rb to use this feature.
+- Add 'executable' feature: Bundle an embedded web server in the war
+  file so that the entire application can be run as
+  'java -jar myapp.war'.
+  Usage: run "warble executable war" or set config.features = %w(executable)
+  in warble.rb to use this feature.
+  To see embedded webserver options, add '--help' to the 'java -jar'
+  command line.
+- No longer embed config.ru in web.xml as 'rackup' parameter by
+  default. Instead, config.ru is included in the war file.
+- Bump jruby-rack version requirement to 0.9.8.
 
 == 1.0.3
 
-* Tracking recent Bundler changes - handle locked Gemfiles differently
+- Tracking recent Bundler changes - handle locked Gemfiles differently
   than unlocked ones
-* Handle file-based symlinks, and warn about inoperational directory
+- Handle file-based symlinks, and warn about inoperational directory
   symlinks under non-JRuby versions of Ruby.
 
 == 1.0.2
 
-* Add 'warble pluginize' task back. This task now just creates a
+- Add 'warble pluginize' task back. This task now just creates a
   vendor/plugins/warbler/tasks/warbler.rake file. There's no need to
   "vendor" all of Warbler into your application anymore.
 
 == 1.0.1
 
-* Fix careless bug where Warbler doesn't work with JRuby 1.4
+- Fix careless bug where Warbler doesn't work with JRuby 1.4
 
 == 1.0
 
-* Warbler hits 1.0! There are enough structural changes in Warbler
+- Warbler hits 1.0! There are enough structural changes in Warbler
   that I feel it's time to roll the major version over to 1.0.
-* Add support for Bundler. Detect Gemfiles, make sure gems are
+- Add support for Bundler. Detect Gemfiles, make sure gems are
   included in the war file and rewrite .bundle/environment.rb inside
   the war file.
-* Warbler now uses RubyZip to create the war file in-place, without
+- Warbler now uses RubyZip to create the war file in-place, without
   copying files to a tmp/war staging area. When run in JRuby it uses a
   Java ZipOutputStream for a modest performance boost.
-* Add config option to allow override of gem_home (Daniel Harrington).
-* Stop bundling jruby-rack, as promised.
-* WARBLER-3: don't add from Rails config.gems if they are frozen
-* WARBLER-7: Add config.webinf_files option with more support for
+- Add config option to allow override of gem_home (Daniel Harrington).
+- Stop bundling jruby-rack, as promised.
+- WARBLER-3: don't add from Rails config.gems if they are frozen
+- WARBLER-7: Add config.webinf_files option with more support for
   custom web.xml files
 
 == 0.9.14
 
-* So, jruby-rack is bundled for one more release. 1.0 will not contain
+- So, jruby-rack is bundled for one more release. 1.0 will not contain
   any jar files, I promise!
-* Upgraded jruby-rack to 0.9.5.
-* Unbundled jruby-complete jar in favor of new jruby-jars gem, which
+- Upgraded jruby-rack to 0.9.5.
+- Unbundled jruby-complete jar in favor of new jruby-jars gem, which
   can be upgraded separately.
-* Skip gems which have no loaded_from attribute set
+- Skip gems which have no loaded_from attribute set
   (this happened with the Authlogic gem on Edge Rails)
   (thanks Laszlo Bacsi)
 
 == 0.9.13
 
-* RailsConf 2009 edition.
-* Only bundled JRuby and JRuby-Rack upgrades. Bug fixes will have to come in 0.9.14.
-* This should also be the last release with bundled JRuby and JRuby-Rack.
-* Upgrade to JRuby 1.3.0RC1 and JRuby-Rack 0.9.4. The latter allows 
+- RailsConf 2009 edition.
+- Only bundled JRuby and JRuby-Rack upgrades. Bug fixes will have to come in 0.9.14.
+- This should also be the last release with bundled JRuby and JRuby-Rack.
+- Upgrade to JRuby 1.3.0RC1 and JRuby-Rack 0.9.4. The latter allows 
   Rails 2.3 to work with Warbler.
 
 == 0.9.12
 
-* Allow framework auto-detection to be disabled. Set
-  `Warbler.framework_detection = false` at the top of config/warble.rb
+- Allow framework auto-detection to be disabled. Set
+  `Warbler.framework_detection = false' at the top of config/warble.rb
   or uncomment the line from a newly generated config.
-* Add configuration option to set manifest file (thanks Tommy McGuire)
-* Mitigate RubyGems 1.3 compatibility issue (thanks Jens Norrgrann)
-* Add experimental `war:exploded` task. This allows you to deploy your
+- Add configuration option to set manifest file (thanks Tommy McGuire)
+- Mitigate RubyGems 1.3 compatibility issue (thanks Jens Norrgrann)
+- Add experimental `war:exploded` task. This allows you to deploy your
   application in an exploded mode, thus allowing continual development
   without re-warring and re-deploying. Feedback is appreciated if you
   try this feature; it may not work in all application servers and for
   applications other than Rails.
-* Handle Rails gem dependencies better (thanks Laszlo Bacsi)
-* Auto-detect Merb dependencies (Merb >= 1.0 only). Please give
+- Handle Rails gem dependencies better (thanks Laszlo Bacsi)
+- Auto-detect Merb dependencies (Merb >= 1.0 only). Please give
   feedback if you try Warbler with a Merb 1.0 app.
-* Ignore gem development dependencies
-* Upgrade to JRuby 1.1.6 and JRuby-Rack 0.9.3
+- Ignore gem development dependencies
+- Upgrade to JRuby 1.1.6 and JRuby-Rack 0.9.3
 
 == 0.9.11
 
-* Auto-detect Rails and Merb and configure appropriately
+- Auto-detect Rails and Merb and configure appropriately
   - For Rails, set rails booter, determine max runtimes based on Rails.configuration.threadsafe!,
     add Rails gem, detect Rails version, set gems to be packaged based on
     Rails.configuration.gems if available
   - Rails gems only added if Rails application detected
   - For Merb, set merb booter automatically
-* Auto-detect config.ru rackup script and pass it into config.webxml.rackup
-* rails.env now commented by default in config/warble.rb and internally default
+- Auto-detect config.ru rackup script and pass it into config.webxml.rackup
+- rails.env now commented by default in config/warble.rb and internally default
   the value to 'production'
-* Default directories in config.dirs to only those that are found to be present
-* Allow config.gems array to contain regexps and Gem::Dependency objects as well
+- Default directories in config.dirs to only those that are found to be present
+- Allow config.gems array to contain regexps and Gem::Dependency objects as well
  (assist from Jani Soila)
-* Fix bug ensuring you can += and -= for config.gems
-* Upgrade to JRuby 1.1.4 and JRuby-Rack 0.9.2
-* add [] as a way to specify non-identifier keys, example: config.webxml['!@#$%^'] = 'haha'
+- Fix bug ensuring you can += and -= for config.gems
+- Upgrade to JRuby 1.1.4 and JRuby-Rack 0.9.2
+- add [] as a way to specify non-identifier keys, example: config.webxml['!@#$%^'] = 'haha'
 
 == 0.9.10
 
-* Upgraded to JRuby-Rack 0.9.1. Fixes JRUBY-2620, JRUBY-2594, JRUBY-2507.
-* Now verified to work with Camping and Sinatra. See
+- Upgraded to JRuby-Rack 0.9.1. Fixes JRUBY-2620, JRUBY-2594, JRUBY-2507.
+- Now verified to work with Camping and Sinatra. See
   http://github.com/nicksieger/jruby-rack/tree/master/examples for examples
   of how to configure Warbler to package your Camping and Sinatra apps.
-* Upgraded to JRuby 1.1.3.
-* Log files are no longer packaged in the .war file.
-* Fix #<Warbler::WebxmlOpenStruct ...> appearing in web.xml and document workarounds.
-* Add config.autodeploy_dir that, when specified, will create the war there.
+- Upgraded to JRuby 1.1.3.
+- Log files are no longer packaged in the .war file.
+- Fix #<Warbler::WebxmlOpenStruct ...> appearing in web.xml and document workarounds.
+- Add config.autodeploy_dir that, when specified, will create the war there.
 
 == 0.9.9
 
-* Now shipping with JRuby-Rack 0.9!
-* Upgrade to JRuby 1.1.1
-* warble.rb and web.xml.erb have changed as a result of the change to JRuby-Rack -- we
+- Now shipping with JRuby-Rack 0.9!
+- Upgrade to JRuby 1.1.1
+- warble.rb and web.xml.erb have changed as a result of the change to JRuby-Rack -- we
   recommend comparing the new base copies with any existing configuration you have to
   make sure you pick up the differences.
-* Config changes:
-** config.webxml.booter chooses what kind of application to use (:rails, :merb or plain :rack).
-** config.webxml.pool.* have been replaced by config.webxml.jruby.(min|max).runtimes
-** config.webxml.standalone and config.webxml.jruby_home no longer have any effect.
+- Config changes:
+-- config.webxml.booter chooses what kind of application to use (:rails, :merb or plain :rack).
+-- config.webxml.pool.* have been replaced by config.webxml.jruby.(min|max).runtimes
+-- config.webxml.standalone and config.webxml.jruby_home no longer have any effect.
 
 == 0.9.5
 
-* Fix bug in plugin warbler.rake task file that would favor loading warbler from gems before the version
+- Fix bug in plugin warbler.rake task file that would favor loading warbler from gems before the version
   installed as a plugin
-* Upgrade to JRuby 1.1 final and Goldspike 1.6.1
+- Upgrade to JRuby 1.1 final and Goldspike 1.6.1
 
 == 0.9.4
 
-* Update bundled JRuby to 1.1RC3 and Goldspike to 1.6.
-* Fix inclusion of gems with platform-specific bits (e.g., Hpricot)
+- Update bundled JRuby to 1.1RC3 and Goldspike to 1.6.
+- Fix inclusion of gems with platform-specific bits (e.g., Hpricot)
 
 == 0.9.3
 
-* Update bundled JRuby to 1.1RC2, and Goldspike to 1.5.
-* The bundled JRuby and Goldspike now require JDK 5 or greater. If you wish to use JDK 1.4, use Warbler 0.9.2.
+- Update bundled JRuby to 1.1RC2, and Goldspike to 1.5.
+- The bundled JRuby and Goldspike now require JDK 5 or greater. If you wish to use JDK 1.4, use Warbler 0.9.2.
 
 == 0.9.2
 
-* Update bundled JRuby to version 1.0.3 and Goldspike 1.4.
-* Add config.java_classes to allow you to copy loose Java classes into WEB-INF/classes.
-* Make jar command a single command string so that jar creation doesn't fail (works around bug in JRuby 1.0.2)
-* Use File.join to form staging directory, should produce the proper jar-command path in Windows
+- Update bundled JRuby to version 1.0.3 and Goldspike 1.4.
+- Add config.java_classes to allow you to copy loose Java classes into WEB-INF/classes.
+- Make jar command a single command string so that jar creation doesn't fail (works around bug in JRuby 1.0.2)
+- Use File.join to form staging directory, should produce the proper jar-command path in Windows
 
 == 0.9.1
 
-* Add rake >= 0.7.3 as a dependency in the gem specification.
-* Add debug tasks: war:debug, war:debug:gems, war:debug:public, war:debug:app, war:debug:includes,
+- Add rake >= 0.7.3 as a dependency in the gem specification.
+- Add debug tasks: war:debug, war:debug:gems, war:debug:public, war:debug:app, war:debug:includes,
   war:debug:excludes, war:debug:java_libs gives you a breakdown of what Warbler expects to package.
 
 == 0.9
 
-* Birthday! Warbler is a gem to make a .war file out of a Rails project. The intent is to provide a
+- Birthday! Warbler is a gem to make a .war file out of a Rails project. The intent is to provide a
   minimal, flexible, ruby-like way to bundle up all of your application files for deployment to a
   Java application server.
-* Bundled versions: goldspike-1.4-SNAPSHOT and jruby-complete-1.0.1
-* Works as both a gem (rake application) or a plugin
+- Bundled versions: goldspike-1.4-SNAPSHOT and jruby-complete-1.0.1
+- Works as both a gem (rake application) or a plugin
