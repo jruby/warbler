@@ -34,7 +34,7 @@ module Warbler
     def replace_compiled_ruby_files(config, compiled_ruby_files)
       # Exclude the rb files and recreate them. This
       # prevents the original contents being used.
-      config.excludes = compiled_ruby_files
+      config.excludes += compiled_ruby_files
 
       compiled_ruby_files.each do |ruby_source|
         files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("require __FILE__.sub(/\.rb$/, '.class')")
