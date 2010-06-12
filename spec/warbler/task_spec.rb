@@ -82,6 +82,21 @@ describe Warbler::Task do
     Warbler::Task.new "warble", @config
   end
 
+  it "should compile any ruby files specified" do
+    @config.compiled_ruby_files = FileList["app/helpers/application_helper.rb"]
+    silence { Rake::Task["warble"].invoke }
+
+    java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
+
+    Zip::ZipFile.open("#{@config.war_name}.war") do |zf|
+      java_class_header     = zf.get_input_stream('WEB-INF/app/helpers/application_helper.class') {|io| io.read }[0..3]
+      ruby_class_definition = zf.get_input_stream('WEB-INF/app/helpers/application_helper.rb') {|io| io.read }
+
+      java_class_header.should == java_class_magic_number
+      ruby_class_definition.should == %{require __FILE__.sub(/.rb$/, '.class')}
+    end
+  end
+
   it "should process symlinks by storing a file in the archive that has the same contents as the source" do
     File.open("config/special.txt", "wb") {|f| f << "special"}
     Dir.chdir("config") { ln_s "special.txt", "link.txt" }

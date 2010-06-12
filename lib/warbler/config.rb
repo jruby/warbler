@@ -81,6 +81,9 @@ module Warbler
     # This also sets 'gem.path' inside web.xml.
     attr_accessor :gem_path
 
+    # FileList of ruby files to compile to class files
+    attr_accessor :compiled_ruby_files
+
     # Extra configuration for web.xml. Controls how the dynamically-generated web.xml
     # file is generated.
     #
@@ -128,6 +131,7 @@ module Warbler
       @war_name    = File.basename(@rails_root)
       @bundler     = true
       @webinf_files = default_webinf_files
+      @compiled_ruby_files = FileList[]
       auto_detect_frameworks
       yield self if block_given?
       update_gem_path
