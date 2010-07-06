@@ -41,7 +41,11 @@ Now you should be able to invoke "rake war" to create your war file.
 == Features
 
 Warbler "features" are small Rake tasks that run before the creation
-of the war file and make manipulations to the war file structure.
+of the war file and make manipulations to the war file structure. For
+instance, the +executable+ feature makes your war file capable of
+running on its own (like a jar), without a servlet container:
+
+    warble executable war
 
 You can either add features to the warbler command line:
 
