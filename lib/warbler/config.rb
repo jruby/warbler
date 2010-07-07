@@ -124,7 +124,7 @@ module Warbler
       @public_html = FileList["public/**/*"]
       @pathmaps    = default_pathmaps
       @webxml      = default_webxml_config
-      @rails_root  = File.expand_path(defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)
+      @rails_root  = default_rails_root
       @war_name    = File.basename(@rails_root)
       @bundler     = true
       @webinf_files = default_webinf_files
@@ -173,6 +173,10 @@ module Warbler
       c.jndi = nil
       c.ignored = %w(jndi booter)
       c
+    end
+
+    def default_rails_root
+      File.expand_path(defined?(Rails.root) ? Rails.root : (defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd))
     end
 
     def default_webinf_files
