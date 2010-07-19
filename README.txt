@@ -164,6 +164,9 @@ For more information on configuration, see Warbler::Config.
 If Warbler isn't packaging the files you were expecting, use the
 war:debug task to give you more insight into what's going on.
 
+If you think you found a bug, please file one at
+http://kenai.com/jira/browse/WARBLER.
+
 == Source
 
 You can get the Warbler source using Git, in any of the following ways:
