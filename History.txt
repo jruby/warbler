@@ -1,3 +1,10 @@
+== 1.2.0
+
+- Drop compatibility with earlier versions of Bundler -- Bundler has
+  changed a lot in a short period of time, so I'm expecting the number
+  of people depending on 0.8 or 0.9 to be small. Please use Warbler
+  1.2.0 with applications that depend on Bundler 1.0 or higher.
+
 == 1.1.0
 
 - Add concept of "features" -- small Rake tasks that run before the
