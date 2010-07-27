@@ -6,8 +6,7 @@
 #++
 
 begin
-  require 'bundler'
-  Bundler.setup
+  require 'bundler/setup'
 rescue LoadError
   puts "Please install Bundler and run 'bundle install' to ensure you have all dependencies"
 end

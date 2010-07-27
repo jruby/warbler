@@ -204,26 +204,13 @@ module Warbler
       if @bundler && File.exist?("Gemfile")
         @gems.clear
         @gem_dependencies = false # Bundler takes care of these
-        begin
-          require 'bundler'
-          env = Bundler::Runtime.new(Bundler.root, Bundler.definition)
-          if bundler_env_file = Bundler.respond_to?(:env_file)
-            class << Bundler
-              alias orig_env_file env_file
-              def env_file; root.join(::Warbler::Runtime::WAR_ENV); end
-            end
-          end
-          env.extend Warbler::Runtime
-          env.gem_path = @gem_path
-          env.write_war_environment
-          env.war_specs.each {|spec| @gems << spec }
-        ensure
-          if bundler_env_file
-            class << Bundler
-              alias env_file orig_env_file
-            end
-          end
-        end
+        require 'bundler'
+        gemfile = Pathname.new("Gemfile").expand_path
+        root = gemfile.dirname
+        lockfile = root.join('Gemfile.lock')
+        definition = Bundler::Definition.build(gemfile, lockfile, nil)
+        env = Bundler::Runtime.new(root, definition)
+        env.requested_specs.each {|spec| @gems << spec }
       else
         @bundler = false
       end
@@ -237,16 +224,7 @@ module Warbler
 
     def auto_detect_frameworks
       return unless Warbler.framework_detection
-      if File.exist?(".bundle/environment.rb")
-        begin                     # Don't want Bundler to load from .bundle/environment
-          mv(".bundle/environment.rb",".bundle/environment-save.rb", :verbose => false)
-          auto_detect_rails || auto_detect_merb || auto_detect_rackup
-        ensure
-          mv(".bundle/environment-save.rb",".bundle/environment.rb", :verbose => false)
-        end
-      else
-        auto_detect_rails || auto_detect_merb || auto_detect_rackup
-      end
+      auto_detect_rails || auto_detect_merb || auto_detect_rackup
     end
 
     def auto_detect_rails
@@ -296,7 +274,7 @@ module Warbler
 
   # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.
   class WebxmlOpenStruct < OpenStruct
-    %w(java com org javax).each {|name| undef_method name if Object.methods.include?(name) }
+    %w(java com org javax gem).each {|name| undef_method name if Object.methods.include?(name) }
 
     def initialize(key = 'webxml')
       @key = key

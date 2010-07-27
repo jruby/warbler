@@ -13,7 +13,6 @@ lib/warbler.rb
 lib/warbler/application.rb
 lib/warbler/config.rb
 lib/warbler/gems.rb
-lib/warbler/runtime.rb
 lib/warbler/task.rb
 lib/warbler/version.rb
 lib/warbler/war.rb

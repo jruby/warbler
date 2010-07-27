@@ -1,5 +1,4 @@
 coverage*
 pkg
 doc
-spec/sample
 .bundle

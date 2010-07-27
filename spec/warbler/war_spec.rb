@@ -365,7 +365,10 @@ describe Warbler::War do
   end
 
   it "should write gems to location specified by gem_path" do
-    @config = Warbler::Config.new {|c| c.gem_path = "/WEB-INF/jewels"; c.gems << 'rake' }
+    @config = Warbler::Config.new do |c|
+      c.gem_path = "/WEB-INF/jewels"
+      c.gems << 'rake'
+    end
     elements = expand_webxml
     file_list(%r{WEB-INF/jewels}).should_not be_empty
     elements.to_a(
@@ -379,47 +382,24 @@ describe Warbler::War do
 
   it "should detect a Bundler Gemfile and process only its gems" do
     File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
-    @war.apply(Warbler::Config.new {|c| c.gems << "rake"})
+    @war.apply(conf = Warbler::Config.new {|c| c.gems << "rake"})
     file_list(%r{WEB-INF/Gemfile}).should_not be_empty
     file_list(%r{WEB-INF/gems/specifications/rspec}).should_not be_empty
     file_list(%r{WEB-INF/gems/specifications/rake}).should be_empty
   end
 
-  it "should write a Bundler environment file into the war" do
+  it "should copy Bundler gemfiles into the war" do
     File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
+    File.open("Gemfile.lock", "w") {|f| f << "GEM"}
     @war.apply(Warbler::Config.new)
     file_list(%r{WEB-INF/Gemfile}).should_not be_empty
-    file_list(%r{WEB-INF/Gemfile.lock}).should be_empty
-    file_list(%r{WEB-INF/\.bundle/environment\.rb}).should be_empty
-  end
-
-  it "should only include Bundler lockfiles if Gemfile.lock exists" do
-    File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
-    `ruby -S bundle lock`
-    @war.apply(Warbler::Config.new)
     file_list(%r{WEB-INF/Gemfile.lock}).should_not be_empty
-    file_list(%r{WEB-INF/\.bundle/environment\.rb}).should_not be_empty
   end
 
   it "should allow overriding of the gem path when using Bundler" do
     File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
     @war.apply(Warbler::Config.new {|c| c.gem_path = '/WEB-INF/jewels' })
     file_list(%r{WEB-INF/jewels/specifications/rspec}).should_not be_empty
-    IO.readlines(".bundle/war-environment.rb").grep(/rspec/).last.should =~ %r{jewels/specifications}m
-  end
-
-  it "should not let the framework load Bundler from the locked environment" do
-    task :environment do
-      File.exist?('.bundle/environment.rb').should_not be_true
-      mock_rails_module
-    end
-
-    File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
-    `ruby -S bundle lock`
-    File.exist?('.bundle/environment.rb').should be_true
-    @war.apply(Warbler::Config.new)
-    hash = eval("[" + IO.readlines(".bundle/environment.rb").grep(/rspec/).last + "]").first
-    hash[:load_paths].each {|p| File.exist?(p).should be_true }
   end
 
   it "should allow adding additional WEB-INF files via config.webinf_files" do
