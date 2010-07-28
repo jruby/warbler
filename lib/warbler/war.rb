@@ -18,9 +18,9 @@ module Warbler
     end
 
     def compile(config)
-      # Need to use the version of JRuby in the application to compile it
-      compiled_ruby_files = config.compiled_ruby_files.to_a
-
+      # Compiling all Ruby files we can find -- do we need to allow an
+      # option to configure what gets compiled?
+      compiled_ruby_files = FileList[*config.dirs.map{|d| "#{d}/**/*.rb"}]
       return if compiled_ruby_files.empty?
 
       run_javac(config, compiled_ruby_files)
@@ -28,6 +28,7 @@ module Warbler
     end
 
     def run_javac(config, compiled_ruby_files)
+      # Need to use the version of JRuby in the application to compile it
       %x{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} org.jruby.Main -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
     end
 

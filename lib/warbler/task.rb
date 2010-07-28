@@ -59,7 +59,7 @@ module Warbler
       define_main_task
       namespace name do
         define_clean_task
-        define_compile_task
+        define_compiled_task
         define_files_task
         define_jar_task
         define_debug_task
@@ -100,14 +100,14 @@ module Warbler
       task "clear" => "#{name}:clean"
     end
 
-    def define_compile_task
-      task "compile_ruby_files" do
+    def define_compiled_task
+      task "compiled" do
         war.compile(config)
       end
     end
 
     def define_files_task
-      task "files" => "compile_ruby_files" do
+      task "files" do
         war.apply(config)
       end
     end

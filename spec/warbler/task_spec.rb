@@ -29,7 +29,7 @@ describe Warbler::Task do
     rm_rf "log"
     rm_f FileList["config.ru", "*web.xml", "config/web.xml*", "config/warble.rb",
                   "config/special.txt", "config/link.txt", "tmp/gems.jar",
-                  "file.txt", 'Gemfile', 'lib/rakelib']
+                  "file.txt", 'Gemfile', 'lib/rakelib', '**/*.class']
     Dir.chdir(@pwd)
   end
 
@@ -83,7 +83,7 @@ describe Warbler::Task do
   end
 
   it "should compile any ruby files specified" do
-    @config.compiled_ruby_files = FileList["app/helpers/application_helper.rb"]
+    @config.features << "compiled"
     silence { Rake::Task["warble"].invoke }
 
     java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
