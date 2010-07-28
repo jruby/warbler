@@ -18,6 +18,7 @@ lib/warbler/version.rb
 lib/warbler/war.rb
 lib/warbler_war.jar
 spec/sample/app/controllers/application.rb
+spec/sample/app/helpers/application_helper.class
 spec/sample/app/helpers/application_helper.rb
 spec/sample/config/boot.rb
 spec/sample/config/database.yml

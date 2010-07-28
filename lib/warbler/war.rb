@@ -17,6 +17,30 @@ module Warbler
       @files = {}
     end
 
+    def compile(config)
+      # Need to use the version of JRuby in the application to compile it
+      compiled_ruby_files = config.compiled_ruby_files.to_a
+
+      return if compiled_ruby_files.empty?
+
+      run_javac(config, compiled_ruby_files)
+      replace_compiled_ruby_files(config, compiled_ruby_files)
+    end
+
+    def run_javac(config, compiled_ruby_files)
+      %x{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} org.jruby.Main -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
+    end
+
+    def replace_compiled_ruby_files(config, compiled_ruby_files)
+      # Exclude the rb files and recreate them. This
+      # prevents the original contents being used.
+      config.excludes += compiled_ruby_files
+
+      compiled_ruby_files.each do |ruby_source|
+        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("require __FILE__.sub(/\.rb$/, '.class')")
+      end
+    end
+
     # Apply the information in a Warbler::Config object in order to
     # look for files to put into this war file.
     def apply(config)
