@@ -21,6 +21,7 @@ Warbler's +warble+ command is just a small wrapper around Rake with internally
 defined tasks.
 
     $ warble -T
+    warble compiled    # Feature: precompile all Ruby files
     warble config      # Generate a configuration file to customize your war
     warble executable  # Feature: make an executable archive
     warble gemjar      # Feature: package gem repository inside a jar
@@ -55,7 +56,7 @@ or configure them in config/warble.rb to always be used.
 
    config.features = %w(FEATURE)
 
-Currently, two features are available.
+Currently, three features are available.
 
 * +gemjar+: This bundles all gems into a single gem file to reduce the
   number of files in the .war. This is mostly useful for Google
@@ -63,6 +64,9 @@ Currently, two features are available.
 * +executable+: This bundles an embedded web server into the .war so
   that it can either be deployed into a traditional java web server or
   run as a standalone application using 'java -jar myapp.war'.
+* +compiled+: This uses +jrubyc+ to precompile all .rb files in your
+  application to .class files and includes those in the .war instead
+  of the Ruby sources.
 
 Features may form the basis for a third-party plugin system in the
 future if there is demand.

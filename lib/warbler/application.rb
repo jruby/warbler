@@ -38,6 +38,9 @@ class Warbler::Application < Rake::Application
     desc "Feature: make an executable archive"
     task :executable => "war:executable"
 
+    desc "Feature: precompile all Ruby files"
+    task :compiled => "war:compiled"
+
     desc "Display version of Warbler"
     task :version => "war:version"
   end
