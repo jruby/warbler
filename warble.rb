@@ -43,6 +43,10 @@ Warbler::Config.new do |config|
   # functionality, uncomment here.
   # config.bundler = false
 
+  # An array of Bundler groups to avoid including in the war file.
+  # Defaults to ["development", "test"].
+  # config.bundle_without = []
+
   # Files for WEB-INF directory (next to web.xml). This contains
   # web.xml by default. If there is an .erb-File it will be processed
   # with webxml-config. You may want to exclude this file via

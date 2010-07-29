@@ -413,6 +413,15 @@ describe Warbler::War do
     file_list(%r{WEB-INF/gems/specifications/warbler}).should_not be_empty
   end
 
+  it "should not bundle dependencies in the test group by default when bundling" do
+    File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'rspec'\nend\n"}
+    @war.apply(Warbler::Config.new)
+    file_list(%r{WEB-INF/gems/gems/rake[^/]*/}).should_not be_empty
+    file_list(%r{WEB-INF/gems/gems/rspec[^/]*/}).should be_empty
+    file_list(%r{WEB-INF/gems/specifications/rake}).should_not be_empty
+    file_list(%r{WEB-INF/gems/specifications/rspec}).should be_empty
+  end
+
   it "should allow adding additional WEB-INF files via config.webinf_files" do
     File.open("myserver-web.xml", "w") do |f|
       f << "<web-app></web-app>"
