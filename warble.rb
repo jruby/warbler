@@ -91,6 +91,11 @@ Warbler::Config.new do |config|
   # MANIFEST.MF that contains the version of Warbler used to create the war file.
   # config.manifest_file = "config/MANIFEST.MF"
 
+  # When using the 'compiled' feature and specified, only these Ruby
+  # files will be compiled. Default is to compile all \.rb files in
+  # the application.
+  # config.compiled_ruby_files = FileList['app/**/*.rb']
+
   # Value of RAILS_ENV for the webapp -- default as shown below
   # config.webxml.rails.env = ENV['RAILS_ENV'] || 'production'
 

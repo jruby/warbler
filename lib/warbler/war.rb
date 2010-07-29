@@ -20,11 +20,10 @@ module Warbler
     def compile(config)
       # Compiling all Ruby files we can find -- do we need to allow an
       # option to configure what gets compiled?
-      compiled_ruby_files = FileList[*config.dirs.map{|d| "#{d}/**/*.rb"}]
-      return if compiled_ruby_files.empty?
+      return if config.compiled_ruby_files.nil? || config.compiled_ruby_files.empty?
 
-      run_javac(config, compiled_ruby_files)
-      replace_compiled_ruby_files(config, compiled_ruby_files)
+      run_javac(config, config.compiled_ruby_files)
+      replace_compiled_ruby_files(config, config.compiled_ruby_files)
     end
 
     def run_javac(config, compiled_ruby_files)
