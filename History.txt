@@ -4,9 +4,16 @@
   changed a lot in a short period of time, so I'm expecting the number
   of people depending on 0.8 or 0.9 to be small. Please use Warbler
   1.2.0 with applications that depend on Bundler 1.0 or higher.
+- Support for Bundler groups. The 'development' and 'test' groups are
+  excluded by default.
 - Add 'compiled' feature: With this feature added to config.features
   Warbler will pre-compile all Ruby files and will not ship the
   original Ruby source in your war file.
+- warble.rb: Add config.bundle_without that controls Bundler groups to
+  be skipped, like 'Bundler.settings.without'.
+- warble.rb: Add config.compiled_ruby_files to specify which Ruby
+  files to compile when using the "compiled" feature. Defaults to
+  compiling all Ruby files.
 
 == 1.1.0
 

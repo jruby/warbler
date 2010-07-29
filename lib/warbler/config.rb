@@ -19,6 +19,7 @@ module Warbler
     # Currently the following features are supported:
     # - gemjar: package the gem repository in a jar file in WEB-INF/lib
     # - executable: embed a web server and make the war executable
+    # - compiled: compile .rb files to .class files
     attr_accessor :features
 
     # Deprecated: No longer has any effect.
@@ -26,7 +27,7 @@ module Warbler
 
     # Directory where the war file will be written. Can be used to direct
     # Warbler to place your war file directly in your application server's
-    # autodeploy directory. Defaults to the root of the Rails directory.
+    # autodeploy directory. Defaults to the root of the application directory.
     attr_accessor :autodeploy_dir
 
     # Top-level directories to be copied into WEB-INF.  Defaults to
@@ -85,7 +86,8 @@ module Warbler
     # This also sets 'gem.path' inside web.xml.
     attr_accessor :gem_path
 
-    # FileList of ruby files to compile to class files
+    # List of ruby files to compile to class files. Default is to
+    # compile all .rb files in the application.
     attr_accessor :compiled_ruby_files
 
     # Extra configuration for web.xml. Controls how the dynamically-generated web.xml

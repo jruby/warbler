@@ -63,7 +63,7 @@ Currently, three features are available.
   AppEngine where the number of files per application has a limit.
 * +executable+: This bundles an embedded web server into the .war so
   that it can either be deployed into a traditional java web server or
-  run as a standalone application using 'java -jar myapp.war'.
+  run as a standalone application using <tt>java -jar myapp.war</tt>.
 * +compiled+: This uses +jrubyc+ to precompile all .rb files in your
   application to .class files and includes those in the .war instead
   of the Ruby sources.
@@ -77,8 +77,9 @@ future if there is demand.
 
 Applications that use Bundler[http://gembundler.com/], detected via
 presence of a +Gemfile+, will have the gems packaged up into the war
-file. The .bundle/environment.rb file will be included for you, and
-rewritten to use the paths to the gems inside the war.
+file along with the Gemfile. The Bundler groups named +:development+
+and +:test+ will be excluded by default, unless you specify with
++config.bundle_without+ in +config/warble.rb+.
 
 === Rails applications
 
@@ -98,7 +99,7 @@ dependencies are packaged.
 
 === Other Rack-based applications
 
-If you have a 'config.ru' file in the top directory or one of the
+If you have a +config.ru+ file in the top directory or one of the
 immediate subdirectories of your application, it will be included and
 used as the rackup script for your Rack-based application. You will
 probably need to specify framework and application gems in
@@ -109,16 +110,16 @@ of how to configure Warbler to package Camping and Sinatra apps.
 
 === Configuration auto-detect notes
 
-* Warbler will load the "environment" Rake task in a Rails application
+* Warbler will load the +environment+ Rake task in a Rails application
   to try to detect some configuration. If you don't have database
   access in the environment where you package your application, you
-  may wish to set `Warbler.framework_detection` to false at the top of
+  may wish to set +Warbler.framework_detection+ to false at the top of
   config.rb. In this case you may need to specify additional details
   such as booter, gems and other settings that would normally be
   gleaned from the application configuration.
 * A more accurate way of detecting a Merb application's gems is
   needed. Until then, you will have to specify them in
-  config/warble.rb. See below.
+  +config/warble.rb+. See below.
 * Is it possible to more generally detect what gems an application
   uses? Gem.loaded_specs is available, but the application needs to be
   loaded first before its contents are reliable.
@@ -166,7 +167,7 @@ For more information on configuration, see Warbler::Config.
 === Troubleshooting
 
 If Warbler isn't packaging the files you were expecting, use the
-war:debug task to give you more insight into what's going on.
++war:debug+ task to give you more insight into what's going on.
 
 If you think you found a bug, please file one at
 http://kenai.com/jira/browse/WARBLER.
