@@ -21,6 +21,8 @@ describe Warbler::War do
       config.webxml.jruby.max.runtimes = 5
     end
     @war = Warbler::War.new
+    @bundle_gemfile = ENV['BUNDLE_GEMFILE']
+    ENV['BUNDLE_GEMFILE'] = nil
   end
 
   after(:each) do
@@ -29,6 +31,7 @@ describe Warbler::War do
     rm_f FileList["*.war", "config.ru", "*web.xml*", "config/web.xml*",
                   "config/warble.rb", "file.txt", 'manifest', 'Gemfile*']
     Dir.chdir(@pwd)
+    ENV['BUNDLE_GEMFILE'] = @bundle_gemfile
   end
 
   def file_list(regex)
@@ -400,6 +403,14 @@ describe Warbler::War do
     File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
     @war.apply(Warbler::Config.new {|c| c.gem_path = '/WEB-INF/jewels' })
     file_list(%r{WEB-INF/jewels/specifications/rspec}).should_not be_empty
+  end
+
+  it "should work with :git entries in Bundler Gemfiles" do
+    File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
+    silence { ruby "-S", "bundle", "install", "--local" }
+    @war.apply(Warbler::Config.new)
+    file_list(%r{WEB-INF/gems/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
+    file_list(%r{WEB-INF/gems/specifications/warbler}).should_not be_empty
   end
 
   it "should allow adding additional WEB-INF files via config.webinf_files" do
