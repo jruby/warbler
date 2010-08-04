@@ -26,8 +26,7 @@ describe Warbler::War do
   end
 
   after(:each) do
-    rm_rf "log"
-    rm_rf ".bundle"
+    rm_rf FileList["log", ".bundle", "tmp/war"]
     rm_f FileList["*.war", "config.ru", "*web.xml*", "config/web.xml*",
                   "config/warble.rb", "file.txt", 'manifest', 'Gemfile*']
     Dir.chdir(@pwd)
@@ -365,6 +364,15 @@ describe Warbler::War do
     silence { @war.apply(@config) }
     file_list(%r{WEB-INF/lib}).should_not be_empty
     file_list(%r{WEB-INF/notexist}).should be_empty
+  end
+
+  it "should exclude Warbler's old tmp/war directory by default" do
+    mkdir_p "tmp/war"
+    touch "tmp/war/index.html"
+    @config = Warbler::Config.new
+    @config.dirs += ["tmp"]
+    @war.apply(@config)
+    file_list(%r{WEB-INF/tmp/war/index\.html}).should be_empty
   end
 
   it "should write gems to location specified by gem_path" do

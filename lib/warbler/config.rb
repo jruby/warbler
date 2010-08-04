@@ -145,6 +145,7 @@ module Warbler
       detect_bundler_gems
 
       @compiled_ruby_files ||= FileList[*@dirs.map {|d| "#{d}/**/*.rb"}]
+      @excludes += ["tmp/war"] if File.directory?("tmp/war")
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes += FileList["**/*.log"] if @exclude_logs
     end
