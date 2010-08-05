@@ -6,8 +6,7 @@ bundle up all of your application files for deployment to a Java application
 server.
 
 Warbler provides a sane set of out-of-the box defaults that should allow most
-Rails applications without external gem dependencies (aside from Rails itself)
-to assemble and Just Work.
+Ruby web applications to assemble and Just Work.
 
 == Getting Started
 
@@ -31,13 +30,7 @@ defined tasks.
     warble war:clean   # Remove the .war file
     warble war:debug   # Dump diagnostic information
 
-If you'd like to control Warbler from your own project's Rakefile,
-simply add the following code somewhere in the Rakefile:
-
-    require 'warbler'
-    Warbler::Task.new
-
-Now you should be able to invoke "rake war" to create your war file.
+Type <tt>warble</tt> or <tt>warble war</tt> to create the war file.
 
 == Features
 
@@ -164,7 +157,23 @@ customize it in any way, you have two options.
 
 For more information on configuration, see Warbler::Config.
 
-=== Troubleshooting
+== Rakefile integration
+
+If you'd like to control Warbler from your own project's Rakefile,
+simply add the following code somewhere in the Rakefile:
+
+    require 'warbler'
+    Warbler::Task.new
+
+If you're using Bundler, you'll want to add Warbler to your Gemfile:
+
+    group :development do
+      gem "warbler"
+    end
+
+Now you should be able to invoke "rake war" to create your war file.
+
+== Troubleshooting
 
 If Warbler isn't packaging the files you were expecting, use the
 +war:debug+ task to give you more insight into what's going on.
@@ -176,9 +185,9 @@ http://kenai.com/jira/browse/WARBLER.
 
 You can get the Warbler source using Git, in any of the following ways:
 
-   git clone git://kenai.com/warbler~main
    git clone git://git.caldersphere.net/warbler.git
    git clone git://github.com/nicksieger/warbler.git
+   git clone git://kenai.com/warbler~main
 
 You can also download a tarball of Warbler source at
 http://github.com/nicksieger/warbler/tree/master.
