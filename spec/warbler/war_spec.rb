@@ -19,18 +19,18 @@ describe Warbler::War do
       config.war_name = "warbler"
       config.gems = ["rake"]
       config.webxml.jruby.max.runtimes = 5
-    end
+    end rescue nil
     @war = Warbler::War.new
-    @bundle_gemfile = ENV['BUNDLE_GEMFILE']
-    ENV['BUNDLE_GEMFILE'] = nil
+    @env_save = {}
+    (ENV.keys.grep(/BUNDLE/) + ["RUBYOPT", "GEM_PATH"]).each {|k| @env_save[k] = ENV[k]; ENV[k] = nil}
   end
 
   after(:each) do
     rm_rf FileList["log", ".bundle", "tmp/war"]
     rm_f FileList["*.war", "config.ru", "*web.xml*", "config/web.xml*",
-                  "config/warble.rb", "file.txt", 'manifest', 'Gemfile*']
+                  "config/warble.rb", "file.txt", 'manifest', 'Gemfile*', 'MANIFEST.MF*']
     Dir.chdir(@pwd)
-    ENV['BUNDLE_GEMFILE'] = @bundle_gemfile
+    @env_save.keys.each {|k| ENV[k] = @env_save[k]}
   end
 
   def file_list(regex)
