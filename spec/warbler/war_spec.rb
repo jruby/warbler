@@ -446,4 +446,9 @@ describe Warbler::War do
     file_list(%r{WEB-INF/myserver-web.xml}).should_not be_empty
     @war.files['WEB-INF/myserver-web.xml'].read.should =~ /web-app.*production/
   end
+
+  it "should exclude test files in gems according to config.gem_excludes" do
+    @war.apply(@config)
+    file_list(%r{WEB-INF/gems/gems/rake([^/]+)/test/test_rake.rb}).should be_empty
+  end
 end

@@ -16,6 +16,9 @@
   compiling all Ruby files.
 - Exclude 'tmp/war' directory so that people upgrading from 0.9 won't
   accidentally include it in their war file.
+- Add config.gem_excludes which allows exclusion of some gem files from
+  the war. Default value assumes that test or spec directories should
+  not be included.
 
 == 1.1.0
 

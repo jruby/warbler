@@ -77,6 +77,11 @@ Warbler::Config.new do |config|
   # to turn off.
   # config.gem_dependencies = false
 
+  # Array of regular expressions matching relative paths in gems to be
+  # excluded from the war. Defaults to '[/^(test|spec)\//]', which
+  # excludes test files. Set to empty to include all gem files.
+  # config.gem_excludes = []
+
   # Files to be included in the root of the webapp.  Note that files in public
   # will have the leading 'public/' part of the path stripped during staging.
   # config.public_html = FileList["public/**/*", "doc/**/*"]
