@@ -448,6 +448,7 @@ describe Warbler::War do
   end
 
   it "should exclude test files in gems according to config.gem_excludes" do
+    @config.gem_excludes += [/^(test|spec)\//]
     @war.apply(@config)
     file_list(%r{WEB-INF/gems/gems/rake([^/]+)/test/test_rake.rb}).should be_empty
   end

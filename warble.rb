@@ -73,14 +73,14 @@ Warbler::Config.new do |config|
   # config.gems << /^merb-/
   # config.gems << Gem::Dependency.new("merb-core", "= 0.9.3")
 
-  # Include gem dependencies not mentioned specifically. Default is true, uncomment
-  # to turn off.
+  # Include gem dependencies not mentioned specifically. Default is
+  # true, uncomment to turn off.
   # config.gem_dependencies = false
 
   # Array of regular expressions matching relative paths in gems to be
-  # excluded from the war. Defaults to '[/^(test|spec)\//]', which
-  # excludes test files. Set to empty to include all gem files.
-  # config.gem_excludes = []
+  # excluded from the war. Defaults to empty, but you can set it like
+  # below, which excludes test files.
+  # config.gem_excludes = [/^(test|spec)\//]
 
   # Files to be included in the root of the webapp.  Note that files in public
   # will have the leading 'public/' part of the path stripped during staging.

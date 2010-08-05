@@ -54,7 +54,7 @@ module Warbler
     attr_accessor :gem_dependencies
 
     # Array of regular expressions matching relative paths in gems to
-    # be excluded from the war. Defaults to [/^(test|spec)\//].
+    # be excluded from the war. Default contains no exclusions.
     attr_accessor :gem_excludes
 
     # Whether to exclude **/*.log files (default is true)
@@ -133,7 +133,7 @@ module Warbler
       @gems        = Warbler::Gems.new
       @gem_path    = DEFAULT_GEM_PATH
       @gem_dependencies = true
-      @gem_excludes = [/^(test|spec)\//]
+      @gem_excludes = []
       @exclude_logs = true
       @public_html = FileList["public/**/*"]
       @pathmaps    = default_pathmaps

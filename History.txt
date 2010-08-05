@@ -15,8 +15,7 @@
   files to compile when using the "compiled" feature. Defaults to
   compiling all Ruby files.
 - warble.rb: Add config.gem_excludes which allows exclusion of some
-  gem files from the war. Default value assumes that test or spec
-  directories should not be included.
+  gem files from the war. Default assumes no exclusions.
 - Exclude 'tmp/war' directory so that people upgrading from 0.9 won't
   accidentally include it in their war file.
 
