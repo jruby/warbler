@@ -58,10 +58,11 @@ public class Main implements Runnable {
         URLClassLoader loader = new URLClassLoader(new URL[] {jar});
         Class klass = Class.forName("winstone.Launcher", true, loader);
         Method main = klass.getDeclaredMethod("main", new Class[] {String[].class});
-        String[] newargs = new String[args.length + 2];
+        String[] newargs = new String[args.length + 3];
         newargs[0] = "--warfile=" + warfile;
         newargs[1] = "--webroot=" + webroot;
-        System.arraycopy(args, 0, newargs, 2, args.length);
+        newargs[2] = "--directoryListings=false";
+        System.arraycopy(args, 0, newargs, 3, args.length);
         debug("invoking Winstone with: " + Arrays.deepToString(newargs));
         main.invoke(null, new Object[] {newargs});
     }
