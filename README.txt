@@ -79,11 +79,13 @@ and +:test+ will be excluded by default, unless you specify with
 Rails applications are detected automatically and configured appropriately.
 The following items are set up for you:
 
-* The Rails gem is packaged if you haven't vendored Rails.
+* Your application runs in the +production+ environment by default.
+Change it in <tt>config/warble.rb</tt> (see below).
+* The Rails gem is packaged if you haven't vendored Rails (Rails <= 2.x).
 * Other gems configured in Rails.configuration.gems are packaged
-  (Rails 2.1 - 2.3)
+(Rails 2.1 - 2.3)
 * Multi-thread-safe execution (as introduced in Rails 2.2) is detected
-  and runtime pooling is disabled.
+and runtime pooling is disabled.
 
 === Merb applications
 
@@ -97,6 +99,7 @@ immediate subdirectories of your application, it will be included and
 used as the rackup script for your Rack-based application. You will
 probably need to specify framework and application gems in
 config/warble.rb unless you're using Bundler to manage your gems.
+<tt>ENV['RACK_ENV']</tt> will be set to +production+.
 
 See {the examples in the jruby-rack project}[http://github.com/nicksieger/jruby-rack/tree/master/examples/]
 of how to configure Warbler to package Camping and Sinatra apps.
