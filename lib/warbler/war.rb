@@ -73,10 +73,7 @@ module Warbler
     def add_webxml(config)
       config.webinf_files.each do |wf|
         if wf =~ /\.erb$/
-          require 'erb'
-          erb = ERB.new(File.open(wf) {|f| f.read })
-          contents = StringIO.new(erb.result(erb_binding(config.webxml)))
-          @files[apply_pathmaps(config, wf, :webinf)] = contents
+          @files[apply_pathmaps(config, wf, :webinf)] = expand_erb(wf, config)
         else
           @files[apply_pathmaps(config, wf, :webinf)] = wf
         end
@@ -174,9 +171,32 @@ module Warbler
       end
     end
 
+    # Add init.rb file to the war file.
+    def add_init_file(config)
+      if config.init_contents
+        contents = ''
+        config.init_contents.each do |file|
+          if file.respond_to?(:read)
+            contents << file.read
+          elsif File.extname(file) == '.erb'
+            contents << expand_erb(file, config).read
+          else
+            contents << File.read(file)
+          end
+        end
+        @files[config.init_filename] = StringIO.new(contents)
+      end
+    end
+
     private
     def add_with_pathmaps(config, f, map_type)
       @files[apply_pathmaps(config, f, map_type)] = f
+    end
+
+    def expand_erb(file, config)
+      require 'erb'
+      erb = ERB.new(File.open(file) {|f| f.read })
+      StringIO.new(erb.result(erb_binding(config.webxml)))
     end
 
     def erb_binding(webxml)

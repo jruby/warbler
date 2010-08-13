@@ -452,4 +452,39 @@ describe Warbler::War do
     @war.apply(@config)
     file_list(%r{WEB-INF/gems/gems/rake([^/]+)/test/test_rake.rb}).should be_empty
   end
+
+  it "should create a META-INF/init.rb file with startup config" do
+    @war.add_init_file(@config)
+    file_list(%r{META-INF/init.rb}).should_not be_empty
+  end
+
+  it "should allow adjusting the init file location in the war" do
+    @config.init_filename = 'WEB-INF/init.rb'
+    @war.add_init_file(@config)
+    file_list(%r{WEB-INF/init.rb}).should_not be_empty
+  end
+
+  it "should add RAILS_ENV to init.rb for Rails apps" do
+    @config = Warbler::Config.new { |c| c.webxml.booter = :rails }
+    @war.add_init_file(@config)
+    contents = @war.files['META-INF/init.rb'].read
+    contents.should =~ /ENV\['RAILS_ENV'\]/
+    contents.should =~ /'production'/
+  end
+
+  it "should add RACK_ENV to init.rb for Rack apps" do
+    @config = Warbler::Config.new { |c| c.webxml.booter = :rack }
+    @war.add_init_file(@config)
+    contents = @war.files['META-INF/init.rb'].read
+    contents.should =~ /ENV\['RACK_ENV'\]/
+    contents.should =~ /'production'/
+  end
+
+  it "should add BUNDLE_WITHOUT to init.rb when Bundler is used" do
+    File.open("Gemfile", "w") {|f| f << "gem 'rake'"}
+    @war.add_init_file(Warbler::Config.new)
+    contents = @war.files['META-INF/init.rb'].read
+    contents.should =~ /ENV\['BUNDLE_WITHOUT'\]/
+    contents.should =~ /'development:test'/
+  end
 end

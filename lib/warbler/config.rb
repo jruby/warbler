@@ -94,6 +94,14 @@ module Warbler
     # compile all .rb files in the application.
     attr_accessor :compiled_ruby_files
 
+    # Warbler writes an "init" file into the war at this location. JRuby-Rack and possibly other
+    # launchers may use this to initialize the Ruby environment.
+    attr_accessor :init_filename
+
+    # Array containing filenames or StringIO's to be concatenated together to form the init file.
+    # If the filename ends in .erb the file will be expanded the same way web.xml.erb is; see below.
+    attr_accessor :init_contents
+
     # Extra configuration for web.xml. Controls how the dynamically-generated web.xml
     # file is generated.
     #
@@ -143,12 +151,16 @@ module Warbler
       @bundler     = true
       @bundle_without = ["development", "test"]
       @webinf_files = default_webinf_files
+      @init_filename = 'META-INF/init.rb'
+      @init_contents = [File.expand_path('../templates/config.erb', __FILE__)]
 
       auto_detect_frameworks
       yield self if block_given?
       update_gem_path
       detect_bundler_gems
 
+      framework_init = File.expand_path("../templates/#{@webxml.booter}.erb", __FILE__)
+      @init_contents << framework_init if File.exist?(framework_init)
       @compiled_ruby_files ||= FileList[*@dirs.map {|d| "#{d}/**/*.rb"}]
       @excludes += ["tmp/war"] if File.directory?("tmp/war")
       @excludes += warbler_vendor_excludes(warbler_home)
@@ -230,6 +242,7 @@ module Warbler
         definition = Bundler::Definition.build(gemfile, lockfile, nil)
         groups = definition.groups - @bundle_without.map {|g| g.to_sym}
         definition.specs_for(groups).each {|spec| @gems << spec }
+        @init_contents << StringIO.new("ENV['BUNDLE_WITHOUT'] = '#{@bundle_without.join(':')}'\n")
       else
         @bundler = false
       end
