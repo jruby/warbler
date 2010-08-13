@@ -1,3 +1,13 @@
+== 1.2.1
+
+- Add --directoryListings=false to Winstone launch by default. In some
+  cases (sinatra) Winstone's directory listing masks application
+  content. (Fletcher Nichol)
+- Build and add META-INF/init.rb file into the war file. This is
+  recognized and loaded by JRuby-Rack 1.0.3 as a new way to do extra
+  environment initialization before the web framework is loaded. See
+  config.init_contents in Warbler::Config for details.
+
 == 1.2.0
 
 - Drop compatibility with earlier versions of Bundler -- Bundler has
