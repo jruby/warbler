@@ -335,7 +335,7 @@ module Warbler
       send("#{key}=", value)
     end
 
-    def context_params
+    def context_params(escape = true)
       require 'cgi'
       params = {}
       @table.each do |k,v|
@@ -343,10 +343,10 @@ module Warbler
         when WebxmlOpenStruct
           nested_params = v.context_params
           nested_params.each do |nk,nv|
-            params["#{CGI::escapeHTML(k.to_s)}.#{nk}"] = nv
+            params["#{escape ? CGI::escapeHTML(k.to_s) : k.to_s}.#{nk}"] = nv
           end
         else
-          params[CGI::escapeHTML(k.to_s)] = CGI::escapeHTML(v.to_s)
+          params[escape ? CGI::escapeHTML(k.to_s) : k.to_s] = escape ? CGI::escapeHTML(v.to_s) : v.to_s
         end
       end
       params.delete_if {|k,v| ['ignored', *ignored].include?(k.to_s) }

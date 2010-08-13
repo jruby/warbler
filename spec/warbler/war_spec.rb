@@ -494,4 +494,10 @@ describe Warbler::War do
     contents = @war.files['META-INF/init.rb'].read
     contents.should =~ /require 'rake'/
   end
+
+  it "should not have escaped HTML in WARBLER_CONFIG" do
+    @config.webxml.dummy = '<dummy/>'
+    @war.apply(@config)
+    @war.files['META-INF/init.rb'].read.should =~ /<dummy\/>/
+  end
 end
