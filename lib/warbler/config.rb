@@ -132,6 +132,7 @@ module Warbler
 
     def initialize(warbler_home = WARBLER_HOME)
       @warbler_home = warbler_home
+      @warbler_templates = "#{WARBLER_HOME}/lib/warbler/templates"
       @features    = []
       @dirs        = TOP_DIRS.select {|d| File.directory?(d)}
       @includes    = FileList[]
@@ -152,14 +153,14 @@ module Warbler
       @bundle_without = ["development", "test"]
       @webinf_files = default_webinf_files
       @init_filename = 'META-INF/init.rb'
-      @init_contents = [File.expand_path('../templates/config.erb', __FILE__)]
+      @init_contents = ["#{@warbler_templates}/config.erb"]
 
       auto_detect_frameworks
       yield self if block_given?
       update_gem_path
       detect_bundler_gems
 
-      framework_init = File.expand_path("../templates/#{@webxml.booter}.erb", __FILE__)
+      framework_init = "#{@warbler_templates}/#{@webxml.booter}.erb"
       @init_contents << framework_init if File.exist?(framework_init)
       @compiled_ruby_files ||= FileList[*@dirs.map {|d| "#{d}/**/*.rb"}]
       @excludes += ["tmp/war"] if File.directory?("tmp/war")

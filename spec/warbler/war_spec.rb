@@ -27,8 +27,8 @@ describe Warbler::War do
 
   after(:each) do
     rm_rf FileList["log", ".bundle", "tmp/war"]
-    rm_f FileList["*.war", "config.ru", "*web.xml*", "config/web.xml*",
-                  "config/warble.rb", "file.txt", 'manifest', 'Gemfile*', 'MANIFEST.MF*']
+    rm_f FileList["*.war", "config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
+                  "file.txt", 'manifest', 'Gemfile*', 'MANIFEST.MF*', 'init.rb*']
     Dir.chdir(@pwd)
     @env_save.keys.each {|k| ENV[k] = @env_save[k]}
   end
@@ -486,5 +486,12 @@ describe Warbler::War do
     contents = @war.files['META-INF/init.rb'].read
     contents.should =~ /ENV\['BUNDLE_WITHOUT'\]/
     contents.should =~ /'development:test'/
+  end
+
+  it "should allow adding custom files' contents to init.rb" do
+    @config = Warbler::Config.new { |c| c.init_contents << "Rakefile" }
+    @war.add_init_file(@config)
+    contents = @war.files['META-INF/init.rb'].read
+    contents.should =~ /require 'rake'/
   end
 end
