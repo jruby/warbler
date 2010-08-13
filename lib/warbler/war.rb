@@ -52,6 +52,7 @@ module Warbler
       add_webxml(config)
       add_manifest(config)
       add_bundler_files(config)
+      add_init_file(config)
     end
 
     # Create the war file. The single argument can either be a

@@ -454,7 +454,7 @@ describe Warbler::War do
   end
 
   it "should create a META-INF/init.rb file with startup config" do
-    @war.add_init_file(@config)
+    @war.apply(@config)
     file_list(%r{META-INF/init.rb}).should_not be_empty
   end
 
