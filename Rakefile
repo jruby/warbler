@@ -61,6 +61,8 @@ end
 Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.spec_opts ||= []
   t.spec_opts << "--options" << "spec/spec.opts"
+  t.rcov_opts ||= []
+  t.rcov_opts << "-x" << "/gems/"
   t.rcov = true
 end
 
