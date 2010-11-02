@@ -208,7 +208,7 @@ module Warbler
 
       task "executable" => winstone_jar do
         war.files['META-INF/MANIFEST.MF'] = StringIO.new(War::DEFAULT_MANIFEST.chomp + "Main-Class: Main\n")
-        war.files['Main.class'] = Zip::ZipFile.open("#{WARBLER_HOME}/lib/warbler_war.jar") do |zf|
+        war.files['Main.class'] = Zip::ZipFile.open("#{WARBLER_HOME}/lib/warbler_jar.jar") do |zf|
           zf.get_input_stream('Main.class') {|io| StringIO.new(io.read) }
         end
         war.files['WEB-INF/winstone.jar'] = winstone_jar

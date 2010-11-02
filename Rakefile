@@ -82,11 +82,11 @@ begin
   end
 
   task :jar => :compile do
-    ant.jar :basedir => "pkg/classes", :destfile => "lib/warbler_war.jar", :includes => "*.class"
+    ant.jar :basedir => "pkg/classes", :destfile => "lib/warbler_jar.jar", :includes => "*.class"
   end
 rescue LoadError
   task :jar do
-    puts "Run 'jar' with JRuby >= 1.5 to re-compile the java war booster"
+    puts "Run 'jar' with JRuby >= 1.5 to re-compile the java jar booster"
   end
 end
 

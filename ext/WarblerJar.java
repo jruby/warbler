@@ -23,14 +23,14 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.util.JRubyFile;
 
-public class WarblerWar {
+public class WarblerJar {
     public static void create(Ruby runtime) {
-        RubyModule task = runtime.getClassFromPath("Warbler::War");
-        task.defineAnnotatedMethods(WarblerWar.class);
+        RubyModule task = runtime.getClassFromPath("Warbler::Jar");
+        task.defineAnnotatedMethods(WarblerJar.class);
     }
 
     @JRubyMethod
-    public static IRubyObject create_war(ThreadContext context, IRubyObject recv, IRubyObject war_path, IRubyObject entries) {
+    public static IRubyObject create_jar(ThreadContext context, IRubyObject recv, IRubyObject jar_path, IRubyObject entries) {
         final Ruby runtime = recv.getRuntime();
 
         if (!(entries instanceof RubyHash)) {
@@ -39,7 +39,7 @@ public class WarblerWar {
 
         RubyHash hash = (RubyHash) entries;
         try {
-            FileOutputStream file = newFile(war_path);
+            FileOutputStream file = newFile(jar_path);
             try {
                 ZipOutputStream zip = new ZipOutputStream(file);
                 addEntries(context, zip, hash);
@@ -92,8 +92,8 @@ public class WarblerWar {
         }
     }
 
-    private static FileOutputStream newFile(IRubyObject war_path) throws IOException {
-        return new FileOutputStream(getFile(war_path));
+    private static FileOutputStream newFile(IRubyObject jar_path) throws IOException {
+        return new FileOutputStream(getFile(jar_path));
     }
 
     private static FileInputStream openFile(File file) throws IOException {

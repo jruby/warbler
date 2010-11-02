@@ -6,13 +6,14 @@ README.txt
 Rakefile
 bin/warble
 ext/Main.java
-ext/WarblerWar.java
-ext/WarblerWarService.java
+ext/WarblerJar.java
+ext/WarblerJarService.java
 lib/warbler
 lib/warbler.rb
 lib/warbler/application.rb
 lib/warbler/config.rb
 lib/warbler/gems.rb
+lib/warbler/jar.rb
 lib/warbler/task.rb
 lib/warbler/templates
 lib/warbler/templates/config.erb
@@ -20,7 +21,7 @@ lib/warbler/templates/rack.erb
 lib/warbler/templates/rails.erb
 lib/warbler/version.rb
 lib/warbler/war.rb
-lib/warbler_war.jar
+lib/warbler_jar.jar
 spec/sample/app/controllers/application.rb
 spec/sample/app/helpers/application_helper.rb
 spec/sample/config/boot.rb
