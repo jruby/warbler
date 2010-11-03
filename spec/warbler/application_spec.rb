@@ -11,7 +11,7 @@ describe Warbler::Application do
   before :each do
     verbose(false)
     @pwd = Dir.getwd
-    Dir.chdir("spec/sample")
+    Dir.chdir("spec/sample_war")
     @argv = ARGV.dup
     ARGV.clear
     @app = Rake.application

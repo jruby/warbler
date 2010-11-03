@@ -13,7 +13,7 @@ describe Warbler::Task do
     Rake.application = @rake
     verbose(false)
     @pwd = Dir.getwd
-    Dir.chdir("spec/sample")
+    Dir.chdir("spec/sample_war")
     mkdir_p "log"
     touch "log/test.log"
     @config = Warbler::Config.new do |config|
