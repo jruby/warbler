@@ -3,8 +3,9 @@
 require 'rubygems'
 require 'hoe'
 
-hoe = Hoe.spec 'sample_jar' do
-  developer('Nick Sieger', 'nick@nicksieger.com')
+hoe = Hoe.spec 'sample_jar' do |p|
+  p.developer('Nick Sieger', 'nick@nicksieger.com')
+  p.extra_deps += [["rubyzip", ">= 0"]]
 end
 
 task :gemspec do
