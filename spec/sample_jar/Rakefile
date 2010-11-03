@@ -1,0 +1,15 @@
+# -*- ruby -*-
+
+require 'rubygems'
+require 'hoe'
+
+hoe = Hoe.spec 'sample_jar' do
+  developer('Nick Sieger', 'nick@nicksieger.com')
+end
+
+task :gemspec do
+  File.open('sample_jar.gemspec', 'w') do |f|
+    f << hoe.spec.to_ruby
+  end
+end
+# vim: syntax=ruby
