@@ -22,6 +22,11 @@ module Warbler
     # - compiled: compile .rb files to .class files
     attr_accessor :features
 
+    # Traits: an array of trait classes corresponding to
+    # characteristics of the project that are either auto-detected or
+    # configured.
+    attr_accessor :traits
+
     # Deprecated: No longer has any effect.
     attr_accessor :staging_dir
 
@@ -154,6 +159,7 @@ module Warbler
       @webinf_files = default_webinf_files
       @init_filename = 'META-INF/init.rb'
       @init_contents = ["#{@warbler_templates}/config.erb"]
+      @traits        = [Traits::War]
 
       auto_detect_frameworks
       yield self if block_given?
@@ -234,6 +240,7 @@ module Warbler
 
     def detect_bundler_gems
       if @bundler && File.exist?("Gemfile")
+        @traits << Traits::Bundler
         @gems.clear
         @gem_dependencies = false # Bundler takes care of these
         require 'bundler'
@@ -264,6 +271,7 @@ module Warbler
       return false unless task = Warbler.project_application.lookup("environment")
       task.invoke rescue nil
       return false unless defined?(::Rails)
+      @traits << Traits::Rails
       @dirs << "tmp" if File.directory?("tmp")
       @webxml.booter = :rails
       unless (defined?(Rails.vendor_rails?) && Rails.vendor_rails?) || File.directory?("vendor/rails")
@@ -288,6 +296,7 @@ module Warbler
       return false unless task = Warbler.project_application.lookup("merb_env")
       task.invoke rescue nil
       return false unless defined?(::Merb)
+      @traits << Traits::Merb
       @webxml.booter = :merb
       if defined?(Merb::BootLoader::Dependencies.dependencies)
         Merb::BootLoader::Dependencies.dependencies.each {|g| @gems << g }
@@ -299,10 +308,16 @@ module Warbler
 
     def auto_detect_rackup
       return false unless File.exist?("config.ru") || !Dir['*/config.ru'].empty?
+      @traits << Traits::Rack
       @webxml.booter = :rack
       @webinf_files += [FileList['config.ru', '*/config.ru'].detect {|f| File.exist?(f)}]
       true
     end
+
+    def dump
+      YAML::dump(self.dup.tap{|c| c.traits = c.traits.map{|k| k.name} })
+    end
+    public :dump
   end
 
   # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.

@@ -37,6 +37,10 @@ describe Warbler::War do
     @war.files.keys.select {|f| f =~ regex }
   end
 
+  it "detects a War trait" do
+    @config.traits.should include(Warbler::Traits::War)
+  end
+
   it "collects files in public" do
     @war.apply(@config)
     file_list(%r{^index\.html}).should_not be_empty
@@ -233,6 +237,11 @@ describe Warbler::War do
       rails
     end
 
+    it "detects a Rails trait" do
+      @config = Warbler::Config.new
+      @config.traits.should include(Warbler::Traits::Rails)
+    end
+
     it "auto-detects a Rails application" do
       @config = Warbler::Config.new
       @config.webxml.booter.should == :rails
@@ -292,6 +301,13 @@ describe Warbler::War do
   end
 
   context "in a Merb application" do
+    before :each do
+      @merb = nil
+      task :merb_env do
+        @merb = mock_merb_module
+      end
+    end
+
     def mock_merb_module
       merb = Module.new
       silence { Object.const_set("Merb", merb) }
@@ -311,10 +327,12 @@ describe Warbler::War do
       dependencies
     end
 
+    it "detects a Merb trait" do
+      @config = Warbler::Config.new
+      @config.traits.should include(Warbler::Traits::Merb)
+    end
+
     it "auto-detects a Merb application" do
-      task :merb_env do
-        mock_merb_module
-      end
       @config = Warbler::Config.new
       @config.webxml.booter.should == :merb
       @config.gems.keys.should_not include("rails")
@@ -322,8 +340,7 @@ describe Warbler::War do
 
     it "automatically adds Merb::BootLoader::Dependencies.dependencies to the list of gems" do
       task :merb_env do
-        deps = mock_merb_module
-        deps.dependencies = [Gem::Dependency.new("merb-core", ">= 1.0.6.1")]
+        @merb.dependencies = [Gem::Dependency.new("merb-core", ">= 1.0.6.1")]
       end
       @config = Warbler::Config.new
       @config.webxml.booter.should == :merb
@@ -332,8 +349,7 @@ describe Warbler::War do
 
     it "skips Merb development dependencies" do
       task :merb_env do
-        deps = mock_merb_module
-        deps.dependencies = [Gem::Dependency.new("rake", "= #{RAKEVERSION}", :development)]
+        @merb.dependencies = [Gem::Dependency.new("rake", "= #{RAKEVERSION}", :development)]
       end
       @war.apply(Warbler::Config.new)
       file_list(/rake-#{RAKEVERSION}/).should be_empty
@@ -349,16 +365,24 @@ describe Warbler::War do
   end
 
   context "in a Rack application" do
-    it "auto-detects a Rack application with a config.ru file" do
+    before :each do
       rackup = "run Proc.new {|env| [200, {}, ['Hello World']]}"
       File.open("config.ru", "w") {|f| f << rackup }
+    end
+
+    it "detects a Rack trait" do
+      @config = Warbler::Config.new
+      @config.traits.should include(Warbler::Traits::Rack)
+    end
+
+    it "auto-detects a Rack application with a config.ru file" do
       @config = Warbler::Config.new
       @war.apply(@config)
       @war.files['WEB-INF/config.ru'].should == 'config.ru'
     end
 
     it "adds RACK_ENV to init.rb" do
-      @config = Warbler::Config.new { |c| c.webxml.booter = :rack }
+      @config = Warbler::Config.new
       @war.add_init_file(@config)
       contents = @war.files['META-INF/init.rb'].read
       contents.should =~ /ENV\['RACK_ENV'\]/
@@ -367,8 +391,16 @@ describe Warbler::War do
   end
 
   context "with Bundler" do
-    it "detects a Bundler Gemfile and process only its gems" do
+    before :each do
       File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
+    end
+
+    it "detects a Bundler trait" do
+      @config = Warbler::Config.new
+      @config.traits.should include(Warbler::Traits::Bundler)
+    end
+
+    it "detects a Bundler Gemfile and process only its gems" do
       @war.apply(conf = Warbler::Config.new {|c| c.gems << "rake"})
       file_list(%r{WEB-INF/Gemfile}).should_not be_empty
       file_list(%r{WEB-INF/gems/specifications/rspec}).should_not be_empty
@@ -376,7 +408,6 @@ describe Warbler::War do
     end
 
     it "copies Bundler gemfiles into the war" do
-      File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
       File.open("Gemfile.lock", "w") {|f| f << "GEM"}
       @war.apply(Warbler::Config.new)
       file_list(%r{WEB-INF/Gemfile}).should_not be_empty
@@ -384,7 +415,6 @@ describe Warbler::War do
     end
 
     it "allows overriding of the gem path when using Bundler" do
-      File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
       @war.apply(Warbler::Config.new {|c| c.gem_path = '/WEB-INF/jewels' })
       file_list(%r{WEB-INF/jewels/specifications/rspec}).should_not be_empty
     end
@@ -407,7 +437,6 @@ describe Warbler::War do
     end
 
     it "adds BUNDLE_WITHOUT to init.rb" do
-      File.open("Gemfile", "w") {|f| f << "gem 'rake'"}
       @war.add_init_file(Warbler::Config.new)
       contents = @war.files['META-INF/init.rb'].read
       contents.should =~ /ENV\['BUNDLE_WITHOUT'\]/

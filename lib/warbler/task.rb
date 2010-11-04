@@ -122,7 +122,7 @@ module Warbler
       desc "Dump diagnostic information"
       task "debug" => "files" do
         require 'yaml'
-        puts YAML::dump(config)
+        puts config.dump
         war.files.each {|k,v| puts "#{k} -> #{String === v ? v : '<blob>'}"}
       end
       task "debug:includes" => "files" do
