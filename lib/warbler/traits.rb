@@ -5,6 +5,15 @@ module Warbler
   # the kind of project and how it should be packed into the jar or
   # war file.
   module Traits
+    attr_accessor :traits
+
+    def initialize
+      @traits = auto_detect_traits
+    end
+
+    def auto_detect_traits
+      [Traits::War]
+    end
   end
 end
 

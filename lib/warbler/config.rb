@@ -17,6 +17,8 @@ module Warbler
     DEFAULT_GEM_PATH = '/WEB-INF/gems'
     BUILD_GEMS = %w(warbler rake rcov)
 
+    include Traits
+
     # Features: additional options controlling how the jar is built.
     # Currently the following features are supported:
     # - gemjar: package the gem repository in a jar file in WEB-INF/lib
@@ -161,8 +163,8 @@ module Warbler
       @webinf_files      = default_webinf_files
       @init_filename     = 'META-INF/init.rb'
       @init_contents     = ["#{@warbler_templates}/config.erb"]
-      @traits            = [Traits::War]
 
+      super()
       auto_detect_frameworks
       yield self if block_given?
       update_gem_path
@@ -228,7 +230,7 @@ module Warbler
     end
 
     def default_app_root
-      File.expand_path(defined?(Rails.root) ? Rails.root : (defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd))
+      File.expand_path(defined?(::Rails.root) ? ::Rails.root : (defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd))
     end
 
     def default_webinf_files
@@ -261,7 +263,7 @@ module Warbler
         gemfile = Pathname.new("Gemfile").expand_path
         root = gemfile.dirname
         lockfile = root.join('Gemfile.lock')
-        definition = Bundler::Definition.build(gemfile, lockfile, nil)
+        definition = ::Bundler::Definition.build(gemfile, lockfile, nil)
         groups = definition.groups - @bundle_without.map {|g| g.to_sym}
         definition.specs_for(groups).each {|spec| @gems << spec }
         @init_contents << StringIO.new("ENV['BUNDLE_WITHOUT'] = '#{@bundle_without.join(':')}'\n")
@@ -288,19 +290,19 @@ module Warbler
       @traits << Traits::Rails
       @dirs << "tmp" if File.directory?("tmp")
       @webxml.booter = :rails
-      unless (defined?(Rails.vendor_rails?) && Rails.vendor_rails?) || File.directory?("vendor/rails")
-        @gems["rails"] = Rails::VERSION::STRING
+      unless (defined?(::Rails.vendor_rails?) && ::Rails.vendor_rails?) || File.directory?("vendor/rails")
+        @gems["rails"] = ::Rails::VERSION::STRING
       end
-      if defined?(Rails.configuration.gems)
-        Rails.configuration.gems.each do |g|
+      if defined?(::Rails.configuration.gems)
+        ::Rails.configuration.gems.each do |g|
           @gems << Gem::Dependency.new(g.name, g.requirement) if Dir["vendor/gems/#{g.name}*"].empty?
         end
       end
-      if defined?(Rails.configuration.threadsafe!) &&
-        (defined?(Rails.configuration.allow_concurrency) && # Rails 3
-          Rails.configuration.allow_concurrency && Rails.configuration.preload_frameworks) ||
-        (defined?(Rails.configuration.action_controller.allow_concurrency) && # Rails 2
-         Rails.configuration.action_controller.allow_concurrency && Rails.configuration.action_controller.preload_frameworks)
+      if defined?(::Rails.configuration.threadsafe!) &&
+        (defined?(::Rails.configuration.allow_concurrency) && # Rails 3
+          ::Rails.configuration.allow_concurrency && ::Rails.configuration.preload_frameworks) ||
+        (defined?(::Rails.configuration.action_controller.allow_concurrency) && # Rails 2
+         ::Rails.configuration.action_controller.allow_concurrency && ::Rails.configuration.action_controller.preload_frameworks)
         @webxml.jruby.max.runtimes = 1
       end
       true
@@ -312,8 +314,8 @@ module Warbler
       return false unless defined?(::Merb)
       @traits << Traits::Merb
       @webxml.booter = :merb
-      if defined?(Merb::BootLoader::Dependencies.dependencies)
-        Merb::BootLoader::Dependencies.dependencies.each {|g| @gems << g }
+      if defined?(::Merb::BootLoader::Dependencies.dependencies)
+        ::Merb::BootLoader::Dependencies.dependencies.each {|g| @gems << g }
       else
         warn "unable to auto-detect Merb dependencies; upgrade to Merb 1.0 or greater"
       end
