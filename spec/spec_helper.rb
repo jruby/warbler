@@ -44,6 +44,31 @@ module Spec::Example::ExampleGroupMethods
       Dir.chdir(@pwd)
     end
   end
+
+  def use_fresh_rake_application
+    @rake = Rake::Application.new
+    Rake.application = @rake
+    verbose(false)
+  end
+
+  def use_fresh_environment
+    before(:each) do
+      @env_save = {}
+      (ENV.keys.grep(/BUNDLE/) + ["RUBYOPT", "GEM_PATH"]).each {|k| @env_save[k] = ENV[k]; ENV[k] = nil}
+    end
+
+    after(:each) do
+      @env_save.keys.each {|k| ENV[k] = @env_save[k]}
+    end
+  end
+
+  def cleanup_temp_files
+    after(:each) do
+      rm_rf FileList["log", ".bundle", "tmp/war"]
+      rm_f FileList["*.war", "*.foobar", "**/config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
+                    "file.txt", 'manifest', 'Gemfile*', 'MANIFEST.MF*', 'init.rb*']
+    end
+  end
 end
 
 Spec::Runner.configure do |config|
