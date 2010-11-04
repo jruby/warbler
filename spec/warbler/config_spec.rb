@@ -17,7 +17,7 @@ describe Warbler::Config do
     config.dirs.should include(*Warbler::Config::TOP_DIRS.select{|d| File.directory?(d)})
     config.includes.should be_empty
     config.java_libs.should_not be_empty
-    config.war_name.size.should > 0
+    config.jar_name.size.should > 0
     config.webxml.should be_kind_of(OpenStruct)
     config.pathmaps.should be_kind_of(OpenStruct)
     config.pathmaps.public_html.should == ["%{public/,}p"]
@@ -25,9 +25,9 @@ describe Warbler::Config do
 
   it "should allow configuration through an initializer block" do
     config = Warbler::Config.new do |c|
-      c.war_name = "mywar"
+      c.jar_name = "mywar"
     end
-    config.war_name.should == "mywar"
+    config.jar_name.should == "mywar"
   end
 
   it "should allow gems to be added/changed with =, +=, -=, <<" do

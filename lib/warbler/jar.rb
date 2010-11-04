@@ -55,18 +55,18 @@ module Warbler
       add_init_file(config)
     end
 
-    # Create the war file. The single argument can either be a
-    # Warbler::Config or a filename of the war file to create.
+    # Create the jar or war file. The single argument can either be a
+    # Warbler::Config or a filename of the file to create.
     def create(config_or_path)
       war_path = config_or_path
       if Warbler::Config === config_or_path
-        war_path = "#{config_or_path.war_name}.war"
+        war_path = "#{config_or_path.jar_name}.war"
         war_path = File.join(config_or_path.autodeploy_dir, war_path) if config_or_path.autodeploy_dir
       end
       rm_f war_path
       ensure_directory_entries
       puts "Creating #{war_path}"
-      create_war war_path, @files
+      create_jar war_path, @files
     end
 
     # Add web.xml and other WEB-INF configuration files from

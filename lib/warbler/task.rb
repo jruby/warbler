@@ -18,11 +18,11 @@ module Warbler
   # code like the following in a Rakefile:
   #
   #     Warbler::Task.new("war1", Warbler::Config.new do |config|
-  #       config.war_name = "war1"
+  #       config.jar_name = "war1"
   #       # ...
   #     end
   #     Warbler::Task.new("war2", Warbler::Config.new do |config|
-  #       config.war_name = "war2"
+  #       config.jar_name = "war2"
   #       # ...
   #     end
   #
@@ -35,8 +35,8 @@ module Warbler
     # Warbler::Config
     attr_accessor :config
 
-    # Warbler::War
-    attr_accessor :war
+    # Warbler::Jar
+    attr_accessor :jar
 
     def initialize(name = :war, config = nil)
       @name   = name
@@ -49,10 +49,13 @@ module Warbler
         warn "Warbler::Config not provided by override in initializer or #{Config::FILE}; using defaults"
         @config = Config.new
       end
-      @war = Warbler::War.new
+      @jar = Warbler::Jar.new
       yield self if block_given?
       define_tasks
     end
+
+    # Deprecated: attr_accessor :war
+    alias war jar
 
     private
     def define_tasks
@@ -95,26 +98,26 @@ module Warbler
     def define_clean_task
       desc "Remove the .war file"
       task "clean" do
-        rm_f "#{config.war_name}.war"
+        rm_f "#{config.jar_name}.war"
       end
       task "clear" => "#{name}:clean"
     end
 
     def define_compiled_task
       task "compiled" do
-        war.compile(config)
+        jar.compile(config)
       end
     end
 
     def define_files_task
       task "files" do
-        war.apply(config)
+        jar.apply(config)
       end
     end
 
     def define_jar_task
       task "jar" do
-        war.create(config)
+        jar.create(config)
       end
     end
 
@@ -123,7 +126,7 @@ module Warbler
       task "debug" => "files" do
         require 'yaml'
         puts config.dump
-        war.files.each {|k,v| puts "#{k} -> #{String === v ? v : '<blob>'}"}
+        jar.files.each {|k,v| puts "#{k} -> #{String === v ? v : '<blob>'}"}
       end
       task "debug:includes" => "files" do
         puts "", "included files:"
@@ -140,15 +143,15 @@ module Warbler
         task "#@name:jar" => "#@name:make_gemjar"
       end
 
-      gem_jar = Warbler::War.new
+      gem_jar = Warbler::Jar.new
       task "make_gemjar" => "files" do
         gem_path = Regexp::quote(config.relative_gem_path)
-        gems = war.files.select{|k,v| k =~ %r{#{gem_path}/} }
+        gems = jar.files.select{|k,v| k =~ %r{#{gem_path}/} }
         gems.each do |k,v|
           gem_jar.files[k.sub(%r{#{gem_path}/}, '')] = v
         end
-        war.files["WEB-INF/lib/gems.jar"] = "tmp/gems.jar"
-        war.files.reject!{|k,v| k =~ /#{gem_path}/ }
+        jar.files["WEB-INF/lib/gems.jar"] = "tmp/gems.jar"
+        jar.files.reject!{|k,v| k =~ /#{gem_path}/ }
         mkdir_p "tmp"
         gem_jar.add_manifest
         gem_jar.create("tmp/gems.jar")
@@ -207,11 +210,11 @@ module Warbler
       end
 
       task "executable" => winstone_jar do
-        war.files['META-INF/MANIFEST.MF'] = StringIO.new(War::DEFAULT_MANIFEST.chomp + "Main-Class: Main\n")
-        war.files['Main.class'] = Zip::ZipFile.open("#{WARBLER_HOME}/lib/warbler_jar.jar") do |zf|
+        jar.files['META-INF/MANIFEST.MF'] = StringIO.new(Jar::DEFAULT_MANIFEST.chomp + "Main-Class: Main\n")
+        jar.files['Main.class'] = Zip::ZipFile.open("#{WARBLER_HOME}/lib/warbler_jar.jar") do |zf|
           zf.get_input_stream('Main.class') {|io| StringIO.new(io.read) }
         end
-        war.files['WEB-INF/winstone.jar'] = winstone_jar
+        jar.files['WEB-INF/winstone.jar'] = winstone_jar
       end
     end
 

@@ -17,7 +17,7 @@ describe Warbler::Task do
     mkdir_p "log"
     touch "log/test.log"
     @config = Warbler::Config.new do |config|
-      config.war_name = "warbler"
+      config.jar_name = "warbler"
       config.gems = ["rake"]
       config.webxml.jruby.max.runtimes = 5
     end
@@ -34,7 +34,7 @@ describe Warbler::Task do
   end
 
   it "should define a clean task for removing the war file" do
-    war_file = "#{@config.war_name}.war"
+    war_file = "#{@config.jar_name}.war"
     touch war_file
     Rake::Task["warble:clean"].invoke
     File.exist?(war_file).should == false
@@ -43,8 +43,8 @@ describe Warbler::Task do
   it "should define a make_gemjar task for storing gems in a jar file" do
     silence { Rake::Task["warble:make_gemjar"].invoke }
     File.exist?("tmp/gems.jar").should == true
-    @task.war.files.keys.should_not include(%r{WEB-INF\/gems})
-    @task.war.files.keys.should include("WEB-INF/lib/gems.jar")
+    @task.jar.files.keys.should_not include(%r{WEB-INF\/gems})
+    @task.jar.files.keys.should include("WEB-INF/lib/gems.jar")
   end
 
   it "should define a war task for bundling up everything" do
@@ -57,15 +57,15 @@ describe Warbler::Task do
 
   it "should define a jar task for creating the .war" do
     touch "file.txt"
-    @task.war.files["file.txt"] = "file.txt"
+    @task.jar.files["file.txt"] = "file.txt"
     silence { Rake::Task["warble:jar"].invoke }
-    File.exist?("#{@config.war_name}.war").should == true
+    File.exist?("#{@config.jar_name}.war").should == true
   end
 
   it "should invoke feature tasks configured in config.features" do
     @config.features << "gemjar"
     silence { Rake::Task["warble"].invoke }
-    @task.war.files.keys.should include("WEB-INF/lib/gems.jar")
+    @task.jar.files.keys.should include("WEB-INF/lib/gems.jar")
   end
 
   it "should warn and skip unknown features configured in config.features" do
@@ -75,7 +75,7 @@ describe Warbler::Task do
 
   it "should define an executable task for embedding a server in the war file" do
     silence { Rake::Task["warble:executable"].invoke }
-    @task.war.files.keys.should include('WEB-INF/winstone.jar')
+    @task.jar.files.keys.should include('WEB-INF/winstone.jar')
   end
 
   it "should be able to define all tasks successfully" do
@@ -88,7 +88,7 @@ describe Warbler::Task do
 
     java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
 
-    Zip::ZipFile.open("#{@config.war_name}.war") do |zf|
+    Zip::ZipFile.open("#{@config.jar_name}.war") do |zf|
       java_class_header     = zf.get_input_stream('WEB-INF/app/helpers/application_helper.class') {|io| io.read }[0..3]
       ruby_class_definition = zf.get_input_stream('WEB-INF/app/helpers/application_helper.rb') {|io| io.read }
 
@@ -101,7 +101,7 @@ describe Warbler::Task do
     File.open("config/special.txt", "wb") {|f| f << "special"}
     Dir.chdir("config") { ln_s "special.txt", "link.txt" }
     silence { Rake::Task["warble"].invoke }
-    Zip::ZipFile.open("#{@config.war_name}.war") do |zf|
+    Zip::ZipFile.open("#{@config.jar_name}.war") do |zf|
       special = zf.get_input_stream('WEB-INF/config/special.txt') {|io| io.read }
       link = zf.get_input_stream('WEB-INF/config/link.txt') {|io| io.read }
       link.should == special
@@ -111,7 +111,7 @@ describe Warbler::Task do
   it "should process directory symlinks by copying the whole subdirectory" do
     Dir.chdir("lib") { ln_s "tasks", "rakelib" }
     silence { Rake::Task["warble"].invoke }
-    Zip::ZipFile.open("#{@config.war_name}.war") do |zf|
+    Zip::ZipFile.open("#{@config.jar_name}.war") do |zf|
       zf.find_entry("WEB-INF/lib/tasks/utils.rake").should_not be_nil
       zf.find_entry("WEB-INF/lib/rakelib/").should_not be_nil
       zf.find_entry("WEB-INF/lib/rakelib/utils.rake").should_not be_nil if defined?(JRUBY_VERSION)
@@ -123,7 +123,7 @@ describe Warbler::Task do
     @config.bundler = true
     @config.send(:detect_bundler_gems)
     silence { Rake::Task["warble"].invoke }
-    Zip::ZipFile.open("#{@config.war_name}.war") do |zf|
+    Zip::ZipFile.open("#{@config.jar_name}.war") do |zf|
       rspec_version = @config.gems.keys.detect {|k| k.name == 'rspec'}.version
       zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec_version}.gemspec").should_not be_nil
     end

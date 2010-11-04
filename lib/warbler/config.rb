@@ -75,7 +75,7 @@ module Warbler
 
     # Name of war file (without the .war), defaults to the directory name containing
     # the Rails application
-    attr_accessor :war_name
+    attr_accessor :jar_name
 
     # Name of a MANIFEST.MF template to use.
     attr_accessor :manifest_file
@@ -153,7 +153,7 @@ module Warbler
       @pathmaps          = default_pathmaps
       @webxml            = default_webxml_config
       @app_root          = default_app_root
-      @war_name          = File.basename(@app_root)
+      @jar_name          = File.basename(@app_root)
       @bundler           = true
       @bundle_without    = ["development", "test"]
       @webinf_files      = default_webinf_files
@@ -180,6 +180,18 @@ module Warbler
 
     def relative_gem_path
       @gem_path[1..-1]
+    end
+
+    # Deprecated
+    def war_name
+      warn "config.war_name deprecated; replace with config.jar_name"
+      jar_name
+    end
+
+    # Deprecated
+    def war_name=(w)
+      warn "config.war_name deprecated; replace with config.jar_name"
+      self.jar_name = w
     end
 
     private
