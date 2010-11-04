@@ -14,6 +14,37 @@ module Warbler
     def auto_detect_traits
       [Traits::War]
     end
+
+    def before_configure
+      trait_objects.each {|t| t.before_configure }
+    end
+
+    def after_configure
+      trait_objects.each {|t| t.after_configure }
+    end
+
+    def trait_objects
+      @trait_objects ||= @traits.map {|klass| klass.new(self) }
+    end
+
+    def dump_traits
+      @trait_objects = nil
+      @traits.collect! {|t| t.name }
+    end
+  end
+
+  # Each trait class includes this module to receive shared functionality.
+  module Trait
+    attr_reader :config
+    def initialize(config)
+      @config = config
+    end
+
+    def before_configure
+    end
+
+    def after_configure
+    end
   end
 end
 

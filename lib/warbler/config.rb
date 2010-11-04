@@ -14,7 +14,6 @@ module Warbler
   class Config
     TOP_DIRS = %w(app config lib log vendor)
     FILE = "config/warble.rb"
-    DEFAULT_GEM_PATH = '/WEB-INF/gems'
     BUILD_GEMS = %w(warbler rake rcov)
 
     include Traits
@@ -140,6 +139,8 @@ module Warbler
     attr_accessor :webxml
 
     def initialize(warbler_home = WARBLER_HOME)
+      super()
+
       @warbler_home      = warbler_home
       @warbler_templates = "#{WARBLER_HOME}/lib/warbler/templates"
       @features          = []
@@ -149,12 +150,10 @@ module Warbler
       @java_libs         = default_jar_files
       @java_classes      = FileList[]
       @gems              = Warbler::Gems.new
-      @gem_path          = DEFAULT_GEM_PATH
       @gem_dependencies  = true
       @gem_excludes      = []
       @exclude_logs      = true
       @public_html       = FileList["public/**/*"]
-      @pathmaps          = default_pathmaps
       @webxml            = default_webxml_config
       @app_root          = default_app_root
       @jar_name          = File.basename(@app_root)
@@ -164,10 +163,12 @@ module Warbler
       @init_filename     = 'META-INF/init.rb'
       @init_contents     = ["#{@warbler_templates}/config.erb"]
 
-      super()
       auto_detect_frameworks
+
+      before_configure
       yield self if block_given?
-      update_gem_path
+      after_configure
+
       detect_bundler_gems
 
       framework_init = "#{@warbler_templates}/#{@webxml.booter}.erb"
@@ -242,16 +243,6 @@ module Warbler
         "#{WARBLER_HOME}/web.xml.erb"
       end
       FileList[webxml]
-    end
-
-    def update_gem_path
-      if @gem_path != DEFAULT_GEM_PATH
-        @gem_path = "/#{@gem_path}" unless @gem_path =~ %r{^/}
-        sub_gem_path = @gem_path[1..-1]
-        @pathmaps.gemspecs.each {|p| p.sub!(DEFAULT_GEM_PATH[1..-1], sub_gem_path)}
-        @pathmaps.gems.each {|p| p.sub!(DEFAULT_GEM_PATH[1..-1], sub_gem_path)}
-        @webxml["gem"]["path"] = @gem_path
-      end
     end
 
     def detect_bundler_gems
@@ -331,7 +322,7 @@ module Warbler
     end
 
     def dump
-      YAML::dump(self.dup.tap{|c| c.traits = c.traits.map{|k| k.name} })
+      YAML::dump(self.dup.tap{|c| c.dump_traits })
     end
     public :dump
   end
