@@ -33,6 +33,19 @@ def capture(&block)
   io.string
 end
 
+module Spec::Example::ExampleGroupMethods
+  def run_in_directory(dir)
+    before :each do
+      @pwd = Dir.getwd
+      Dir.chdir(dir)
+    end
+
+    after :each do
+      Dir.chdir(@pwd)
+    end
+  end
+end
+
 Spec::Runner.configure do |config|
   config.after(:each) do
     class << Object

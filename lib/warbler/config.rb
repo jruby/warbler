@@ -140,6 +140,8 @@ module Warbler
     #     <%= webxml.context_params['maybe.present.key'] || 'default' %>
     attr_accessor :webxml
 
+    attr_reader :warbler_templates
+
     def initialize(warbler_home = WARBLER_HOME)
       super()
 
@@ -156,24 +158,15 @@ module Warbler
       @gem_excludes      = []
       @exclude_logs      = true
       @public_html       = FileList[]
-      @app_root          = Dir.getwd
-      @jar_name          = File.basename(@app_root)
+      @jar_name          = File.basename(Dir.getwd)
       @jar_extension     = 'jar'
-      @bundler           = true
-      @bundle_without    = ["development", "test"]
       @webinf_files      = FileList[]
       @init_filename     = 'META-INF/init.rb'
       @init_contents     = ["#{@warbler_templates}/config.erb"]
 
       before_configure
-      auto_detect_frameworks
       yield self if block_given?
       after_configure
-
-      detect_bundler_gems
-
-      framework_init = "#{@warbler_templates}/#{@webxml.booter}.erb"
-      @init_contents << framework_init if File.exist?(framework_init)
 
       @compiled_ruby_files ||= FileList[*@dirs.map {|d| "#{d}/**/*.rb"}]
 
@@ -205,81 +198,11 @@ module Warbler
     private
     def warbler_vendor_excludes(warbler_home)
       warbler = File.expand_path(warbler_home)
-      if warbler =~ %r{^#{@app_root}/(.*)}
+      if warbler =~ %r{^#{Dir.getwd}/(.*)}
         FileList["#{$1}"]
       else
         []
       end
-    end
-
-    def detect_bundler_gems
-      if @bundler && File.exist?("Gemfile")
-        @traits << Traits::Bundler
-        @gems.clear
-        @gem_dependencies = false # Bundler takes care of these
-        require 'bundler'
-        gemfile = Pathname.new("Gemfile").expand_path
-        root = gemfile.dirname
-        lockfile = root.join('Gemfile.lock')
-        definition = ::Bundler::Definition.build(gemfile, lockfile, nil)
-        groups = definition.groups - @bundle_without.map {|g| g.to_sym}
-        definition.specs_for(groups).each {|spec| @gems << spec }
-        @init_contents << StringIO.new("ENV['BUNDLE_WITHOUT'] = '#{@bundle_without.join(':')}'\n")
-      else
-        @bundler = false
-      end
-    end
-
-    def auto_detect_frameworks
-      return unless Warbler.framework_detection
-      auto_detect_rails || auto_detect_merb || auto_detect_rackup
-    end
-
-    def auto_detect_rails
-      return false unless task = Warbler.project_application.lookup("environment")
-      task.invoke rescue nil
-      return false unless defined?(::Rails)
-      @traits << Traits::Rails
-      @dirs << "tmp" if File.directory?("tmp")
-      @webxml.booter = :rails
-      unless (defined?(::Rails.vendor_rails?) && ::Rails.vendor_rails?) || File.directory?("vendor/rails")
-        @gems["rails"] = ::Rails::VERSION::STRING
-      end
-      if defined?(::Rails.configuration.gems)
-        ::Rails.configuration.gems.each do |g|
-          @gems << Gem::Dependency.new(g.name, g.requirement) if Dir["vendor/gems/#{g.name}*"].empty?
-        end
-      end
-      if defined?(::Rails.configuration.threadsafe!) &&
-        (defined?(::Rails.configuration.allow_concurrency) && # Rails 3
-          ::Rails.configuration.allow_concurrency && ::Rails.configuration.preload_frameworks) ||
-        (defined?(::Rails.configuration.action_controller.allow_concurrency) && # Rails 2
-         ::Rails.configuration.action_controller.allow_concurrency && ::Rails.configuration.action_controller.preload_frameworks)
-        @webxml.jruby.max.runtimes = 1
-      end
-      true
-    end
-
-    def auto_detect_merb
-      return false unless task = Warbler.project_application.lookup("merb_env")
-      task.invoke rescue nil
-      return false unless defined?(::Merb)
-      @traits << Traits::Merb
-      @webxml.booter = :merb
-      if defined?(::Merb::BootLoader::Dependencies.dependencies)
-        ::Merb::BootLoader::Dependencies.dependencies.each {|g| @gems << g }
-      else
-        warn "unable to auto-detect Merb dependencies; upgrade to Merb 1.0 or greater"
-      end
-      true
-    end
-
-    def auto_detect_rackup
-      return false unless File.exist?("config.ru") || !Dir['*/config.ru'].empty?
-      @traits << Traits::Rack
-      @webxml.booter = :rack
-      @webinf_files += [FileList['config.ru', '*/config.ru'].detect {|f| File.exist?(f)}]
-      true
     end
 
     def dump

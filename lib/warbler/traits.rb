@@ -1,3 +1,9 @@
+#--
+# Copyright (c) 2010 Engine Yard, Inc.
+# This source code is available under the MIT license.
+# See the file LICENSE.txt for details.
+#++
+
 module Warbler
   # Traits are project configuration characteristics that correspond
   # to the framework or project layout. Each trait corresponds to a
@@ -12,7 +18,7 @@ module Warbler
     end
 
     def auto_detect_traits
-      [Traits::War]
+      Traits.constants.map {|t| Traits.const_get(t)}.select {|tc| tc.detect? }.sort
     end
 
     def before_configure
@@ -35,6 +41,20 @@ module Warbler
 
   # Each trait class includes this module to receive shared functionality.
   module Trait
+    module ClassMethods
+      def <=>(o)
+        requires?(o) ? 1 : (o.requires?(self) ? -1 : 0)
+      end
+
+      def requires?(t)
+        false
+      end
+    end
+
+    def self.included(base)
+      base.extend ClassMethods
+    end
+
     attr_reader :config
     def initialize(config)
       @config = config

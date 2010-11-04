@@ -8,12 +8,12 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Warbler::Jar do
   context "in a jar project" do
+    run_in_directory "spec/sample_jar"
+
     before(:each) do
       @rake = Rake::Application.new
       Rake.application = @rake
       verbose(false)
-      @pwd = Dir.getwd
-      Dir.chdir("spec/sample_jar")
       @config = Warbler::Config.new
       @jar = Warbler::Jar.new
       @env_save = {}
@@ -22,9 +22,8 @@ describe Warbler::Jar do
 
     after(:each) do
       rm_rf FileList["log", ".bundle", "tmp/war"]
-      rm_f FileList["*.war", "config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
+      rm_f FileList["*.war", "**/config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
                     "file.txt", 'manifest', 'Gemfile*', 'MANIFEST.MF*', 'init.rb*']
-      Dir.chdir(@pwd)
       @env_save.keys.each {|k| ENV[k] = @env_save[k]}
     end
 
@@ -108,12 +107,12 @@ describe Warbler::Jar do
   end
 
   context "in a war project" do
+    run_in_directory "spec/sample_war"
+
     before(:each) do
       @rake = Rake::Application.new
       Rake.application = @rake
       verbose(false)
-      @pwd = Dir.getwd
-      Dir.chdir("spec/sample_war")
       mkdir_p "log"
       touch "log/test.log"
       @config = Warbler::Config.new do |config|
@@ -130,7 +129,6 @@ describe Warbler::Jar do
       rm_rf FileList["log", ".bundle", "tmp/war"]
       rm_f FileList["*.war", "*.foobar", "config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
                     "file.txt", 'manifest', 'Gemfile*', 'MANIFEST.MF*', 'init.rb*']
-      Dir.chdir(@pwd)
       @env_save.keys.each {|k| ENV[k] = @env_save[k]}
     end
 
@@ -411,10 +409,15 @@ describe Warbler::Jar do
 
     context "in a Merb application" do
       before :each do
+        touch "config/init.rb"
         @merb = nil
         task :merb_env do
           @merb = mock_merb_module
         end
+      end
+
+      after :each do
+        rm_f "config/init.rb"
       end
 
       def mock_merb_module
@@ -475,6 +478,7 @@ describe Warbler::Jar do
 
     context "in a Rack application" do
       before :each do
+        Dir.chdir('tmp')
         rackup = "run Proc.new {|env| [200, {}, ['Hello World']]}"
         File.open("config.ru", "w") {|f| f << rackup }
       end

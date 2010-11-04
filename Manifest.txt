@@ -60,6 +60,7 @@ spec/warbler/config_spec.rb
 spec/warbler/gems_spec.rb
 spec/warbler/jar_spec.rb
 spec/warbler/task_spec.rb
+spec/warbler/traits_spec.rb
 spec/warbler/war_spec.rb
 warble.rb
 web.xml.erb

@@ -22,27 +22,27 @@ class Warbler::Application < Rake::Application
     @name = 'warble'
 
     # Load the main warbler tasks
-    Warbler::Task.new
+    wt = Warbler::Task.new
 
-    task :default => :war
+    task :default => wt.name
 
     desc "Generate a configuration file to customize your war"
-    task :config => "war:config"
+    task :config => "#{wt.name}:config"
 
     desc "Install Warbler tasks in your Rails application"
-    task :pluginize => "war:pluginize"
+    task :pluginize => "#{wt.name}:pluginize"
 
     desc "Feature: package gem repository inside a jar"
-    task :gemjar => "war:gemjar"
+    task :gemjar => "#{wt.name}:gemjar"
 
     desc "Feature: make an executable archive"
-    task :executable => "war:executable"
+    task :executable => "#{wt.name}:executable"
 
     desc "Feature: precompile all Ruby files"
-    task :compiled => "war:compiled"
+    task :compiled => "#{wt.name}:compiled"
 
     desc "Display version of Warbler"
-    task :version => "war:version"
+    task :version => "#{wt.name}:version"
   end
 
   # Loads the project Rakefile in a separate application

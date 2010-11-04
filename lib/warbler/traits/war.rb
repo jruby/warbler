@@ -1,3 +1,9 @@
+#--
+# Copyright (c) 2010 Engine Yard, Inc.
+# This source code is available under the MIT license.
+# See the file LICENSE.txt for details.
+#++
+
 require 'ostruct'
 
 module Warbler
@@ -6,6 +12,10 @@ module Warbler
       include Trait
 
       DEFAULT_GEM_PATH = '/WEB-INF/gems'
+
+      def self.detect?
+        Traits::Rails.detect? || Traits::Merb.detect? || Traits::Rack.detect?
+      end
 
       def before_configure
         config.gem_path      = DEFAULT_GEM_PATH
