@@ -152,7 +152,7 @@ module Warbler
       @gem_dependencies  = true
       @gem_excludes      = []
       @exclude_logs      = true
-      @public_html       = FileList["public/**/*"]
+      @public_html       = FileList[]
       @app_root          = default_app_root
       @jar_name          = File.basename(@app_root)
       @bundler           = true

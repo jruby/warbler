@@ -12,6 +12,7 @@ module Warbler
         config.pathmaps     = default_pathmaps
         config.webxml       = default_webxml_config
         config.webinf_files = default_webinf_files
+        config.public_html  = FileList["public/**/*"]
       end
 
       def after_configure
