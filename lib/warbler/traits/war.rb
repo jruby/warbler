@@ -8,9 +8,10 @@ module Warbler
       DEFAULT_GEM_PATH = '/WEB-INF/gems'
 
       def before_configure
-        config.gem_path = DEFAULT_GEM_PATH
-        config.pathmaps = default_pathmaps
-        config.webxml   = default_webxml_config
+        config.gem_path     = DEFAULT_GEM_PATH
+        config.pathmaps     = default_pathmaps
+        config.webxml       = default_webxml_config
+        config.webinf_files = default_webinf_files
       end
 
       def after_configure
@@ -36,6 +37,17 @@ module Warbler
         c.jndi = nil
         c.ignored = %w(jndi booter)
         c
+      end
+
+      def default_webinf_files
+        webxml = if File.exist?("config/web.xml")
+          "config/web.xml"
+        elsif File.exist?("config/web.xml.erb")
+          "config/web.xml.erb"
+        else
+          "#{WARBLER_HOME}/web.xml.erb"
+        end
+        FileList[webxml]
       end
 
       def update_gem_path

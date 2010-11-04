@@ -157,7 +157,7 @@ module Warbler
       @jar_name          = File.basename(@app_root)
       @bundler           = true
       @bundle_without    = ["development", "test"]
-      @webinf_files      = default_webinf_files
+      @webinf_files      = FileList[]
       @init_filename     = 'META-INF/init.rb'
       @init_contents     = ["#{@warbler_templates}/config.erb"]
 
@@ -210,17 +210,6 @@ module Warbler
 
     def default_app_root
       File.expand_path(defined?(::Rails.root) ? ::Rails.root : (defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd))
-    end
-
-    def default_webinf_files
-      webxml = if File.exist?("config/web.xml")
-        "config/web.xml"
-      elsif File.exist?("config/web.xml.erb")
-        "config/web.xml.erb"
-      else
-        "#{WARBLER_HOME}/web.xml.erb"
-      end
-      FileList[webxml]
     end
 
     def detect_bundler_gems
