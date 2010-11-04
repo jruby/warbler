@@ -75,9 +75,12 @@ module Warbler
     # entries in this structure).
     attr_accessor :pathmaps
 
-    # Name of war file (without the .war), defaults to the directory name containing
-    # the Rails application
+    # Name of jar or war file (without the extension), defaults to the
+    # directory name containing the application.
     attr_accessor :jar_name
+
+    # Extension of jar file. Defaults to <tt>jar</tt> or <tt>war</tt> depending on the project.
+    attr_accessor :jar_extension
 
     # Name of a MANIFEST.MF template to use.
     attr_accessor :manifest_file
@@ -155,6 +158,7 @@ module Warbler
       @public_html       = FileList[]
       @app_root          = Dir.getwd
       @jar_name          = File.basename(@app_root)
+      @jar_extension     = 'jar'
       @bundler           = true
       @bundle_without    = ["development", "test"]
       @webinf_files      = FileList[]

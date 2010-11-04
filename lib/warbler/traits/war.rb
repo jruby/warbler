@@ -8,12 +8,13 @@ module Warbler
       DEFAULT_GEM_PATH = '/WEB-INF/gems'
 
       def before_configure
-        config.gem_path     = DEFAULT_GEM_PATH
-        config.pathmaps     = default_pathmaps
-        config.webxml       = default_webxml_config
-        config.webinf_files = default_webinf_files
-        config.java_libs    = default_jar_files
-        config.public_html  = FileList["public/**/*"]
+        config.gem_path      = DEFAULT_GEM_PATH
+        config.pathmaps      = default_pathmaps
+        config.webxml        = default_webxml_config
+        config.webinf_files  = default_webinf_files
+        config.java_libs     = default_jar_files
+        config.public_html   = FileList["public/**/*"]
+        config.jar_extension = 'war'
       end
 
       def after_configure

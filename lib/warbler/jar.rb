@@ -60,7 +60,7 @@ module Warbler
     def create(config_or_path)
       war_path = config_or_path
       if Warbler::Config === config_or_path
-        war_path = "#{config_or_path.jar_name}.war"
+        war_path = "#{config_or_path.jar_name}.#{config_or_path.jar_extension}"
         war_path = File.join(config_or_path.autodeploy_dir, war_path) if config_or_path.autodeploy_dir
       end
       rm_f war_path

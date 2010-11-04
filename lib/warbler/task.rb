@@ -40,8 +40,7 @@ module Warbler
     # Warbler::Jar
     attr_accessor :jar
 
-    def initialize(name = :war, config = nil)
-      @name   = name
+    def initialize(name = nil, config = nil)
       @config = config
       if @config.nil? && File.exists?(Config::FILE)
         @config = eval(File.open(Config::FILE) {|f| f.read})
@@ -51,6 +50,7 @@ module Warbler
         warn "Warbler::Config not provided by override in initializer or #{Config::FILE}; using defaults"
         @config = Config.new
       end
+      @name = name || @config.jar_extension
       @jar = Warbler::Jar.new
       yield self if block_given?
       define_tasks
@@ -98,9 +98,9 @@ module Warbler
     end
 
     def define_clean_task
-      desc "Remove the .war file"
+      desc "Remove the #{config.jar_extension} file"
       task "clean" do
-        rm_f "#{config.jar_name}.war"
+        rm_f "#{config.jar_name}.#{config.jar_extension}"
       end
       task "clear" => "#{name}:clean"
     end

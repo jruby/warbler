@@ -128,7 +128,7 @@ describe Warbler::Jar do
 
     after(:each) do
       rm_rf FileList["log", ".bundle", "tmp/war"]
-      rm_f FileList["*.war", "config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
+      rm_f FileList["*.war", "*.foobar", "config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
                     "file.txt", 'manifest', 'Gemfile*', 'MANIFEST.MF*', 'init.rb*']
       Dir.chdir(@pwd)
       @env_save.keys.each {|k| ENV[k] = @env_save[k]}
@@ -256,6 +256,14 @@ describe Warbler::Jar do
       @jar.files["file.txt"] = "file.txt"
       silence { @jar.create(@config) }
       File.exist?(File.join("#{Dir::tmpdir}","warbler.war")).should == true
+    end
+
+    it "allows the jar extension to be customized" do
+      @config.jar_extension = 'foobar'
+      touch "file.txt"
+      @jar.files["file.txt"] = "file.txt"
+      silence { @jar.create(@config) }
+      File.exist?("warbler.foobar").should == true
     end
 
     it "can exclude files from the .war" do
