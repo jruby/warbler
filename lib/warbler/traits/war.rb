@@ -12,6 +12,7 @@ module Warbler
         config.pathmaps     = default_pathmaps
         config.webxml       = default_webxml_config
         config.webinf_files = default_webinf_files
+        config.java_libs    = default_jar_files
         config.public_html  = FileList["public/**/*"]
       end
 
@@ -49,6 +50,12 @@ module Warbler
           "#{WARBLER_HOME}/web.xml.erb"
         end
         FileList[webxml]
+      end
+
+      def default_jar_files
+        require 'jruby-jars'
+        require 'jruby-rack'
+        FileList[JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path, JRubyJars.jruby_rack_jar_path]
       end
 
       def update_gem_path

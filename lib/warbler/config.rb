@@ -146,7 +146,7 @@ module Warbler
       @dirs              = TOP_DIRS.select {|d| File.directory?(d)}
       @includes          = FileList[]
       @excludes          = FileList[]
-      @java_libs         = default_jar_files
+      @java_libs         = FileList[]
       @java_classes      = FileList[]
       @gems              = Warbler::Gems.new
       @gem_dependencies  = true
@@ -228,12 +228,6 @@ module Warbler
       else
         @bundler = false
       end
-    end
-
-    def default_jar_files
-      require 'jruby-jars'
-      require 'jruby-rack'
-      FileList[JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path, JRubyJars.jruby_rack_jar_path]
     end
 
     def auto_detect_frameworks
