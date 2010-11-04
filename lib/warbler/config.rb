@@ -5,7 +5,6 @@
 # See the file LICENSE.txt for details.
 #++
 
-require 'ostruct'
 require 'warbler/gems'
 require 'warbler/traits'
 
@@ -154,7 +153,6 @@ module Warbler
       @gem_excludes      = []
       @exclude_logs      = true
       @public_html       = FileList["public/**/*"]
-      @webxml            = default_webxml_config
       @app_root          = default_app_root
       @jar_name          = File.basename(@app_root)
       @bundler           = true
@@ -163,9 +161,8 @@ module Warbler
       @init_filename     = 'META-INF/init.rb'
       @init_contents     = ["#{@warbler_templates}/config.erb"]
 
-      auto_detect_frameworks
-
       before_configure
+      auto_detect_frameworks
       yield self if block_given?
       after_configure
 
@@ -173,7 +170,9 @@ module Warbler
 
       framework_init = "#{@warbler_templates}/#{@webxml.booter}.erb"
       @init_contents << framework_init if File.exist?(framework_init)
+
       @compiled_ruby_files ||= FileList[*@dirs.map {|d| "#{d}/**/*.rb"}]
+
       @excludes += ["tmp/war"] if File.directory?("tmp/war")
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes += FileList["**/*.log"] if @exclude_logs
@@ -207,27 +206,6 @@ module Warbler
       else
         []
       end
-    end
-
-    def default_pathmaps
-      p = OpenStruct.new
-      p.public_html  = ["%{public/,}p"]
-      p.java_libs    = ["WEB-INF/lib/%f"]
-      p.java_classes = ["WEB-INF/classes/%p"]
-      p.application  = ["WEB-INF/%p"]
-      p.webinf       = ["WEB-INF/%{.erb$,}f"]
-      p.gemspecs     = ["#{relative_gem_path}/specifications/%f"]
-      p.gems         = ["#{relative_gem_path}/gems/%p"]
-      p
-    end
-
-    def default_webxml_config
-      c = WebxmlOpenStruct.new
-      c.rails.env  = ENV['RAILS_ENV'] || 'production'
-      c.public.root = '/'
-      c.jndi = nil
-      c.ignored = %w(jndi booter)
-      c
     end
 
     def default_app_root
@@ -325,58 +303,5 @@ module Warbler
       YAML::dump(self.dup.tap{|c| c.dump_traits })
     end
     public :dump
-  end
-
-  # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.
-  class WebxmlOpenStruct < OpenStruct
-    %w(java com org javax gem).each {|name| undef_method name if Object.methods.include?(name) }
-
-    def initialize(key = 'webxml')
-      @key = key
-      @table = Hash.new {|h,k| h[k] = WebxmlOpenStruct.new(k) }
-    end
-
-    def servlet_context_listener
-      case self.booter
-      when :rack
-        "org.jruby.rack.RackServletContextListener"
-      when :merb
-        "org.jruby.rack.merb.MerbServletContextListener"
-      else # :rails, default
-        "org.jruby.rack.rails.RailsServletContextListener"
-      end
-    end
-
-    def [](key)
-      new_ostruct_member(key)
-      send(key)
-    end
-
-    def []=(key, value)
-      new_ostruct_member(key)
-      send("#{key}=", value)
-    end
-
-    def context_params(escape = true)
-      require 'cgi'
-      params = {}
-      @table.each do |k,v|
-        case v
-        when WebxmlOpenStruct
-          nested_params = v.context_params
-          nested_params.each do |nk,nv|
-            params["#{escape ? CGI::escapeHTML(k.to_s) : k.to_s}.#{nk}"] = nv
-          end
-        else
-          params[escape ? CGI::escapeHTML(k.to_s) : k.to_s] = escape ? CGI::escapeHTML(v.to_s) : v.to_s
-        end
-      end
-      params.delete_if {|k,v| ['ignored', *ignored].include?(k.to_s) }
-      params
-    end
-
-    def to_s
-      "No value for '#@key' found"
-    end
   end
 end
