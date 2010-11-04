@@ -153,7 +153,7 @@ module Warbler
       @gem_excludes      = []
       @exclude_logs      = true
       @public_html       = FileList[]
-      @app_root          = default_app_root
+      @app_root          = Dir.getwd
       @jar_name          = File.basename(@app_root)
       @bundler           = true
       @bundle_without    = ["development", "test"]
@@ -206,10 +206,6 @@ module Warbler
       else
         []
       end
-    end
-
-    def default_app_root
-      File.expand_path(defined?(::Rails.root) ? ::Rails.root : (defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd))
     end
 
     def detect_bundler_gems
