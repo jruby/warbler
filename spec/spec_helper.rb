@@ -46,9 +46,11 @@ module Spec::Example::ExampleGroupMethods
   end
 
   def use_fresh_rake_application
-    @rake = Rake::Application.new
-    Rake.application = @rake
-    verbose(false)
+    before :each do
+      @rake = Rake::Application.new
+      Rake.application = @rake
+      verbose(false)
+    end
   end
 
   def use_fresh_environment
