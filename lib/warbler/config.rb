@@ -136,30 +136,30 @@ module Warbler
     attr_accessor :webxml
 
     def initialize(warbler_home = WARBLER_HOME)
-      @warbler_home = warbler_home
+      @warbler_home      = warbler_home
       @warbler_templates = "#{WARBLER_HOME}/lib/warbler/templates"
-      @features    = []
-      @dirs        = TOP_DIRS.select {|d| File.directory?(d)}
-      @includes    = FileList[]
-      @excludes    = FileList[]
-      @java_libs   = default_jar_files
-      @java_classes = FileList[]
-      @gems        = Warbler::Gems.new
-      @gem_path    = DEFAULT_GEM_PATH
-      @gem_dependencies = true
-      @gem_excludes = []
-      @exclude_logs = true
-      @public_html = FileList["public/**/*"]
-      @pathmaps    = default_pathmaps
-      @webxml      = default_webxml_config
-      @rails_root  = default_rails_root
-      @war_name    = File.basename(@rails_root)
-      @bundler     = true
-      @bundle_without = ["development", "test"]
-      @webinf_files = default_webinf_files
-      @init_filename = 'META-INF/init.rb'
-      @init_contents = ["#{@warbler_templates}/config.erb"]
-      @traits        = [Traits::War]
+      @features          = []
+      @dirs              = TOP_DIRS.select {|d| File.directory?(d)}
+      @includes          = FileList[]
+      @excludes          = FileList[]
+      @java_libs         = default_jar_files
+      @java_classes      = FileList[]
+      @gems              = Warbler::Gems.new
+      @gem_path          = DEFAULT_GEM_PATH
+      @gem_dependencies  = true
+      @gem_excludes      = []
+      @exclude_logs      = true
+      @public_html       = FileList["public/**/*"]
+      @pathmaps          = default_pathmaps
+      @webxml            = default_webxml_config
+      @app_root          = default_app_root
+      @war_name          = File.basename(@app_root)
+      @bundler           = true
+      @bundle_without    = ["development", "test"]
+      @webinf_files      = default_webinf_files
+      @init_filename     = 'META-INF/init.rb'
+      @init_contents     = ["#{@warbler_templates}/config.erb"]
+      @traits            = [Traits::War]
 
       auto_detect_frameworks
       yield self if block_given?
@@ -185,7 +185,7 @@ module Warbler
     private
     def warbler_vendor_excludes(warbler_home)
       warbler = File.expand_path(warbler_home)
-      if warbler =~ %r{^#{@rails_root}/(.*)}
+      if warbler =~ %r{^#{@app_root}/(.*)}
         FileList["#{$1}"]
       else
         []
@@ -213,7 +213,7 @@ module Warbler
       c
     end
 
-    def default_rails_root
+    def default_app_root
       File.expand_path(defined?(Rails.root) ? Rails.root : (defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd))
     end
 
