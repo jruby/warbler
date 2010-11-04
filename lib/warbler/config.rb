@@ -6,6 +6,8 @@
 #++
 
 require 'ostruct'
+require 'warbler/gems'
+require 'warbler/traits'
 
 module Warbler
   # Warbler war file assembly configuration class.

@@ -9,6 +9,8 @@ require 'rake'
 require 'rake/tasklib'
 require 'stringio'
 require 'zip/zip'
+require 'warbler/config'
+require 'warbler/jar'
 
 module Warbler
   # Warbler Rake task.  Allows defining multiple configurations inside the same

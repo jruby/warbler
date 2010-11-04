@@ -29,9 +29,5 @@ module Warbler
 end
 
 require 'warbler/version'
-require 'warbler/gems'
-require 'warbler/config'
-require 'warbler/war'
 require 'warbler/task'
-require 'warbler/traits'
 require 'warbler/application'

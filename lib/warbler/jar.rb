@@ -244,4 +244,12 @@ module Warbler
     # Java-boosted war creation for JRuby; replaces #create_jar with Java version
     require 'warbler_jar' if defined?(JRUBY_VERSION) && JRUBY_VERSION >= "1.5"
   end
+
+  # Warbler::War is Deprecated. Please use Warbler::Jar.
+  class War < Jar
+    def initialize(*)
+      super
+      warn "Warbler::War is deprecated. Please replace all occurrences with Warbler::Jar."
+    end
+  end
 end
