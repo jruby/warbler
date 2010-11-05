@@ -185,14 +185,14 @@ module Warbler
 
     # Deprecated
     def war_name
-      warn "config.war_name deprecated; replace with config.jar_name"
-      jar_name
+      warn "config.war_name deprecated; replace with config.jar_name" #:nocov:
+      jar_name                  #:nocov:
     end
 
     # Deprecated
     def war_name=(w)
-      warn "config.war_name deprecated; replace with config.jar_name"
-      self.jar_name = w
+      warn "config.war_name deprecated; replace with config.jar_name" #:nocov:
+      self.jar_name = w         #:nocov:
     end
 
     private
