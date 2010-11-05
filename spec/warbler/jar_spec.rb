@@ -50,7 +50,6 @@ describe Warbler::Jar do
     end
 
     it "collects java libraries" do
-      pending
       jar.apply(config)
       file_list(%r{^META-INF/lib/jruby-.*\.jar$}).should_not be_empty
     end
@@ -70,7 +69,6 @@ describe Warbler::Jar do
     end
 
     it "adds an init.rb" do
-      pending
       jar.apply(config)
       file_list(%r{^META-INF/init.rb$}).should_not be_empty
     end
@@ -91,14 +89,12 @@ describe Warbler::Jar do
     end
 
     it "accepts a MANIFEST.MF file if it exists in the project root" do
-      pending
       touch 'MANIFEST.MF'
       jar.apply(config)
       jar.files['META-INF/MANIFEST.MF'].should == "MANIFEST.MF"
     end
 
     it "does not add a manifest if one already exists" do
-      pending
       jar.files['META-INF/MANIFEST.MF'] = 'manifest'
       jar.add_manifest(config)
       jar.files['META-INF/MANIFEST.MF'].should == "manifest"

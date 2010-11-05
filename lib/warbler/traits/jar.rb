@@ -18,9 +18,10 @@ module Warbler
       end
 
       def before_configure
-        config.gem_path  = DEFAULT_GEM_PATH
-        config.pathmaps  = default_pathmaps
-        config.java_libs = default_jar_files
+        config.gem_path      = DEFAULT_GEM_PATH
+        config.pathmaps      = default_pathmaps
+        config.java_libs     = default_jar_files
+        config.manifest_file = 'MANIFEST.MF' if File.exist?('MANIFEST.MF')
       end
 
       def after_configure
