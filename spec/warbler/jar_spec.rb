@@ -30,7 +30,6 @@ describe Warbler::Jar do
     cleanup_temp_files
 
     it "detects a Jar trait" do
-      pending
       config.traits.should include(Warbler::Traits::Jar)
     end
 
@@ -42,7 +41,6 @@ describe Warbler::Jar do
     end
 
     it "collects gem files" do
-      pending
       use_config do |config|
         config.gems << "rake"
       end
@@ -84,7 +82,6 @@ describe Warbler::Jar do
     end
 
     it "accepts a custom manifest file" do
-      pending
       touch 'manifest'
       use_config do |config|
         config.manifest_file = 'manifest'

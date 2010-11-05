@@ -28,7 +28,7 @@ module Warbler
       end
 
       def after_configure
-        update_gem_path
+        update_gem_path(DEFAULT_GEM_PATH)
       end
 
       def default_pathmaps
@@ -67,16 +67,6 @@ module Warbler
         require 'jruby-jars'
         require 'jruby-rack'
         FileList[JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path, JRubyJars.jruby_rack_jar_path]
-      end
-
-      def update_gem_path
-        if config.gem_path != DEFAULT_GEM_PATH
-          config.gem_path = "/#{config.gem_path}" unless config.gem_path =~ %r{^/}
-          sub_gem_path = config.gem_path[1..-1]
-          config.pathmaps.gemspecs.each {|p| p.sub!(DEFAULT_GEM_PATH[1..-1], sub_gem_path)}
-          config.pathmaps.gems.each {|p| p.sub!(DEFAULT_GEM_PATH[1..-1], sub_gem_path)}
-          config.webxml["gem"]["path"] = config.gem_path
-        end
       end
 
       def update_archive(jar)

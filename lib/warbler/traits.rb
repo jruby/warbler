@@ -72,9 +72,20 @@ module Warbler
 
     def update_archive(jar)
     end
+
+    def update_gem_path(default_gem_path)
+      if config.gem_path != default_gem_path
+        config.gem_path = "/#{config.gem_path}" unless config.gem_path =~ %r{^/}
+        sub_gem_path = config.gem_path[1..-1]
+        config.pathmaps.gemspecs.each {|p| p.sub!(default_gem_path[1..-1], sub_gem_path)}
+        config.pathmaps.gems.each {|p| p.sub!(default_gem_path[1..-1], sub_gem_path)}
+        config.webxml["gem"]["path"] = config.gem_path if config.webxml
+      end
+    end
   end
 end
 
+require 'warbler/traits/jar'
 require 'warbler/traits/war'
 require 'warbler/traits/rails'
 require 'warbler/traits/merb'
