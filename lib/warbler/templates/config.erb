@@ -1,1 +1,1 @@
-WARBLER_CONFIG = <%= webxml.context_params(false) .inspect %>
+WARBLER_CONFIG = <%= config.webxml ? config.webxml.context_params(false).inspect : '{}' %>

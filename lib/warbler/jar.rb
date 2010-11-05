@@ -178,10 +178,11 @@ module Warbler
     def expand_erb(file, config)
       require 'erb'
       erb = ERB.new(File.open(file) {|f| f.read })
-      StringIO.new(erb.result(erb_binding(config.webxml)))
+      StringIO.new(erb.result(erb_binding(config)))
     end
 
-    def erb_binding(webxml)
+    def erb_binding(config)
+      webxml = config.webxml
       binding
     end
 
