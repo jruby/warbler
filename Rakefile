@@ -33,7 +33,7 @@ begin
     p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
     p.description = p.paragraphs_of('README.txt', 1...2).join("\n\n")
     p.extra_deps += [['rake', '>= 0.8.7'], ['jruby-jars', '>= 1.4.0'], ['jruby-rack', '>= 1.0.0'], ['rubyzip', '>= 0.9.4']]
-    p.clean_globs += ['spec/sample*/MANIFEST*', 'spec/sample*/web.xml*']
+    p.clean_globs += %w(MANIFEST web.xml init.rb).map{|f| "spec/sample*/#{f}*" }
   end
   hoe.spec.files = MANIFEST
   hoe.spec.dependencies.delete_if { |dep| dep.name == "hoe" }
