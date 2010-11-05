@@ -23,12 +23,10 @@ module Warbler
       end
 
       def after_configure
-        add_bundler_gems
+        add_bundler_gems if config.bundler
       end
 
       def add_bundler_gems
-        return unless config.bundler
-
         config.gems.clear
         config.gem_dependencies = false # Bundler takes care of these
 
@@ -40,6 +38,18 @@ module Warbler
         groups = definition.groups - config.bundle_without.map {|g| g.to_sym}
         definition.specs_for(groups).each {|spec| config.gems << spec }
         config.init_contents << StringIO.new("ENV['BUNDLE_WITHOUT'] = '#{config.bundle_without.join(':')}'\n")
+      end
+
+      def update_archive(jar)
+        add_bundler_files(jar) if config.bundler
+      end
+
+      # Add Bundler Gemfiles to the archive.
+      def add_bundler_files(jar)
+        jar.files[jar.apply_pathmaps(config, 'Gemfile', :application)] = 'Gemfile'
+        if File.exist?('Gemfile.lock')
+          jar.files[jar.apply_pathmaps(config, 'Gemfile.lock', :application)] = 'Gemfile.lock'
+        end
       end
     end
   end

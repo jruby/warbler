@@ -79,6 +79,28 @@ module Warbler
         end
       end
 
+      def update_archive(jar)
+        add_public_files(jar)
+        add_webxml(jar)
+      end
+
+      # Add public/static assets to the root of the war file.
+      def add_public_files(jar)
+        config.public_html.map {|f| jar.add_with_pathmaps(config, f, :public_html) }
+      end
+
+      # Add web.xml and other WEB-INF configuration files from
+      # config.webinf_files to the war file.
+      def add_webxml(jar)
+        config.webinf_files.each do |wf|
+          if wf =~ /\.erb$/
+            jar.files[jar.apply_pathmaps(config, wf, :webinf)] = jar.expand_erb(wf, config)
+          else
+            jar.files[jar.apply_pathmaps(config, wf, :webinf)] = wf
+          end
+        end
+      end
+
       # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.
       class WebxmlOpenStruct < OpenStruct
         %w(java com org javax gem).each {|name| undef_method name if Object.methods.include?(name) }

@@ -33,6 +33,10 @@ module Warbler
       @trait_objects ||= @traits.map {|klass| klass.new(self) }
     end
 
+    def update_archive(jar)
+      trait_objects.each {|t| t.update_archive(jar) }
+    end
+
     def dump_traits
       @trait_objects = nil
       @traits.collect! {|t| t.name }
@@ -64,6 +68,9 @@ module Warbler
     end
 
     def after_configure
+    end
+
+    def update_archive(jar)
     end
   end
 end
