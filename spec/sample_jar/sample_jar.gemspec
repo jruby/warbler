@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.email = ["nick@nicksieger.com"]
   s.executables = ["sample_jar"]
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.txt"]
-  s.files = [".autotest", "History.txt", "Manifest.txt", "README.txt", "Rakefile", "bin/sample_jar", "lib/sample_jar.rb", "test/test_sample_jar.rb"]
+  s.files = ["History.txt", "Manifest.txt", "README.txt", "Rakefile", "bin/sample_jar", "lib/sample_jar.rb", "test/test_sample_jar.rb"]
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{sample_jar}
