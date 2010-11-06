@@ -82,14 +82,12 @@ describe Warbler::Jar do
       end
 
       it "detects gem dependencies" do
-        pending
         jar.apply(config)
         file_list(%r{^META-INF/gems/gems/rubyzip.*/lib/zip/zip.rb}).should_not be_empty
         file_list(%r{^META-INF/gems/specifications/rubyzip.*\.gemspec}).should_not be_empty
       end
 
       it "sets files to be stored in the archive from the spec" do
-        pending
         touch "extra.foobar"
         jar.apply(config)
         file_list(%r{^sample_jar/History\.txt$}).should_not be_empty
