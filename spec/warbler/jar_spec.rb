@@ -33,33 +33,9 @@ describe Warbler::Jar do
       config.traits.should include(Warbler::Traits::Jar)
     end
 
-    it "detects gems from the .gemspec file" do
-      pending
-      jar.apply(config)
-      file_list(%r{^META-INF/gems/gems/rubyzip.*/lib/zip/zip.rb}).should_not be_empty
-      file_list(%r{^META-INF/gems/specifications/rubyzip.*\.gemspec}).should_not be_empty
-    end
-
-    it "collects gem files" do
-      use_config do |config|
-        config.gems << "rake"
-      end
-      jar.apply(config)
-      file_list(%r{^META-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
-      file_list(%r{^META-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
-    end
-
     it "collects java libraries" do
       jar.apply(config)
       file_list(%r{^META-INF/lib/jruby-.*\.jar$}).should_not be_empty
-    end
-
-    it "collects application files" do
-      pending
-      jar.apply(config)
-      file_list(%r{^sample_jar/bin$}).should_not be_empty
-      file_list(%r{^sample_jar/test$}).should_not be_empty
-      file_list(%r{^sample_jar/lib/sample_jar.rb$}).should_not be_empty
     end
 
     it "adds a Main class" do
@@ -98,6 +74,46 @@ describe Warbler::Jar do
       jar.files['META-INF/MANIFEST.MF'] = 'manifest'
       jar.add_manifest(config)
       jar.files['META-INF/MANIFEST.MF'].should == "manifest"
+    end
+
+    context "with a .gemspec" do
+      it "detects gem dependencies" do
+        pending
+        jar.apply(config)
+        file_list(%r{^META-INF/gems/gems/rubyzip.*/lib/zip/zip.rb}).should_not be_empty
+        file_list(%r{^META-INF/gems/specifications/rubyzip.*\.gemspec}).should_not be_empty
+      end
+
+      it "sets files to be stored in the archive"
+      it "sets require paths in init.rb"
+      it "loads the default executable in main.rb"
+    end
+
+    context "without a .gemspec" do
+      before :each do
+        Dir['*.gemspec'].each {|f| mv f, "#{f}.tmp"}
+      end
+
+      after :each do
+        Dir['*.gemspec.tmp'].each {|f| mv f, "#{f.sub /\.tmp$/, ''}"}
+      end
+
+      it "collects gem files from configuration" do
+        use_config do |config|
+          config.gems << "rake"
+        end
+        jar.apply(config)
+        file_list(%r{^META-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
+        file_list(%r{^META-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
+      end
+
+      it "collects all project files in the directory" do
+        pending
+        jar.apply(config)
+        file_list(%r{^sample_jar/bin$}).should_not be_empty
+        file_list(%r{^sample_jar/test$}).should_not be_empty
+        file_list(%r{^sample_jar/lib/sample_jar.rb$}).should_not be_empty
+      end
     end
   end
 
