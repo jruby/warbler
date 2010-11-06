@@ -4,6 +4,8 @@
 # See the file LICENSE.txt for details.
 #++
 
+require 'stringio'
+
 module Warbler
   module Traits
     class Gemspec
@@ -14,7 +16,8 @@ module Warbler
       end
 
       def before_configure
-        @spec = eval(File.read(Dir['*.gemspec'].first))
+        @spec_file = Dir['*.gemspec'].first
+        @spec = eval(File.read(@spec_file))
         @spec.runtime_dependencies.each {|g| config.gems << g }
         config.dirs = []
       end
@@ -30,6 +33,20 @@ module Warbler
       def update_archive(jar)
         @spec.files.each do |f|
           jar.files[jar.apply_pathmaps(config, f, :application)] = f
+        end
+        bin_path = jar.apply_pathmaps(config, default_executable, :application)
+
+        jar.files['META-INF/main.rb'] = StringIO.new("load File.expand_path '../../#{bin_path}', __FILE__")
+      end
+
+      def default_executable
+        if @spec.default_executable
+          "bin/#{@spec.default_executable}"
+        else
+          exe = Dir['bin/*'].first
+          raise "No executable script found" unless exe
+          warn "No default executable found in #{@spec_file}, using #{exe}"
+          exe
         end
       end
     end

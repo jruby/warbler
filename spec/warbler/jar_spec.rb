@@ -102,10 +102,34 @@ describe Warbler::Jar do
       end
 
       it "loads the default executable in main.rb" do
-        pending
-        jar.add_init_file(config)
+        jar.apply(config)
         contents = jar.files['META-INF/main.rb'].read
-        contents.split.grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
+        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
+      end
+    end
+
+    context "with a gemspec without a default executable" do
+      before :each do
+        Dir['*.gemspec'].each do |f|
+          cp f, "#{f}.tmp"
+          lines = IO.readlines(f)
+          File.open(f, 'w') do |io|
+            lines.each do |line|
+              next if line =~ /executable/
+              io << line
+            end
+          end
+        end
+      end
+
+      after :each do
+        Dir['*.gemspec.tmp'].each {|f| mv f, "#{f.sub /\.tmp$/, ''}"}
+      end
+
+      it "loads the first bin/executable in main.rb" do
+        silence { jar.apply(config) }
+        contents = jar.files['META-INF/main.rb'].read
+        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
       end
     end
 
