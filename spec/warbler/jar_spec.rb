@@ -38,10 +38,9 @@ describe Warbler::Jar do
       file_list(%r{^META-INF/lib/jruby-.*\.jar$}).should_not be_empty
     end
 
-    it "adds a Main class" do
-      pending
+    it "adds a JarMain class" do
       jar.apply(config)
-      file_list(%r{^Main\.class$}).should_not be_empty
+      file_list(%r{^JarMain\.class$}).should_not be_empty
     end
 
     it "adds an init.rb" do

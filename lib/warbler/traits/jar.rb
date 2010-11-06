@@ -30,6 +30,13 @@ module Warbler
         config.init_contents << StringIO.new(gem_path_code)
       end
 
+      def update_archive(jar)
+        jar.files['META-INF/MANIFEST.MF'] = StringIO.new(Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: JarMain\n") unless config.manifest_file
+        jar.files['JarMain.class'] = Zip::ZipFile.open("#{WARBLER_HOME}/lib/warbler_jar.jar") do |zf|
+          zf.get_input_stream('JarMain.class') {|io| StringIO.new(io.read) }
+        end
+      end
+
       def default_pathmaps
         p = OpenStruct.new
         p.java_libs    = ["META-INF/lib/%f"]
