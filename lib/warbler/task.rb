@@ -132,11 +132,11 @@ module Warbler
       end
       task "debug:includes" => "files" do
         puts "", "included files:"
-        puts *war.webinf_filelist.include
+        puts *war.app_filelist.include
       end
       task "debug:excludes" => "files" do
         puts "", "excluded files:"
-        puts *war.webinf_filelist.exclude
+        puts *war.app_filelist.exclude
       end
     end
 

@@ -17,7 +17,7 @@ module Warbler
     DEFAULT_MANIFEST = %{Manifest-Version: 1.0\nCreated-By: Warbler #{Warbler::VERSION}\n\n}
 
     attr_reader :files
-    attr_reader :webinf_filelist
+    attr_reader :app_filelist
 
     def initialize
       @files = {}
@@ -148,10 +148,10 @@ module Warbler
       end.each do |d|
         @files[apply_pathmaps(config, d, :application)] = nil
       end
-      @webinf_filelist = FileList[*(config.dirs.map{|d| "#{d}/**/*"})]
-      @webinf_filelist.include *(config.includes.to_a)
-      @webinf_filelist.exclude *(config.excludes.to_a)
-      @webinf_filelist.map {|f| add_with_pathmaps(config, f, :application) }
+      @app_filelist = FileList[*(config.dirs.map{|d| "#{d}/**/*"})]
+      @app_filelist.include *(config.includes.to_a)
+      @app_filelist.exclude *(config.excludes.to_a)
+      @app_filelist.map {|f| add_with_pathmaps(config, f, :application) }
     end
 
     # Add init.rb file to the war file.
