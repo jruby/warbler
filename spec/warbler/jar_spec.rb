@@ -50,7 +50,6 @@ describe Warbler::Jar do
     end
 
     it "adds a main.rb" do
-      pending
       jar.apply(config)
       file_list(%r{^META-INF/main.rb$}).should_not be_empty
     end
