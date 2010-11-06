@@ -77,6 +77,10 @@ describe Warbler::Jar do
     end
 
     context "with a .gemspec" do
+      it "detects a Gemspec trait" do
+        config.traits.should include(Warbler::Traits::Gemspec)
+      end
+
       it "detects gem dependencies" do
         pending
         jar.apply(config)

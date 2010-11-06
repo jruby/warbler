@@ -22,6 +22,7 @@ lib/warbler/templates/rails.erb
 lib/warbler/traits
 lib/warbler/traits.rb
 lib/warbler/traits/bundler.rb
+lib/warbler/traits/gemspec.rb
 lib/warbler/traits/jar.rb
 lib/warbler/traits/merb.rb
 lib/warbler/traits/rack.rb
