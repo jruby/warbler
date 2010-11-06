@@ -72,6 +72,7 @@ module Warbler
       def update_archive(jar)
         add_public_files(jar)
         add_webxml(jar)
+        add_executables(jar) if config.features.include?("executable")
       end
 
       # Add public/static assets to the root of the war file.
@@ -90,6 +91,35 @@ module Warbler
           end
         end
       end
+
+      def add_executables(jar)
+        winstone_type = ENV["WINSTONE"] || "winstone-lite"
+        winstone_version = ENV["WINSTONE_VERSION"] || "0.9.10"
+        winstone_path = "net/sourceforge/winstone/#{winstone_type}/#{winstone_version}/#{winstone_type}-#{winstone_version}.jar"
+        winstone_jar = File.expand_path("~/.m2/repository/#{winstone_path}")
+        unless File.exist?(winstone_jar)
+          # Not always covered in tests as these lines may not get
+          # executed every time if the jar is cached.
+          puts "Downloading #{winstone_type}.jar" #:nocov:
+          mkdir_p File.dirname(t.name)            #:nocov:
+          require 'open-uri'                      #:nocov:
+          maven_repo = ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2" #:nocov:
+          open("#{maven_repo}/#{winstone_path}") do |stream| #:nocov:
+            File.open(t.name, "wb") do |f|  #:nocov:
+              while buf = stream.read(4096) #:nocov:
+                f << buf                    #:nocov:
+              end                           #:nocov:
+            end                             #:nocov:
+          end                               #:nocov:
+        end
+
+        jar.files['META-INF/MANIFEST.MF'] = StringIO.new(Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: WarMain\n")
+        jar.files['WarMain.class'] = Zip::ZipFile.open("#{WARBLER_HOME}/lib/warbler_jar.jar") do |zf|
+          zf.get_input_stream('WarMain.class') {|io| StringIO.new(io.read) }
+        end
+        jar.files['WEB-INF/winstone.jar'] = winstone_jar
+      end
+
 
       # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.
       class WebxmlOpenStruct < OpenStruct

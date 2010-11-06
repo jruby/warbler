@@ -5,6 +5,7 @@
 # See the file LICENSE.txt for details.
 #++
 
+require 'set'
 require 'warbler/gems'
 require 'warbler/traits'
 
@@ -147,7 +148,7 @@ module Warbler
 
       @warbler_home      = warbler_home
       @warbler_templates = "#{WARBLER_HOME}/lib/warbler/templates"
-      @features          = []
+      @features          = Set.new
       @dirs              = TOP_DIRS.select {|d| File.directory?(d)}
       @includes          = FileList[]
       @excludes          = FileList[]

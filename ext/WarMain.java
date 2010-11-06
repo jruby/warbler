@@ -13,8 +13,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 
-public class Main implements Runnable {
-    public static final String MAIN = "/" + Main.class.getName().replace('.', '/') + ".class";
+public class WarMain implements Runnable {
+    public static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
     public static final String WINSTONE_JAR = "/WEB-INF/winstone.jar";
 
     private String[] args;
@@ -22,7 +22,7 @@ public class Main implements Runnable {
     private boolean debug;
     private File webroot;
 
-    public Main(String[] args) throws Exception {
+    public WarMain(String[] args) throws Exception {
         this.args = args;
         URL mainClass = getClass().getResource(MAIN);
         this.path = mainClass.toURI().getSchemeSpecificPart();
@@ -94,7 +94,7 @@ public class Main implements Runnable {
 
     public static void main(String[] args) {
         try {
-            new Main(args).start();
+            new WarMain(args).start();
         } catch (Exception e) {
             System.err.println("error: " + e.toString());
             if (isDebug()) {

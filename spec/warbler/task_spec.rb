@@ -83,7 +83,7 @@ describe Warbler::Task do
   end
 
   it "should define an executable task for embedding a server in the war file" do
-    silence { run_task "warble:executable" }
+    silence { run_task "warble:executable"; run_task "warble:files" }
     warble_task.jar.files.keys.should include('WEB-INF/winstone.jar')
   end
 

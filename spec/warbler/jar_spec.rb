@@ -313,6 +313,7 @@ describe Warbler::Jar do
     it "accepts an autodeploy directory where the war should be created" do
       require 'tmpdir'
       use_config do |config|
+        config.jar_name = 'warbler'
         config.autodeploy_dir = Dir::tmpdir
       end
       touch "file.txt"
@@ -399,6 +400,16 @@ describe Warbler::Jar do
         t.instance_variable_get("@already_invoked").should == false
       ensure
         Warbler.framework_detection = true
+      end
+    end
+
+    context "with the executable feature" do
+      it "adds a WarMain class" do
+        use_config do |config|
+          config.features << "executable"
+        end
+        jar.apply(config)
+        file_list(%r{^WarMain\.class$}).should_not be_empty
       end
     end
 

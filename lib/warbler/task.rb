@@ -191,32 +191,8 @@ module Warbler
     end
 
     def define_executable_task
-      winstone_type = ENV["WINSTONE"] || "winstone-lite"
-      winstone_version = ENV["WINSTONE_VERSION"] || "0.9.10"
-      winstone_path = "net/sourceforge/winstone/#{winstone_type}/#{winstone_version}/#{winstone_type}-#{winstone_version}.jar"
-      winstone_jar = File.expand_path("~/.m2/repository/#{winstone_path}")
-      file winstone_jar do |t|
-        # Not always covered in tests as these lines may not get
-        # executed every time if the jar is cached.
-        puts "Downloading #{winstone_type}.jar" #:nocov:
-        mkdir_p File.dirname(t.name)            #:nocov:
-        require 'open-uri'                      #:nocov:
-        maven_repo = ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2" #:nocov:
-        open("#{maven_repo}/#{winstone_path}") do |stream| #:nocov:
-          File.open(t.name, "wb") do |f|  #:nocov:
-            while buf = stream.read(4096) #:nocov:
-              f << buf                    #:nocov:
-            end                           #:nocov:
-          end                             #:nocov:
-        end                               #:nocov:
-      end
-
-      task "executable" => winstone_jar do
-        jar.files['META-INF/MANIFEST.MF'] = StringIO.new(Jar::DEFAULT_MANIFEST.chomp + "Main-Class: Main\n")
-        jar.files['Main.class'] = Zip::ZipFile.open("#{WARBLER_HOME}/lib/warbler_jar.jar") do |zf|
-          zf.get_input_stream('Main.class') {|io| StringIO.new(io.read) }
-        end
-        jar.files['WEB-INF/winstone.jar'] = winstone_jar
+      task "executable" do
+        @config.features << "executable"
       end
     end
 
