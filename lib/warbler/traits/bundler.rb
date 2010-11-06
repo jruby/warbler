@@ -14,7 +14,7 @@ module Warbler
       end
 
       def self.requires?(trait)
-        trait == Traits::War
+        trait == Traits::War || trait == Traits::Jar
       end
 
       def before_configure
