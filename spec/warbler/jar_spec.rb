@@ -142,6 +142,10 @@ describe Warbler::Jar do
         Dir['*.gemspec.tmp'].each {|f| mv f, "#{f.sub /\.tmp$/, ''}"}
       end
 
+      it "detects a NoGemspec trait" do
+        config.traits.should include(Warbler::Traits::NoGemspec)
+      end
+
       it "collects gem files from configuration" do
         use_config do |config|
           config.gems << "rake"
@@ -152,11 +156,24 @@ describe Warbler::Jar do
       end
 
       it "collects all project files in the directory" do
-        pending
+        touch "extra.foobar"
         jar.apply(config)
         file_list(%r{^sample_jar/bin$}).should_not be_empty
         file_list(%r{^sample_jar/test$}).should_not be_empty
         file_list(%r{^sample_jar/lib/sample_jar.rb$}).should_not be_empty
+        file_list(%r{^sample_jar/extra\.foobar$}).should_not be_empty
+      end
+
+      it "sets load paths in init.rb" do
+        jar.add_init_file(config)
+        contents = jar.files['META-INF/init.rb'].read
+        contents.split("\n").grep(/LOAD_PATH\.unshift.*sample_jar\/lib/).should_not be_empty
+      end
+
+      it "loads the first bin/executable in main.rb" do
+        jar.apply(config)
+        contents = jar.files['META-INF/main.rb'].read
+        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
       end
     end
   end

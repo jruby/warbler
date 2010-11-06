@@ -187,6 +187,7 @@ module Warbler
     end
 
     def apply_pathmaps(config, file, pathmaps)
+      file = file[2..-1] if file =~ /^\.\//
       pathmaps = config.pathmaps.send(pathmaps)
       pathmaps.each do |p|
         file = file.pathmap(p)
