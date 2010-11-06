@@ -49,6 +49,12 @@ describe Warbler::Jar do
       file_list(%r{^META-INF/init.rb$}).should_not be_empty
     end
 
+    it "sets ENV['GEM_PATH'] in init.rb" do
+      jar.add_init_file(config)
+      contents = jar.files['META-INF/init.rb'].read
+      contents.split("\n").grep(/ENV\['GEM_PATH'\].*#{config.relative_gem_path}/).should_not be_empty
+    end
+
     it "adds a main.rb" do
       jar.apply(config)
       file_list(%r{^META-INF/main.rb$}).should_not be_empty

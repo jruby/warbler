@@ -4,6 +4,7 @@
 # See the file LICENSE.txt for details.
 #++
 
+require 'stringio'
 require 'ostruct'
 
 module Warbler
@@ -26,6 +27,7 @@ module Warbler
 
       def after_configure
         update_gem_path(DEFAULT_GEM_PATH)
+        config.init_contents << StringIO.new(gem_path_code)
       end
 
       def default_pathmaps
@@ -41,6 +43,17 @@ module Warbler
       def default_jar_files
         require 'jruby-jars'
         FileList[JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path]
+      end
+
+      def gem_path_code
+        code = <<-CODE
+if ENV['GEM_PATH']
+  ENV['GEM_PATH'] = '#{config.relative_gem_path}' + File::PATH_SEPARATOR + ENV['GEM_PATH']
+else
+  ENV['GEM_PATH'] = '#{config.relative_gem_path}'
+end
+require 'rubygems'
+CODE
       end
     end
   end
