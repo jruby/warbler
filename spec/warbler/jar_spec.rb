@@ -96,17 +96,16 @@ describe Warbler::Jar do
       end
 
       it "sets load paths in init.rb" do
-        pending
         jar.add_init_file(config)
         contents = jar.files['META-INF/init.rb'].read
-        contents.split.grep(/LOAD_PATH.*simple_jar\/lib/).should_not be_empty
+        contents.split("\n").grep(/LOAD_PATH\.unshift.*sample_jar\/lib/).should_not be_empty
       end
 
       it "loads the default executable in main.rb" do
         pending
         jar.add_init_file(config)
         contents = jar.files['META-INF/main.rb'].read
-        contents.split.grep(/load.*simple_jar\/bin\/simple_jar/).should_not be_empty
+        contents.split.grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
       end
     end
 

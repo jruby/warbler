@@ -19,6 +19,14 @@ module Warbler
         config.dirs = []
       end
 
+      def after_configure
+        code = @spec.require_paths.map do |p|
+          require_path = config.pathmaps.application.inject(p) {|pm,x| pm.pathmap(x)}
+          "$LOAD_PATH.unshift '#{require_path}'"
+        end.join("\n")
+        config.init_contents << StringIO.new(code)
+      end
+
       def update_archive(jar)
         @spec.files.each do |f|
           jar.files[jar.apply_pathmaps(config, f, :application)] = f
