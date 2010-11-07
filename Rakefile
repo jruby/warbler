@@ -91,4 +91,6 @@ rescue LoadError
   end
 end
 
-task :package => :jar
+# Make sure jar gets compiled before the gem is built
+task Rake::Task['gem'].prerequisites.first => :jar
+

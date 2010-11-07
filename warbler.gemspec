@@ -2,20 +2,20 @@
 
 Gem::Specification.new do |s|
   s.name = %q{warbler}
-  s.version = "1.2.1"
+  s.version = "1.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sieger"]
-  s.date = %q{2010-11-06}
+  s.date = %q{2010-11-07}
   s.default_executable = %q{warble}
-  s.description = %q{Warbler is a gem to make a .war file out of a Rails, Merb, or Rack-based
-application. The intent is to provide a minimal, flexible, ruby-like way to
-bundle up all of your application files for deployment to a Java application
-server.}
+  s.description = %q{Warbler is a gem to make a Java jar or war file out of any Ruby,
+Rails, Merb, or Rack application. Warbler provides a minimal,
+flexible, Ruby-like way to bundle up all of your application files for
+deployment to a Java environment.}
   s.email = %q{nick@nicksieger.com}
   s.executables = ["warble"]
   s.extra_rdoc_files = ["History.txt", "LICENSE.txt", "Manifest.txt", "README.txt"]
-  s.files = ["Gemfile", "History.txt", "LICENSE.txt", "Manifest.txt", "README.txt", "Rakefile", "bin/warble", "ext/JarMain.java", "ext/WarMain.java", "ext/WarblerJar.java", "ext/WarblerJarService.java", "lib/warbler", "lib/warbler.rb", "lib/warbler/application.rb", "lib/warbler/config.rb", "lib/warbler/gems.rb", "lib/warbler/jar.rb", "lib/warbler/task.rb", "lib/warbler/templates", "lib/warbler/templates/config.erb", "lib/warbler/templates/rack.erb", "lib/warbler/templates/rails.erb", "lib/warbler/traits", "lib/warbler/traits.rb", "lib/warbler/traits/bundler.rb", "lib/warbler/traits/gemspec.rb", "lib/warbler/traits/jar.rb", "lib/warbler/traits/merb.rb", "lib/warbler/traits/nogemspec.rb", "lib/warbler/traits/rack.rb", "lib/warbler/traits/rails.rb", "lib/warbler/traits/war.rb", "lib/warbler/version.rb", "lib/warbler/war.rb", "lib/warbler_jar.jar", "spec/sample_jar/History.txt", "spec/sample_jar/Manifest.txt", "spec/sample_jar/README.txt", "spec/sample_jar/lib/sample_jar.rb", "spec/sample_jar/sample_jar.gemspec", "spec/sample_jar/test/test_sample_jar.rb", "spec/sample_war/app/controllers/application.rb", "spec/sample_war/app/helpers/application_helper.rb", "spec/sample_war/config/boot.rb", "spec/sample_war/config/database.yml", "spec/sample_war/config/environment.rb", "spec/sample_war/config/environments/development.rb", "spec/sample_war/config/environments/production.rb", "spec/sample_war/config/environments/test.rb", "spec/sample_war/config/initializers/inflections.rb", "spec/sample_war/config/initializers/mime_types.rb", "spec/sample_war/config/initializers/new_rails_defaults.rb", "spec/sample_war/config/routes.rb", "spec/sample_war/lib/tasks/utils.rake", "spec/sample_war/public/404.html", "spec/sample_war/public/422.html", "spec/sample_war/public/500.html", "spec/sample_war/public/favicon.ico", "spec/sample_war/public/index.html", "spec/sample_war/public/robots.txt", "spec/spec_helper.rb", "spec/warbler/application_spec.rb", "spec/warbler/config_spec.rb", "spec/warbler/gems_spec.rb", "spec/warbler/jar_spec.rb", "spec/warbler/task_spec.rb", "spec/warbler/traits_spec.rb", "spec/warbler/war_spec.rb", "warble.rb", "web.xml.erb"]
+  s.files = ["Gemfile", "History.txt", "LICENSE.txt", "Manifest.txt", "README.txt", "Rakefile", "bin/warble", "ext/JarMain.java", "ext/WarMain.java", "ext/WarblerJar.java", "ext/WarblerJarService.java", "lib/warbler.rb", "lib/warbler/application.rb", "lib/warbler/config.rb", "lib/warbler/gems.rb", "lib/warbler/jar.rb", "lib/warbler/task.rb", "lib/warbler/templates/config.erb", "lib/warbler/templates/rack.erb", "lib/warbler/templates/rails.erb", "lib/warbler/traits.rb", "lib/warbler/traits/bundler.rb", "lib/warbler/traits/gemspec.rb", "lib/warbler/traits/jar.rb", "lib/warbler/traits/merb.rb", "lib/warbler/traits/nogemspec.rb", "lib/warbler/traits/rack.rb", "lib/warbler/traits/rails.rb", "lib/warbler/traits/war.rb", "lib/warbler/version.rb", "lib/warbler/war.rb", "lib/warbler_jar.jar", "spec/sample_jar/History.txt", "spec/sample_jar/Manifest.txt", "spec/sample_jar/README.txt", "spec/sample_jar/lib/sample_jar.rb", "spec/sample_jar/sample_jar.gemspec", "spec/sample_jar/test/test_sample_jar.rb", "spec/sample_war/app/controllers/application.rb", "spec/sample_war/app/helpers/application_helper.rb", "spec/sample_war/config/boot.rb", "spec/sample_war/config/database.yml", "spec/sample_war/config/environment.rb", "spec/sample_war/config/environments/development.rb", "spec/sample_war/config/environments/production.rb", "spec/sample_war/config/environments/test.rb", "spec/sample_war/config/initializers/inflections.rb", "spec/sample_war/config/initializers/mime_types.rb", "spec/sample_war/config/initializers/new_rails_defaults.rb", "spec/sample_war/config/routes.rb", "spec/sample_war/lib/tasks/utils.rake", "spec/sample_war/public/404.html", "spec/sample_war/public/422.html", "spec/sample_war/public/500.html", "spec/sample_war/public/favicon.ico", "spec/sample_war/public/index.html", "spec/sample_war/public/robots.txt", "spec/spec_helper.rb", "spec/warbler/application_spec.rb", "spec/warbler/config_spec.rb", "spec/warbler/gems_spec.rb", "spec/warbler/jar_spec.rb", "spec/warbler/task_spec.rb", "spec/warbler/traits_spec.rb", "spec/warbler/war_spec.rb", "warble.rb", "web.xml.erb"]
   s.homepage = %q{http://caldersphere.rubyforge.org/warbler}
   s.rdoc_options = ["--main", "README.txt", "-SHN", "-f", "darkfish"]
   s.require_paths = ["lib"]
