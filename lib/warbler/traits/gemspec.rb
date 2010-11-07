@@ -4,8 +4,6 @@
 # See the file LICENSE.txt for details.
 #++
 
-require 'stringio'
-
 module Warbler
   module Traits
     class Gemspec
@@ -23,11 +21,9 @@ module Warbler
       end
 
       def after_configure
-        code = @spec.require_paths.map do |p|
-          require_path = config.pathmaps.application.inject(p) {|pm,x| pm.pathmap(x)}
-          "$LOAD_PATH.unshift '#{require_path}'"
-        end.join("\n")
-        config.init_contents << StringIO.new(code)
+        @spec.require_paths.each do |p|
+          add_init_load_path(config.pathmaps.application.inject(p) {|pm,x| pm.pathmap(x)})
+        end
       end
 
       def update_archive(jar)
@@ -35,8 +31,7 @@ module Warbler
           jar.files[jar.apply_pathmaps(config, f, :application)] = f
         end
         bin_path = jar.apply_pathmaps(config, default_executable, :application)
-
-        jar.files['META-INF/main.rb'] = StringIO.new("load File.expand_path '../../#{bin_path}', __FILE__")
+        add_main_rb(jar, bin_path)
       end
 
       def default_executable

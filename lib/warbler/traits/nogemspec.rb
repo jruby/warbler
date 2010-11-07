@@ -4,8 +4,6 @@
 # See the file LICENSE.txt for details.
 #++
 
-require 'stringio'
-
 module Warbler
   module Traits
     class NoGemspec
@@ -21,14 +19,12 @@ module Warbler
 
       def after_configure
         if File.directory?("lib")
-          require_path = config.pathmaps.application.inject("lib") {|pm,x| pm.pathmap(x)}
-          config.init_contents << StringIO.new("$LOAD_PATH.unshift '#{require_path}'")
+          add_init_load_path(config.pathmaps.application.inject("lib") {|pm,x| pm.pathmap(x)})
         end
       end
 
       def update_archive(jar)
-        bin_path = jar.apply_pathmaps(config, default_executable, :application)
-        jar.files['META-INF/main.rb'] = StringIO.new("load File.expand_path '../../#{bin_path}', __FILE__")
+        add_main_rb(jar, jar.apply_pathmaps(config, default_executable, :application))
       end
 
       def default_executable

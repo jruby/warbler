@@ -4,6 +4,8 @@
 # See the file LICENSE.txt for details.
 #++
 
+require 'stringio'
+
 module Warbler
   # Traits are project configuration characteristics that correspond
   # to the framework or project layout. Each trait corresponds to a
@@ -71,6 +73,14 @@ module Warbler
     end
 
     def update_archive(jar)
+    end
+
+    def add_init_load_path(path)
+      config.init_contents << StringIO.new("$LOAD_PATH.unshift __FILE__.sub(/!.*/, '!/#{path}')")
+    end
+
+    def add_main_rb(jar, bin_path)
+      jar.files['META-INF/main.rb'] = StringIO.new("load '#{bin_path}'")
     end
 
     def update_gem_path(default_gem_path)
