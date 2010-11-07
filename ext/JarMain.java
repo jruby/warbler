@@ -4,19 +4,18 @@
  * See the file LICENSE.txt for details.
  */
 
-import java.net.URLClassLoader;
-import java.net.URL;
-import java.lang.reflect.Method;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Arrays;
-import java.util.jar.JarFile;
-import java.util.jar.JarEntry;
-import java.util.List;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class JarMain implements Runnable {
     public static final String MAIN = "/" + JarMain.class.getName().replace('.', '/') + ".class";
@@ -44,7 +43,7 @@ public class JarMain implements Runnable {
         for (Enumeration<JarEntry> eje = jf.entries(); eje.hasMoreElements(); ) {
             String name = eje.nextElement().getName();
             if (name.startsWith("META-INF/lib") && name.endsWith(".jar")) {
-                jarNames.add(name);
+                jarNames.add("/" + name);
             }
         }
 
@@ -58,12 +57,12 @@ public class JarMain implements Runnable {
 
     private URL extractJar(String jarpath) throws Exception {
         InputStream jarStream = new URL("jar:" + path.replace(MAIN, jarpath)).openStream();
-        String jarname = jarpath.substring(jarpath.lastIndexOf("/"), jarpath.lastIndexOf("."));
-        File jarFile = File.createTempFile(jarname, ".jar");
+        String jarname = jarpath.substring(jarpath.lastIndexOf("/") + 1, jarpath.lastIndexOf("."));
+        File jarFile = new File(extractRoot, jarname + ".jar");
         jarFile.deleteOnExit();
         FileOutputStream outStream = new FileOutputStream(jarFile);
         try {
-            byte[] buf = new byte[4096];
+            byte[] buf = new byte[65536];
             int bytesRead = 0;
             while ((bytesRead = jarStream.read(buf)) != -1) {
                 outStream.write(buf, 0, bytesRead);
@@ -76,27 +75,28 @@ public class JarMain implements Runnable {
         return jarFile.toURI().toURL();
     }
 
-    private Integer launchJRuby(URL[] jars) throws Exception {
+    private int launchJRuby(URL[] jars) throws Exception {
+        System.setProperty("org.jruby.embed.class.path", "");
         URLClassLoader loader = new URLClassLoader(jars);
         Class scriptingContainerClass = Class.forName("org.jruby.embed.ScriptingContainer", true, loader);
         Object scriptingContainer = scriptingContainerClass.newInstance();
 
         Method argv = scriptingContainerClass.getDeclaredMethod("setArgv", new Class[] {String[].class});
-        argv.invoke(scriptingContainer, (Object[]) args);
+        argv.invoke(scriptingContainer, new Object[] {args});
         Method setClassLoader = scriptingContainerClass.getDeclaredMethod("setClassLoader", new Class[] {ClassLoader.class});
         setClassLoader.invoke(scriptingContainer, new Object[] {loader});
         debug("invoking " + jarfile + " with: " + Arrays.deepToString(args));
 
         Method runScriptlet = scriptingContainerClass.getDeclaredMethod("runScriptlet", new Class[] {String.class});
-        return (Integer) runScriptlet.invoke(scriptingContainer, new Object[] {
-                "begin\n" +
-                "require 'META-INF/init.rb'\n" +
-                "require 'META-INF/main.rb'\n" +
-                "0\n" +
-                "rescue SystemExit => e\n" +
-                "e.status\n" +
-                "end"
-            });
+        return ((Number) runScriptlet.invoke(scriptingContainer, new Object[] {
+                    "begin\n" +
+                    "require 'META-INF/init.rb'\n" +
+                    "require 'META-INF/main.rb'\n" +
+                    "0\n" +
+                    "rescue SystemExit => e\n" +
+                    "e.status\n" +
+                    "end"
+                })).intValue();
     }
 
     private int start() throws Exception {
@@ -129,9 +129,13 @@ public class JarMain implements Runnable {
             int exit = new JarMain(args).start();
             System.exit(exit);
         } catch (Exception e) {
-            System.err.println("error: " + e.toString());
+            Throwable t = e;
+            while (t.getCause() != null && t.getCause() != t) {
+                t = t.getCause();
+            }
+
             if (isDebug()) {
-                e.printStackTrace();
+                t.printStackTrace();
             }
             System.exit(1);
         }
