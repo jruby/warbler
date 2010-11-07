@@ -73,6 +73,7 @@ module Warbler
         add_public_files(jar)
         add_webxml(jar)
         add_executables(jar) if config.features.include?("executable")
+        add_gemjar(jar) if config.features.include?("gemjar")
       end
 
       # Add public/static assets to the root of the war file.
@@ -118,6 +119,19 @@ module Warbler
         jar.files['WEB-INF/winstone.jar'] = winstone_jar
       end
 
+      def add_gemjar(jar)
+        gem_jar = Warbler::Jar.new
+        gem_path = Regexp::quote(config.relative_gem_path)
+        gems = jar.files.select{|k,v| k =~ %r{#{gem_path}/} }
+        gems.each do |k,v|
+          gem_jar.files[k.sub(%r{#{gem_path}/}, '')] = v
+        end
+        jar.files["WEB-INF/lib/gems.jar"] = "tmp/gems.jar"
+        jar.files.reject!{|k,v| k =~ /#{gem_path}/ }
+        mkdir_p "tmp"
+        gem_jar.add_manifest
+        gem_jar.create("tmp/gems.jar")
+      end
 
       # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.
       class WebxmlOpenStruct < OpenStruct

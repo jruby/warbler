@@ -50,7 +50,7 @@ describe Warbler::Task do
   end
 
   it "should define a make_gemjar task for storing gems in a jar file" do
-    silence { run_task "warble:make_gemjar" }
+    silence { run_task "warble:gemjar"; run_task "warble:files" }
     File.exist?("tmp/gems.jar").should == true
     warble_task.jar.files.keys.should_not include(%r{WEB-INF\/gems})
     warble_task.jar.files.keys.should include("WEB-INF/lib/gems.jar")

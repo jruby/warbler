@@ -83,10 +83,4 @@ describe Warbler::Application do
   it "should provide a means to load the project Rakefile" do
     Warbler::Application.new.load_project_rakefile
   end
-
-  it "should define a gemjar task for setting up gem packaging inside a jar" do
-    ARGV.unshift "gemjar"
-    Warbler::Application.new.run
-    Rake::Task['war:jar'].prerequisites.should include('war:make_gemjar')
-  end
 end

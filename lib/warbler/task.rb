@@ -142,21 +142,7 @@ module Warbler
 
     def define_gemjar_task
       task "gemjar" do
-        task "#@name:jar" => "#@name:make_gemjar"
-      end
-
-      gem_jar = Warbler::Jar.new
-      task "make_gemjar" => "files" do
-        gem_path = Regexp::quote(config.relative_gem_path)
-        gems = jar.files.select{|k,v| k =~ %r{#{gem_path}/} }
-        gems.each do |k,v|
-          gem_jar.files[k.sub(%r{#{gem_path}/}, '')] = v
-        end
-        jar.files["WEB-INF/lib/gems.jar"] = "tmp/gems.jar"
-        jar.files.reject!{|k,v| k =~ /#{gem_path}/ }
-        mkdir_p "tmp"
-        gem_jar.add_manifest
-        gem_jar.create("tmp/gems.jar")
+        @config.features << "gemjar"
       end
     end
 
