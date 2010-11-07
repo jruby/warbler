@@ -55,9 +55,9 @@ module Warbler
       find_java_libs(config)
       find_java_classes(config)
       find_gems_files(config)
-      apply_traits(config)
       add_manifest(config)
       add_init_file(config)
+      apply_traits(config)
     end
 
     # Create the jar or war file. The single argument can either be a
