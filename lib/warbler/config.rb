@@ -10,7 +10,7 @@ require 'warbler/gems'
 require 'warbler/traits'
 
 module Warbler
-  # Warbler war file assembly configuration class.
+  # Warbler archive assembly configuration class.
   class Config
     TOP_DIRS = %w(app config lib log vendor)
     FILE = "config/warble.rb"

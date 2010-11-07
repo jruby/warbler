@@ -6,6 +6,7 @@
 
 module Warbler
   module Traits
+    # The Rails trait invokes the Rake environment task and sets up Rails for a war-based project.
     class Rails
       include Trait
 

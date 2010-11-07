@@ -6,6 +6,9 @@
 
 module Warbler
   module Traits
+    # The NoGemspec trait is used when no gemspec file is found for a
+    # jar project. It assumes a standard layout including +bin+ and
+    # +lib+ directories.
     class NoGemspec
       include Trait
 

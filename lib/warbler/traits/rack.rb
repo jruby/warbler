@@ -6,6 +6,7 @@
 
 module Warbler
   module Traits
+    # The Rack trait adds config.ru to a Rack-based war project.
     class Rack
       include Trait
 

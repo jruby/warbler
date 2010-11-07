@@ -11,7 +11,7 @@ module Warbler
   # It would be easier to just use a hash.
   class Gems < Hash
     ANY_VERSION = nil
-    
+
     def initialize(gems = nil)
       if gems.is_a?(Hash)
         self.merge!(gems)
@@ -19,7 +19,7 @@ module Warbler
         gems.each {|gem| self << gem }
       end
     end
-    
+
     def <<(gem)
       self[gem] ||= ANY_VERSION
     end

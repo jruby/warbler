@@ -6,6 +6,8 @@
 
 module Warbler
   module Traits
+    # The Gemspec trait reads a .gemspec file to determine the files,
+    # executables, require paths, and dependencies for a project.
     class Gemspec
       include Trait
 

@@ -6,6 +6,7 @@
 
 module Warbler
   module Traits
+    # The Merb trait adds Merb::BootLoader gem dependencies to the project.
     class Merb
       include Trait
 

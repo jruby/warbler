@@ -8,6 +8,7 @@ require 'ostruct'
 
 module Warbler
   module Traits
+    # The War trait sets up the layout and generates web.xml for the war project.
     class War
       include Trait
 

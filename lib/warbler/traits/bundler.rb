@@ -6,6 +6,8 @@
 
 module Warbler
   module Traits
+    # The Bundler trait uses Bundler to determine gem dependencies to
+    # be added to the project.
     class Bundler
       include Trait
 

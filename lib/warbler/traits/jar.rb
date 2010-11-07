@@ -9,6 +9,9 @@ require 'ostruct'
 
 module Warbler
   module Traits
+    # The Jar trait sets up the archive layout for an executable jar
+    # project, and adds the JRuby jar files and a JarMain class to the
+    # archive.
     class Jar
       include Trait
 
