@@ -77,7 +77,7 @@ module Warbler
     end
 
     def define_main_task
-      desc "Create the project .war file"
+      desc "Create the project #{config.jar_extension} file"
       task @name do
         unless @config.features.empty?
           @config.features.each do |feature|
@@ -98,7 +98,7 @@ module Warbler
     end
 
     def define_clean_task
-      desc "Remove the #{config.jar_extension} file"
+      desc "Remove the project #{config.jar_extension} file"
       task "clean" do
         rm_f "#{config.jar_name}.#{config.jar_extension}"
       end

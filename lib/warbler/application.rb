@@ -26,7 +26,7 @@ class Warbler::Application < Rake::Application
 
     task :default => wt.name
 
-    desc "Generate a configuration file to customize your war"
+    desc "Generate a configuration file to customize your archive"
     task :config => "#{wt.name}:config"
 
     desc "Install Warbler tasks in your Rails application"
