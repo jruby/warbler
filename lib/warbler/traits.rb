@@ -76,7 +76,7 @@ module Warbler
     end
 
     def add_init_load_path(path)
-      config.init_contents << StringIO.new("$LOAD_PATH.unshift __FILE__.sub(/!.*/, '!/#{path}')")
+      config.init_contents << StringIO.new("$LOAD_PATH.unshift __FILE__.sub(/!.*/, '!/#{path}')\n")
     end
 
     def add_main_rb(jar, bin_path)
