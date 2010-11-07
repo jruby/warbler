@@ -7,8 +7,6 @@
 
 require 'rake'
 require 'rake/tasklib'
-require 'stringio'
-require 'zip/zip'
 require 'warbler/config'
 require 'warbler/jar'
 
