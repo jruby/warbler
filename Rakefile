@@ -94,3 +94,9 @@ end
 # Make sure jar gets compiled before the gem is built
 task Rake::Task['gem'].prerequisites.first => :jar
 
+task :warbler_jar => 'pkg' do
+  ruby "-rubygems", "-Ilib", "-S", "bin/warble"
+  mv "warbler.jar", "pkg/warbler-#{Warbler::VERSION}.jar"
+end
+
+task :package => :warbler_jar
