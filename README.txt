@@ -1,18 +1,20 @@
 = Warbler
 
-Warbler is a gem to make a .war file out of a Rails, Merb, or Rack-based
-application. The intent is to provide a minimal, flexible, ruby-like way to
-bundle up all of your application files for deployment to a Java application
-server.
+Warbler is a gem to make a Java jar or war file out of any Ruby,
+Rails, Merb, or Rack application. Warbler provides a minimal,
+flexible, Ruby-like way to bundle up all of your application files for
+deployment to a Java environment.
 
 Warbler provides a sane set of out-of-the box defaults that should allow most
-Ruby web applications to assemble and Just Work.
+Ruby applications to assemble and Just Work.
 
 == Getting Started
 
 1. Install the gem: <tt>gem install warbler</tt>.
-2. Run warbler in the top directory of your Rails application: <tt>warble</tt>.
-3. Deploy your myapp.war file to your favorite Java application server.
+2. Run warbler in the top directory of your application: <tt>warble</tt>.
+3a. For a web project, deploy your myapp.war file to your favorite Java
+    application server.
+3b. For a standalone applications, just run it: <tt>java -jar myapp.jar</tt>.
 
 == Usage
 
@@ -21,23 +23,23 @@ defined tasks.
 
     $ warble -T
     warble compiled    # Feature: precompile all Ruby files
-    warble config      # Generate a configuration file to customize your war
+    warble config      # Generate a configuration file to customize your archive
     warble executable  # Feature: make an executable archive
-    warble gemjar      # Feature: package gem repository inside a jar
+    warble gemjar      # Feature: package gem repository inside a war
     warble pluginize   # Install Warbler tasks in your Rails application
     warble version     # Display version of Warbler
-    warble war         # Create the project .war file
-    warble war:clean   # Remove the .war file
+    warble war         # Create the project war file
+    warble war:clean   # Remove the project war file
     warble war:debug   # Dump diagnostic information
 
-Type <tt>warble</tt> or <tt>warble war</tt> to create the war file.
+Type <tt>warble</tt> to create the jar or war file.
 
 == Features
 
 Warbler "features" are small Rake tasks that run before the creation
-of the war file and make manipulations to the war file structure. For
+of the war file and make manipulations to the archive structure. For
 instance, the +executable+ feature makes your war file capable of
-running on its own (like a jar), without a servlet container:
+running on its own, without a servlet container:
 
     warble executable war
 
@@ -54,9 +56,11 @@ Currently, three features are available.
 * +gemjar+: This bundles all gems into a single gem file to reduce the
   number of files in the .war. This is mostly useful for Google
   AppEngine where the number of files per application has a limit.
+  (Note: not applicable for jar-based applications.)
 * +executable+: This bundles an embedded web server into the .war so
   that it can either be deployed into a traditional java web server or
   run as a standalone application using <tt>java -jar myapp.war</tt>.
+  (Note: jar-based applications are executable by default.)
 * +compiled+: This uses +jrubyc+ to precompile all .rb files in your
   application to .class files and includes those in the .war instead
   of the Ruby sources.
@@ -64,15 +68,50 @@ Currently, three features are available.
 Features may form the basis for a third-party plugin system in the
 future if there is demand.
 
-== Configuration
+== War or Jar?
+
+War-based projects are for Rails, Merb, or Rack-based web
+applications. They usually contain a <tt>config/environment.rb</tt>
+file, a <tt>config/init.rb</tt> file, or a <tt>config.ru</tt> file.
+The presence of these files are used to determine if the project
+is a web application, and thus a Java EE compatible war file is built
+for the project.
+
+Jar-based projects are for standalone Ruby applications. Usually a
+Ruby application has a launcher script in the <tt>bin</tt> directory
+and Ruby code in the <tt>lib</tt> directory. Warbler packages the
+application so that <tt>java -jar myapp.jar</tt> runs the launcher
+script.
+
+== Jar Files
+
+=== Gem Specification (gemspec) Files
+
+If your project has a <tt>.gemspec</tt> file in the top directory, it
+will be used to configure the project's dependencies, launcher script,
+require paths, and the files to be included in the archive. For best
+results make sure your gemspec specifies all of the following
+attributes:
+
+* +default_executable+
+* +files+
+* +require_paths+
+* runtime dependencies added with +add_dependency+
+
+If your project do not have a <tt>.gemspec</tt>, Warbler will attempt
+to guess the launcher from the contents of the <tt>bin</tt> directory
+and use the <tt>lib</tt> directory as the lone require path. All files
+in the project will be included in the archive.
 
 === Bundler
 
 Applications that use Bundler[http://gembundler.com/], detected via
-presence of a +Gemfile+, will have the gems packaged up into the war
-file along with the Gemfile. The Bundler groups named +:development+
-and +:test+ will be excluded by default, unless you specify with
-+config.bundle_without+ in +config/warble.rb+.
+presence of a +Gemfile+, will have the gems packaged up into the
+archive along with the Gemfile. The Bundler groups named
++:development+ and +:test+ will be excluded by default, unless you
+specify with +config.bundle_without+ in +config/warble.rb+.
+
+== War Files
 
 === Rails applications
 
@@ -120,13 +159,7 @@ of how to configure Warbler to package Camping and Sinatra apps.
   uses? Gem.loaded_specs is available, but the application needs to be
   loaded first before its contents are reliable.
 
-=== Custom configuration
-
-The default configuration puts application files (+app+, +config+, +lib+,
-+log+, +vendor+, +tmp+) under the .war file's WEB-INF directory, and files in
-+public+ in the root of the .war file. Any Java .jar files stored in lib will
-automatically be placed in WEB-INF/lib for placement on the web app's
-classpath.
+== Custom configuration
 
 If the default settings are not appropriate for your application, you can
 customize Warbler's behavior. To customize files, libraries, and gems included
@@ -138,6 +171,14 @@ doing this. With the gem, simply run
 Finally, edit the config/warble.rb to your taste. The generated
 config/warble.rb file is fully-documented with the available options
 and default values.
+
+=== War layout
+
+The default configuration puts application files (+app+, +config+, +lib+,
++log+, +vendor+, +tmp+) under the .war file's WEB-INF directory, and files in
++public+ in the root of the .war file. Any Java .jar files stored in lib will
+automatically be placed in WEB-INF/lib for placement on the web app's
+classpath.
 
 === Web.xml
 
