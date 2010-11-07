@@ -48,10 +48,10 @@ describe Warbler::Jar do
       file_list(%r{^META-INF/init.rb$}).should_not be_empty
     end
 
-    it "sets ENV['GEM_PATH'] in init.rb" do
+    it "requires 'rubygems' in init.rb" do
       jar.add_init_file(config)
       contents = jar.files['META-INF/init.rb'].read
-      contents.split("\n").grep(/ENV\['GEM_PATH'\].*#{config.relative_gem_path}/).should_not be_empty
+      contents.split("\n").grep(/require 'rubygems'/).should_not be_empty
     end
 
     it "adds a main.rb" do
@@ -87,8 +87,8 @@ describe Warbler::Jar do
 
       it "detects gem dependencies" do
         jar.apply(config)
-        file_list(%r{^META-INF/gems/gems/rubyzip.*/lib/zip/zip.rb}).should_not be_empty
-        file_list(%r{^META-INF/gems/specifications/rubyzip.*\.gemspec}).should_not be_empty
+        file_list(%r{^gems/rubyzip.*/lib/zip/zip.rb}).should_not be_empty
+        file_list(%r{^specifications/rubyzip.*\.gemspec}).should_not be_empty
       end
 
       it "sets files to be stored in the archive from the spec" do
@@ -155,8 +155,8 @@ describe Warbler::Jar do
           config.gems << "rake"
         end
         jar.apply(config)
-        file_list(%r{^META-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
-        file_list(%r{^META-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
+        file_list(%r{^gems/rake.*/lib/rake.rb}).should_not be_empty
+        file_list(%r{^specifications/rake.*\.gemspec}).should_not be_empty
       end
 
       it "collects all project files in the directory" do

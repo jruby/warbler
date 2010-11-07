@@ -224,7 +224,14 @@ module Warbler
       end
     end
 
-    # Java-boosted jar creation for JRuby; replaces #create_jar with Java version
+    def entry_in_jar(jar, entry)
+      Zip::ZipFile.open(jar) do |zf|
+        zf.get_input_stream(entry) {|io| StringIO.new(io.read) }
+      end
+    end
+
+    # Java-boosted jar creation for JRuby; replaces #create_jar and
+    # #entry_in_jar with Java version
     require 'warbler_jar' if defined?(JRUBY_VERSION) && JRUBY_VERSION >= "1.5"
   end
 

@@ -114,9 +114,7 @@ module Warbler
         end
 
         jar.files['META-INF/MANIFEST.MF'] = StringIO.new(Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: WarMain\n")
-        jar.files['WarMain.class'] = Zip::ZipFile.open("#{WARBLER_HOME}/lib/warbler_jar.jar") do |zf|
-          zf.get_input_stream('WarMain.class') {|io| StringIO.new(io.read) }
-        end
+        jar.files['WarMain.class'] = jar.entry_in_jar("#{WARBLER_HOME}/lib/warbler_jar.jar", 'WarMain.class')
         jar.files['WEB-INF/winstone.jar'] = winstone_jar
       end
 
