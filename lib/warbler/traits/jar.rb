@@ -12,8 +12,6 @@ module Warbler
     class Jar
       include Trait
 
-      DEFAULT_GEM_PATH = '/META-INF/gems'
-
       def self.detect?
         !War.detect?
       end
