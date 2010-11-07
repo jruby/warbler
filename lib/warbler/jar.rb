@@ -130,6 +130,7 @@ module Warbler
 
       add_with_pathmaps(config, spec.loaded_from, :gemspecs)
       spec.files.each do |f|
+        f = f[2..-1] if f =~ /^\.\//
         next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
         src = File.join(spec.full_gem_path, f)
         # some gemspecs may have incorrect file listings
