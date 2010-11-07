@@ -7,9 +7,14 @@
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.jruby.Ruby;
@@ -21,6 +26,7 @@ import org.jruby.anno.JRubyMethod;
 import org.jruby.runtime.Block;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
+import org.jruby.util.ByteList;
 import org.jruby.util.JRubyFile;
 
 public class WarblerJar {
@@ -57,6 +63,32 @@ public class WarblerJar {
         return runtime.getNil();
     }
 
+    @JRubyMethod
+    public static IRubyObject entry_in_jar(ThreadContext context, IRubyObject recv, IRubyObject jar_path, IRubyObject entry) {
+        final Ruby runtime = recv.getRuntime();
+        try {
+            InputStream entryStream = getStream(jar_path.convertToString().getUnicodeValue(),
+                                                entry.convertToString().getUnicodeValue());
+            try {
+                byte[] buf = new byte[16384];
+                ByteList blist = new ByteList();
+                int bytesRead = -1;
+                while ((bytesRead = entryStream.read(buf)) != -1) {
+                    blist.append(buf, 0, bytesRead);
+                }
+                IRubyObject stringio = runtime.getModule("StringIO");
+                return stringio.callMethod(context, "new", runtime.newString(blist));
+            } finally {
+                close(entryStream);
+            }
+        } catch (IOException e) {
+            if (runtime.isDebug()) {
+                e.printStackTrace();
+            }
+            throw runtime.newIOErrorFromException(e);
+        }
+    }
+
     private static void addEntries(ThreadContext context, ZipOutputStream zip, RubyHash entries) throws IOException {
         RubyArray keys = entries.keys().sort(context, Block.NULL_BLOCK);
         for (int i = 0; i < keys.getLength(); i++) {
@@ -77,7 +109,12 @@ public class WarblerJar {
             if (value.isNil() || (f = getFile(value)).isDirectory()) {
                 zip.putNextEntry(new ZipEntry(entryName + "/"));
             } else {
-                FileInputStream inFile = openFile(f);
+                String path = f.getPath();
+                if (!f.exists()) {
+                    path = value.convertToString().getUnicodeValue();
+                }
+
+                InputStream inFile = getStream(path, null);
                 try {
                     zip.putNextEntry(new ZipEntry(entryName));
                     byte[] buf = new byte[16384];
@@ -96,10 +133,6 @@ public class WarblerJar {
         return new FileOutputStream(getFile(jar_path));
     }
 
-    private static FileInputStream openFile(File file) throws IOException {
-        return new FileInputStream(file);
-    }
-
     private static File getFile(IRubyObject path) {
         return JRubyFile.create(path.getRuntime().getCurrentDirectory(),
                                 path.convertToString().getUnicodeValue());
@@ -108,8 +141,41 @@ public class WarblerJar {
     private static void close(Closeable c) {
         try {
             c.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
         }
     }
 
+    private static Pattern PROTOCOL = Pattern.compile("^[a-z][a-z0-9]+:");
+
+    private static InputStream getStream(String jar, String entry) throws IOException {
+        Matcher m = PROTOCOL.matcher(jar);
+        while (m.find()) {
+            jar = jar.substring(m.end());
+            m = PROTOCOL.matcher(jar);
+        }
+
+        String[] path = jar.split("!/");
+        InputStream stream = new FileInputStream(path[0]);
+        for (int i = 1; i < path.length; i++) {
+            stream = entryInJar(stream, path[i]);
+        }
+
+        if (entry == null) {
+            return stream;
+        }
+
+        return entryInJar(stream, entry);
+    }
+
+    private static InputStream entryInJar(InputStream jar, String entry) throws IOException {
+        ZipInputStream jstream = new ZipInputStream(jar);
+        ZipEntry zentry = null;
+        while ((zentry = jstream.getNextEntry()) != null) {
+            if (zentry.getName().equals(entry)) {
+                return jstream;
+            }
+            jstream.closeEntry();
+        }
+        throw new FileNotFoundException("entry '" + entry + "' not found in " + jar);
+    }
 }
