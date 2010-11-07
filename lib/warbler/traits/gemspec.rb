@@ -15,7 +15,8 @@ module Warbler
 
       def before_configure
         @spec_file = Dir['*.gemspec'].first
-        @spec = eval(File.read(@spec_file))
+        require 'yaml'
+        @spec = File.open(@spec_file) {|f| Gem::Specification.from_yaml(f) } rescue Gem::Specification.load(@spec_file)
         @spec.runtime_dependencies.each {|g| config.gems << g }
         config.dirs = []
       end
