@@ -110,6 +110,20 @@ describe Warbler::Jar do
         contents = jar.files['META-INF/main.rb'].read
         contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
       end
+
+      context "and a missing file" do
+        before :each do
+          mv "Rakefile", "Rakefile.tmp"
+        end
+
+        after :each do
+          mv "Rakefile.tmp", "Rakefile"
+        end
+
+        it "should warn about the missing file but still continue" do
+          capture { jar.apply(config) }.should =~ /Rakefile/
+        end
+      end
     end
 
     context "with a gemspec without a default executable" do

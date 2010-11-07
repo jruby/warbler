@@ -28,6 +28,10 @@ module Warbler
 
       def update_archive(jar)
         @spec.files.each do |f|
+          unless File.exist?(f)
+            warn "update your gemspec; skipping missing file #{f}"
+            next
+          end
           jar.files[jar.apply_pathmaps(config, f, :application)] = f
         end
         bin_path = jar.apply_pathmaps(config, default_executable, :application)
