@@ -21,6 +21,7 @@ module Warbler
         @spec = File.open(@spec_file) {|f| Gem::Specification.from_yaml(f) } rescue Gem::Specification.load(@spec_file)
         @spec.runtime_dependencies.each {|g| config.gems << g }
         config.dirs = []
+        config.compiled_ruby_files = @spec.files.select {|f| f =~ /\.rb$/}
       end
 
       def after_configure
