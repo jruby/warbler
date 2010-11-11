@@ -106,6 +106,12 @@ describe Warbler::Task do
     end
   end
 
+  it "should delete .class files after finishing the jar" do
+    config.features << "compiled"
+    silence { run_task "warble" }
+    File.exist?('app/helpers/application_helper.class').should be_false
+  end
+
   it "should process symlinks by storing a file in the archive that has the same contents as the source" do
     File.open("config/special.txt", "wb") {|f| f << "special"}
     Dir.chdir("config") { ln_s "special.txt", "link.txt" }
