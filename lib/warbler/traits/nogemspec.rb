@@ -31,7 +31,8 @@ module Warbler
       end
 
       def default_executable
-        exe = Dir['bin/*'].first
+        exes = Dir['bin/*']
+        exe = exes.grep(/#{config.jar_name}/).first || exes.first
         raise "No executable script found" unless exe
         exe
       end
