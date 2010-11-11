@@ -112,9 +112,11 @@ describe Warbler::Jar do
       end
 
       it "includes compiled .rb and .class files" do
-        touch "lib/sample_jar.class"
+        config.compiled_ruby_files = %w(lib/sample_jar.rb)
+        jar.compile(config)
         jar.apply(config)
         file_list(%r{^sample_jar/lib/sample_jar\.class$}).should_not be_empty
+        jar.files['sample_jar/lib/sample_jar.rb'].read.should =~ /require __FILE__\.sub/
       end
 
       context "and a missing file" do

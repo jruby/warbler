@@ -36,7 +36,9 @@ module Warbler
             warn "update your gemspec; skipping missing file #{f}"
             next
           end
-          jar.files[jar.apply_pathmaps(config, f, :application)] = f
+          file_key = jar.apply_pathmaps(config, f, :application)
+          next if jar.files[file_key]
+          jar.files[file_key] = f
         end
         config.compiled_ruby_files.each do |f|
           f = f.sub(/\.rb$/, '.class')
