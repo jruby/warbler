@@ -38,6 +38,11 @@ module Warbler
           end
           jar.files[jar.apply_pathmaps(config, f, :application)] = f
         end
+        config.compiled_ruby_files.each do |f|
+          f = f.sub(/\.rb$/, '.class')
+          next unless File.exist?(f)
+          jar.files[jar.apply_pathmaps(config, f, :application)] = f
+        end
         bin_path = jar.apply_pathmaps(config, default_executable, :application)
         add_main_rb(jar, bin_path)
       end

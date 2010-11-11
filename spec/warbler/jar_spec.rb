@@ -111,6 +111,12 @@ describe Warbler::Jar do
         contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
       end
 
+      it "includes compiled .rb and .class files" do
+        touch "lib/sample_jar.class"
+        jar.apply(config)
+        file_list(%r{^sample_jar/lib/sample_jar\.class$}).should_not be_empty
+      end
+
       context "and a missing file" do
         before :each do
           mv "Rakefile", "Rakefile.tmp"
