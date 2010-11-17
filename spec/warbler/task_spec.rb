@@ -92,17 +92,41 @@ describe Warbler::Task do
   end
 
   it "should compile any ruby files specified" do
+    ruby_file_path         = 'app/helpers/application_helper.rb'
+    escaped_ruby_file_path = 'app/helpers/application_helper\.rb'
+    java_file_path         = 'app/helpers/application_helper.class'
+
     config.features << "compiled"
     silence { run_task "warble" }
 
-    java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
+    Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
+      java_class_header     = zf.get_input_stream("WEB-INF/#{java_file_path}") {|io| io.read }[0..3]
+      ruby_class_definition = zf.get_input_stream("WEB-INF/#{ruby_file_path}") {|io| io.read }
+
+      java_class_header.should == Warbler::Jar::JAVA_CLASS_MAGIC_NUMBER
+      ruby_class_definition.should == %{require __FILE__.sub(%r{#{escaped_ruby_file_path}$},'#{java_file_path}')}
+    end
+  end
+
+  it "should correctly compile any ruby files with dots in their names" do
+    ruby_file_path         = 'lib/with.dot.rb'
+    escaped_ruby_file_path = 'lib/with\.dot\.rb'
+    java_file_path         = 'lib/with_dot_dot.class'
+
+    #
+    # jrubyc transforms files like foo-bar.rb to foo_minus_bar.class
+    # and directories like lib/some-library/foo.rb to lib/some_minus_library/foo.class
+    #
+    config.features << "compiled"
+    config.compiled_ruby_files = FileList["lib/*.rb"]
+    silence { run_task "warble" }
 
     Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
-      java_class_header     = zf.get_input_stream('WEB-INF/app/helpers/application_helper.class') {|io| io.read }[0..3]
-      ruby_class_definition = zf.get_input_stream('WEB-INF/app/helpers/application_helper.rb') {|io| io.read }
+      java_class_header     = zf.get_input_stream("WEB-INF/#{java_file_path}") {|io| io.read }[0..3]
+      ruby_class_definition = zf.get_input_stream("WEB-INF/#{ruby_file_path}") {|io| io.read }
 
-      java_class_header.should == java_class_magic_number
-      ruby_class_definition.should == %{require __FILE__.sub(/.rb$/, '.class')}
+      java_class_header.should == Warbler::Jar::JAVA_CLASS_MAGIC_NUMBER
+      ruby_class_definition.should == %{require __FILE__.sub(%r{#{escaped_ruby_file_path}$},'#{java_file_path}')}
     end
   end
 

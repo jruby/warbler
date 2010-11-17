@@ -1,0 +1,3 @@
+
+class WithDot
+end

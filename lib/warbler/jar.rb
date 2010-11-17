@@ -6,6 +6,7 @@
 
 require 'zip/zip'
 require 'stringio'
+require 'warbler/java_name_mangler'
 
 module Warbler
   # Class that holds the files that will be stored in the jar file.
@@ -16,6 +17,7 @@ module Warbler
   # * A String filename pointing to a file on disk
   class Jar
     DEFAULT_MANIFEST = %{Manifest-Version: 1.0\nCreated-By: Warbler #{Warbler::VERSION}\n\n}
+    JAVA_CLASS_MAGIC_NUMBER = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
 
     attr_reader :files
     attr_reader :app_filelist
@@ -44,7 +46,7 @@ module Warbler
       config.excludes += compiled_ruby_files
 
       compiled_ruby_files.each do |ruby_source|
-        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("require __FILE__.sub(/\.rb$/, '.class')")
+        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("require __FILE__.#{JavaNameMangler.subtitution_string(ruby_source)}")
       end
     end
 
