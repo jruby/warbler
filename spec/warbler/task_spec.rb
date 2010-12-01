@@ -112,24 +112,32 @@ describe Warbler::Task do
     File.exist?('app/helpers/application_helper.class').should be_false
   end
 
-  it "should process symlinks by storing a file in the archive that has the same contents as the source" do
-    File.open("config/special.txt", "wb") {|f| f << "special"}
-    Dir.chdir("config") { ln_s "special.txt", "link.txt" }
-    silence { run_task "warble" }
-    Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
-      special = zf.get_input_stream('WEB-INF/config/special.txt') {|io| io.read }
-      link = zf.get_input_stream('WEB-INF/config/link.txt') {|io| io.read }
-      link.should == special
-    end
-  end
+  context "where symlinks are available" do
+    begin
+      ln_s "README.txt", "r.txt.symlink"
+      it "should process symlinks by storing a file in the archive that has the same contents as the source" do
+        File.open("config/special.txt", "wb") {|f| f << "special"}
+        Dir.chdir("config") { ln_s "special.txt", "link.txt" }
+        silence { run_task "warble" }
+        Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
+          special = zf.get_input_stream('WEB-INF/config/special.txt') {|io| io.read }
+          link = zf.get_input_stream('WEB-INF/config/link.txt') {|io| io.read }
+          link.should == special
+        end
+      end
 
-  it "should process directory symlinks by copying the whole subdirectory" do
-    Dir.chdir("lib") { ln_s "tasks", "rakelib" }
-    silence { run_task "warble" }
-    Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
-      zf.find_entry("WEB-INF/lib/tasks/utils.rake").should_not be_nil
-      zf.find_entry("WEB-INF/lib/rakelib/").should_not be_nil
-      zf.find_entry("WEB-INF/lib/rakelib/utils.rake").should_not be_nil if defined?(JRUBY_VERSION)
+      it "should process directory symlinks by copying the whole subdirectory" do
+        Dir.chdir("lib") { ln_s "tasks", "rakelib" }
+        silence { run_task "warble" }
+        Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
+          zf.find_entry("WEB-INF/lib/tasks/utils.rake").should_not be_nil
+          zf.find_entry("WEB-INF/lib/rakelib/").should_not be_nil
+          zf.find_entry("WEB-INF/lib/rakelib/utils.rake").should_not be_nil if defined?(JRUBY_VERSION)
+        end
+      end
+
+      rm_f "r.txt.symlink"
+    rescue NotImplementedError
     end
   end
 
