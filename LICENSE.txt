@@ -2,7 +2,7 @@
 
 Warbler is provided under the terms of the MIT license.
 
-Warbler (c) 2010 Engine Yard, Inc.
+Warbler (c) 2010-2011 Engine Yard, Inc.
 Warbler (c) 2007-2009 Sun Microsystems, Inc.
 
 Permission is hereby granted, free of charge, to any person
