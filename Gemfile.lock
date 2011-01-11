@@ -2,10 +2,10 @@ GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.1.2)
-    hoe (2.6.2)
+    hoe (2.7.0)
       rake (>= 0.8.7)
       rubyforge (>= 2.0.4)
-    jruby-jars (1.5.3)
+    jruby-jars (1.5.5)
     jruby-rack (1.0.3)
     json_pure (1.4.6)
     rake (0.8.7)

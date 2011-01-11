@@ -20,7 +20,7 @@ MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt", "Gemfile",
                    ].to_a.reject{|f| f=~%r{spec/sample/(MANIFEST|link|web.xml)}}.sort.uniq
 
 begin
-  File.open("Manifest.txt", "w") {|f| MANIFEST.each {|n| f << "#{n}\n"} }
+  File.open("Manifest.txt", "wb") {|f| MANIFEST.each {|n| f << "#{n}\n"} }
   require 'hoe'
   require File.dirname(__FILE__) + '/lib/warbler/version'
   hoe = Hoe.spec("warbler") do |p|

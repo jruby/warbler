@@ -114,7 +114,7 @@ describe Warbler::Task do
 
   context "where symlinks are available" do
     begin
-      ln_s "README.txt", "r.txt.symlink"
+      ln_s "README.txt", "r.txt.symlink", :verbose => false
       it "should process symlinks by storing a file in the archive that has the same contents as the source" do
         File.open("config/special.txt", "wb") {|f| f << "special"}
         Dir.chdir("config") { ln_s "special.txt", "link.txt" }
