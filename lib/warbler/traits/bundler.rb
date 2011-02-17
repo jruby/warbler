@@ -39,10 +39,19 @@ module Warbler
         lockfile = root.join('Gemfile.lock')
         definition = ::Bundler::Definition.build(gemfile, lockfile, nil)
         groups = definition.groups - config.bundle_without.map {|g| g.to_sym}
-        definition.specs_for(groups).each {|spec| config.gems << spec }
+        definition.specs_for(groups).each { |spec|
+          spec_warning(spec)
+          config.gems << spec
+        }
         config.init_contents << StringIO.new("ENV['BUNDLE_WITHOUT'] = '#{config.bundle_without.join(':')}'\n")
       end
-
+      
+      def spec_warning(spec)
+        if spec && spec.files.empty?
+          $stderr.puts "WARNING:  Gem::Specification for #{spec.name} has no files in it.  This probably means that there is currently an environment problem that we can\'t resolve. Perhaps manually copy the #{ spec.name } gem and spec into the current rvm gemset?"
+        end  
+      end
+      
       def update_archive(jar)
         add_bundler_files(jar) if config.bundler
       end
