@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ public class JarMain implements Runnable {
         URL mainClass = getClass().getResource(MAIN);
         this.path = mainClass.toURI().getSchemeSpecificPart();
         this.jarfile = mainClass.getFile().replace("!" + MAIN, "").replace("file:", "");
+        this.jarfile = URLDecoder.decode(this.jarfile);
         this.debug = isDebug();
         this.extractRoot = File.createTempFile("jruby", "extract");
         this.extractRoot.delete();

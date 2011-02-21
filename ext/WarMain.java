@@ -5,6 +5,7 @@
  * See the file LICENSE.txt for details.
  */
 
+import java.net.URLDecoder;
 import java.net.URLClassLoader;
 import java.net.URL;
 import java.lang.reflect.Method;
@@ -28,6 +29,7 @@ public class WarMain implements Runnable {
         URL mainClass = getClass().getResource(MAIN);
         this.path = mainClass.toURI().getSchemeSpecificPart();
         this.warfile = mainClass.getFile().replace("!" + MAIN, "").replace("file:", "");
+        this.warfile = URLDecoder.decode(this.warfile);
         this.debug = isDebug();
         this.webroot = File.createTempFile("winstone", "webroot");
         this.webroot.delete();
