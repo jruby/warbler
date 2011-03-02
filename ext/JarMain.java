@@ -30,7 +30,7 @@ public class JarMain implements Runnable {
         this.args = args;
         URL mainClass = getClass().getResource(MAIN);
         this.path = mainClass.toURI().getSchemeSpecificPart();
-        this.jarfile = mainClass.getFile().replace("!" + MAIN, "").replace("file:", "");
+        this.jarfile = this.path.replace("!" + MAIN, "").replace("file:", "");
         this.debug = isDebug();
         this.extractRoot = File.createTempFile("jruby", "extract");
         this.extractRoot.delete();

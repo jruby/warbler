@@ -27,7 +27,7 @@ public class WarMain implements Runnable {
         this.args = args;
         URL mainClass = getClass().getResource(MAIN);
         this.path = mainClass.toURI().getSchemeSpecificPart();
-        this.warfile = mainClass.getFile().replace("!" + MAIN, "").replace("file:", "");
+        this.warfile = this.path.replace("!" + MAIN, "").replace("file:", "");
         this.debug = isDebug();
         this.webroot = File.createTempFile("winstone", "webroot");
         this.webroot.delete();
