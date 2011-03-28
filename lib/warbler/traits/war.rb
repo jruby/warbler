@@ -104,11 +104,11 @@ module Warbler
           # Not always covered in tests as these lines may not get
           # executed every time if the jar is cached.
           puts "Downloading #{winstone_type}.jar" #:nocov:
-          mkdir_p File.dirname(t.name)            #:nocov:
+          mkdir_p File.dirname(winstone_jar)      #:nocov:
           require 'open-uri'                      #:nocov:
           maven_repo = ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2" #:nocov:
           open("#{maven_repo}/#{winstone_path}") do |stream| #:nocov:
-            File.open(t.name, "wb") do |f|  #:nocov:
+            File.open(winstone_jar, "wb") do |f| #:nocov:
               while buf = stream.read(4096) #:nocov:
                 f << buf                    #:nocov:
               end                           #:nocov:
