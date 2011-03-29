@@ -152,6 +152,14 @@ describe Warbler::Task do
   end
 end
 
+describe Warbler::Task do
+  it "should report Warbler version with --version" do
+    output = `ruby -Ilib -S bin/warble --version`.chomp
+    output.should =~ /warbler/i
+    output.should =~ /#{Warbler::VERSION}/
+  end
+end
+
 describe "Debug targets" do
   run_in_directory "spec/sample_war"
 

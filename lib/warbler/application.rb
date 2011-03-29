@@ -67,4 +67,20 @@ class Warbler::Application < Rake::Application
     Rake.application = self
     super
   end
+
+  # Remap the version option to display Warbler version.
+  def standard_rake_options
+    super.map do |opt|
+      if opt.first == '--version'
+        ['--version', '-V', "Display the program version.",
+         lambda { |value|
+           puts "Warbler version #{Warbler::VERSION}"
+           exit
+         }
+        ]
+      else
+        opt
+      end
+    end
+  end
 end
