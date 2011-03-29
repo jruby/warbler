@@ -66,11 +66,10 @@ module Warbler
         define_files_task
         define_jar_task
         define_debug_task
-        define_gemjar_task
         define_config_task
         define_pluginize_task
-        define_executable_task
         define_version_task
+        define_extra_tasks
       end
     end
 
@@ -141,10 +140,8 @@ module Warbler
       end
     end
 
-    def define_gemjar_task
-      task "gemjar" do
-        @config.features << "gemjar"
-      end
+    def define_extra_tasks
+      @config.define_tasks
     end
 
     def define_config_task
@@ -174,12 +171,6 @@ module Warbler
             f.puts "Warbler::Task.new"
           end
         end
-      end
-    end
-
-    def define_executable_task
-      task "executable" do
-        @config.features << "executable"
       end
     end
 

@@ -184,6 +184,15 @@ module Warbler
       @gem_path[1..-1]
     end
 
+    def define_tasks
+      task "gemjar" do
+        self.features << "gemjar"
+      end
+      task "executable" do
+        self.features << "executable"
+      end
+    end
+
     # Deprecated
     def war_name
       warn "config.war_name deprecated; replace with config.jar_name" #:nocov:
