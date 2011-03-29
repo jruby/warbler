@@ -80,6 +80,7 @@ module Warbler
 
       # Add public/static assets to the root of the war file.
       def add_public_files(jar)
+        config.public_html.exclude *(config.excludes.to_a)
         config.public_html.map {|f| jar.add_with_pathmaps(config, f, :public_html) }
       end
 

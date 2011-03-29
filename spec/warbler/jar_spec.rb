@@ -369,6 +369,14 @@ describe Warbler::Jar do
       file_list(%r{lib/tasks/utils.rake}).should be_empty
     end
 
+    it "can exclude public files from the .war" do
+      use_config do |config|
+        config.excludes += FileList['public/robots.txt']
+      end
+      jar.apply(config)
+      file_list(%r{robots.txt}).should be_empty
+    end
+
     it "reads configuration from #{Warbler::Config::FILE}" do
       mkdir_p "config"
       File.open(Warbler::Config::FILE, "w") do |dest|
