@@ -1,0 +1,2 @@
+ENV['BUNDLE_WITHOUT'] = '<%= config.bundle_without.join(':') %>'
+ENV['BUNDLE_GEMFILE'] = '<%= config.bundler[:gemfile].basename %>'

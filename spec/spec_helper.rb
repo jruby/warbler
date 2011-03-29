@@ -68,7 +68,7 @@ module Spec::Example::ExampleGroupMethods
     after(:each) do
       rm_rf FileList["log", ".bundle", "tmp/war"]
       rm_f FileList["*.war", "*.foobar", "**/config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
-                    "file.txt", 'manifest', 'Gemfile*', 'MANIFEST.MF*', 'init.rb*', '**/*.class']
+                    "file.txt", 'manifest', '*Gemfile*', 'MANIFEST.MF*', 'init.rb*', '**/*.class']
     end
   end
 end

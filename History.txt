@@ -2,6 +2,7 @@
 
 - Warbler can now package regular Ruby projects as executable jar
   files. See the README.txt file for details.
+- WARBLER-18: Heed BUNDLE_GEMFILE in environment
 
 == 1.2.1
 

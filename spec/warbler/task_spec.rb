@@ -9,6 +9,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Warbler::Task do
   run_in_directory "spec/sample_war"
+  use_fresh_environment
 
   let :config do
     Warbler::Config.new do |config|
@@ -136,7 +137,7 @@ describe Warbler::Task do
         end
       end
 
-      rm_f "r.txt.symlink"
+      rm_f "r.txt.symlink", :verbose => false
     rescue NotImplementedError
     end
   end

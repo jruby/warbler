@@ -663,6 +663,12 @@ describe Warbler::Jar do
         contents.should =~ /ENV\['BUNDLE_WITHOUT'\]/
         contents.should =~ /'development:test'/
       end
+
+      it "uses ENV['BUNDLE_GEMFILE'] if set" do
+        mv "Gemfile", "Special-Gemfile"
+        ENV['BUNDLE_GEMFILE'] = "Special-Gemfile"
+        config.traits.should include(Warbler::Traits::Bundler)
+      end
     end
 
     it "skips directories that don't exist in config.dirs and print a warning" do

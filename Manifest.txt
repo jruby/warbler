@@ -17,6 +17,7 @@ lib/warbler/gems.rb
 lib/warbler/jar.rb
 lib/warbler/task.rb
 lib/warbler/templates
+lib/warbler/templates/bundler.erb
 lib/warbler/templates/config.erb
 lib/warbler/templates/rack.erb
 lib/warbler/templates/rails.erb

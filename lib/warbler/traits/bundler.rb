@@ -13,7 +13,7 @@ module Warbler
       include Trait
 
       def self.detect?
-        File.exist?("Gemfile")
+        File.exist?(ENV['BUNDLE_GEMFILE'] || "Gemfile")
       end
 
       def self.requires?(trait)
@@ -32,15 +32,15 @@ module Warbler
       def add_bundler_gems
         config.gems.clear
         config.gem_dependencies = false # Bundler takes care of these
+        config.bundler = {}
 
         require 'bundler'
-        gemfile = Pathname.new("Gemfile").expand_path
-        root = gemfile.dirname
-        lockfile = root.join('Gemfile.lock')
+        gemfile  = config.bundler[:gemfile]  = ::Bundler.default_gemfile
+        lockfile = config.bundler[:lockfile] = ::Bundler.default_lockfile
         definition = ::Bundler::Definition.build(gemfile, lockfile, nil)
         groups = definition.groups - config.bundle_without.map {|g| g.to_sym}
         definition.specs_for(groups).each {|spec| config.gems << spec }
-        config.init_contents << StringIO.new("ENV['BUNDLE_WITHOUT'] = '#{config.bundle_without.join(':')}'\n")
+        config.init_contents << "#{config.warbler_templates}/bundler.erb"
       end
 
       def update_archive(jar)
@@ -49,9 +49,12 @@ module Warbler
 
       # Add Bundler Gemfiles to the archive.
       def add_bundler_files(jar)
-        jar.files[jar.apply_pathmaps(config, 'Gemfile', :application)] = 'Gemfile'
-        if File.exist?('Gemfile.lock')
-          jar.files[jar.apply_pathmaps(config, 'Gemfile.lock', :application)] = 'Gemfile.lock'
+        pwd = Pathname.new(Dir.pwd)
+        gemfile  = config.bundler[:gemfile].relative_path_from(pwd).to_s
+        lockfile = config.bundler[:lockfile].relative_path_from(pwd).to_s
+        jar.files[jar.apply_pathmaps(config, gemfile, :application)] = config.bundler[:gemfile].to_s
+        if File.exist?(lockfile)
+          jar.files[jar.apply_pathmaps(config, lockfile, :application)] = config.bundler[:lockfile].to_s
         end
       end
     end
