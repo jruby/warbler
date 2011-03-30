@@ -154,7 +154,7 @@ end
 
 describe Warbler::Task do
   it "should report Warbler version with --version" do
-    output = `ruby -Ilib -S bin/warble --version`.chomp
+    output = `ruby -rubygems -Ilib -S bin/warble --version`.chomp
     output.should =~ /warbler/i
     output.should =~ /#{Warbler::VERSION}/
   end
