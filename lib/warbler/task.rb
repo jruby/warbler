@@ -45,7 +45,7 @@ module Warbler
       end
       @config ||= Config.new
       unless @config.kind_of? Config
-        warn "Warbler::Config not provided by override in initializer or #{Config::FILE}; using defaults"
+        $stderr.puts "Warbler::Config not provided by override in initializer or #{Config::FILE}; using defaults"
         @config = Config.new
       end
       @name = name || @config.jar_extension
@@ -80,7 +80,7 @@ module Warbler
           @config.features.each do |feature|
             t = "#@name:#{feature}"
             unless Rake.application.lookup(t)
-              warn "unknown feature `#{feature}', ignoring"
+              $stderr.puts "unknown feature `#{feature}', ignoring"
               next
             end
             Rake::Task[t].invoke

@@ -146,7 +146,7 @@ module Warbler
     def find_application_files(config)
       config.dirs.select do |d|
         exists = File.directory?(d)
-        warn "warning: application directory `#{d}' does not exist or is not a directory; skipping" unless exists
+        $stderr.puts "warning: application directory `#{d}' does not exist or is not a directory; skipping" unless exists
         exists
       end.each do |d|
         @files[apply_pathmaps(config, d, :application)] = nil
@@ -215,7 +215,7 @@ module Warbler
           if src.respond_to?(:read)
             zipfile.get_output_stream(entry) {|f| f << src.read }
           elsif src.nil? || File.directory?(src)
-            warn "directory symlinks are not followed unless using JRuby; #{entry} contents not in archive" \
+            $stderr.puts "directory symlinks are not followed unless using JRuby; #{entry} contents not in archive" \
               if File.symlink?(entry) && !defined?(JRUBY_VERSION)
             zipfile.mkdir(entry)
           elsif File.symlink?(src)
@@ -242,7 +242,7 @@ module Warbler
   class War < Jar
     def initialize(*)
       super
-      warn "Warbler::War is deprecated. Please replace all occurrences with Warbler::Jar."
+      $stderr.puts "Warbler::War is deprecated. Please replace all occurrences with Warbler::Jar."
     end
   end
 end
