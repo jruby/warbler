@@ -33,13 +33,15 @@ module Warbler
         config.gems.clear
         config.gem_dependencies = false # Bundler takes care of these
         config.bundler = {}
-
+        ENV['BUNDLE_WITHOUT'] ||= config.bundle_without.join(':')
         require 'bundler'
-        gemfile  = config.bundler[:gemfile]  = ::Bundler.default_gemfile
-        lockfile = config.bundler[:lockfile] = ::Bundler.default_lockfile
-        definition = ::Bundler::Definition.build(gemfile, lockfile, nil)
-        groups = definition.groups - config.bundle_without.map {|g| g.to_sym}
-        definition.specs_for(groups).each {|spec| config.gems << spec }
+        ::Bundler.setup.requested_specs.each do |spec|
+          config.gems << spec
+        end
+        config.bundler[:gemfile]  = ::Bundler.default_gemfile
+        config.bundler[:lockfile] = ::Bundler.default_lockfile
+        config.bundler[:frozen] = ::Bundler.settings[:frozen]
+        config.excludes += [::Bundler.settings[:path]] if ::Bundler.settings[:path]
         config.init_contents << "#{config.warbler_templates}/bundler.erb"
       end
 

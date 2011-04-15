@@ -51,7 +51,7 @@ describe Warbler::Jar do
 
     it "requires 'rubygems' in init.rb" do
       jar.add_init_file(config)
-      contents = jar.files['META-INF/init.rb'].read
+      contents = jar.contents('META-INF/init.rb')
       contents.split("\n").grep(/require 'rubygems'/).should_not be_empty
     end
 
@@ -102,13 +102,13 @@ describe Warbler::Jar do
 
       it "sets load paths in init.rb" do
         jar.add_init_file(config)
-        contents = jar.files['META-INF/init.rb'].read
+        contents = jar.contents('META-INF/init.rb')
         contents.split("\n").grep(/LOAD_PATH\.unshift.*sample_jar\/lib/).should_not be_empty
       end
 
       it "loads the default executable in main.rb" do
         jar.apply(config)
-        contents = jar.files['META-INF/main.rb'].read
+        contents = jar.contents('META-INF/main.rb')
         contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
       end
 
@@ -117,21 +117,7 @@ describe Warbler::Jar do
         jar.compile(config)
         jar.apply(config)
         file_list(%r{^sample_jar/lib/sample_jar\.class$}).should_not be_empty
-        jar.files['sample_jar/lib/sample_jar.rb'].read.should =~ /require __FILE__\.sub/
-      end
-
-      context "and a missing file" do
-        before :each do
-          mv "Rakefile", "Rakefile.tmp"
-        end
-
-        after :each do
-          mv "Rakefile.tmp", "Rakefile"
-        end
-
-        it "should warn about the missing file but still continue" do
-          capture { jar.apply(config) }.should =~ /Rakefile/
-        end
+        jar.contents('sample_jar/lib/sample_jar.rb').should =~ /require __FILE__\.sub/
       end
     end
 
@@ -155,7 +141,7 @@ describe Warbler::Jar do
 
       it "loads the first bin/executable in main.rb" do
         silence { jar.apply(config) }
-        contents = jar.files['META-INF/main.rb'].read
+        contents = jar.contents('META-INF/main.rb')
         contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
       end
     end
@@ -193,13 +179,13 @@ describe Warbler::Jar do
 
       it "sets load paths in init.rb" do
         jar.add_init_file(config)
-        contents = jar.files['META-INF/init.rb'].read
+        contents = jar.contents('META-INF/init.rb')
         contents.split("\n").grep(/LOAD_PATH\.unshift.*sample_jar\/lib/).should_not be_empty
       end
 
       it "loads the first bin/executable in main.rb" do
         jar.apply(config)
-        contents = jar.files['META-INF/main.rb'].read
+        contents = jar.contents('META-INF/main.rb')
         contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
       end
     end
@@ -403,6 +389,7 @@ describe Warbler::Jar do
 
     it "allows specification of dependency by Gem::Dependency" do
       spec = mock "gem spec"
+      spec.stub!(:name).and_return "hpricot"
       spec.stub!(:full_name).and_return "hpricot-0.6.157"
       spec.stub!(:full_gem_path).and_return "hpricot-0.6.157"
       spec.stub!(:loaded_from).and_return "hpricot.gemspec"
@@ -415,7 +402,7 @@ describe Warbler::Jar do
       use_config do |config|
         config.gems = [Gem::Dependency.new("hpricot", "> 0.6")]
       end
-      jar.apply(config)
+      silence { jar.apply(config) }
     end
 
     it "copies loose java classes to WEB-INF/classes" do
@@ -520,7 +507,7 @@ describe Warbler::Jar do
           config.webxml.booter = :rails
         end
         jar.add_init_file(config)
-        contents = jar.files['META-INF/init.rb'].read
+        contents = jar.contents('META-INF/init.rb')
         contents.should =~ /ENV\['RAILS_ENV'\]/
         contents.should =~ /'production'/
       end
@@ -608,74 +595,9 @@ describe Warbler::Jar do
 
       it "adds RACK_ENV to init.rb" do
         jar.add_init_file(config)
-        contents = jar.files['META-INF/init.rb'].read
+        contents = jar.contents('META-INF/init.rb')
         contents.should =~ /ENV\['RACK_ENV'\]/
         contents.should =~ /'production'/
-      end
-    end
-
-    context "with Bundler" do
-      before :each do
-        File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
-      end
-
-      it "detects a Bundler trait" do
-        config.traits.should include(Warbler::Traits::Bundler)
-      end
-
-      it "detects a Bundler Gemfile and process only its gems" do
-        use_config do |config|
-          config.gems << "rake"
-        end
-        jar.apply(config)
-        file_list(%r{WEB-INF/Gemfile}).should_not be_empty
-        file_list(%r{WEB-INF/gems/specifications/rspec}).should_not be_empty
-        file_list(%r{WEB-INF/gems/specifications/rake}).should be_empty
-      end
-
-      it "copies Bundler gemfiles into the war" do
-        File.open("Gemfile.lock", "w") {|f| f << "GEM"}
-        jar.apply(config)
-        file_list(%r{WEB-INF/Gemfile}).should_not be_empty
-        file_list(%r{WEB-INF/Gemfile.lock}).should_not be_empty
-      end
-
-      it "allows overriding of the gem path when using Bundler" do
-        use_config do |config|
-          config.gem_path = '/WEB-INF/jewels'
-        end
-        jar.apply(config)
-        file_list(%r{WEB-INF/jewels/specifications/rspec}).should_not be_empty
-      end
-
-      it "works with :git entries in Bundler Gemfiles" do
-        File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
-        silence { ruby "-S", "bundle", "install", "--local" }
-        jar.apply(config)
-        file_list(%r{WEB-INF/gems/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
-        file_list(%r{WEB-INF/gems/specifications/warbler}).should_not be_empty
-      end
-
-      it "does not bundle dependencies in the test group by default" do
-        File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'rspec'\nend\n"}
-        jar.apply(config)
-        file_list(%r{WEB-INF/gems/gems/rake[^/]*/}).should_not be_empty
-        file_list(%r{WEB-INF/gems/gems/rspec[^/]*/}).should be_empty
-        file_list(%r{WEB-INF/gems/specifications/rake}).should_not be_empty
-        file_list(%r{WEB-INF/gems/specifications/rspec}).should be_empty
-      end
-
-      it "adds BUNDLE_WITHOUT to init.rb" do
-        jar.add_init_file(config)
-        contents = jar.files['META-INF/init.rb'].read
-        contents.should =~ /ENV\['BUNDLE_WITHOUT'\]/
-        contents.should =~ /'development:test'/
-      end
-
-      it "uses ENV['BUNDLE_GEMFILE'] if set" do
-        mv "Gemfile", "Special-Gemfile"
-        ENV['BUNDLE_GEMFILE'] = "Special-Gemfile"
-        config.traits.should include(Warbler::Traits::Bundler)
       end
     end
 
@@ -733,7 +655,7 @@ describe Warbler::Jar do
       end
       jar.apply(config)
       file_list(%r{WEB-INF/myserver-web.xml}).should_not be_empty
-      jar.files['WEB-INF/myserver-web.xml'].read.should =~ /web-app.*production/
+      jar.contents('WEB-INF/myserver-web.xml').should =~ /web-app.*production/
     end
 
     it "excludes test files in gems according to config.gem_excludes" do
@@ -762,7 +684,7 @@ describe Warbler::Jar do
         config.init_contents << "Rakefile"
       end
       jar.add_init_file(config)
-      contents = jar.files['META-INF/init.rb'].read
+      contents = jar.contents('META-INF/init.rb')
       contents.should =~ /require 'rake'/
     end
 
@@ -771,7 +693,7 @@ describe Warbler::Jar do
         config.webxml.dummy = '<dummy/>'
       end
       jar.apply(config)
-      jar.files['META-INF/init.rb'].read.should =~ /<dummy\/>/
+      jar.contents('META-INF/init.rb').should =~ /<dummy\/>/
     end
   end
 end

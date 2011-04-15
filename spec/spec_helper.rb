@@ -36,12 +36,13 @@ end
 module Spec::Example::ExampleGroupMethods
   def run_in_directory(dir)
     before :each do
-      @pwd = Dir.getwd
+      (@pwd ||= []) << Dir.getwd
+      Dir.chdir(@pwd.first) # let directory always be relative to project root
       Dir.chdir(dir)
     end
 
     after :each do
-      Dir.chdir(@pwd)
+      Dir.chdir(@pwd.pop)
     end
   end
 
@@ -56,7 +57,7 @@ module Spec::Example::ExampleGroupMethods
   def use_fresh_environment
     before(:each) do
       @env_save = {}
-      (ENV.keys.grep(/BUNDLE/) + ["RUBYOPT", "GEM_PATH"]).each {|k| @env_save[k] = ENV[k]; ENV[k] = nil}
+      (ENV.keys.grep(/BUNDLE/) + ["RUBYOPT"]).each {|k| @env_save[k] = ENV[k]; ENV.delete(k)}
     end
 
     after(:each) do
@@ -69,6 +70,32 @@ module Spec::Example::ExampleGroupMethods
       rm_rf FileList["log", ".bundle", "tmp/war"]
       rm_f FileList["*.war", "*.foobar", "**/config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
                     "file.txt", 'manifest', '*Gemfile*', 'MANIFEST.MF*', 'init.rb*', '**/*.class']
+    end
+  end
+
+  def run_out_of_process_with_drb
+    before :all do
+      require 'drb'
+      DRb.start_service
+      @orig_dir = Dir.pwd
+    end
+
+    let(:drbclient) do
+      drb
+      DRbObject.new(nil, 'druby://127.0.0.1:7890').tap do |drbclient|
+        loop { (drbclient.alive? && break) rescue nil }
+      end
+    end
+
+    let(:drb) do
+      Thread.new do
+        ruby "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')
+      end
+    end
+
+    after :each do
+      drbclient.stop
+      drb.join
     end
   end
 end

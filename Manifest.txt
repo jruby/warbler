@@ -34,6 +34,14 @@ lib/warbler/traits/war.rb
 lib/warbler/version.rb
 lib/warbler/war.rb
 lib/warbler_jar.jar
+spec/drb_helper.rb
+spec/sample_bundler/Gemfile.lock
+spec/sample_bundler/config.ru
+spec/sample_bundler/vendor/bundle/jruby/1.8
+spec/sample_bundler/vendor/bundle/jruby/1.8/cache/rake-0.8.7.gem
+spec/sample_bundler/vendor/bundle/jruby/1.8/gems/rake-0.8.7
+spec/sample_bundler/vendor/bundle/jruby/1.8/gems/rake-0.8.7/lib/rake.rb
+spec/sample_bundler/vendor/bundle/jruby/1.8/specifications/rake-0.8.7.gemspec
 spec/sample_jar/History.txt
 spec/sample_jar/Manifest.txt
 spec/sample_jar/README.txt
@@ -61,6 +69,7 @@ spec/sample_war/public/index.html
 spec/sample_war/public/robots.txt
 spec/spec_helper.rb
 spec/warbler/application_spec.rb
+spec/warbler/bundler_spec.rb
 spec/warbler/config_spec.rb
 spec/warbler/gems_spec.rb
 spec/warbler/jar_spec.rb

@@ -25,6 +25,15 @@ module Warbler
       @files = {}
     end
 
+    def contents(entry)
+      file = files[entry]
+      if file.respond_to?(:read)
+        file.read
+      else
+        File.open(file) {|f| f.read }
+      end
+    end
+
     def compile(config)
       # Compiling all Ruby files we can find -- do we need to allow an
       # option to configure what gets compiled?
@@ -126,16 +135,24 @@ module Warbler
         spec = matched.last
       end
 
-      # skip gems with no load path
-      return if spec.loaded_from == ""
+      full_gem_path = Pathname.new(spec.full_gem_path)
 
-      add_with_pathmaps(config, spec.loaded_from, :gemspecs)
-      spec.files.each do |f|
-        f = f[2..-1] if f =~ /^\.\//
+      # Bundler HAX -- see fake bundler gemspec with bad path in bundler/source.rb
+      if spec.name == "bundler"
+        tries = 2
+        while tries > 0 && !full_gem_path.join('bundler.gemspec').exist?
+          full_gem_path = full_gem_path.dirname
+          tries -= 1
+        end
+      end
+
+      # skip gems whose full_gem_path does not exist
+      ($stderr.puts "warning: skipping #{spec.name} (#{full_gem_path.to_s} does not exist)" ; return) unless full_gem_path.exist?
+
+      @files[apply_pathmaps(config, "#{spec.full_name}.gemspec", :gemspecs)] = StringIO.new(spec.to_ruby)
+      FileList["#{full_gem_path.to_s}/**/*"].each do |src|
+        f = Pathname.new(src).relative_path_from(full_gem_path).to_s
         next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
-        src = File.join(spec.full_gem_path, f)
-        # some gemspecs may have incorrect file listings
-        next unless File.exist?(src)
         @files[apply_pathmaps(config, File.join(spec.full_name, f), :gems)] = src
       end
 
