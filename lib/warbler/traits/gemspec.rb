@@ -32,14 +32,8 @@ module Warbler
       end
 
       def update_archive(jar)
-        @spec.files.each do |f|
-          unless File.exist?(f)
-            warn "update your gemspec; skipping missing file #{f}"
-            next
-          end
-          file_key = jar.apply_pathmaps(config, f, :application)
-          next if jar.files[file_key]
-          jar.files[file_key] = f
+        (Dir['**/*'] - config.compiled_ruby_files).each do |f|
+          jar.files[jar.apply_pathmaps(config, f, :application)] = f
         end
         config.compiled_ruby_files.each do |f|
           f = f.sub(/\.rb$/, '.class')
@@ -51,8 +45,8 @@ module Warbler
       end
 
       def default_executable
-        if @spec.default_executable
-          "bin/#{@spec.default_executable}"
+        if !@spec.executables.empty?
+          "bin/#{@spec.executables.first}"
         else
           exe = Dir['bin/*'].first
           raise "No executable script found" unless exe

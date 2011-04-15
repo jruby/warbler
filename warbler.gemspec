@@ -7,7 +7,6 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sieger"]
   s.date = %q{2011-03-03}
-  s.default_executable = %q{warble}
   s.description = %q{Warbler is a gem to make a Java jar or war file out of any Ruby,
 Rails, Merb, or Rack application. Warbler provides a minimal,
 flexible, Ruby-like way to bundle up all of your application files for

@@ -92,14 +92,6 @@ describe Warbler::Jar do
         file_list(%r{^specifications/rubyzip.*\.gemspec}).should_not be_empty
       end
 
-      it "sets files to be stored in the archive from the spec" do
-        touch "extra.foobar"
-        jar.apply(config)
-        file_list(%r{^sample_jar/History\.txt$}).should_not be_empty
-        file_list(%r{^sample_jar/lib/sample_jar\.rb$}).should_not be_empty
-        file_list(%r{^sample_jar/extra\.foobar$}).should be_empty
-      end
-
       it "sets load paths in init.rb" do
         jar.add_init_file(config)
         contents = jar.contents('META-INF/init.rb')

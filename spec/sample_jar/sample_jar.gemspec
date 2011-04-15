@@ -7,7 +7,6 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sieger"]
   s.date = %q{2010-11-03}
-  s.default_executable = %q{sample_jar}
   s.description = %q{Sample jar application for Warbler specs.}
   s.email = ["nick@nicksieger.com"]
   s.executables = ["sample_jar"]

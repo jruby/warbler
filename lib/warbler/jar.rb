@@ -27,11 +27,7 @@ module Warbler
 
     def contents(entry)
       file = files[entry]
-      if file.respond_to?(:read)
-        file.read
-      else
-        File.open(file) {|f| f.read }
-      end
+      file.respond_to?(:read) ? file.read : File.open(file) {|f| f.read }
     end
 
     def compile(config)
@@ -140,10 +136,7 @@ module Warbler
       # Bundler HAX -- see fake bundler gemspec with bad path in bundler/source.rb
       if spec.name == "bundler"
         tries = 2
-        while tries > 0 && !full_gem_path.join('bundler.gemspec').exist?
-          full_gem_path = full_gem_path.dirname
-          tries -= 1
-        end
+        (full_gem_path = full_gem_path.dirname; tries -= 1) while tries > 0 && !full_gem_path.join('bundler.gemspec').exist?
       end
 
       # skip gems whose full_gem_path does not exist
