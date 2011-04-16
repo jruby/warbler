@@ -5,7 +5,7 @@
 # See the file LICENSE.txt for details.
 #++
 
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path('../../spec_helper', __FILE__)
 
 describe Warbler::War do
   it "is deprecated, replace occurrences with Warbler::Jar" do

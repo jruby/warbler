@@ -5,7 +5,7 @@
 # See the file LICENSE.txt for details.
 #++
 
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path('../../spec_helper', __FILE__)
 
 describe Warbler::Task do
   run_in_directory "spec/sample_war"
@@ -149,14 +149,6 @@ describe Warbler::Task do
       rspec_version = config.gems.keys.detect {|k| k.name == 'rspec'}.version
       zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec_version}.gemspec").should_not be_nil
     end
-  end
-end
-
-describe Warbler::Task do
-  it "should report Warbler version with --version" do
-    output = `ruby -rubygems -Ilib -S bin/warble --version`.chomp
-    output.should =~ /warbler/i
-    output.should =~ /#{Warbler::VERSION}/
   end
 end
 

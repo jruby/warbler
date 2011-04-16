@@ -22,7 +22,7 @@
     <listener-class><%= webxml.servlet_context_listener %></listener-class>
   </listener>
 
-<% if webxml.jndi then webxml.jndi.each do |jndi| %>
+<% if webxml.jndi then [webxml.jndi].flatten.each do |jndi| %>
   <resource-ref>
     <res-ref-name><%= jndi %></res-ref-name>
     <res-type>javax.sql.DataSource</res-type>

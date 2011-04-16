@@ -138,7 +138,7 @@ module Warbler
 
       # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.
       class WebxmlOpenStruct < OpenStruct
-        %w(java com org javax gem).each {|name| undef_method name if Object.methods.include?(name) }
+        %w(java com org javax gem).each {|name| undef_method name.to_sym if Object.methods.include?(name.to_sym) }
 
         def initialize(key = 'webxml')
           @key = key
@@ -180,7 +180,8 @@ module Warbler
               params[escape ? CGI::escapeHTML(k.to_s) : k.to_s] = escape ? CGI::escapeHTML(v.to_s) : v.to_s
             end
           end
-          params.delete_if {|k,v| ['ignored', *ignored].include?(k.to_s) }
+          extra_ignored = Array === ignored ? ignored : []
+          params.delete_if {|k,v| ['ignored', *extra_ignored].include?(k.to_s) }
           params
         end
 

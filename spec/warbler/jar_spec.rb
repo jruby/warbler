@@ -5,7 +5,7 @@
 # See the file LICENSE.txt for details.
 #++
 
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path('../../spec_helper', __FILE__)
 
 describe Warbler::Jar do
   use_fresh_rake_application
@@ -525,12 +525,12 @@ describe Warbler::Jar do
         merb.const_set("BootLoader", boot_loader)
         merb.const_set("VERSION", "1.0")
         dependencies = Class.new do
-          @@dependencies = []
+          @dependencies = []
           def self.dependencies
-            @@dependencies
+            @dependencies
           end
           def self.dependencies=(deps)
-            @@dependencies = deps
+            @dependencies = deps
           end
         end
         boot_loader.const_set("Dependencies", dependencies)

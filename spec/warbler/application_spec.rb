@@ -5,7 +5,7 @@
 # See the file LICENSE.txt for details.
 #++
 
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path('../../spec_helper', __FILE__)
 
 describe Warbler::Application do
   run_in_directory "spec/sample_war"
@@ -82,5 +82,14 @@ describe Warbler::Application do
 
   it "should provide a means to load the project Rakefile" do
     Warbler::Application.new.load_project_rakefile
+  end
+end
+
+describe Warbler::Application do
+  it "should report Warbler version with --version" do
+    ruby = File.join Config::CONFIG['bindir'], 'ruby'
+    output = `#{ruby} -rubygems -Ilib -S bin/warble --version`.chomp
+    output.should =~ /warbler/i
+    output.should =~ /#{Warbler::VERSION}/
   end
 end

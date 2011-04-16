@@ -47,6 +47,11 @@ spec/sample_bundler/vendor/bundle/ruby/1.8/cache/rake-0.8.7.gem
 spec/sample_bundler/vendor/bundle/ruby/1.8/gems/rake-0.8.7
 spec/sample_bundler/vendor/bundle/ruby/1.8/gems/rake-0.8.7/lib/rake.rb
 spec/sample_bundler/vendor/bundle/ruby/1.8/specifications/rake-0.8.7.gemspec
+spec/sample_bundler/vendor/bundle/ruby/1.9.1
+spec/sample_bundler/vendor/bundle/ruby/1.9.1/cache/rake-0.8.7.gem
+spec/sample_bundler/vendor/bundle/ruby/1.9.1/gems/rake-0.8.7
+spec/sample_bundler/vendor/bundle/ruby/1.9.1/gems/rake-0.8.7/lib/rake.rb
+spec/sample_bundler/vendor/bundle/ruby/1.9.1/specifications/rake-0.8.7.gemspec
 spec/sample_jar/History.txt
 spec/sample_jar/Manifest.txt
 spec/sample_jar/README.txt
