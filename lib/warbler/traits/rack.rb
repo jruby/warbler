@@ -22,6 +22,7 @@ module Warbler
       def before_configure
         config.webxml.booter = :rack
         config.webinf_files += [FileList['config.ru', '*/config.ru'].detect {|f| File.exist?(f)}]
+        config.webxml.rack.env = ENV['RACK_ENV'] || 'production'
       end
 
       def after_configure

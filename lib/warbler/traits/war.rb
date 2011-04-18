@@ -48,7 +48,6 @@ module Warbler
 
       def default_webxml_config
         c = WebxmlOpenStruct.new
-        c.rails.env  = ENV['RAILS_ENV'] || 'production'
         c.public.root = '/'
         c.jndi = nil
         c.ignored = %w(jndi booter)

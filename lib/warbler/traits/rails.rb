@@ -21,11 +21,14 @@ module Warbler
 
       def before_configure
         config.jar_name = default_app_name
+        config.webxml.rails.env = ENV['RAILS_ENV'] || 'production'
 
         return unless Warbler.framework_detection
         return false unless task = Warbler.project_application.lookup("environment")
+
         task.invoke rescue nil
         return false unless defined?(::Rails)
+
         config.dirs << "tmp" if File.directory?("tmp")
         config.webxml.booter = :rails
         unless (defined?(::Rails.vendor_rails?) && ::Rails.vendor_rails?) || File.directory?("vendor/rails")
