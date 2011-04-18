@@ -88,7 +88,7 @@ module Warbler
       if config.gem_path != default_gem_path
         config.gem_path = "/#{config.gem_path}" unless config.gem_path =~ %r{^/}
         sub_gem_path = config.gem_path[1..-1]
-        config.pathmaps.public_methods(false).select {|m| m !~ /=/}.each do |pm|
+        config.pathmaps.marshal_dump.keys.each do |pm|
           config.pathmaps.send(pm).each {|p| p.sub!(default_gem_path[1..-1], sub_gem_path)}
         end
         config.webxml["gem"]["path"] = config.gem_path if config.webxml
