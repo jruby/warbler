@@ -494,17 +494,30 @@ describe Warbler::Jar do
         config.gems.keys.should include(Gem::Dependency.new("hpricot", Gem::Requirement.new("=0.6")))
       end
 
-      it "sets the jruby max runtimes to 1 when MT Rails is detected" do
-        task :environment do
-          config = mock "config"
-          @rails.stub!(:configuration).and_return(config)
-          config.stub!(:threadsafe!)
-          config.should_receive(:allow_concurrency).and_return true
-          config.should_receive(:preload_frameworks).and_return true
+      context "with threadsafe! enabled" do
+        before :each do
+          cp "config/environments/production.rb", "config/environments/production.rb.orig"
+          File.open("config/environments/production.rb", "a") {|f| f.puts "", "config.threadsafe!" }
         end
 
-        config.webxml.booter.should == :rails
-        config.webxml.jruby.max.runtimes.should == 1
+        after :each do
+          mv "config/environments/production.rb.orig", "config/environments/production.rb"
+        end
+
+        it "sets the jruby min and max runtimes to 1" do
+          config.webxml.booter.should == :rails
+          config.webxml.jruby.min.runtimes.should == 1
+          config.webxml.jruby.max.runtimes.should == 1
+        end
+
+        it "doesn't override already configured runtime numbers" do
+          use_config do |config|
+            config.webxml.jruby.min.runtimes = 2
+            config.webxml.jruby.max.runtimes = 2
+          end
+          config.webxml.jruby.min.runtimes.should == 2
+          config.webxml.jruby.max.runtimes.should == 2
+        end
       end
 
       it "adds RAILS_ENV to init.rb" do

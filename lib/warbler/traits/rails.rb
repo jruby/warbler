@@ -39,17 +39,18 @@ module Warbler
             config.gems << Gem::Dependency.new(g.name, g.requirement) if Dir["vendor/gems/#{g.name}*"].empty?
           end
         end
-        if defined?(::Rails.configuration.threadsafe!) &&
-            (defined?(::Rails.configuration.allow_concurrency) && # Rails 3
-             ::Rails.configuration.allow_concurrency && ::Rails.configuration.preload_frameworks) ||
-          (defined?(::Rails.configuration.action_controller.allow_concurrency) && # Rails 2
-           ::Rails.configuration.action_controller.allow_concurrency && ::Rails.configuration.action_controller.preload_frameworks)
-          config.webxml.jruby.max.runtimes = 1
-        end
       end
 
       def after_configure
         config.init_contents << "#{config.warbler_templates}/rails.erb"
+        begin
+          rails_env = config.webxml.rails.env
+          unless File.read("config/environments/#{rails_env}.rb").grep(/^\s*config\.threadsafe!/).empty?
+            config.webxml.jruby.min.runtimes = 1 unless Integer === config.webxml.jruby.min.runtimes
+            config.webxml.jruby.max.runtimes = 1 unless Integer === config.webxml.jruby.max.runtimes
+          end
+        rescue
+        end
       end
 
 
