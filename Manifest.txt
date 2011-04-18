@@ -19,8 +19,10 @@ lib/warbler/task.rb
 lib/warbler/templates
 lib/warbler/templates/bundler.erb
 lib/warbler/templates/config.erb
+lib/warbler/templates/jar.erb
 lib/warbler/templates/rack.erb
 lib/warbler/templates/rails.erb
+lib/warbler/templates/war.erb
 lib/warbler/traits
 lib/warbler/traits.rb
 lib/warbler/traits/bundler.rb

@@ -55,6 +55,12 @@ describe Warbler::Jar do
       contents.split("\n").grep(/require 'rubygems'/).should_not be_empty
     end
 
+    it "adds ENV['GEM_HOME'] to init.rb" do
+      jar.add_init_file(config)
+      contents = jar.contents('META-INF/init.rb')
+      contents.should =~ /ENV\['GEM_HOME'\]/
+    end
+
     it "adds a main.rb" do
       jar.apply(config)
       file_list(%r{^META-INF/main.rb$}).should_not be_empty
@@ -208,6 +214,13 @@ describe Warbler::Jar do
       jar.apply(config)
       file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
       file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
+    end
+
+    it "adds ENV['GEM_HOME'] to init.rb" do
+      jar.add_init_file(config)
+      contents = jar.contents('META-INF/init.rb')
+      contents.should =~ /ENV\['GEM_HOME'\]/
+      contents.should =~ /WEB-INF\/gems/
     end
 
     it "does not include log files by default" do

@@ -21,9 +21,11 @@ module Warbler
       end
 
       def before_configure
+        config.gem_path      = '/'
         config.pathmaps      = default_pathmaps
         config.java_libs     = default_jar_files
         config.manifest_file = 'MANIFEST.MF' if File.exist?('MANIFEST.MF')
+        config.init_contents << "#{config.warbler_templates}/jar.erb"
       end
 
       def after_configure

@@ -133,12 +133,6 @@ module Warbler
 
       full_gem_path = Pathname.new(spec.full_gem_path)
 
-      # Bundler HAX -- see fake bundler gemspec with bad path in bundler/source.rb
-      if spec.name == "bundler"
-        tries = 2
-        (full_gem_path = full_gem_path.dirname; tries -= 1) while tries > 0 && !full_gem_path.join('bundler.gemspec').exist?
-      end
-
       # skip gems whose full_gem_path does not exist
       ($stderr.puts "warning: skipping #{spec.name} (#{full_gem_path.to_s} does not exist)" ; return) unless full_gem_path.exist?
 

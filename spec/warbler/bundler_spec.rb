@@ -35,7 +35,7 @@ describe Warbler::Jar, "with Bundler" do
       config.traits.should include(Warbler::Traits::Bundler)
     end
 
-    it "detects a Bundler Gemfile and process only its gems" do
+    it "detects a Gemfile and process only its gems" do
       use_config do |config|
         config.gems << "rake"
       end
@@ -45,7 +45,7 @@ describe Warbler::Jar, "with Bundler" do
       file_list(%r{WEB-INF/gems/specifications/rake}).should be_empty
     end
 
-    it "copies Bundler gemfiles into the war" do
+    it "copies Gemfiles into the war" do
       File.open("Gemfile.lock", "w") {|f| f << "GEM"}
       jar.apply(config)
       file_list(%r{WEB-INF/Gemfile}).should_not be_empty
@@ -60,12 +60,21 @@ describe Warbler::Jar, "with Bundler" do
       file_list(%r{WEB-INF/jewels/specifications/rspec}).should_not be_empty
     end
 
-    it "works with :git entries in Bundler Gemfiles" do
+    it "works with :git entries in Gemfiles" do
       File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
       silence { ruby "-S", "bundle", "install", "--local" }
       jar.apply(config)
-      file_list(%r{WEB-INF/gems/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
-      file_list(%r{WEB-INF/gems/specifications/warbler}).should_not be_empty
+      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
+      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
+    end
+
+    it "does not work with :path entries in Gemfiles" do
+      File.open("Gemfile", "w") {|f| f << "gem 'warbler', :path => '#{Warbler::WARBLER_HOME}'\n"}
+      silence do
+        ruby "-S", "bundle", "install", "--local"
+        jar.apply(config)
+      end
+      file_list(%r{warbler}).should be_empty
     end
 
     it "does not bundle dependencies in the test group by default" do
@@ -88,6 +97,19 @@ describe Warbler::Jar, "with Bundler" do
       mv "Gemfile", "Special-Gemfile"
       ENV['BUNDLE_GEMFILE'] = "Special-Gemfile"
       config.traits.should include(Warbler::Traits::Bundler)
+    end
+  end
+
+  context "in a jar project" do
+    run_in_directory "spec/sample_jar"
+    cleanup_temp_files
+
+    it "works with :git entries in Gemfiles" do
+      File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
+      silence { ruby "-S", "bundle", "install", "--local" }
+      jar.apply(config)
+      file_list(%r{^bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
+      file_list(%r{^bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
     end
   end
 

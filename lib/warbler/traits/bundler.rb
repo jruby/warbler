@@ -36,7 +36,26 @@ module Warbler
         ENV['BUNDLE_WITHOUT'] ||= config.bundle_without.join(':')
         require 'bundler'
         ::Bundler.setup.requested_specs.each do |spec|
-          config.gems << spec
+          # Bundler HAX -- fixup bad #loaded_from attribute in fake
+          # bundler gemspec from bundler/source.rb
+          if spec.name == "bundler"
+            full_gem_path = Pathname.new(spec.full_gem_path)
+            tries = 2
+            (full_gem_path = full_gem_path.dirname; tries -= 1) while tries > 0 && !full_gem_path.join('bundler.gemspec').exist?
+            spec.loaded_from = full_gem_path.to_s
+          end
+
+          case spec.source
+          when ::Bundler::Source::Git
+            config.bundler[:git_specs] ||= []
+            config.bundler[:git_specs] << spec
+          when ::Bundler::Source::Path
+            $stderr.puts("warning: Bundler `path' components are not currently supported.",
+                         "The `#{spec.full_name}' component was not bundled.",
+                         "Your application may fail to boot!")
+          else
+            config.gems << spec
+          end
         end
         config.bundler[:gemfile]  = ::Bundler.default_gemfile
         config.bundler[:lockfile] = ::Bundler.default_lockfile
@@ -49,7 +68,7 @@ module Warbler
         add_bundler_files(jar) if config.bundler
       end
 
-      # Add Bundler Gemfiles to the archive.
+      # Add Bundler Gemfiles and git repositories to the archive.
       def add_bundler_files(jar)
         pwd = Pathname.new(Dir.pwd)
         gemfile  = config.bundler[:gemfile].relative_path_from(pwd).to_s
@@ -57,6 +76,19 @@ module Warbler
         jar.files[jar.apply_pathmaps(config, gemfile, :application)] = config.bundler[:gemfile].to_s
         if File.exist?(lockfile)
           jar.files[jar.apply_pathmaps(config, lockfile, :application)] = config.bundler[:lockfile].to_s
+        end
+        if config.bundler[:git_specs]
+          pathmap = "#{config.relative_gem_path}/bundler/gems/%p"
+          pathmap.sub!(%r{^/+}, '')
+          config.pathmaps.git = [pathmap]
+          config.bundler[:git_specs].each do |spec|
+            full_gem_path = Pathname.new(spec.full_gem_path)
+            FileList["#{full_gem_path.to_s}/**/*"].each do |src|
+              f = Pathname.new(src).relative_path_from(full_gem_path).to_s
+              next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
+              jar.files[jar.apply_pathmaps(config, File.join(full_gem_path.basename, f), :git)] = src
+            end
+          end
         end
       end
     end

@@ -27,6 +27,7 @@ module Warbler
         config.java_libs     = default_jar_files
         config.public_html   = FileList["public/**/*"]
         config.jar_extension = 'war'
+        config.init_contents << "#{config.warbler_templates}/war.erb"
       end
 
       def after_configure
