@@ -110,6 +110,10 @@ archive along with the Gemfile. The Bundler groups named
 +:development+ and +:test+ will be excluded by default, unless you
 specify with +config.bundle_without+ in +config/warble.rb+.
 
+Warbler supports Bundler for gems and git repositories, but not for
+plain path components. Warbler will warn when a +:path+ component is
+found in the +Gemfile+ and will refuse to include it in the archive.
+
 == War Files
 
 === Rails applications
