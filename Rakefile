@@ -23,6 +23,7 @@ begin
   File.open("Manifest.txt", "wb") {|f| MANIFEST.each {|n| f << "#{n}\n"} }
   require 'hoe'
   require File.dirname(__FILE__) + '/lib/warbler/version'
+  Hoe.plugin :rubyforge
   hoe = Hoe.spec("warbler") do |p|
     p.version = Warbler::VERSION
     p.rubyforge_name = "caldersphere"
@@ -38,6 +39,8 @@ begin
   hoe.spec.files = MANIFEST
   hoe.spec.dependencies.delete_if { |dep| dep.name == "hoe" }
   hoe.spec.rdoc_options += ["-SHN", "-f", "darkfish"]
+
+  p Hoe.plugins
 
   task :gemspec do
     File.open("#{hoe.name}.gemspec", "w") {|f| f << hoe.spec.to_ruby }

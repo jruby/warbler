@@ -30,16 +30,19 @@ deployment to a Java environment.}
       s.add_runtime_dependency(%q<jruby-jars>, [">= 1.4.0"])
       s.add_runtime_dependency(%q<jruby-rack>, [">= 1.0.0"])
       s.add_runtime_dependency(%q<rubyzip>, [">= 0.9.4"])
+      s.add_development_dependency(%q<rubyforge>, [">= 2.0.4"])
     else
       s.add_dependency(%q<rake>, [">= 0.8.7"])
       s.add_dependency(%q<jruby-jars>, [">= 1.4.0"])
       s.add_dependency(%q<jruby-rack>, [">= 1.0.0"])
       s.add_dependency(%q<rubyzip>, [">= 0.9.4"])
+      s.add_dependency(%q<rubyforge>, [">= 2.0.4"])
     end
   else
     s.add_dependency(%q<rake>, [">= 0.8.7"])
     s.add_dependency(%q<jruby-jars>, [">= 1.4.0"])
     s.add_dependency(%q<jruby-rack>, [">= 1.0.0"])
     s.add_dependency(%q<rubyzip>, [">= 0.9.4"])
+    s.add_dependency(%q<rubyforge>, [">= 2.0.4"])
   end
 end
