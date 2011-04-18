@@ -4,6 +4,13 @@
   files. See the README.txt file for details.
 - WARBLER-18: Heed BUNDLE_GEMFILE in environment
 - WARBLER-17: Allow config.excludes to work for files in public/
+- GH#3, #12, #17: Properly bundle when BUNDLE_PATH is set or
+  --deployment flag is used
+- JRUBY-5077, WARBLER-24: Gems from git repositories are now packaged
+  correctly
+- GH#20: Ruby 1.9.2 support
+- GH#8: Clean up compiled .class files after building war
+- GH#15: Simplify detection of thread-safe Rails
 
 == 1.2.1
 

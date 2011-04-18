@@ -93,8 +93,7 @@ require paths, and the files to be included in the archive. For best
 results make sure your gemspec specifies all of the following
 attributes:
 
-* +default_executable+
-* +files+
+* +executables+
 * +require_paths+
 * runtime dependencies added with +add_dependency+
 
@@ -248,5 +247,5 @@ After that, simply run "rake".
 
 Warbler is provided under the terms of the MIT license.
 
-Warbler (c) 2010 Engine Yard, Inc.
+Warbler (c) 2010-2011 Engine Yard, Inc.
 Warbler (c) 2007-2009 Sun Microsystems, Inc.
