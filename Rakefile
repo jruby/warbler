@@ -73,18 +73,19 @@ end
 
 task :default => :spec
 
+desc "Compile and jar the Warbler Java helper classes"
 begin
   require 'ant'
+  task :jar => :compile do
+    ant.jar :basedir => "pkg/classes", :destfile => "lib/warbler_jar.jar", :includes => "*.class"
+  end
+
   directory "pkg/classes"
   task :compile => "pkg/classes" do |t|
     ant.javac :srcdir => "ext", :destdir => t.prerequisites.first,
     :source => "1.5", :target => "1.5", :debug => true,
     :classpath => "${java.class.path}:${sun.boot.class.path}",
     :includeantRuntime => false
-  end
-
-  task :jar => :compile do
-    ant.jar :basedir => "pkg/classes", :destfile => "lib/warbler_jar.jar", :includes => "*.class"
   end
 rescue LoadError
   task :jar do
