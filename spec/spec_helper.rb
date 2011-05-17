@@ -38,6 +38,7 @@ module Spec::Example::ExampleGroupMethods
     before :each do
       (@pwd ||= []) << Dir.getwd
       Dir.chdir(@pwd.first) # let directory always be relative to project root
+      mkdir_p(dir, :verbose => false)
       Dir.chdir(dir)
     end
 

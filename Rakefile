@@ -40,8 +40,6 @@ begin
   hoe.spec.dependencies.delete_if { |dep| dep.name == "hoe" }
   hoe.spec.rdoc_options += ["-SHN", "-f", "darkfish"]
 
-  p Hoe.plugins
-
   task :gemspec do
     File.open("#{hoe.name}.gemspec", "w") {|f| f << hoe.spec.to_ruby }
   end

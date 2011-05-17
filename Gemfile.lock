@@ -1,10 +1,13 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    bouncy-castle-java (1.5.0145.2)
     diff-lcs (1.1.2)
     hoe (2.9.1)
       rake (>= 0.8.7)
     jruby-jars (1.6.0)
+    jruby-openssl (0.7.1)
+      bouncy-castle-java
     jruby-rack (1.0.8)
     json_pure (1.4.6)
     rake (0.8.7)
@@ -24,6 +27,7 @@ DEPENDENCIES
   diff-lcs
   hoe (>= 2.3.2)
   jruby-jars
+  jruby-openssl
   jruby-rack
   rake (>= 0.8.7)
   rcov (>= 0.9.8)
