@@ -7,6 +7,7 @@
 
 require 'zip/zip'
 require 'stringio'
+require 'pathname'
 
 module Warbler
   # Class that holds the files that will be stored in the jar file.
