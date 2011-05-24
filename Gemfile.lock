@@ -29,7 +29,7 @@ DEPENDENCIES
   jruby-jars
   jruby-openssl
   jruby-rack
-  rake (>= 0.8.7)
+  rake (~> 0.8.7)
   rcov (>= 0.9.8)
   rdoc
   rspec (~> 1.3)
