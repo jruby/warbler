@@ -30,12 +30,12 @@ module Warbler
       end
 
       def add_bundler_gems
+	require 'bundler'
         config.gems.clear
         config.gem_dependencies = false # Bundler takes care of these
         config.bundler = {}
-        ENV['BUNDLE_WITHOUT'] ||= config.bundle_without.join(':')
-        require 'bundler'
-        ::Bundler.setup.requested_specs.each do |spec|
+
+        bundler_specs.each do |spec|
           # Bundler HAX -- fixup bad #loaded_from attribute in fake
           # bundler gemspec from bundler/source.rb
           if spec.name == "bundler"
@@ -90,6 +90,18 @@ module Warbler
             end
           end
         end
+      end
+
+      private
+
+      def bundler_specs
+	original_without = ::Bundler.settings.without
+	::Bundler.settings.without = config.bundle_without
+
+	::Bundler::Definition.build(::Bundler.default_gemfile, ::Bundler.default_lockfile, nil).requested_specs
+      ensure
+	# need to set the settings back, otherwise they get persisted in .bundle/config
+	::Bundler.settings[:without] = original_without.join(':')
       end
     end
   end
