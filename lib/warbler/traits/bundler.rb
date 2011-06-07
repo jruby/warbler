@@ -95,13 +95,9 @@ module Warbler
       private
 
       def bundler_specs
-	original_without = ::Bundler.settings.without
-	::Bundler.settings.without = config.bundle_without
-
-	::Bundler::Definition.build(::Bundler.default_gemfile, ::Bundler.default_lockfile, nil).requested_specs
-      ensure
-	# need to set the settings back, otherwise they get persisted in .bundle/config
-	::Bundler.settings[:without] = original_without.join(':')
+	bundle_without = config.bundle_without.map {|s| s.to_sym}
+	definition = ::Bundler.definition
+        definition.specs_for(definition.groups - bundle_without)
       end
     end
   end
