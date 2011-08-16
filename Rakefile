@@ -11,8 +11,6 @@ rescue LoadError
   puts "Please install Bundler and run 'bundle install' to ensure you have all dependencies"
 end
 
-require 'spec/rake/spectask'
-require 'spec/rake/verify_rcov'
 
 MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt", "Gemfile",
                     "LICENSE.txt", "Rakefile", "*.erb", "*.rb", "bin/*",
@@ -33,7 +31,7 @@ begin
     p.summary = "Warbler chirpily constructs .war files of your Rails applications."
     p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
     p.description = p.paragraphs_of('README.txt', 1...2).join("\n\n")
-    p.extra_deps += [['rake', '~> 0.8.7'], ['jruby-jars', '>= 1.4.0'], ['jruby-rack', '>= 1.0.0'], ['rubyzip', '>= 0.9.4']]
+    p.extra_deps += [['rake', '>= 0.8.7'], ['jruby-jars', '>= 1.4.0'], ['jruby-rack', '>= 1.0.0'], ['rubyzip', '>= 0.9.4']]
     p.clean_globs += %w(MANIFEST web.xml init.rb).map{|f| "spec/sample*/#{f}*" }
   end
   hoe.spec.files = MANIFEST
@@ -47,13 +45,10 @@ rescue LoadError
   puts "You really need Hoe installed to be able to package this gem"
 end
 
-# Leave my tasks alone, Hoe
-%w(default spec rcov).each do |task|
-  Rake::Task[task].prerequisites.clear
-  Rake::Task[task].actions.clear
-end
+require 'spec/rake/spectask'
+require 'spec/rake/verify_rcov'
 
-Spec::Rake::SpecTask.new do |t|
+Spec::Rake::SpecTask.new(:spec) do |t|
   t.spec_opts ||= []
   t.spec_opts << "--options" << "spec/spec.opts"
 end

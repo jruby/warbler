@@ -60,7 +60,8 @@ module Warbler
         config.bundler[:gemfile]  = ::Bundler.default_gemfile
         config.bundler[:lockfile] = ::Bundler.default_lockfile
         config.bundler[:frozen] = ::Bundler.settings[:frozen]
-        config.excludes += [::Bundler.settings[:path]] if ::Bundler.settings[:path]
+        path = ::Bundler.settings[:path]
+        config.excludes += [path, "#{path}/**/*"] if path
         config.init_contents << "#{config.warbler_templates}/bundler.erb"
       end
 

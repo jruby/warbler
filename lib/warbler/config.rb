@@ -12,6 +12,8 @@ require 'warbler/traits'
 module Warbler
   # Warbler archive assembly configuration class.
   class Config
+    include RakeHelper
+
     TOP_DIRS = %w(app config lib log vendor)
     FILE = "config/warble.rb"
     BUILD_GEMS = %w(warbler rake rcov)
@@ -171,7 +173,7 @@ module Warbler
 
       @compiled_ruby_files ||= FileList[*@dirs.map {|d| "#{d}/**/*.rb"}]
 
-      @excludes += ["tmp/war"] if File.directory?("tmp/war")
+      @excludes += ["tmp/war", "tmp/war/**/*"] if File.directory?("tmp/war")
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes += FileList["**/*.log"] if @exclude_logs
     end

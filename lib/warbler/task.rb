@@ -29,6 +29,8 @@ module Warbler
   # With this setup, you can create two separate war files two
   # different configurations by running <tt>rake war1 war2</tt>.
   class Task < Rake::TaskLib
+    include RakeHelper
+
     # Task name
     attr_accessor :name
 

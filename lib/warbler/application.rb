@@ -11,6 +11,8 @@ require 'rake'
 # report its name properly and inject its own tasks without a
 # Rakefile.
 class Warbler::Application < Rake::Application
+  include Warbler::RakeHelper
+
   def initialize
     super
     Warbler.application = self

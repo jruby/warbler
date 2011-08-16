@@ -29,5 +29,6 @@ module Warbler
 end
 
 require 'warbler/version'
+require 'warbler/rake_helper'
 require 'warbler/task'
 require 'warbler/application'

@@ -17,6 +17,8 @@ module Warbler
   # * Any object responding to +read+ representing an in-memory blob
   # * A String filename pointing to a file on disk
   class Jar
+    include RakeHelper
+
     DEFAULT_MANIFEST = %{Manifest-Version: 1.0\nCreated-By: Warbler #{Warbler::VERSION}\n\n}
 
     attr_reader :files

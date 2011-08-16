@@ -83,9 +83,9 @@ module Spec::Example::ExampleGroupMethods
 
     let(:drbclient) do
       drb
-      DRbObject.new(nil, 'druby://127.0.0.1:7890').tap do |drbclient|
+      DRbObject.new(nil, 'druby://127.0.0.1:7890').tap {|drbclient|
         loop { (drbclient.alive? && break) rescue nil }
-      end
+      }
     end
 
     let(:drb) do
@@ -102,6 +102,9 @@ module Spec::Example::ExampleGroupMethods
 end
 
 Spec::Runner.configure do |config|
+  config.include Warbler::RakeHelper
+  config.extend Warbler::RakeHelper
+
   config.after(:each) do
     class << Object
       public :remove_const

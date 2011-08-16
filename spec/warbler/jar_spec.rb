@@ -635,6 +635,7 @@ describe Warbler::Jar do
         config.dirs += ["tmp"]
       end
       jar.apply(config)
+      file_list(%r{WEB-INF/tmp/war}).should be_empty
       file_list(%r{WEB-INF/tmp/war/index\.html}).should be_empty
     end
 
