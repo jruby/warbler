@@ -101,17 +101,13 @@ module Warbler
       private
 
       def bundler_specs
-	original_without = ::Bundler.settings.without
-        definition = ::Bundler::Definition.build(::Bundler.default_gemfile, ::Bundler.default_lockfile, nil)
+	bundle_without = config.bundle_without.map {|s| s.to_sym}
+	definition = ::Bundler.definition
         all = definition.specs.to_a
-        ::Bundler.settings.without = config.bundle_without
-        requested = definition.requested_specs.to_a
+        requested = definition.specs_for(definition.groups - bundle_without).to_a
         excluded_git_specs = (all - requested).select {|spec| ::Bundler::Source::Git === spec.source }
         excluded_git_specs.each {|spec| spec.groups << :warbler_excluded }
         requested + excluded_git_specs
-      ensure
-	# need to set the settings back, otherwise they get persisted in .bundle/config
-	::Bundler.settings[:without] = original_without.join(':')
       end
     end
   end

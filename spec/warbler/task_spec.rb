@@ -142,12 +142,21 @@ describe Warbler::Task do
     end
   end
 
-  it "should use a Bundler Gemfile to include gems" do
-    File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
-    silence { run_task "warble" }
-    Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
-      rspec_version = config.gems.keys.detect {|k| k.name == 'rspec'}.version
-      zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec_version}.gemspec").should_not be_nil
+  context "with a Bundler Gemfile" do
+    run_out_of_process_with_drb
+
+    after do
+      drbclient.run_task "warble:clean"
+    end
+
+    it "includes gems from the Gemfile" do
+      File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
+      silence { drbclient.run_task "warble" }
+      config = drbclient.config
+      Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
+        rspec_version = config.gems.keys.detect {|k| k.name == 'rspec'}.version
+        zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec_version}.gemspec").should_not be_nil
+      end
     end
   end
 end

@@ -30,6 +30,11 @@ class WarblerDrbServer
     @jar ||= Warbler::Jar.new
   end
 
+  def run_task(t)
+    @task ||= Warbler::Task.new "warble", config
+    Rake::Task[t].invoke
+  end
+
   def stop
     DRb.stop_service
   end
