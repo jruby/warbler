@@ -11,6 +11,7 @@ module Warbler
     # be added to the project.
     class Bundler
       include Trait
+      include PathmapHelper
 
       def self.detect?
         File.exist?(ENV['BUNDLE_GEMFILE'] || "Gemfile")
@@ -58,6 +59,7 @@ module Warbler
           end
         end
         config.bundler[:gemfile]  = ::Bundler.default_gemfile
+        config.bundler[:gemfile_path] = apply_pathmaps(config, relative_from_pwd(::Bundler.default_gemfile), :application)
         config.bundler[:lockfile] = ::Bundler.default_lockfile
         config.bundler[:frozen] = ::Bundler.settings[:frozen]
         path = ::Bundler.settings[:path]
@@ -71,12 +73,11 @@ module Warbler
 
       # Add Bundler Gemfiles and git repositories to the archive.
       def add_bundler_files(jar)
-        pwd = Pathname.new(Dir.pwd)
-        gemfile  = config.bundler[:gemfile].relative_path_from(pwd).to_s
-        lockfile = config.bundler[:lockfile].relative_path_from(pwd).to_s
-        jar.files[jar.apply_pathmaps(config, gemfile, :application)] = config.bundler[:gemfile].to_s
+        gemfile  = relative_from_pwd(config.bundler[:gemfile])
+        lockfile = relative_from_pwd(config.bundler[:lockfile])
+        jar.files[apply_pathmaps(config, gemfile, :application)] = config.bundler[:gemfile].to_s
         if File.exist?(lockfile)
-          jar.files[jar.apply_pathmaps(config, lockfile, :application)] = config.bundler[:lockfile].to_s
+          jar.files[apply_pathmaps(config, lockfile, :application)] = config.bundler[:lockfile].to_s
         end
         if config.bundler[:git_specs]
           pathmap = "#{config.relative_gem_path}/bundler/gems/%p"
@@ -92,10 +93,14 @@ module Warbler
             FileList[pattern].each do |src|
               f = Pathname.new(src).relative_path_from(full_gem_path).to_s
               next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
-              jar.files[jar.apply_pathmaps(config, File.join(full_gem_path.basename, f), :git)] = src
+              jar.files[apply_pathmaps(config, File.join(full_gem_path.basename, f), :git)] = src
             end
           end
         end
+      end
+
+      def relative_from_pwd(path)
+        path.relative_path_from(Pathname.new(Dir.pwd)).to_s
       end
 
       private

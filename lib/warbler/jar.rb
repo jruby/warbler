@@ -17,6 +17,7 @@ module Warbler
   # * Any object responding to +read+ representing an in-memory blob
   # * A String filename pointing to a file on disk
   class Jar
+    include PathmapHelper
     include RakeHelper
 
     DEFAULT_MANIFEST = %{Manifest-Version: 1.0\nCreated-By: Warbler #{Warbler::VERSION}\n\n}
@@ -194,15 +195,6 @@ module Warbler
     def erb_binding(config)
       webxml = config.webxml
       binding
-    end
-
-    def apply_pathmaps(config, file, pathmaps)
-      file = file[2..-1] if file =~ /^\.\//
-      pathmaps = config.pathmaps.send(pathmaps)
-      pathmaps.each do |p|
-        file = file.pathmap(p)
-      end if pathmaps
-      file
     end
 
     def ensure_directory_entries

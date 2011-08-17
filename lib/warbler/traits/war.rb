@@ -11,8 +11,9 @@ module Warbler
   module Traits
     # The War trait sets up the layout and generates web.xml for the war project.
     class War
-      include RakeHelper
       include Trait
+      include RakeHelper
+      include PathmapHelper
 
       DEFAULT_GEM_PATH = '/WEB-INF/gems'
 
@@ -90,9 +91,9 @@ module Warbler
       def add_webxml(jar)
         config.webinf_files.each do |wf|
           if wf =~ /\.erb$/
-            jar.files[jar.apply_pathmaps(config, wf, :webinf)] = jar.expand_erb(wf, config)
+            jar.files[apply_pathmaps(config, wf, :webinf)] = jar.expand_erb(wf, config)
           else
-            jar.files[jar.apply_pathmaps(config, wf, :webinf)] = wf
+            jar.files[apply_pathmaps(config, wf, :webinf)] = wf
           end
         end
       end

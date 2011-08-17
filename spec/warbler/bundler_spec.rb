@@ -101,6 +101,12 @@ describe Warbler::Jar, "with Bundler" do
       contents.should =~ /'development:test'/
     end
 
+    it "adds BUNDLE_GEMFILE to init.rb" do
+      jar.add_init_file(config)
+      contents = jar.contents('META-INF/init.rb')
+      contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
+    end
+
     it "uses ENV['BUNDLE_GEMFILE'] if set" do
       mv "Gemfile", "Special-Gemfile"
       ENV['BUNDLE_GEMFILE'] = "Special-Gemfile"
@@ -118,6 +124,9 @@ describe Warbler::Jar, "with Bundler" do
       jar.apply(config)
       file_list(%r{^bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
       file_list(%r{^bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
+      jar.add_init_file(config)
+      contents = jar.contents('META-INF/init.rb')
+      contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
     end
   end
 
