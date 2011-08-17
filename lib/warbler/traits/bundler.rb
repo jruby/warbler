@@ -84,7 +84,12 @@ module Warbler
           config.pathmaps.git = [pathmap]
           config.bundler[:git_specs].each do |spec|
             full_gem_path = Pathname.new(spec.full_gem_path)
-            FileList["#{full_gem_path.to_s}/**/*"].each do |src|
+            if spec.groups.include?(:warbler_excluded)
+              pattern = "#{full_gem_path.to_s}/*.gemspec" # #42: gemspec only to avert Bundler error
+            else
+              pattern = "#{full_gem_path.to_s}/**/*"
+            end
+            FileList[pattern].each do |src|
               f = Pathname.new(src).relative_path_from(full_gem_path).to_s
               next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
               jar.files[jar.apply_pathmaps(config, File.join(full_gem_path.basename, f), :git)] = src
@@ -97,9 +102,13 @@ module Warbler
 
       def bundler_specs
 	original_without = ::Bundler.settings.without
-	::Bundler.settings.without = config.bundle_without
-
-	::Bundler::Definition.build(::Bundler.default_gemfile, ::Bundler.default_lockfile, nil).requested_specs
+        definition = ::Bundler::Definition.build(::Bundler.default_gemfile, ::Bundler.default_lockfile, nil)
+        all = definition.specs.to_a
+        ::Bundler.settings.without = config.bundle_without
+        requested = definition.requested_specs.to_a
+        excluded_git_specs = (all - requested).select {|spec| ::Bundler::Source::Git === spec.source }
+        excluded_git_specs.each {|spec| spec.groups << :warbler_excluded }
+        requested + excluded_git_specs
       ensure
 	# need to set the settings back, otherwise they get persisted in .bundle/config
 	::Bundler.settings[:without] = original_without.join(':')

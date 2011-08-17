@@ -68,6 +68,14 @@ describe Warbler::Jar, "with Bundler" do
       file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
     end
 
+    it "bundles only the gemspec for :git entries that are excluded" do
+      File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\nend\n"}
+      silence { ruby "-S", "bundle", "install", "--local" }
+      jar.apply(config)
+      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should be_empty
+      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
+    end
+
     it "does not work with :path entries in Gemfiles" do
       File.open("Gemfile", "w") {|f| f << "gem 'warbler', :path => '#{Warbler::WARBLER_HOME}'\n"}
       silence do
