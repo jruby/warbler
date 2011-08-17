@@ -76,19 +76,21 @@ describe Warbler::Application do
 
   it "should define a pluginize task for adding the tasks to a Rails application" do
     ARGV.unshift "pluginize"
-    Warbler::Application.new.run
+    silence { Warbler::Application.new.run }
     File.exist?("vendor/plugins/warbler/tasks/warbler.rake").should be_true
   end
 
   it "should provide a means to load the project Rakefile" do
-    Warbler::Application.new.load_project_rakefile
+    silence { Warbler::Application.new.load_project_rakefile }
   end
 end
 
 describe Warbler::Application do
   it "should report Warbler version with --version" do
     ruby = File.join Config::CONFIG['bindir'], 'ruby'
-    output = `#{ruby} -rubygems -Ilib -S bin/warble --version`.chomp
+    output = capture do
+      sh "#{ruby} -rubygems -Ilib -S bin/warble --version"
+    end
     output.should =~ /warbler/i
     output.should =~ /#{Warbler::VERSION}/
   end
