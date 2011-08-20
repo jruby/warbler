@@ -100,7 +100,11 @@ module Warbler
       end
 
       def relative_from_pwd(path)
-        path.relative_path_from(Pathname.new(Dir.pwd)).to_s
+        if path.relative?
+          path
+        else
+          path.relative_path_from(Pathname.new(Dir.pwd)).to_s
+        end
       end
 
       private
