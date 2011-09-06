@@ -2,7 +2,7 @@ Gemfile
 History.txt
 LICENSE.txt
 Manifest.txt
-README.txt
+README.rdoc
 Rakefile
 bin/warble
 ext/JarMain.java

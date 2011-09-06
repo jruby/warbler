@@ -12,7 +12,7 @@ rescue LoadError
 end
 
 
-MANIFEST = FileList["History.txt", "Manifest.txt", "README.txt", "Gemfile",
+MANIFEST = FileList["History.txt", "Manifest.txt", "README.rdoc", "Gemfile",
                     "LICENSE.txt", "Rakefile", "*.erb", "*.rb", "bin/*",
                     "ext/**/*", "lib/**/*", "spec/**/*.rb", "spec/sample*/**/*.*"
                    ].to_a.reject{|f| f=~%r{spec/sample/(MANIFEST|link|web.xml)}}.sort.uniq
@@ -30,7 +30,7 @@ begin
     p.email = "nick@nicksieger.com"
     p.summary = "Warbler chirpily constructs .war files of your Rails applications."
     p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
-    p.description = p.paragraphs_of('README.txt', 1...2).join("\n\n")
+    p.description = p.paragraphs_of('README.rdoc', 1...2).join("\n\n")
     p.extra_deps += [['rake', '>= 0.8.7'], ['jruby-jars', '>= 1.4.0'], ['jruby-rack', '>= 1.0.0'], ['rubyzip', '>= 0.9.4']]
     p.clean_globs += %w(MANIFEST web.xml init.rb).map{|f| "spec/sample*/#{f}*" }
   end
