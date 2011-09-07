@@ -233,7 +233,7 @@ http://kenai.com/jira/browse/WARBLER.
 You can get the Warbler source using Git, in any of the following ways:
 
    git clone git://git.caldersphere.net/warbler.git
-   git clone git://github.com/nicksieger/warbler.git
+   git clone git://github.com/jruby/warbler.git
    git clone git://kenai.com/warbler~main
 
 You can also download a tarball of Warbler source at
