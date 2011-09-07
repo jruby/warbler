@@ -237,7 +237,7 @@ You can get the Warbler source using Git, in any of the following ways:
    git clone git://kenai.com/warbler~main
 
 You can also download a tarball of Warbler source at
-http://github.com/nicksieger/warbler/tree/master.
+https://github.com/jruby/warbler/tarball/master.
 
 == Development
 
