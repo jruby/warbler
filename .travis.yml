@@ -1,0 +1,6 @@
+rvm:
+  - jruby
+  - jruby-head
+branches:
+  only:
+    - master
