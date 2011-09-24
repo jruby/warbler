@@ -505,6 +505,7 @@ describe Warbler::Jar do
         end
 
         it "sets the jruby min and max runtimes to 1" do
+          ENV["RAILS_ENV"] = nil
           config.webxml.booter.should == :rails
           config.webxml.jruby.min.runtimes.should == 1
           config.webxml.jruby.max.runtimes.should == 1
@@ -521,6 +522,7 @@ describe Warbler::Jar do
       end
 
       it "adds RAILS_ENV to init.rb" do
+        ENV["RAILS_ENV"] = nil
         use_config do |config|
           config.webxml.booter = :rails
         end
@@ -612,6 +614,7 @@ describe Warbler::Jar do
       end
 
       it "adds RACK_ENV to init.rb" do
+        ENV["RACK_ENV"] = nil
         jar.add_init_file(config)
         contents = jar.contents('META-INF/init.rb')
         contents.should =~ /ENV\['RACK_ENV'\]/
@@ -666,6 +669,7 @@ describe Warbler::Jar do
     end
 
     it "allows expanding of additional WEB-INF files via config.webinf_files" do
+      ENV["RAILS_ENV"] = nil
       File.open("myserver-web.xml.erb", "w") do |f|
         f << "<web-app><%= webxml.rails.env %></web-app>"
       end
