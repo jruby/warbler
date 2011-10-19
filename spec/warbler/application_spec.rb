@@ -87,9 +87,9 @@ end
 
 describe Warbler::Application do
   it "should report Warbler version with --version" do
-    ruby = File.join Config::CONFIG['bindir'], 'ruby'
+    ruby = File.join Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']
     output = capture do
-      sh "#{ruby} -rubygems -Ilib -S bin/warble --version"
+      sh "#{ruby} -Ilib -S bin/warble --version"
     end
     output.should =~ /warbler/i
     output.should =~ /#{Warbler::VERSION}/
