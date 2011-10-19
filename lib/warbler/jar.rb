@@ -130,7 +130,8 @@ module Warbler
         # skip development dependencies
         return if gem.respond_to?(:type) and gem.type != :runtime
 
-        matched = Gem.source_index.search(gem)
+        # Deal with deprecated Gem.source_index and #search
+        matched = gem.respond_to?(:to_spec) ? [gem.to_spec] : Gem.source_index.search(gem)
         fail "gem '#{gem}' not installed" if matched.empty?
         spec = matched.last
       end

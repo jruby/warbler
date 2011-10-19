@@ -400,12 +400,10 @@ describe Warbler::Jar do
       spec.stub!(:loaded_from).and_return "hpricot.gemspec"
       spec.stub!(:files).and_return ["Rakefile"]
       spec.stub!(:dependencies).and_return []
-      Gem.source_index.should_receive(:search).and_return do |gem|
-        gem.name.should == "hpricot"
-        [spec]
-      end
+      dep = Gem::Dependency.new("hpricot", "> 0.6")
+      dep.should_receive(:to_spec).and_return spec
       use_config do |config|
-        config.gems = [Gem::Dependency.new("hpricot", "> 0.6")]
+        config.gems = [dep]
       end
       silence { jar.apply(config) }
     end
