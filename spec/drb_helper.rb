@@ -18,6 +18,11 @@ class Warbler::Jar
 end
 
 class WarblerDrbServer
+  def initialize
+    @output = StringIO.new
+    $stdout = $stderr = @output
+  end
+
   def config(extra_config_proc = nil)
     @config ||= Warbler::Config.new {|c| extra_config_proc.call(c) if extra_config_proc }
   end

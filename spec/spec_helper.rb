@@ -33,6 +33,9 @@ def capture(&block)
   io.string
 end
 
+require 'rbconfig'
+RUBY_EXE = File.join Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']
+
 module Spec::Example::ExampleGroupMethods
   def run_in_directory(dir)
     before :each do

@@ -62,7 +62,7 @@ describe Warbler::Jar, "with Bundler" do
 
     it "works with :git entries in Gemfiles" do
       File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
-      silence { ruby "-S", "bundle", "install", "--local" }
+      `#{RUBY_EXE} -S bundle install --local`
       jar.apply(config)
       file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
       file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
@@ -70,7 +70,7 @@ describe Warbler::Jar, "with Bundler" do
 
     it "bundles only the gemspec for :git entries that are excluded" do
       File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\nend\n"}
-      silence { ruby "-S", "bundle", "install", "--local" }
+      `#{RUBY_EXE} -S bundle install --local`
       jar.apply(config)
       file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should be_empty
       file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
@@ -78,10 +78,8 @@ describe Warbler::Jar, "with Bundler" do
 
     it "does not work with :path entries in Gemfiles" do
       File.open("Gemfile", "w") {|f| f << "gem 'warbler', :path => '#{Warbler::WARBLER_HOME}'\n"}
-      silence do
-        ruby "-S", "bundle", "install", "--local"
-        jar.apply(config)
-      end
+      `#{RUBY_EXE} -S bundle install --local`
+      silence { jar.apply(config) }
       file_list(%r{warbler}).should be_empty
     end
 
@@ -120,7 +118,7 @@ describe Warbler::Jar, "with Bundler" do
 
     it "works with :git entries in Gemfiles" do
       File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
-      silence { ruby "-S", "bundle", "install", "--local" }
+      `#{RUBY_EXE} -S bundle install --local`
       jar.apply(config)
       file_list(%r{^bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
       file_list(%r{^bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
