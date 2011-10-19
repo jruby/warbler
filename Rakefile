@@ -25,6 +25,7 @@ begin
   hoe = Hoe.spec("warbler") do |p|
     p.version = Warbler::VERSION
     p.rubyforge_name = "caldersphere"
+    p.readme_file = "README.rdoc"
     p.url = "http://caldersphere.rubyforge.org/warbler"
     p.author = "Nick Sieger"
     p.email = "nick@nicksieger.com"
