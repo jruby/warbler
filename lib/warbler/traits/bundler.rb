@@ -43,7 +43,10 @@ module Warbler
             full_gem_path = Pathname.new(spec.full_gem_path)
             tries = 2
             (full_gem_path = full_gem_path.dirname; tries -= 1) while tries > 0 && !full_gem_path.join('bundler.gemspec').exist?
-            spec.loaded_from = full_gem_path.to_s
+            spec.loaded_from = full_gem_path.join('bundler.gemspec').to_s
+            # RubyGems 1.8.x: @full_gem_path is cached, so we have to set it
+            def spec.full_gem_path=(p); @full_gem_path = p; end
+            spec.full_gem_path = full_gem_path.to_s
           end
 
           case spec.source
