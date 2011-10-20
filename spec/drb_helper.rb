@@ -27,7 +27,7 @@ class WarblerDrbServer
     @config ||= Warbler::Config.new {|c| extra_config_proc.call(c) if extra_config_proc }
   end
 
-  def alive?
+  def ready?
     true
   end
 

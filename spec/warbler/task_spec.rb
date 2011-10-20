@@ -151,7 +151,7 @@ describe Warbler::Task do
 
     it "includes gems from the Gemfile" do
       File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
-      silence { drbclient.run_task "warble" }
+      drbclient.run_task "warble"
       config = drbclient.config
       Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
         rspec_version = config.gems.keys.detect {|k| k.name == 'rspec'}.version

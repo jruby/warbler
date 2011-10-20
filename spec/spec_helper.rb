@@ -87,7 +87,9 @@ module Spec::Example::ExampleGroupMethods
     let(:drbclient) do
       drb
       DRbObject.new(nil, 'druby://127.0.0.1:7890').tap {|drbclient|
-        loop { (drbclient.alive? && break) rescue nil }
+        ready = nil
+        100.times { ((ready = drbclient.ready?) && break) rescue nil; sleep 0.5 }
+        raise "Connection error" unless ready
       }
     end
 
