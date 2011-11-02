@@ -140,9 +140,10 @@ module Warbler
 
       # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.
       class WebxmlOpenStruct < OpenStruct
+        object_kernel_methods = (Object.methods + Kernel.methods + Kernel.private_methods)
         %w(java com org javax gem).each do |name|
-          undef_method name        if Object.methods.include?(name)
-          undef_method name.to_sym if Object.methods.include?(name.to_sym)
+          undef_method name        if object_kernel_methods.include?(name)
+          undef_method name.to_sym if object_kernel_methods.include?(name.to_sym)
         end
 
         def initialize(key = 'webxml')
