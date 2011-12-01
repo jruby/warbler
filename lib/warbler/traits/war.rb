@@ -76,6 +76,7 @@ module Warbler
       def update_archive(jar)
         add_public_files(jar)
         add_webxml(jar)
+        move_jars_to_webinf_lib(jar)
         add_executables(jar) if config.features.include?("executable")
         add_gemjar(jar) if config.features.include?("gemjar")
       end
@@ -136,6 +137,28 @@ module Warbler
         mkdir_p "tmp"
         gem_jar.add_manifest
         gem_jar.create("tmp/gems.jar")
+      end
+
+      def move_jars_to_webinf_lib(jar)
+        jar.files.keys.select {|k| k =~ /^WEB-INF\/.*\.jar$/ }.each do |k|
+          next if k =~ /^WEB-INF\/lib\/([^\/]+)\.jar$/ # skip jars already in WEB-INF/lib
+          jar.files["WEB-INF/lib/#{k.sub('WEB-INF','')[1..-1].gsub(/[\/\\]/,'-')}"] = jar.files[k]
+          jar.files[k] = empty_jar
+        end
+      end
+
+      def empty_jar
+        @empty_jar ||= begin
+          t = Tempfile.new(["empty", "jar"])
+          path = t.path
+          t.unlink
+          Zip::ZipFile.open(path, Zip::ZipFile::CREATE) do |zipfile|
+            zipfile.mkdir("META-INF")
+            zipfile.get_output_stream("META-INF/MANIFEST.MF") {|f| f << ::Warbler::Jar::DEFAULT_MANIFEST }
+          end
+          at_exit { File.delete(path) }
+          path
+        end
       end
 
       # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.

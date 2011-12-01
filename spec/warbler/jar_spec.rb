@@ -429,6 +429,27 @@ describe Warbler::Jar do
       end
     end
 
+    context "with embedded jar files" do
+      before :each do
+        touch FileList["app/sample.jar", "lib/existing.jar"]
+      end
+      after :each do
+        rm_f FileList["app/sample.jar", "lib/existing.jar"]
+      end
+
+      it "moves jar files to WEB-INF/lib" do
+        jar.apply(config)
+        file_list(%r{WEB-INF/lib/app-sample.jar}).should_not be_empty
+        file_list(%r{WEB-INF/app/sample.jar}).should_not be_empty
+      end
+
+      it "leaves jar files alone that are already in WEB-INF/lib" do
+        jar.apply(config)
+        file_list(%r{WEB-INF/lib/lib-existing.jar}).should be_empty
+        file_list(%r{WEB-INF/lib/existing.jar}).should_not be_empty
+      end
+    end
+
     context "with the executable feature" do
       it "adds a WarMain class" do
         use_config do |config|
