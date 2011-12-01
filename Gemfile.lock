@@ -10,7 +10,7 @@ GEM
       bouncy-castle-java
     jruby-rack (1.0.9)
     json_pure (1.5.3)
-    rake (0.9.2)
+    rake (0.9.2.2)
     rcov (0.9.10)
     rcov (0.9.10-java)
     rdoc (3.9.2)
