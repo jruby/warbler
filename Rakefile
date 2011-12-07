@@ -36,6 +36,7 @@ begin
     p.extra_rdoc_files += ["README.rdoc"]
     p.extra_deps += [['rake', '>= 0.8.7'], ['jruby-jars', '>= 1.4.0'], ['jruby-rack', '>= 1.0.0'], ['rubyzip', '>= 0.9.4']]
     p.clean_globs += %w(MANIFEST web.xml init.rb).map{|f| "spec/sample*/#{f}*" }
+    p.rspec_options = ["--options", "spec/spec.opts"]
   end
   hoe.spec.files = MANIFEST
   hoe.spec.rdoc_options += ["-SHN", "-f", "darkfish"]
@@ -48,13 +49,7 @@ rescue LoadError
   puts "You really need Hoe installed to be able to package this gem"
 end
 
-require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
-
-Spec::Rake::SpecTask.new(:spec) do |t|
-  t.spec_opts ||= []
-  t.spec_opts << "--options" << "spec/spec.opts"
-end
 
 Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.spec_opts ||= []
