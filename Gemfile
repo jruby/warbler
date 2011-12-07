@@ -13,4 +13,5 @@ group :development do
   gem "rubyforge"
   gem "hoe", ">= 2.3.2"
   gem "rdoc"
+  gem "childprocess"
 end

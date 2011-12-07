@@ -7,6 +7,7 @@
 
 require 'rubygems'
 require 'spec'
+require 'childprocess'
 
 $LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
 require 'warbler'
@@ -88,20 +89,31 @@ module Spec::Example::ExampleGroupMethods
       drb
       DRbObject.new(nil, 'druby://127.0.0.1:7890').tap {|drbclient|
         ready = nil
-        100.times { ((ready = drbclient.ready?) && break) rescue nil; sleep 0.5 }
-        raise "Connection error" unless ready
+        e = nil
+        100.times { ((ready = drbclient.ready?) && break) rescue e = $!; sleep 0.5 }
+        raise e unless ready
       }
     end
 
-    let(:drb) do
-      Thread.new do
-        ruby "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')
-      end
-    end
+    let(:drb_helper_args) { ["-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')] }
 
-    after :each do
-      drbclient.stop
-      drb.join
+    if defined?(JRUBY_VERSION)
+      let(:drb) do
+        Thread.new do
+          ruby *drb_helper_args
+        end
+      end
+      after :each do
+        drbclient.stop
+        drb.join
+      end
+    else
+      let(:drb) do
+        ChildProcess.build(FileUtils::RUBY, *drb_helper_args).tap {|d| d.start }
+      end
+      after :each do
+        drb.stop
+      end
     end
   end
 end
