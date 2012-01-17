@@ -45,7 +45,8 @@ module Warbler
         config.init_contents << "#{config.warbler_templates}/rails.erb"
         begin
           rails_env = config.webxml.rails.env
-          unless IO.readlines("config/environments/#{rails_env}.rb").grep(/^\s*config\.threadsafe!/).empty?
+          unless IO.readlines("config/environments/#{rails_env}.rb").grep(/^\s*config\.threadsafe!/).empty? &&
+                 IO.readlines("config/environment.rb").grep(/^\s*config\.threadsafe!/).empty?
             config.webxml.jruby.min.runtimes = 1 unless Integer === config.webxml.jruby.min.runtimes
             config.webxml.jruby.max.runtimes = 1 unless Integer === config.webxml.jruby.max.runtimes
           end

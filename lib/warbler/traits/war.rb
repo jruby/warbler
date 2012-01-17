@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2010-2011 Engine Yard, Inc.
+# Copyright (c) 2010-2012 Engine Yard, Inc.
 # Copyright (c) 2007-2009 Sun Microsystems, Inc.
 # This source code is available under the MIT license.
 # See the file LICENSE.txt for details.
@@ -149,7 +149,9 @@ module Warbler
 
       def empty_jar
         @empty_jar ||= begin
-          path = Tempfile.open(["empty", "jar"]) {|t| return t.path }
+          t = Tempfile.new(["empty", "jar"])
+          path = t.path
+          t.close!
           Zip::ZipFile.open(path, Zip::ZipFile::CREATE) do |zipfile|
             zipfile.mkdir("META-INF")
             zipfile.get_output_stream("META-INF/MANIFEST.MF") {|f| f << ::Warbler::Jar::DEFAULT_MANIFEST }
