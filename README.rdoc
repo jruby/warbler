@@ -65,7 +65,10 @@ Currently, three features are available.
   (Note: jar-based applications are executable by default.)
 * +compiled+: This uses +jrubyc+ to precompile all .rb files in your
   application to .class files and includes those in the .war instead
-  of the Ruby sources.
+  of the Ruby sources. NOTE: The war file will still contain .rb
+  files, but they will be short stubs containing the following code:
+
+    require __FILE__.sub(/\.rb$/, '.class')
 
 Features may form the basis for a third-party plugin system in the
 future if there is demand.
