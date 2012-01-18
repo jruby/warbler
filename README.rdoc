@@ -49,7 +49,7 @@ You can either add features to the warbler command line:
 
     warble FEATURE war
 
-or configure them in config/warble.rb to always be used.
+or configure them in <tt>config/warble.rb</tt> to always be used.
 
    config.features = %w(FEATURE)
 
@@ -72,6 +72,18 @@ Currently, three features are available.
 
 Features may form the basis for a third-party plugin system in the
 future if there is demand.
+
+NOTE: Feature tasks must be included in the same command invocation
+and inserted before the +war+ task in order to take effect. For
+example, <tt>warble compiled; warble war</tt> does not compile and
+obfuscate +.rb+ sources because the second invocation of +warble+ does
+not run the +compiled+ feature and creates a basic war with the
+sources included. Always make sure you run
+
+    warble compiled war
+
+or, if it's important that the war always be compiled, use the option
+above to put the feature in your <tt>config/warble.rb</tt>.
 
 == War or Jar?
 
