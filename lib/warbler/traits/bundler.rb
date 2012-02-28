@@ -88,14 +88,25 @@ module Warbler
           config.pathmaps.git = [pathmap]
           config.bundler[:git_specs].each do |spec|
             full_gem_path = Pathname.new(spec.full_gem_path)
+            
+            gem_relative_path = full_gem_path.relative_path_from(::Bundler.install_path) 
+            filenames = []
+            gem_relative_path.each_filename { |f| filenames << f }
+
+            exclude_gems = true
+            unless filenames.empty?
+              full_gem_path = Pathname.new(::Bundler.install_path) + filenames.first
+            end
+
             if spec.groups.include?(:warbler_excluded)
-              pattern = "#{full_gem_path.to_s}/*.gemspec" # #42: gemspec only to avert Bundler error
+              pattern = "#{full_gem_path.to_s}/**/#{spec.name}.gemspec" # #42: gemspec only to avert Bundler error
             else
               pattern = "#{full_gem_path.to_s}/**/*"
             end
+
             FileList[pattern].each do |src|
               f = Pathname.new(src).relative_path_from(full_gem_path).to_s
-              next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
+              next if exclude_gems && config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
               jar.files[apply_pathmaps(config, File.join(full_gem_path.basename, f), :git)] = src
             end
           end
