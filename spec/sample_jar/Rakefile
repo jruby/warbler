@@ -1,16 +1,21 @@
 # -*- ruby -*-
 
 require 'rubygems'
-require 'hoe'
 
-hoe = Hoe.spec 'sample_jar' do |p|
-  p.developer('Nick Sieger', 'nick@nicksieger.com')
-  p.extra_deps += [["rubyzip", ">= 0"]]
+spec = Gem::Specification.new do |s|
+  s.name        = "sample_jar"
+  s.version     = "1.0"
+  s.authors     = ["Nick Sieger"]
+  s.email       = ["nick@nicksieger.com"]
+  s.homepage    = ""
+  s.summary     = ""
+  s.description = ""
+  s.add_runtime_dependency("rubyzip", [">= 0"])
 end
 
 task :gemspec do
   File.open('sample_jar.gemspec', 'w') do |f|
-    f << hoe.spec.to_ruby
+    f << spec.to_ruby
   end
 end
 # vim: syntax=ruby

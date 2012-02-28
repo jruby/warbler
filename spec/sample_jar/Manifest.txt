@@ -1,8 +1,0 @@
-.autotest
-History.txt
-Manifest.txt
-README.txt
-Rakefile
-bin/sample_jar
-lib/sample_jar.rb
-test/test_sample_jar.rb

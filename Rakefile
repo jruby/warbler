@@ -1,55 +1,26 @@
 #--
-# Copyright (c) 2010-2011 Engine Yard, Inc.
+# Copyright (c) 2010-2012 Engine Yard, Inc.
 # Copyright (c) 2007-2009 Sun Microsystems, Inc.
 # This source code is available under the MIT license.
 # See the file LICENSE.txt for details.
 #++
 
 begin
+  require 'bundler'
+  Bundler::GemHelper.install_tasks
   require 'bundler/setup'
 rescue LoadError
   puts $!
   puts "Please install Bundler and run 'bundle install' to ensure you have all dependencies"
 end
 
+require 'rake/clean'
+require 'spec/rake/spectask'
 
-MANIFEST = FileList["History.txt", "Manifest.txt", "README.rdoc", "Gemfile",
-                    "LICENSE.txt", "Rakefile", "*.erb", "*.rb", "bin/*",
-                    "ext/**/*", "lib/**/*", "spec/**/*.rb", "spec/sample*/**/*.*"
-                   ].to_a.reject{|f| f=~%r{spec/sample/(MANIFEST|link|web.xml)}}.sort.uniq
-
-begin
-  File.open("Manifest.txt", "wb") {|f| MANIFEST.each {|n| f << "#{n}\n"} }
-  require 'hoe'
-  require File.dirname(__FILE__) + '/lib/warbler/version'
-  Hoe.plugin :rubyforge
-  hoe = Hoe.spec("warbler") do |p|
-    p.version = Warbler::VERSION
-    p.rubyforge_name = "caldersphere"
-    p.readme_file = "README.rdoc"
-    p.url = "http://caldersphere.rubyforge.org/warbler"
-    p.author = "Nick Sieger"
-    p.email = "nick@nicksieger.com"
-    p.summary = "Warbler chirpily constructs .war files of your Rails applications."
-    p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
-    p.description = p.paragraphs_of('README.rdoc', 1...2).join("\n\n")
-    p.extra_rdoc_files += ["README.rdoc"]
-    p.extra_deps += [['rake', '>= 0.8.7'], ['jruby-jars', '>= 1.4.0'], ['jruby-rack', '>= 1.0.0'], ['rubyzip', '>= 0.9.4']]
-    p.clean_globs += %w(MANIFEST web.xml init.rb).map{|f| "spec/sample*/#{f}*" }
-    p.rspec_options = ["--options", "spec/spec.opts"]
-  end
-  hoe.spec.files = MANIFEST
-  hoe.spec.rdoc_options += ["-SHN", "-f", "darkfish"]
-
-  task :gemspec do
-    File.open("#{hoe.name}.gemspec", "w") {|f| f << hoe.spec.to_ruby }
-  end
-  task :package => :gemspec
-rescue LoadError
-  puts "You really need Hoe installed to be able to package this gem"
+Spec::Rake::SpecTask.new do |t|
+  t.spec_opts ||= []
+  t.spec_opts << "--options" << "spec/spec.opts"
 end
-
-require 'spec/rake/verify_rcov'
 
 Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.spec_opts ||= []
@@ -58,6 +29,8 @@ Spec::Rake::SpecTask.new("spec:rcov") do |t|
   t.rcov_opts << "-x" << "/gems/"
   t.rcov = true
 end
+
+require 'spec/rake/verify_rcov'
 
 RCov::VerifyTask.new(:rcov => "spec:rcov") do |t|
   t.threshold = 100
@@ -86,11 +59,11 @@ rescue LoadError
 end
 
 # Make sure jar gets compiled before the gem is built
-task Rake::Task['gem'].prerequisites.first => :jar
+task Rake::Task['build'].prerequisites.first => :jar
 
 task :warbler_jar => 'pkg' do
   ruby "-rubygems", "-Ilib", "-S", "bin/warble"
   mv "warbler.jar", "pkg/warbler-#{Warbler::VERSION}.jar"
 end
 
-task :package => :warbler_jar
+task :build => :warbler_jar
