@@ -1,5 +1,15 @@
+== 1.3.4
+
+- #77, #78: Handle the case when multiple gems exists in a git path
+  (Patrick Cheng)
+- #66: On Windows, File#unlink does not delete the file like it does
+  on POSIX (Greg Mefford)
+- Check config/environment.rb in addition to production.rb for
+  threadsafe (Joe Kutner)
+
 == 1.3.3
 
+- Note: 1.3.3 was YANKED due to #62
 - Move all jars to WEB-INF/lib, and leave an empty jar in the original
   place
 - Deal with private Kernel#gem method in recent RubyGems
