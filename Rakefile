@@ -7,7 +7,9 @@
 
 begin
   require 'bundler'
-  Bundler::GemHelper.install_tasks
+  gem_helper = Bundler::GemHelper.new(Dir.pwd)
+  gem_helper.install
+  gemspec = gem_helper.gemspec
   require 'bundler/setup'
 rescue LoadError
   puts $!
@@ -15,6 +17,8 @@ rescue LoadError
 end
 
 require 'rake/clean'
+CLEAN << "pkg" << "doc"
+
 require 'spec/rake/spectask'
 
 Spec::Rake::SpecTask.new do |t|
@@ -67,3 +71,21 @@ task :warbler_jar => 'pkg' do
 end
 
 task :build => :warbler_jar
+
+require 'rdoc/task'
+RDoc::Task.new(:docs) do |rd|
+  rd.rdoc_dir = "doc"
+  rd.rdoc_files.include("README.rdoc", "History.txt", "LICENSE.txt")
+  rd.rdoc_files += gemspec.require_paths
+  rd.options << '--title' << "#{gemspec.name}-#{gemspec.version} Documentation"
+  rd.options += gemspec.rdoc_options
+end
+
+task :release => :docs do
+  config = YAML.load(File.read(File.expand_path("~/.rubyforge/user-config.yml"))) rescue nil
+  if config
+    dir  = "/var/www/gforge-projects/#{gemspec.rubyforge_project}/#{gemspec.name}"
+    dest "#{config["username"]}@rubyforge.org:#{dir}"
+    sh %{rsync -av --delete doc/ #{dest}}
+  end
+end

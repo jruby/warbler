@@ -21,7 +21,7 @@ deployment to a Java environment.}
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.rdoc_options = ["--main", "README.rdoc", "-SHN", "-f", "darkfish"]
+  s.rdoc_options = ["--main", "README.rdoc", "-H", "-f", "darkfish"]
   s.rubyforge_project = "caldersphere"
 
   s.add_runtime_dependency(%q<rake>, [">= 0.8.7"])
