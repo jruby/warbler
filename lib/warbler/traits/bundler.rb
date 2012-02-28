@@ -96,6 +96,7 @@ module Warbler
             exclude_gems = true
             unless filenames.empty?
               full_gem_path = Pathname.new(::Bundler.install_path) + filenames.first
+              exclude_gems = false
             end
 
             if spec.groups.include?(:warbler_excluded)
