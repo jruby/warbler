@@ -4,7 +4,7 @@ require 'warbler/version'
 version = Warbler::VERSION
 Gem::Specification.new do |s|
   s.name = "warbler"
-  s.version = "1.3.4"
+  s.version = version
   s.platform = Gem::Platform::RUBY
   s.homepage = "http://caldersphere.rubyforge.org/warbler"
   s.authors = ["Nick Sieger"]
