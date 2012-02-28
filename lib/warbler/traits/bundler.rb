@@ -84,10 +84,24 @@ module Warbler
           config.pathmaps.git = [pathmap]
           config.bundler[:git_specs].each do |spec|
             full_gem_path = Pathname.new(spec.full_gem_path)
-            FileList["#{full_gem_path.to_s}/**/*"].each do |src|
-              f = Pathname.new(src).relative_path_from(full_gem_path).to_s
-              next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
-              jar.files[jar.apply_pathmaps(config, File.join(full_gem_path.basename, f), :git)] = src
+ 
+            gem_relative_path = full_gem_path.relative_path_from(::Bundler.install_path) 
+            filenames = []
+            gem_relative_path.each_filename { |f| filenames << f }
+            
+            if filenames.empty?
+              # full_gem_path has only one gem
+              FileList["#{full_gem_path.to_s}/**/*"].each do |src|
+                f = Pathname.new(src).relative_path_from(full_gem_path).to_s
+                next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
+                jar.files[jar.apply_pathmaps(config, File.join(full_gem_path.basename, f), :git)] = src
+              end
+            else
+              gem_base_path = Pathname.new(::Bundler.install_path) + filenames.first
+              FileList["#{gem_base_path.to_s}/**/*"].each do |src|
+                f = Pathname.new(src).relative_path_from(gem_base_path).to_s
+                jar.files[jar.apply_pathmaps(config, File.join(gem_base_path.basename, f), :git)] = src
+              end
             end
           end
         end
