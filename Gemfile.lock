@@ -16,7 +16,7 @@ GEM
     rcov (0.9.10-java)
     rdoc (3.9.2)
     rspec (1.3.2)
-    rubyzip (0.9.4)
+    rubyzip (0.9.6.1)
 
 PLATFORMS
   java

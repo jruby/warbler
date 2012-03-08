@@ -87,6 +87,28 @@ describe Warbler::Jar do
       jar.files['META-INF/MANIFEST.MF'].should == "manifest"
     end
 
+    it "creates a jar" do
+      begin
+        touch "foo.txt"
+        mkdir 'bar'
+        touch "bar/bar.txt"
+        
+        use_config do |config|
+          config.jar_name = 'sample'
+        end
+        
+        jar.files["foo.txt".freeze] = "foo.txt"
+        jar.files["bar".freeze] = "bar" # @see #76 on MRI
+        jar.files["bar/bar.txt"] = "bar/bar.txt".freeze
+
+        silence { jar.create(config) }
+        File.exist?("sample.jar").should == true
+      ensure
+        rm_f ['foo.txt', 'bar/bar.txt', 'sample.jar']
+        rmdir 'bar'
+      end
+    end
+    
     context "with a .gemspec" do
       it "detects a Gemspec trait" do
         config.traits.should include(Warbler::Traits::Gemspec)
