@@ -6,14 +6,16 @@
 #++
 
 require 'rubygems'
-require 'spec'
-require 'childprocess'
+require 'rspec'
 
 $LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
 require 'warbler'
 
 raise %{Error: detected running Warbler specs in a Rails app;
 Warbler specs are destructive to application directories.} if File.directory?("app")
+
+require 'rbconfig'
+RUBY_EXE = File.join Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']
 
 require 'stringio'
 
@@ -34,10 +36,8 @@ def capture(&block)
   io.string
 end
 
-require 'rbconfig'
-RUBY_EXE = File.join Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']
-
-module Spec::Example::ExampleGroupMethods
+module ExampleGroupHelpers
+  
   def run_in_directory(dir)
     before :each do
       (@pwd ||= []) << Dir.getwd
@@ -87,12 +87,12 @@ module Spec::Example::ExampleGroupMethods
 
     let(:drbclient) do
       drb
-      DRbObject.new(nil, 'druby://127.0.0.1:7890').tap {|drbclient|
+      DRbObject.new(nil, 'druby://127.0.0.1:7890').tap do |drbclient|
         ready = nil
         e = nil
         100.times { ((ready = drbclient.ready?) && break) rescue e = $!; sleep 0.5 }
         raise e unless ready
-      }
+      end
     end
 
     let(:drb_helper_args) { ["-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')] }
@@ -109,6 +109,7 @@ module Spec::Example::ExampleGroupMethods
       end
     else
       let(:drb) do
+        require 'childprocess'
         ChildProcess.build(FileUtils::RUBY, *drb_helper_args).tap {|d| d.start }
       end
       after :each do
@@ -116,17 +117,21 @@ module Spec::Example::ExampleGroupMethods
       end
     end
   end
+  
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.include Warbler::RakeHelper
   config.extend Warbler::RakeHelper
+  config.extend ExampleGroupHelpers
 
-  config.after(:each) do
-    class << Object
-      public :remove_const
-    end
-    Object.remove_const("Rails") rescue nil
+  class << ::Object
+    public :remove_const
+  end
+  
+  config.after :each do
+    Object.remove_const("Rails") if defined?(Rails)
     rm_rf "vendor"
   end
+  
 end

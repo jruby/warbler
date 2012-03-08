@@ -6,38 +6,23 @@
 #++
 
 begin
-  require 'bundler'
-  gem_helper = Bundler::GemHelper.new(Dir.pwd)
-  gem_helper.install
-  gemspec = gem_helper.gemspec
   require 'bundler/setup'
 rescue LoadError
   puts $!
   puts "Please install Bundler and run 'bundle install' to ensure you have all dependencies"
 end
 
+require 'bundler/gem_helper'
+gem_helper = Bundler::GemHelper.new(File.dirname(__FILE__))
+gem_helper.install
+gemspec = gem_helper.gemspec
+
 require 'rake/clean'
 CLEAN << "pkg" << "doc"
 
-require 'spec/rake/spectask'
-
-Spec::Rake::SpecTask.new do |t|
-  t.spec_opts ||= []
-  t.spec_opts << "--options" << "spec/spec.opts"
-end
-
-Spec::Rake::SpecTask.new("spec:rcov") do |t|
-  t.spec_opts ||= []
-  t.spec_opts << "--options" << "spec/spec.opts"
-  t.rcov_opts ||= []
-  t.rcov_opts << "-x" << "/gems/"
-  t.rcov = true
-end
-
-require 'spec/rake/verify_rcov'
-
-RCov::VerifyTask.new(:rcov => "spec:rcov") do |t|
-  t.threshold = 100
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.rspec_opts = ['--color', "--format documentation"]
 end
 
 task :default => :spec
