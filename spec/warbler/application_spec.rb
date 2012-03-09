@@ -87,7 +87,7 @@ end
 
 describe Warbler::Application do
   it "should report Warbler version with --version" do
-    output = `#{RUBY_EXE} -Ilib -S bundle exec bin/warble --version`
+    output = `#{RUBY_EXE} -Ilib -S bin/warble --version`
     output.should =~ /warbler/i
     output.should =~ /#{Warbler::VERSION}/
   end
