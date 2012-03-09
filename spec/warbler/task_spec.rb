@@ -115,10 +115,11 @@ describe Warbler::Task do
 
   context "where symlinks are available" do
     begin
-      ln_s "README.txt", "r.txt.symlink", :verbose => false
+      FileUtils.ln_s "README.txt", "r.txt.symlink", :verbose => false
+      
       it "should process symlinks by storing a file in the archive that has the same contents as the source" do
         File.open("config/special.txt", "wb") {|f| f << "special"}
-        Dir.chdir("config") { ln_s "special.txt", "link.txt" }
+        Dir.chdir("config") { FileUtils.ln_s "special.txt", "link.txt" }
         silence { run_task "warble" }
         Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
           special = zf.get_input_stream('WEB-INF/config/special.txt') {|io| io.read }
@@ -128,7 +129,7 @@ describe Warbler::Task do
       end
 
       it "should process directory symlinks by copying the whole subdirectory" do
-        Dir.chdir("lib") { ln_s "tasks", "rakelib" }
+        Dir.chdir("lib") { FileUtils.ln_s "tasks", "rakelib" }
         silence { run_task "warble" }
         Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
           zf.find_entry("WEB-INF/lib/tasks/utils.rake").should_not be_nil
@@ -137,25 +138,37 @@ describe Warbler::Task do
         end
       end
 
-      rm_f "r.txt.symlink", :verbose => false
+      FileUtils.rm_f "r.txt.symlink", :verbose => false
     rescue NotImplementedError
     end
   end
 
   context "with a Bundler Gemfile" do
-    run_out_of_process_with_drb
+    
+    run_out_of_process_with_drb if DRB = true
 
     after do
-      drbclient.run_task "warble:clean"
+      if DRB
+        drbclient.run_task "warble:clean"
+      else
+        silence { run_task "warble:clean" }
+      end
     end
 
     it "includes gems from the Gemfile" do
       File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
-      drbclient.run_task "warble"
-      config = drbclient.config
+      
+      if DRB
+        drbclient.run_task "warble"
+        config = drbclient.config
+      else
+       silence { run_task "warble" } 
+      end
+      
       Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
-        rspec_version = config.gems.keys.detect {|k| k.name == 'rspec'}.version
-        zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec_version}.gemspec").should_not be_nil
+        rspec = config.gems.keys.detect { |spec| spec.name == 'rspec' }
+        rspec.should_not be_nil, "expected rspec gem among: #{config.gems.keys.join(' ')}"
+        zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec.version}.gemspec").should_not be_nil
       end
     end
   end

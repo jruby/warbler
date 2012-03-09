@@ -17,6 +17,7 @@ Warbler specs are destructive to application directories.} if File.directory?("a
 require 'rbconfig'
 RUBY_EXE = File.join Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']
 
+require 'fileutils'
 require 'stringio'
 
 def silence(io = nil)
@@ -45,7 +46,7 @@ module ExampleGroupHelpers
     before :each do
       (@pwd ||= []) << Dir.getwd
       Dir.chdir(@pwd.first) # let directory always be relative to project root
-      mkdir_p(dir, :verbose => false)
+      FileUtils.mkdir_p(dir, :verbose => false)
       Dir.chdir(dir)
     end
 
@@ -75,9 +76,9 @@ module ExampleGroupHelpers
 
   def cleanup_temp_files
     after(:each) do
-      rm_rf FileList["log", ".bundle", "tmp/war"]
-      rm_f FileList["*.war", "*.foobar", "**/config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
-                    "file.txt", 'manifest', '*Gemfile*', 'MANIFEST.MF*', 'init.rb*', '**/*.class']
+      FileUtils.rm_rf FileList["log", ".bundle", "tmp/war"]
+      FileUtils.rm_f  FileList["*.war", "*.foobar", "**/config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
+                               "file.txt", 'manifest', '*Gemfile*', 'MANIFEST.MF*', 'init.rb*', '**/*.class']
     end
   end
 
@@ -133,7 +134,6 @@ end
 
 RSpec.configure do |config|
   config.include Warbler::RakeHelper
-  config.extend Warbler::RakeHelper
   config.extend ExampleGroupHelpers
 
   class << ::Object
