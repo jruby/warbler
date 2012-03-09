@@ -9,6 +9,8 @@ Gem::Specification.new do |s|
   s.date = "2012-03-09"
   s.description = ""
   s.email = ["nick@nicksieger.com"]
+  s.executables = ["sample_jar"]
+  s.files = ["History.txt", "Rakefile", "README.txt", "sample_jar.gemspec", "bin/sample_jar", "lib/sample_jar.rb", "test/test_sample_jar.rb"]
   s.homepage = ""
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.15"
