@@ -88,28 +88,37 @@ module ExampleGroupHelpers
     let(:drbclient) do
       drb
       DRbObject.new(nil, 'druby://127.0.0.1:7890').tap do |drbclient|
-        ready = nil
-        e = nil
-        100.times { ((ready = drbclient.ready?) && break) rescue e = $!; sleep 0.5 }
-        raise e unless ready
+        ready, error = nil, nil
+        300.times do # timeout 30 secs (300 * 0.1)
+          begin
+            break if ready = drbclient.ready? 
+          rescue DRb::DRbConnError => e
+            error = e; sleep 0.1
+          end
+        end
+        raise error unless ready
       end
     end
 
     let(:drb_helper_args) { ["-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')] }
 
     if defined?(JRUBY_VERSION)
+      require 'jruby'
       let(:drb) do
-        Thread.new do
-          ruby *drb_helper_args
+        version_arg = JRuby.runtime.is1_9 ? "--1.9" : "--1.8"
+        drb_thread = Thread.new do
+          ruby *([ version_arg ] + drb_helper_args)
         end
+        drb_thread.run
+        drb_thread
       end
       after :each do
         drbclient.stop
         drb.join
       end
     else
+      require 'childprocess'
       let(:drb) do
-        require 'childprocess'
         ChildProcess.build(FileUtils::RUBY, *drb_helper_args).tap {|d| d.start }
       end
       after :each do
