@@ -138,13 +138,10 @@ found in the +Gemfile+ and will refuse to include it in the archive.
 Rails applications are detected automatically and configured appropriately.
 The following items are set up for you:
 
-* Your application runs in the +production+ environment by default.
-Change it in <tt>config/warble.rb</tt> (see below).
+* Your application runs in the +production+ environment by default. Change it in <tt>config/warble.rb</tt> (see below).
 * The Rails gem is packaged if you haven't vendored Rails (Rails <= 2.x).
-* Other gems configured in Rails.configuration.gems are packaged
-(Rails 2.1 - 2.3)
-* Multi-thread-safe execution (as introduced in Rails 2.2) is detected
-and runtime pooling is disabled.
+* Other gems configured in Rails.configuration.gems are packaged (Rails 2.1 - 2.3)
+* Multi-thread-safe execution (as introduced in Rails 2.2) is detected and runtime pooling is disabled.
 
 === Merb applications
 
