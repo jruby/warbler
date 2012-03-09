@@ -31,7 +31,7 @@ module Warbler
       end
 
       def add_bundler_gems
-	require 'bundler'
+        require 'bundler'
         config.gems.clear
         config.gem_dependencies = false # Bundler takes care of these
         config.bundler = {}
@@ -125,8 +125,8 @@ module Warbler
       private
 
       def bundler_specs
-	bundle_without = config.bundle_without.map {|s| s.to_sym}
-	definition = ::Bundler.definition
+        bundle_without = config.bundle_without.map { |s| s.to_sym }
+        definition = ::Bundler.definition
         all = definition.specs.to_a
         requested = definition.specs_for(definition.groups - bundle_without).to_a
         excluded_git_specs = (all - requested).select {|spec| ::Bundler::Source::Git === spec.source }
