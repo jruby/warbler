@@ -1,3 +1,2 @@
 ENV['BUNDLE_WITHOUT'] = '<%= config.bundle_without.join(':') %>'
-ENV['BUNDLE_GEMFILE'] = File.expand_path('../../<%= config.bundler[:gemfile_path] %>', __FILE__)
 <% if config.bundler[:frozen] %>ENV['BUNDLE_FROZEN'] = '1'<% end %>

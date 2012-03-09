@@ -3,3 +3,6 @@ ENV['GEM_HOME'] ||= File.expand_path('../..', __FILE__)
 <% else %>
 ENV['GEM_HOME'] ||= File.expand_path('../../<%= config.relative_gem_path %>', __FILE__)
 <% end %>
+<% if config.bundler && config.bundler[:gemfile_path] %>
+ENV['BUNDLE_GEMFILE'] = File.expand_path('../../<%= config.bundler[:gemfile_path] %>', __FILE__)
+<% end %>

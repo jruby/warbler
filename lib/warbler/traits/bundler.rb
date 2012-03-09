@@ -88,8 +88,8 @@ module Warbler
           config.pathmaps.git = [pathmap]
           config.bundler[:git_specs].each do |spec|
             full_gem_path = Pathname.new(spec.full_gem_path)
-            
-            gem_relative_path = full_gem_path.relative_path_from(::Bundler.install_path) 
+
+            gem_relative_path = full_gem_path.relative_path_from(::Bundler.install_path)
             filenames = []
             gem_relative_path.each_filename { |f| filenames << f }
 
