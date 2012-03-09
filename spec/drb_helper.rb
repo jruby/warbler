@@ -7,6 +7,7 @@
 
 require 'rubygems'
 require 'drb'
+require 'stringio'
 require 'warbler'
 
 class Warbler::Config
@@ -23,8 +24,12 @@ class WarblerDrbServer
     $stdout = $stderr = @output
   end
 
-  def config(extra_config_proc = nil)
-    @config ||= Warbler::Config.new {|c| extra_config_proc.call(c) if extra_config_proc }
+  def config(config_proc = nil)
+    @config ||= begin 
+      Warbler::Config.new do |config| 
+        config_proc && config_proc.call(config)
+      end
+    end
   end
 
   def ready?
@@ -44,6 +49,8 @@ class WarblerDrbServer
     DRb.stop_service
   end
 end
+
+require File.expand_path('drb_default_id_conv', File.dirname(__FILE__))
 
 server = WarblerDrbServer.new
 service = DRb.start_service 'druby://127.0.0.1:7890', server

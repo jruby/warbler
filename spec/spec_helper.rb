@@ -36,6 +36,9 @@ def capture(&block)
   io.string
 end
 
+require 'drb'
+require File.expand_path('drb_default_id_conv', File.dirname(__FILE__))
+
 module ExampleGroupHelpers
   
   def run_in_directory(dir)
@@ -80,7 +83,6 @@ module ExampleGroupHelpers
 
   def run_out_of_process_with_drb
     before :all do
-      require 'drb'
       DRb.start_service
       @orig_dir = Dir.pwd
     end
