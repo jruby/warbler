@@ -81,11 +81,12 @@ RDoc::Task.new(:docs) do |rd|
   rd.options += gemspec.rdoc_options
 end
 
-task :release => :docs do
+task :release_docs => :docs do
   config = YAML.load(File.read(File.expand_path("~/.rubyforge/user-config.yml"))) rescue nil
   if config
     dir  = "/var/www/gforge-projects/#{gemspec.rubyforge_project}/#{gemspec.name}"
-    dest "#{config["username"]}@rubyforge.org:#{dir}"
+    dest = "#{config["username"]}@rubyforge.org:#{dir}"
     sh %{rsync -av --delete doc/ #{dest}}
   end
 end
+task :release => :release_docs
