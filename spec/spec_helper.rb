@@ -6,8 +6,7 @@
 #++
 
 require 'rubygems'
-require 'spec'
-require 'childprocess'
+require 'rspec'
 
 $LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
 require 'warbler'
@@ -15,8 +14,13 @@ require 'warbler'
 raise %{Error: detected running Warbler specs in a Rails app;
 Warbler specs are destructive to application directories.} if File.directory?("app")
 
+require 'rbconfig'
+RUBY_EXE = File.join Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']
+
+require 'fileutils'
+require 'stringio'
+
 def silence(io = nil)
-  require 'stringio'
   old_stdout = $stdout
   old_stderr = $stderr
   $stdout = io || StringIO.new
@@ -28,21 +32,21 @@ ensure
 end
 
 def capture(&block)
-  require 'stringio'
   io = StringIO.new
   silence(io, &block)
   io.string
 end
 
-require 'rbconfig'
-RUBY_EXE = File.join Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']
+require 'drb'
+require File.expand_path('drb_default_id_conv', File.dirname(__FILE__))
 
-module Spec::Example::ExampleGroupMethods
+module ExampleGroupHelpers
+  
   def run_in_directory(dir)
     before :each do
       (@pwd ||= []) << Dir.getwd
       Dir.chdir(@pwd.first) # let directory always be relative to project root
-      mkdir_p(dir, :verbose => false)
+      FileUtils.mkdir_p(dir, :verbose => false)
       Dir.chdir(dir)
     end
 
@@ -72,42 +76,51 @@ module Spec::Example::ExampleGroupMethods
 
   def cleanup_temp_files
     after(:each) do
-      rm_rf FileList["log", ".bundle", "tmp/war"]
-      rm_f FileList["*.war", "*.foobar", "**/config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
-                    "file.txt", 'manifest', '*Gemfile*', 'MANIFEST.MF*', 'init.rb*', '**/*.class']
+      FileUtils.rm_rf FileList["log", ".bundle", "tmp/war"]
+      FileUtils.rm_f  FileList["*.war", "*.foobar", "**/config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
+                               "file.txt", 'manifest', '*Gemfile*', 'MANIFEST.MF*', 'init.rb*', '**/*.class']
     end
   end
 
   def run_out_of_process_with_drb
     before :all do
-      require 'drb'
       DRb.start_service
       @orig_dir = Dir.pwd
     end
 
     let(:drbclient) do
       drb
-      DRbObject.new(nil, 'druby://127.0.0.1:7890').tap {|drbclient|
-        ready = nil
-        e = nil
-        100.times { ((ready = drbclient.ready?) && break) rescue e = $!; sleep 0.5 }
-        raise e unless ready
-      }
+      DRbObject.new(nil, 'druby://127.0.0.1:7890').tap do |drbclient|
+        ready, error = nil, nil
+        300.times do # timeout 30 secs (300 * 0.1)
+          begin
+            break if ready = drbclient.ready? 
+          rescue DRb::DRbConnError => e
+            error = e; sleep 0.1
+          end
+        end
+        raise error unless ready
+      end
     end
 
     let(:drb_helper_args) { ["-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')] }
 
     if defined?(JRUBY_VERSION)
+      require 'jruby'
       let(:drb) do
-        Thread.new do
-          ruby *drb_helper_args
+        version_arg = JRuby.runtime.is1_9 ? "--1.9" : "--1.8"
+        drb_thread = Thread.new do
+          ruby *([ version_arg ] + drb_helper_args)
         end
+        drb_thread.run
+        drb_thread
       end
       after :each do
         drbclient.stop
         drb.join
       end
     else
+      require 'childprocess'
       let(:drb) do
         ChildProcess.build(FileUtils::RUBY, *drb_helper_args).tap {|d| d.start }
       end
@@ -116,17 +129,20 @@ module Spec::Example::ExampleGroupMethods
       end
     end
   end
+  
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.include Warbler::RakeHelper
-  config.extend Warbler::RakeHelper
+  config.extend ExampleGroupHelpers
 
-  config.after(:each) do
-    class << Object
-      public :remove_const
-    end
-    Object.remove_const("Rails") rescue nil
+  class << ::Object
+    public :remove_const
+  end
+  
+  config.after :each do
+    Object.remove_const("Rails") if defined?(Rails)
     rm_rf "vendor"
   end
+  
 end
