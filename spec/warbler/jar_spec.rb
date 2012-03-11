@@ -473,8 +473,11 @@ describe Warbler::Jar do
     end
 
     context "with the executable feature" do
+      use_test_webserver
+
       it "adds a WarMain class" do
         use_config do |config|
+          config.webserver = "test"
           config.features << "executable"
         end
         jar.apply(config)

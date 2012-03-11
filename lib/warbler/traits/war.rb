@@ -99,30 +99,53 @@ module Warbler
         end
       end
 
-      def add_executables(jar)
-        winstone_type = ENV["WINSTONE"] || "winstone-lite"
-        winstone_version = ENV["WINSTONE_VERSION"] || "0.9.10"
-        winstone_path = "net/sourceforge/winstone/#{winstone_type}/#{winstone_version}/#{winstone_type}-#{winstone_version}.jar"
-        winstone_jar = File.expand_path("~/.m2/repository/#{winstone_path}")
-        unless File.exist?(winstone_jar)
-          # Not always covered in tests as these lines may not get
-          # executed every time if the jar is cached.
-          puts "Downloading #{winstone_type}.jar" #:nocov:
-          mkdir_p File.dirname(winstone_jar)      #:nocov:
-          require 'open-uri'                      #:nocov:
-          maven_repo = ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2" #:nocov:
-          open("#{maven_repo}/#{winstone_path}") do |stream| #:nocov:
-            File.open(winstone_jar, "wb") do |f| #:nocov:
-              while buf = stream.read(4096) #:nocov:
-                f << buf                    #:nocov:
-              end                           #:nocov:
-            end                             #:nocov:
-          end                               #:nocov:
+      class WebServer < Struct.new(:repo, :group_id, :artifact_id, :version)
+        SERVERS = Hash.new {|h,k| h["winstone"] }
+        SERVERS.update({ "winstone" => new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
+                                           "net.sourceforge.winstone", ENV["WINSTONE"] || "winstone-lite",
+                                           ENV["WINSTONE_VERSION"] || "0.9.10"),
+                         "jenkins-ci.winstone" => new("http://maven.jenkins-ci.org/content/groups/artifacts",
+                                                      "org.jenkins-ci", "winstone", "0.9.10-jenkins-35")
+                       })
+
+        def path_fragment
+          @path_fragment ||= "/#{group_id.sub('.', '/')}/#{version}/#{artifact_id}-#{version}.jar"
         end
 
+        def cached_path
+          @cached_path ||= File.expand_path("~/.m2/repository/#{path_fragment}")
+        end
+
+        def download_url
+          @download_url ||= "#{repo}/#{path_fragment}" #:nocov:
+        end
+
+        def add(jar)
+          unless File.exist?(cached_path)
+            puts "Downloading #{artifact_id}.jar" #:nocov:
+            FileUtils.mkdir_p File.dirname(cached_path) #:nocov:
+            require 'open-uri'                    #:nocov:
+            open(download_url) do |stream|        #:nocov:
+              File.open(cached_path, "wb") do |f| #:nocov:
+                while buf = stream.read(4096) #:nocov:
+                  f << buf                    #:nocov:
+                end                           #:nocov:
+              end                             #:nocov:
+            end                               #:nocov:
+          end
+          jar.files['WEB-INF/webserver.jar'] = cached_path
+        end
+      end
+
+      def add_webserver(jar)
+        webserver = WebServer::SERVERS[config.webserver.to_s]
+        webserver.add(jar)
+      end
+
+      def add_executables(jar)
         jar.files['META-INF/MANIFEST.MF'] = StringIO.new(Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: WarMain\n")
         jar.files['WarMain.class'] = jar.entry_in_jar("#{WARBLER_HOME}/lib/warbler_jar.jar", 'WarMain.class')
-        jar.files['WEB-INF/winstone.jar'] = winstone_jar
+        add_webserver(jar)
       end
 
       def add_gemjar(jar)

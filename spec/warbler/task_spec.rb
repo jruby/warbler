@@ -10,11 +10,13 @@ require File.expand_path('../../spec_helper', __FILE__)
 describe Warbler::Task do
   run_in_directory "spec/sample_war"
   use_fresh_environment
+  use_test_webserver
 
   let :config do
     Warbler::Config.new do |config|
       config.jar_name = "warbler"
       config.gems = ["rake"]
+      config.webserver = "test"
       config.webxml.jruby.max.runtimes = 5
     end
   end
@@ -85,7 +87,7 @@ describe Warbler::Task do
 
   it "should define an executable task for embedding a server in the war file" do
     silence { run_task "warble:executable"; run_task "warble:files" }
-    warble_task.jar.files.keys.should include('WEB-INF/winstone.jar')
+    warble_task.jar.files.keys.should include('WEB-INF/webserver.jar')
   end
 
   it "should be able to define all tasks successfully" do

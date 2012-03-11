@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 public class WarMain implements Runnable {
     public static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
-    public static final String WINSTONE_JAR = "/WEB-INF/winstone.jar";
+    public static final String WINSTONE_JAR = "/WEB-INF/webserver.jar";
 
     private String[] args;
     private String path, warfile;

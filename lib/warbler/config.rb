@@ -143,6 +143,8 @@ module Warbler
     #     <%= webxml.context_params['maybe.present.key'] || 'default' %>
     attr_accessor :webxml
 
+    attr_accessor :webserver
+
     attr_reader :warbler_templates
 
     def initialize(warbler_home = WARBLER_HOME)

@@ -41,7 +41,6 @@ require 'drb'
 require File.expand_path('drb_default_id_conv', File.dirname(__FILE__))
 
 module ExampleGroupHelpers
-  
   def run_in_directory(dir)
     before :each do
       (@pwd ||= []) << Dir.getwd
@@ -129,7 +128,19 @@ module ExampleGroupHelpers
       end
     end
   end
-  
+
+  def use_test_webserver
+    before :each do
+      webserver = double('server').as_null_object
+      webserver.stub!(:add).and_return do |jar|
+        jar.files['WEB-INF/webserver.jar'] = StringIO.new
+      end
+      Warbler::Traits::War::WebServer::SERVERS['test'] = webserver
+    end
+    after :each do
+      Warbler::Traits::War::WebServer::SERVERS.delete('test')
+    end
+  end
 end
 
 RSpec.configure do |config|
@@ -139,10 +150,9 @@ RSpec.configure do |config|
   class << ::Object
     public :remove_const
   end
-  
+
   config.after :each do
     Object.remove_const("Rails") if defined?(Rails)
     rm_rf "vendor"
   end
-  
 end
