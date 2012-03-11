@@ -27,23 +27,27 @@ end
 
 task :default => :spec
 
-desc "Compile and jar the Warbler Java helper classes"
+jar_file = "lib/warbler_jar.jar"
 begin
   require 'ant'
-  task :jar => :compile do
-    ant.jar :basedir => "pkg/classes", :destfile => "lib/warbler_jar.jar", :includes => "*.class"
+  directory "pkg/classes"
+  CLEAN << "pkg"
+
+  file jar_file => FileList['ext/**/*.java', 'pkg/classes'] do
+    rm_rf FileList['pkg/classes/**/*']
+    ant.javac :srcdir => "ext", :destdir => "pkg/classes",
+      :source => "1.5", :target => "1.5", :debug => true,
+      :classpath => "${java.class.path}:${sun.boot.class.path}",
+      :includeantRuntime => false
+
+    ant.jar :basedir => "pkg/classes", :destfile => jar_file, :includes => "*.class"
   end
 
-  directory "pkg/classes"
-  task :compile => "pkg/classes" do |t|
-    ant.javac :srcdir => "ext", :destdir => t.prerequisites.first,
-    :source => "1.5", :target => "1.5", :debug => true,
-    :classpath => "${java.class.path}:${sun.boot.class.path}",
-    :includeantRuntime => false
-  end
+  desc "Compile and jar the Warbler Java helper classes"
+  task :jar => jar_file
 rescue LoadError
   task :jar do
-    puts "Run 'jar' with JRuby >= 1.5 to re-compile the java jar booster"
+    puts "Run 'jar' with JRuby to re-compile the java jar booster"
   end
 end
 
