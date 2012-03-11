@@ -143,6 +143,9 @@ module Warbler
     #     <%= webxml.context_params['maybe.present.key'] || 'default' %>
     attr_accessor :webxml
 
+    # Embedded webserver to use. Currently supported webservers are:
+    # * <tt>winstone</tt> (default) - Winstone 0.9.10 from sourceforge
+    # * <tt>jenkins-ci.winstone</tt> - Improved Winstone from Jenkins CI
     attr_accessor :webserver
 
     attr_reader :warbler_templates

@@ -109,7 +109,7 @@ module Warbler
                        })
 
         def path_fragment
-          @path_fragment ||= "/#{group_id.sub('.', '/')}/#{version}/#{artifact_id}-#{version}.jar"
+          @path_fragment ||= "#{group_id.sub('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.jar"
         end
 
         def cached_path
@@ -122,16 +122,21 @@ module Warbler
 
         def add(jar)
           unless File.exist?(cached_path)
-            puts "Downloading #{artifact_id}.jar" #:nocov:
+            puts "Downloading #{artifact_id}-#{version}.jar" #:nocov:
             FileUtils.mkdir_p File.dirname(cached_path) #:nocov:
             require 'open-uri'                    #:nocov:
-            open(download_url) do |stream|        #:nocov:
-              File.open(cached_path, "wb") do |f| #:nocov:
-                while buf = stream.read(4096) #:nocov:
-                  f << buf                    #:nocov:
-                end                           #:nocov:
-              end                             #:nocov:
-            end                               #:nocov:
+            begin
+              open(download_url) do |stream|        #:nocov:
+                File.open(cached_path, "wb") do |f| #:nocov:
+                  while buf = stream.read(4096) #:nocov:
+                    f << buf                    #:nocov:
+                  end                           #:nocov:
+                end                             #:nocov:
+              end                               #:nocov:
+            rescue => e
+              e.message.concat " - #{download_url}"
+              raise e
+            end
           end
           jar.files['WEB-INF/webserver.jar'] = cached_path
         end
