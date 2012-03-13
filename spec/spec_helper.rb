@@ -132,13 +132,14 @@ module ExampleGroupHelpers
   def use_test_webserver
     before :each do
       webserver = double('server').as_null_object
+      webserver.stub!(:main_class).and_return 'WarMain.class'
       webserver.stub!(:add).and_return do |jar|
         jar.files['WEB-INF/webserver.jar'] = StringIO.new
       end
-      Warbler::Traits::War::WebServer::SERVERS['test'] = webserver
+      Warbler::WEB_SERVERS['test'] = webserver
     end
     after :each do
-      Warbler::Traits::War::WebServer::SERVERS.delete('test')
+      Warbler::WEB_SERVERS.delete('test')
     end
   end
 end

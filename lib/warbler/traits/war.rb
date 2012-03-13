@@ -99,58 +99,11 @@ module Warbler
         end
       end
 
-      class WebServer < Struct.new(:repo, :group_id, :artifact_id, :version)
-        SERVERS = Hash.new {|h,k| h["winstone"] }
-        SERVERS.update({ "winstone" => new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
-                                           "net.sourceforge.winstone", ENV["WINSTONE"] || "winstone-lite",
-                                           ENV["WINSTONE_VERSION"] || "0.9.10"),
-                         "jenkins-ci.winstone" => new("http://maven.jenkins-ci.org/content/groups/artifacts",
-                                                      "org.jenkins-ci", "winstone", "0.9.10-jenkins-35")
-                       })
-
-        def path_fragment
-          @path_fragment ||= "#{group_id.sub('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.jar"
-        end
-
-        def cached_path
-          @cached_path ||= File.expand_path("~/.m2/repository/#{path_fragment}")
-        end
-
-        def download_url
-          @download_url ||= "#{repo}/#{path_fragment}" #:nocov:
-        end
-
-        def add(jar)
-          unless File.exist?(cached_path)
-            puts "Downloading #{artifact_id}-#{version}.jar" #:nocov:
-            FileUtils.mkdir_p File.dirname(cached_path) #:nocov:
-            require 'open-uri'                    #:nocov:
-            begin
-              open(download_url) do |stream|        #:nocov:
-                File.open(cached_path, "wb") do |f| #:nocov:
-                  while buf = stream.read(4096) #:nocov:
-                    f << buf                    #:nocov:
-                  end                           #:nocov:
-                end                             #:nocov:
-              end                               #:nocov:
-            rescue => e
-              e.message.concat " - #{download_url}"
-              raise e
-            end
-          end
-          jar.files['WEB-INF/webserver.jar'] = cached_path
-        end
-      end
-
-      def add_webserver(jar)
-        webserver = WebServer::SERVERS[config.webserver.to_s]
-        webserver.add(jar)
-      end
-
       def add_executables(jar)
+        webserver = WEB_SERVERS[config.webserver.to_s]
+        webserver.add(jar)
         jar.files['META-INF/MANIFEST.MF'] = StringIO.new(Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: WarMain\n")
-        jar.files['WarMain.class'] = jar.entry_in_jar("#{WARBLER_HOME}/lib/warbler_jar.jar", 'WarMain.class')
-        add_webserver(jar)
+        jar.files['WarMain.class'] = jar.entry_in_jar("#{WARBLER_HOME}/lib/warbler_jar.jar", webserver.main_class)
       end
 
       def add_gemjar(jar)
