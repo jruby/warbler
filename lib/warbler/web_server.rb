@@ -66,8 +66,17 @@ module Warbler
     end
   end
 
+  class JettyServer < WebServer
+    def initialize
+      super([Artifact.new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
+                          "org.jruby.warbler", "warbler-embedded-jetty",
+                          ENV["WEBSERVER_VERSION"] || "1.0.0")])
+    end
+  end
+
   WEB_SERVERS = Hash.new {|h,k| h["jenkins-ci.winstone"] }
   WEB_SERVERS.update({ "winstone" => WinstoneServer.new,
-                       "jenkins-ci.winstone" => JenkinsWinstoneServer.new
+                       "jenkins-ci.winstone" => JenkinsWinstoneServer.new,
+                       "jetty" => JettyServer.new
                      })
 end
