@@ -33,9 +33,9 @@ begin
   directory "pkg/classes"
   CLEAN << "pkg"
 
-  file jar_file => FileList['ext/**/*.java', 'pkg/classes'] do
+  file jar_file => FileList['ext/*.java', 'pkg/classes'] do
     rm_rf FileList['pkg/classes/**/*']
-    ant.javac :srcdir => "ext", :destdir => "pkg/classes",
+    ant.javac :srcdir => "ext", :includes => "*.java", :destdir => "pkg/classes",
       :source => "1.5", :target => "1.5", :debug => true,
       :classpath => "${java.class.path}:${sun.boot.class.path}",
       :includeantRuntime => false
@@ -52,14 +52,7 @@ rescue LoadError
 end
 
 # Make sure jar gets compiled before the gem is built
-task Rake::Task['build'].prerequisites.first => :jar
-
-task :warbler_jar => 'pkg' do
-  ruby "-rubygems", "-Ilib", "-S", "bin/warble"
-  mv "warbler.jar", "pkg/warbler-#{Warbler::VERSION}.jar"
-end
-
-task :build => :warbler_jar
+task :build => :jar
 
 require 'rdoc/task'
 RDoc::Task.new(:docs) do |rd|

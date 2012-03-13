@@ -13,10 +13,13 @@ import java.io.InputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
+import java.util.Properties;
+import java.util.Map;
 
 public class WarMain implements Runnable {
     public static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
-    public static final String WINSTONE_JAR = "/WEB-INF/webserver.jar";
+    public static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
+    public static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
 
     private String[] args;
     private String path, warfile;
@@ -29,16 +32,17 @@ public class WarMain implements Runnable {
         this.path = mainClass.toURI().getSchemeSpecificPart();
         this.warfile = this.path.replace("!" + MAIN, "").replace("file:", "");
         this.debug = isDebug();
-        this.webroot = File.createTempFile("winstone", "webroot");
+        this.webroot = File.createTempFile("warbler", "webroot");
         this.webroot.delete();
         this.webroot.mkdirs();
         this.webroot = new File(this.webroot, new File(warfile).getName());
+        debug("webroot directory is " + this.webroot.getPath());
         Runtime.getRuntime().addShutdownHook(new Thread(this));
     }
 
-    private URL extractWinstone() throws Exception {
-        InputStream jarStream = new URL("jar:" + path.replace(MAIN, WINSTONE_JAR)).openStream();
-        File jarFile = File.createTempFile("winstone", ".jar");
+    private URL extractWebserver() throws Exception {
+        InputStream jarStream = new URL("jar:" + path.replace(MAIN, WEBSERVER_JAR)).openStream();
+        File jarFile = File.createTempFile("webserver", ".jar");
         jarFile.deleteOnExit();
         FileOutputStream outStream = new FileOutputStream(jarFile);
         try {
@@ -51,26 +55,69 @@ public class WarMain implements Runnable {
             jarStream.close();
             outStream.close();
         }
-        debug("winstone.jar extracted to " + jarFile.getPath());
+        debug("webserver.jar extracted to " + jarFile.getPath());
         return jarFile.toURI().toURL();
     }
 
-    private void launchWinstone(URL jar) throws Exception {
+    private Properties getWebserverProperties() throws Exception {
+        Properties props = new Properties();
+        try {
+            InputStream is = getClass().getResourceAsStream(WEBSERVER_PROPERTIES);
+            props.load(is);
+        } catch (Exception e) {
+        }
+
+        for (Map.Entry entry : props.entrySet()) {
+            String val = (String) entry.getValue();
+            val = val.replace("{{warfile}}", warfile).replace("{{webroot}}", webroot.getAbsolutePath());
+            entry.setValue(val);
+        }
+
+        if (props.getProperty("props") != null) {
+            String[] propsToSet = props.getProperty("props").split(",");
+            for (String key : propsToSet) {
+                System.setProperty(key, props.getProperty(key));
+            }
+        }
+
+        return props;
+    }
+
+    private void launchWebserver(URL jar) throws Exception {
         URLClassLoader loader = new URLClassLoader(new URL[] {jar});
-        Class klass = Class.forName("winstone.Launcher", true, loader);
+        Thread.currentThread().setContextClassLoader(loader);
+        Properties props = getWebserverProperties();
+        String mainClass = props.getProperty("mainclass");
+        if (mainClass == null) {
+            throw new IllegalArgumentException("unknown webserver main class ("
+                                               + WEBSERVER_PROPERTIES
+                                               + " is missing 'mainclass' property)");
+        }
+        Class klass = Class.forName(mainClass, true, loader);
         Method main = klass.getDeclaredMethod("main", new Class[] {String[].class});
-        String[] newargs = new String[args.length + 3];
-        newargs[0] = "--warfile=" + warfile;
-        newargs[1] = "--webroot=" + webroot;
-        newargs[2] = "--directoryListings=false";
-        System.arraycopy(args, 0, newargs, 3, args.length);
-        debug("invoking Winstone with: " + Arrays.deepToString(newargs));
+        String[] newargs = launchArguments(props);
+        debug("invoking webserver with: " + Arrays.deepToString(newargs));
         main.invoke(null, new Object[] {newargs});
     }
 
+    private String[] launchArguments(Properties props) {
+        String[] newargs = args;
+
+        if (props.getProperty("args") != null) {
+            String[] insertArgs = props.getProperty("args").split(",");
+            newargs = new String[args.length + insertArgs.length];
+            for (int i = 0; i < insertArgs.length; i++) {
+                newargs[i] = props.getProperty(insertArgs[i], "");
+            }
+            System.arraycopy(args, 0, newargs, insertArgs.length, args.length);
+        }
+
+        return newargs;
+    }
+
     private void start() throws Exception {
-        URL u = extractWinstone();
-        launchWinstone(u);
+        URL u = extractWebserver();
+        launchWebserver(u);
     }
 
     private void debug(String msg) {

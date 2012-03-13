@@ -35,14 +35,8 @@ module Warbler
       end
     end
 
-    def initialize(artifacts)
-      @artifacts = artifacts
-    end
-
     def add(jar)
-      artifacts.each do |a|
-        jar.files["WEB-INF/#{a.artifact_id}.jar"] = a.local_path
-      end
+      jar.files["WEB-INF/webserver.jar"] = @artifact.local_path
     end
 
     def main_class
@@ -52,25 +46,47 @@ module Warbler
 
   class WinstoneServer < WebServer
     def initialize
-      super([Artifact.new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
-                          "net.sourceforge.winstone", "winstone-lite",
-                          ENV["WEBSERVER_VERSION"] || "0.9.10")])
+      @artifact = Artifact.new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
+                               "net.sourceforge.winstone", "winstone-lite",
+                               ENV["WEBSERVER_VERSION"] || "0.9.10")
+    end
+
+    def add(jar)
+      super
+      jar.files["WEB-INF/webserver.properties"] = StringIO.new(<<-PROPS)
+mainclass = winstone.Launcher
+args = args0,args1,args2
+args0 = --warfile={{warfile}}
+args1 = --webroot={{webroot}}
+args2 = --directoryListings=false
+PROPS
     end
   end
 
-  class JenkinsWinstoneServer < WebServer
+  class JenkinsWinstoneServer < WinstoneServer
     def initialize
-      super([Artifact.new("http://maven.jenkins-ci.org/content/groups/artifacts",
-                          "org.jenkins-ci", "winstone",
-                          ENV["WEBSERVER_VERSION"] || "0.9.10-jenkins-35")])
+      @artifact = Artifact.new("http://maven.jenkins-ci.org/content/groups/artifacts",
+                               "org.jenkins-ci", "winstone",
+                               ENV["WEBSERVER_VERSION"] || "0.9.10-jenkins-35")
     end
   end
 
   class JettyServer < WebServer
     def initialize
-      super([Artifact.new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
-                          "org.jruby.warbler", "warbler-embedded-jetty",
-                          ENV["WEBSERVER_VERSION"] || "1.0.0")])
+      @artifact = Artifact.new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
+                               "org.jruby.warbler", "warbler-embedded-jetty",
+                               ENV["WEBSERVER_VERSION"] || "1.0.0")
+    end
+
+    def add(jar)
+      super
+      jar.files["WEB-INF/webserver.properties"] = StringIO.new(<<-PROPS)
+mainclass = JettyWarMain
+args = args0
+props = jetty.home
+args0 = {{warfile}}
+jetty.home = {{webroot}}
+PROPS
     end
   end
 
