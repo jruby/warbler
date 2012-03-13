@@ -2,7 +2,7 @@ module Warbler
   class WebServer
     class Artifact < Struct.new(:repo, :group_id, :artifact_id, :version)
       def path_fragment
-        @path_fragment ||= "#{group_id.sub('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.jar"
+        @path_fragment ||= "#{group_id.gsub('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.jar"
       end
 
       def cached_path
