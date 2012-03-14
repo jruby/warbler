@@ -16,6 +16,42 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.Map;
 
+/**
+ * Used as a Main-Class in the manifest for a .war file, so that you can run
+ * a .war file with <tt>java -jar</tt>.
+ *
+ * WarMain can be used with different web server libraries. WarMain expects
+ * to have two files present in the .war file,
+ * <tt>WEB-INF/webserver.properties</tt> and <tt>WEB-INF/webserver.jar</tt>.
+ *
+ * When WarMain starts up, it extracts the webserver jar to a temporary
+ * directory, and creates a temporary work directory for the webapp. Both
+ * are deleted on exit.
+ *
+ * It then reads webserver.properties into a java.util.Properties object,
+ * creates a URL classloader holding the jar, and loads and invokes the
+ * <tt>main</tt> method of the main class mentioned in the properties.
+ *
+ * An example webserver.properties follows for Winstone. The <tt>args</tt>
+ * property indicates the names and ordering of other properties to be used
+ * as command-line arguments. The special tokens <tt>{{warfile}}</tt> and
+ * <tt>{{webroot}}</tt> are substituted with the location of the .war file
+ * being run and the temporary work directory, respectively.
+ * <pre>
+ * mainclass = winstone.Launcher
+ * args = args0,args1,args2
+ * args0 = --warfile={{warfile}}
+ * args1 = --webroot={{webroot}}
+ * args2 = --directoryListings=false
+ * </pre>
+ *
+ * System properties can also be set via webserver.properties. For example,
+ * the following entries set <tt>jetty.home</tt> before launching the server.
+ * <pre>
+ * props = jetty.home
+ * jetty.home = {{webroot}}
+ * </pre>
+ */
 public class WarMain implements Runnable {
     public static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
     public static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
