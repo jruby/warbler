@@ -1,3 +1,9 @@
+== 1.3.5
+
+- Add config.webserver to give choices for which lightweight Java
+  webserver is used in an executable war.
+- Add jenkins-ci.winstone and jetty as embeddable servers
+
 == 1.3.4
 
 - #77, #78: Handle the case when multiple gems exists in a git path
