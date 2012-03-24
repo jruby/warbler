@@ -14,6 +14,7 @@ class Warbler::Application < Rake::Application
   include Warbler::RakeHelper
 
   def initialize
+    self.options.trace = true
     super
     Warbler.application = self
     @project_loaded = false
