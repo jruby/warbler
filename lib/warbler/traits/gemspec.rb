@@ -20,7 +20,7 @@ module Warbler
       def before_configure
         @spec_file = Dir['*.gemspec'].first
         require 'yaml'
-        @spec = File.open(@spec_file) {|f| Gem::Specification.from_yaml(f) } rescue Gem::Specification.load(@spec_file)
+        @spec = load_spec(@spec_file)
         @spec.runtime_dependencies.each {|g| config.gems << g }
         config.dirs = []
         config.compiled_ruby_files = @spec.files.select {|f| f =~ /\.rb$/}
@@ -53,6 +53,32 @@ module Warbler
           raise "No executable script found" unless exe
           warn "No default executable found in #{@spec_file}, using #{exe}"
           exe
+        end
+      end
+
+      protected
+
+      def load_spec(path)
+        Gem::Specification.from_yaml File.read(path)
+      rescue Gem::Exception, *parse_error($!)
+        Gem::Specification.load(path)
+      end
+
+      PARSE_ERRORS = %w[Psych::SyntaxError Syck::ParseError]
+      # Allows to intercept YAML exceptions even if one of both official
+      # modules is not loaded.
+      #
+      # Usage:
+      #     begin
+      #       YAML.parse(something)
+      #     rescue parse_error($!) => ex
+      #       ...
+      #     end
+      def parse_error(ex)
+        if PARSE_ERRORS.include? ex.class.name
+          [ex.class]
+        else
+          []
         end
       end
     end
