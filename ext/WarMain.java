@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.Map;
 import java.util.jar.JarEntry;
@@ -59,6 +60,7 @@ public class WarMain extends JarMain {
     static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
     static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
     
+    private final String[] arguments;
     // whether to launch webserver or run a jruby executable e.g. `rake ...`
     private final String executable;
     private final String[] executableArgv;
@@ -67,20 +69,18 @@ public class WarMain extends JarMain {
 
     WarMain(final String[] args) {
         super(args);
-        final int sIndex = Arrays.asList(args).indexOf("-S");
+        final List<String> argsList = Arrays.asList(args);
+        final int sIndex = argsList.indexOf("-S");
         if ( sIndex == -1 ) {
-            executable = null;
-            executableArgv = null;
+            executable = null; executableArgv = null; arguments = null;
         }
         else {
             if ( args.length == sIndex + 1 || args[sIndex + 1].isEmpty() ) {
                 throw new IllegalArgumentException("missing executable after -S");
             }
-            executable = args[sIndex + 1];
-            executableArgv = new String[ args.length - (sIndex + 2) ];
-            if ( executableArgv.length > 0 ) {
-                System.arraycopy(args, sIndex + 2, executableArgv, 0, executableArgv.length);
-            }
+            arguments = argsList.subList(0, sIndex).toArray(new String[0]);
+            executable = argsList.get(sIndex + 1);
+            executableArgv = argsList.subList(sIndex + 2, argsList.size()).toArray(new String[0]);
         }
     }
     
@@ -168,21 +168,6 @@ public class WarMain extends JarMain {
     
     @Override
     protected String getExtractEntryPath(final JarEntry entry) {
-        /* 42
-        if ( entry.isDirectory() ) return null;
-        final String name = entry.getName();
-        final String start = "WEB-INF";
-        if ( name.startsWith(start) ) {
-            // WEB-INF/app/controllers/application_controller.rb -> 
-            // app/controllers/application_controller.rb
-            return name.substring(start.length());
-        }
-        if ( name.indexOf('/') == -1 ) {
-            // 404.html -> public/404.html
-            return "/public/" + name;
-        }
-        return "/" + name; */
-        
         final String name = entry.getName();
         if ( name.startsWith("WEB-INF/lib") && name.endsWith(".jar") ) {
             return name.substring(name.lastIndexOf("/") + 1);
@@ -216,7 +201,7 @@ public class WarMain extends JarMain {
         }
         invokeMethod(scriptingContainer, "setScriptFilename", executablePath);
         
-        invokeMethod(rubyInstanceConfig, "processArguments", (Object) new String[] { "" });
+        invokeMethod(rubyInstanceConfig, "processArguments", (Object) arguments);
         
         Object executableInput = invokeMethod(rubyInstanceConfig, "getScriptSource");
         Object runtime = invokeMethod(scriptingContainer, "getRuntime");
@@ -230,23 +215,11 @@ public class WarMain extends JarMain {
     }
     
     protected String locateExecutableScript() {
-        /* 42
-        if ( extractRoot == null ) {
-            throw new IllegalStateException("missing extract root");
-        }
-        // /WEB-INF/gems extracted as /gems :
-        final File gemsDir = new File(extractRoot, "gems");
-        // /WEB-INF/Gemfile extracted as /Gemfile :
-        final File gemfile = new File(extractRoot, "Gemfile");
-        return
-        "ENV['GEM_HOME'] = '"+ gemsDir.getAbsolutePath() +"'\n" + 
-        "ENV['BUNDLE_GEMFILE'] = '"+ (gemfile.exists() ? gemfile.getAbsolutePath() : "") +"'\n" + 
-          */
         if ( executable == null ) {
             throw new IllegalStateException("no exexutable");
         }
-        final String gemsDir = "jar://" + archive + "!/WEB-INF/gems";
-        final String gemfile = "jar://" + archive + "!/WEB-INF/Gemfile";
+        final String gemsDir = "file:" + archive + "!/WEB-INF/gems";
+        final String gemfile = "file:" + archive + "!/WEB-INF/Gemfile";
         debug("setting GEM_HOME to " + gemsDir);
         debug("... and BUNDLE_GEMFILE to " + gemfile);
         return
