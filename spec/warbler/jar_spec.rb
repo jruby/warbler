@@ -36,23 +36,23 @@ describe Warbler::Jar do
 
     it "collects java libraries" do
       jar.apply(config)
-      file_list(%r{^META-INF/lib/jruby-.*\.jar$}).should_not be_empty
+      file_list(%r{^META-INF/lib/jruby-.*\.jar$}).should_not == []
     end
 
     it "adds a JarMain class" do
       jar.apply(config)
-      file_list(%r{^JarMain\.class$}).should_not be_empty
+      file_list(%r{^JarMain\.class$}).should_not == []
     end
 
     it "adds an init.rb" do
       jar.apply(config)
-      file_list(%r{^META-INF/init.rb$}).should_not be_empty
+      file_list(%r{^META-INF/init.rb$}).should_not == []
     end
 
     it "requires 'rubygems' in init.rb" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.split("\n").grep(/require 'rubygems'/).should_not be_empty
+      contents.split("\n").grep(/require 'rubygems'/).should_not == []
     end
 
     it "adds ENV['GEM_HOME'] to init.rb" do
@@ -63,7 +63,7 @@ describe Warbler::Jar do
 
     it "adds a main.rb" do
       jar.apply(config)
-      file_list(%r{^META-INF/main.rb$}).should_not be_empty
+      file_list(%r{^META-INF/main.rb$}).should_not == []
     end
 
     it "accepts a custom manifest file" do
@@ -116,27 +116,27 @@ describe Warbler::Jar do
 
       it "detects gem dependencies" do
         jar.apply(config)
-        file_list(%r{^gems/rubyzip.*/lib/zip/zip.rb}).should_not be_empty
-        file_list(%r{^specifications/rubyzip.*\.gemspec}).should_not be_empty
+        file_list(%r{^gems/rubyzip.*/lib/zip/zip.rb}).should_not == []
+        file_list(%r{^specifications/rubyzip.*\.gemspec}).should_not == []
       end
 
       it "sets load paths in init.rb" do
         jar.add_init_file(config)
         contents = jar.contents('META-INF/init.rb')
-        contents.split("\n").grep(/LOAD_PATH\.unshift.*sample_jar\/lib/).should_not be_empty
+        contents.split("\n").grep(/LOAD_PATH\.unshift.*sample_jar\/lib/).should_not == []
       end
 
       it "loads the default executable in main.rb" do
         jar.apply(config)
         contents = jar.contents('META-INF/main.rb')
-        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
+        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not == []
       end
 
       it "includes compiled .rb and .class files" do
         config.compiled_ruby_files = %w(lib/sample_jar.rb)
         jar.compile(config)
         jar.apply(config)
-        file_list(%r{^sample_jar/lib/sample_jar\.class$}).should_not be_empty
+        file_list(%r{^sample_jar/lib/sample_jar\.class$}).should_not == []
         jar.contents('sample_jar/lib/sample_jar.rb').should =~ /require __FILE__\.sub/
       end
     end
@@ -162,7 +162,7 @@ describe Warbler::Jar do
       it "loads the first bin/executable in main.rb" do
         silence { jar.apply(config) }
         contents = jar.contents('META-INF/main.rb')
-        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
+        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not == []
       end
     end
 
@@ -184,29 +184,29 @@ describe Warbler::Jar do
           config.gems << "rake"
         end
         jar.apply(config)
-        file_list(%r{^gems/rake.*/lib/rake.rb}).should_not be_empty
-        file_list(%r{^specifications/rake.*\.gemspec}).should_not be_empty
+        file_list(%r{^gems/rake.*/lib/rake.rb}).should_not == []
+        file_list(%r{^specifications/rake.*\.gemspec}).should_not == []
       end
 
       it "collects all project files in the directory" do
         touch "extra.foobar"
         jar.apply(config)
-        file_list(%r{^sample_jar/bin$}).should_not be_empty
-        file_list(%r{^sample_jar/test$}).should_not be_empty
-        file_list(%r{^sample_jar/lib/sample_jar.rb$}).should_not be_empty
-        file_list(%r{^sample_jar/extra\.foobar$}).should_not be_empty
+        file_list(%r{^sample_jar/bin$}).should_not == []
+        file_list(%r{^sample_jar/test$}).should_not == []
+        file_list(%r{^sample_jar/lib/sample_jar.rb$}).should_not == []
+        file_list(%r{^sample_jar/extra\.foobar$}).should_not == []
       end
 
       it "sets load paths in init.rb" do
         jar.add_init_file(config)
         contents = jar.contents('META-INF/init.rb')
-        contents.split("\n").grep(/LOAD_PATH\.unshift.*sample_jar\/lib/).should_not be_empty
+        contents.split("\n").grep(/LOAD_PATH\.unshift.*sample_jar\/lib/).should_not == []
       end
 
       it "loads the first bin/executable in main.rb" do
         jar.apply(config)
         contents = jar.contents('META-INF/main.rb')
-        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
+        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not == []
       end
     end
   end
@@ -226,7 +226,7 @@ describe Warbler::Jar do
 
     it "collects files in public" do
       jar.apply(config)
-      file_list(%r{^index\.html}).should_not be_empty
+      file_list(%r{^index\.html}).should_not == []
     end
 
     it "collects gem files" do
@@ -234,8 +234,8 @@ describe Warbler::Jar do
         config.gems << "rake"
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
-      file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
+      file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb}).should_not == []
+      file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec}).should_not == []
     end
 
     it "adds ENV['GEM_HOME'] to init.rb" do
@@ -247,8 +247,8 @@ describe Warbler::Jar do
 
     it "does not include log files by default" do
       jar.apply(config)
-      file_list(%r{WEB-INF/log}).should_not be_empty
-      file_list(%r{WEB-INF/log/.*\.log}).should be_empty
+      file_list(%r{WEB-INF/log}).should_not == []
+      file_list(%r{WEB-INF/log/.*\.log}).should == []
     end
 
     def expand_webxml
@@ -265,7 +265,7 @@ describe Warbler::Jar do
       elements = expand_webxml
       elements.to_a(
                     "context-param/param-name[text()='jruby.max.runtimes']"
-                    ).should_not be_empty
+                    ).should_not == []
       elements.to_a(
                     "context-param/param-name[text()='jruby.max.runtimes']/../param-value"
                     ).first.text.should == "5"
@@ -278,7 +278,7 @@ describe Warbler::Jar do
       elements = expand_webxml
       elements.to_a(
                     "context-param/param-name[text()='some.custom.config']"
-                    ).should_not be_empty
+                    ).should_not == []
       elements.to_a(
                     "context-param/param-name[text()='some.custom.config']/../param-value"
                     ).first.text.should == "myconfig"
@@ -291,7 +291,7 @@ describe Warbler::Jar do
       elements = expand_webxml
       elements.to_a(
                     "resource-ref/res-ref-name[text()='jndi/rails']"
-                    ).should_not be_empty
+                    ).should_not == []
     end
 
     it "allows multiple jndi resources to be included" do
@@ -301,10 +301,10 @@ describe Warbler::Jar do
       elements = expand_webxml
       elements.to_a(
                     "resource-ref/res-ref-name[text()='jndi/rails1']"
-                    ).should_not be_empty
+                    ).should_not == []
       elements.to_a(
                     "resource-ref/res-ref-name[text()='jndi/rails2']"
-                    ).should_not be_empty
+                    ).should_not == []
     end
 
     it "does not include any ignored context parameters" do
@@ -315,13 +315,13 @@ describe Warbler::Jar do
       elements = expand_webxml
       elements.to_a(
                     "context-param/param-name[text()='foo']"
-                    ).should be_empty
+                    ).should == []
       elements.to_a(
                     "context-param/param-name[text()='ignored']"
-                    ).should be_empty
+                    ).should == []
       elements.to_a(
                     "context-param/param-name[text()='jndi']"
-                    ).should be_empty
+                    ).should == []
     end
 
     it "uses a config/web.xml if it exists" do
@@ -341,14 +341,14 @@ describe Warbler::Jar do
 
     it "collects java libraries" do
       jar.apply(config)
-      file_list(%r{WEB-INF/lib/jruby-.*\.jar$}).should_not be_empty
+      file_list(%r{WEB-INF/lib/jruby-.*\.jar$}).should_not == []
     end
 
     it "collects application files" do
       jar.apply(config)
-      file_list(%r{WEB-INF/app$}).should_not be_empty
-      file_list(%r{WEB-INF/config$}).should_not be_empty
-      file_list(%r{WEB-INF/lib$}).should_not be_empty
+      file_list(%r{WEB-INF/app$}).should_not == []
+      file_list(%r{WEB-INF/config$}).should_not == []
+      file_list(%r{WEB-INF/lib$}).should_not == []
     end
 
     it "accepts an autodeploy directory where the war should be created" do
@@ -379,7 +379,7 @@ describe Warbler::Jar do
         config.excludes += FileList['lib/tasks/utils.rake']
       end
       jar.apply(config)
-      file_list(%r{lib/tasks/utils.rake}).should be_empty
+      file_list(%r{lib/tasks/utils.rake}).should == []
     end
 
     it "can exclude public files from the .war" do
@@ -387,7 +387,7 @@ describe Warbler::Jar do
         config.excludes += FileList['public/robots.txt']
       end
       jar.apply(config)
-      file_list(%r{robots.txt}).should be_empty
+      file_list(%r{robots.txt}).should == []
     end
 
     it "reads configuration from #{Warbler::Config::FILE}" do
@@ -435,7 +435,7 @@ describe Warbler::Jar do
         config.java_classes = FileList["Rakefile"]
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/classes/Rakefile$}).should_not be_empty
+      file_list(%r{WEB-INF/classes/Rakefile$}).should_not == []
     end
 
     it "does not try to autodetect frameworks when Warbler.framework_detection is false" do
@@ -461,14 +461,14 @@ describe Warbler::Jar do
 
       it "moves jar files to WEB-INF/lib" do
         jar.apply(config)
-        file_list(%r{WEB-INF/lib/app-sample.jar}).should_not be_empty
-        file_list(%r{WEB-INF/app/sample.jar}).should_not be_empty
+        file_list(%r{WEB-INF/lib/app-sample.jar}).should_not == []
+        file_list(%r{WEB-INF/app/sample.jar}).should_not == []
       end
 
       it "leaves jar files alone that are already in WEB-INF/lib" do
         jar.apply(config)
-        file_list(%r{WEB-INF/lib/lib-existing.jar}).should be_empty
-        file_list(%r{WEB-INF/lib/existing.jar}).should_not be_empty
+        file_list(%r{WEB-INF/lib/lib-existing.jar}).should == []
+        file_list(%r{WEB-INF/lib/existing.jar}).should_not == []
       end
     end
 
@@ -481,7 +481,7 @@ describe Warbler::Jar do
           config.features << "executable"
         end
         jar.apply(config)
-        file_list(%r{^WarMain\.class$}).should_not be_empty
+        file_list(%r{^WarMain\.class$}).should_not == []
       end
     end
 
@@ -516,12 +516,12 @@ describe Warbler::Jar do
 
         mkdir_p "vendor/rails"
         config = Warbler::Config.new
-        config.gems.should be_empty
+        config.gems.should == []
 
         rm_rf "vendor/rails"
         @rails.stub!(:vendor_rails?).and_return true
         config = Warbler::Config.new
-        config.gems.should be_empty
+        config.gems.should == []
       end
 
       it "automatically adds Rails.configuration.gems to the list of gems" do
@@ -630,7 +630,7 @@ describe Warbler::Jar do
           @merb.dependencies = [Gem::Dependency.new("rake", "= #{RAKEVERSION}", :development)]
         end
         jar.apply(config)
-        file_list(/rake-#{RAKEVERSION}/).should be_empty
+        file_list(/rake-#{RAKEVERSION}/).should == []
       end
 
       it "warns about using Merb < 1.0" do
@@ -671,8 +671,8 @@ describe Warbler::Jar do
         config.dirs = %w(lib notexist)
       end
       silence { jar.apply(config) }
-      file_list(%r{WEB-INF/lib}).should_not be_empty
-      file_list(%r{WEB-INF/notexist}).should be_empty
+      file_list(%r{WEB-INF/lib}).should_not == []
+      file_list(%r{WEB-INF/notexist}).should == []
     end
 
     it "excludes Warbler's old tmp/war directory by default" do
@@ -682,8 +682,8 @@ describe Warbler::Jar do
         config.dirs += ["tmp"]
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/tmp/war}).should be_empty
-      file_list(%r{WEB-INF/tmp/war/index\.html}).should be_empty
+      file_list(%r{WEB-INF/tmp/war}).should == []
+      file_list(%r{WEB-INF/tmp/war/index\.html}).should == []
     end
 
     it "writes gems to location specified by gem_path" do
@@ -692,10 +692,10 @@ describe Warbler::Jar do
         config.gems << 'rake'
       end
       elements = expand_webxml
-      file_list(%r{WEB-INF/jewels}).should_not be_empty
+      file_list(%r{WEB-INF/jewels}).should_not == []
       elements.to_a(
                     "context-param/param-name[text()='gem.path']"
-                    ).should_not be_empty
+                    ).should_not == []
       elements.to_a(
                     "context-param/param-name[text()='gem.path']/../param-value"
                     ).first.text.should == "/WEB-INF/jewels"
@@ -709,7 +709,7 @@ describe Warbler::Jar do
         config.webinf_files = FileList['myserver-web.xml']
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/myserver-web.xml}).should_not be_empty
+      file_list(%r{WEB-INF/myserver-web.xml}).should_not == []
     end
 
     it "allows expanding of additional WEB-INF files via config.webinf_files" do
@@ -721,7 +721,7 @@ describe Warbler::Jar do
         config.webinf_files = FileList['myserver-web.xml.erb']
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/myserver-web.xml}).should_not be_empty
+      file_list(%r{WEB-INF/myserver-web.xml}).should_not == []
       jar.contents('WEB-INF/myserver-web.xml').should =~ /web-app.*production/
     end
 
@@ -730,12 +730,12 @@ describe Warbler::Jar do
         config.gem_excludes += [/^(test|spec)\//]
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/gems/gems/rake([^/]+)/test/test_rake.rb}).should be_empty
+      file_list(%r{WEB-INF/gems/gems/rake([^/]+)/test/test_rake.rb}).should == []
     end
 
     it "creates a META-INF/init.rb file with startup config" do
       jar.apply(config)
-      file_list(%r{META-INF/init.rb}).should_not be_empty
+      file_list(%r{META-INF/init.rb}).should_not == []
     end
 
     it "allows adjusting the init file location in the war" do
@@ -743,7 +743,7 @@ describe Warbler::Jar do
         config.init_filename = 'WEB-INF/init.rb'
       end
       jar.add_init_file(config)
-      file_list(%r{WEB-INF/init.rb}).should_not be_empty
+      file_list(%r{WEB-INF/init.rb}).should_not == []
     end
 
     it "allows adding custom files' contents to init.rb" do
