@@ -43,7 +43,7 @@ module Warbler
     def initialize(name = nil, config = nil)
       @config = config
       if @config.nil? && File.exists?(Config::FILE)
-        @config = eval(File.open(Config::FILE) {|f| f.read})
+        @config = eval(File.read(Config::FILE), binding, Config::FILE, 0)
       end
       @config ||= Config.new
       unless @config.kind_of? Config
