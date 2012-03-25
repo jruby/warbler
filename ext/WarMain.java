@@ -169,10 +169,17 @@ public class WarMain extends JarMain {
     @Override
     protected String getExtractEntryPath(final JarEntry entry) {
         final String name = entry.getName();
-        if ( name.startsWith("WEB-INF/lib") && name.endsWith(".jar") ) {
-            return name.substring(name.lastIndexOf("/") + 1);
+        final String start = "WEB-INF";
+        if ( name.startsWith(start) ) {
+            // WEB-INF/app/controllers/application_controller.rb -> 
+            // app/controllers/application_controller.rb
+            return name.substring(start.length());
         }
-        return null; // do not extract entry
+        if ( name.indexOf('/') == -1 ) {
+            // 404.html -> public/404.html
+            return "/public/" + name;
+        }
+        return "/" + name;
     }
     
     @Override
@@ -187,7 +194,9 @@ public class WarMain extends JarMain {
         final Object scriptingContainer = newScriptingContainer(jars);
         
         invokeMethod(scriptingContainer, "setArgv", (Object) executableArgv);
-        invokeMethod(scriptingContainer, "runScriptlet", "ENV.clear");
+        invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
+        invokeMethod(scriptingContainer, "setCurrentDirectory", extractRoot.getAbsolutePath());
+        //invokeMethod(scriptingContainer, "runScriptlet", "ENV.clear");
         
         final Object provider = invokeMethod(scriptingContainer, "getProvider");
         final Object rubyInstanceConfig = invokeMethod(provider, "getRubyInstanceConfig");
@@ -218,8 +227,8 @@ public class WarMain extends JarMain {
         if ( executable == null ) {
             throw new IllegalStateException("no exexutable");
         }
-        final String gemsDir = "file:" + archive + "!/WEB-INF/gems";
-        final String gemfile = "file:" + archive + "!/WEB-INF/Gemfile";
+        final String gemsDir = new File(extractRoot, "gems").getAbsolutePath();
+        final String gemfile = new File(extractRoot, "Gemfile").getAbsolutePath();
         debug("setting GEM_HOME to " + gemsDir);
         debug("... and BUNDLE_GEMFILE to " + gemfile);
         return

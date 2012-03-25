@@ -83,18 +83,23 @@ public class JarMain implements Runnable {
     }
     
     protected URL extractEntry(final JarEntry entry, final String path) throws Exception {
+        final File file = new File(extractRoot, path);
+        if ( entry.isDirectory() ) {
+            file.mkdirs(); 
+            return null;
+        }
         final String entryPath = entryPath(entry.getName());
         final InputStream entryStream;
         try {
             entryStream = new URI("jar", entryPath, null).toURL().openStream();
         } 
         catch (IllegalArgumentException e) {
+            // TODO gems '%' file name "encoding" ?!
             debug("failed to open jar:" + entryPath + " skipping entry: " + entry.getName(), e);
             return null;
         }
-        final File file = new File(extractRoot, path);
         final File parent = file.getParentFile();
-        if ( parent != null && ! parent.exists() ) parent.mkdirs();
+        if ( parent != null ) parent.mkdirs();
         FileOutputStream outStream = new FileOutputStream(file);
         final byte[] buf = new byte[65536];
         try {
