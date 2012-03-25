@@ -60,8 +60,13 @@ public class WarMain extends JarMain {
     static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
     static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
     
+    // jruby arguments, consider the following command :
+    //   `java -jar rails.was --1.9 -S rake db:migrate`
+    // arguments == [ "--1.9" ]
+    // executable == "rake"
+    // executableArgv == [ "db:migrate" ]
     private final String[] arguments;
-    // whether to launch webserver or run a jruby executable e.g. `rake ...`
+    // null to launch webserver or != null to run a executable e.g. rake
     private final String executable;
     private final String[] executableArgv;
             
@@ -196,7 +201,7 @@ public class WarMain extends JarMain {
         invokeMethod(scriptingContainer, "setArgv", (Object) executableArgv);
         invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
         invokeMethod(scriptingContainer, "setCurrentDirectory", extractRoot.getAbsolutePath());
-        //invokeMethod(scriptingContainer, "runScriptlet", "ENV.clear");
+        invokeMethod(scriptingContainer, "runScriptlet", "ENV.clear");
         
         final Object provider = invokeMethod(scriptingContainer, "getProvider");
         final Object rubyInstanceConfig = invokeMethod(provider, "getRubyInstanceConfig");
