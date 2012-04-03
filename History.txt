@@ -3,6 +3,7 @@
 - Add config.webserver to give choices for which lightweight Java
   webserver is used in an executable war.
 - Add jenkins-ci.winstone and jetty as embeddable servers
+- #76, #81: fix rubyzip "can't modify frozen string" issue
 
 == 1.3.4
 
