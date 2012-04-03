@@ -68,7 +68,7 @@ task :release_docs => :docs do
   if config
     dir  = "/var/www/gforge-projects/#{gemspec.rubyforge_project}/#{gemspec.name}"
     dest = "#{config["username"]}@rubyforge.org:#{dir}"
-    sh %{rsync -av --delete doc/ #{dest}}
+    sh %{rsync -rl --delete doc/ #{dest}}
   end
 end
 task :release => :release_docs
