@@ -1,7 +1,9 @@
 
+import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
@@ -27,8 +29,9 @@ public class JettyWarMain {
         webapp.setDefaultsDescriptor(webdefaultPath());
 
         Server server = new Server();
-        Connector connector = new SelectChannelConnector();
+        AbstractConnector connector = new SelectChannelConnector();
         connector.setPort(Integer.getInteger("jetty.port",8080).intValue());
+        connector.setThreadPool(new QueuedThreadPool(Integer.getInteger("jetty.threadpool.size",Runtime.getRuntime().availableProcessors()+1)));
         server.setConnectors(new Connector[]{connector});
         server.setHandler(webapp);
         server.start();
