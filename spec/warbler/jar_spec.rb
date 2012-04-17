@@ -762,6 +762,30 @@ describe Warbler::Jar do
       jar.apply(config)
       jar.contents('META-INF/init.rb').should =~ /<dummy\/>/
     end
+
+    context 'jruby compiler ruby version' do
+      it 'set to ruby version defined in config.webxml.jruby.compat.version 1.9' do
+        use_config do |config|
+          config.webxml.jruby.compat.version = "1.9"
+        end
+        jar.should_receive(:'`').with(/\s--1.9\s/)
+        jar.compile(config)
+      end
+      it 'set to ruby version defined in config.webxml.jruby.compat.version 1.8.7' do
+        use_config do |config|
+          config.webxml.jruby.compat.version = "1.8.7"
+        end
+        jar.should_receive(:'`').with(/\s--1.8\s/)
+        jar.compile(config)
+      end
+      context 'when config.webxml.jruby.compat.version is not defined' do
+        it "set to ruby version defined by RUBY_VERSION (#{RUBY_VERSION})" do
+          jar.should_receive(:'`').with(/\s--#{RUBY_VERSION.to_f}\s/)
+          jar.compile(config)
+        end
+      end
+    end
+
   end
 end
 
