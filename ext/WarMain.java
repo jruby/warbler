@@ -5,13 +5,13 @@
  * See the file LICENSE.txt for details.
  */
 
-import java.net.URI;
-import java.net.URLClassLoader;
-import java.net.URL;
 import java.lang.reflect.Method;
 import java.io.InputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.URI;
+import java.net.URLClassLoader;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -150,22 +150,22 @@ public class WarMain extends JarMain {
         Method main = klass.getDeclaredMethod("main", new Class[] { String[].class });
         String[] newArgs = launchWebServerArguments(props);
         debug("invoking webserver with: " + Arrays.deepToString(newArgs));
-        main.invoke(null, new Object[] {newArgs});
+        main.invoke(null, new Object[] { newArgs });
     }
 
     private String[] launchWebServerArguments(Properties props) {
-        String[] newargs = args;
+        String[] newArgs = args;
 
         if (props.getProperty("args") != null) {
             String[] insertArgs = props.getProperty("args").split(",");
-            newargs = new String[args.length + insertArgs.length];
+            newArgs = new String[args.length + insertArgs.length];
             for (int i = 0; i < insertArgs.length; i++) {
-                newargs[i] = props.getProperty(insertArgs[i], "");
+                newArgs[i] = props.getProperty(insertArgs[i], "");
             }
-            System.arraycopy(args, 0, newargs, insertArgs.length, args.length);
+            System.arraycopy(args, 0, newArgs, insertArgs.length, args.length);
         }
 
-        return newargs;
+        return newArgs;
     }
 
     // JarMain overrides to make WarMain "launchable" 
@@ -199,9 +199,10 @@ public class WarMain extends JarMain {
         final Object scriptingContainer = newScriptingContainer(jars);
         
         invokeMethod(scriptingContainer, "setArgv", (Object) executableArgv);
-        invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
+        //invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
         invokeMethod(scriptingContainer, "setCurrentDirectory", extractRoot.getAbsolutePath());
-        invokeMethod(scriptingContainer, "runScriptlet", "ENV.clear");
+        //invokeMethod(scriptingContainer, "runScriptlet", "ENV.clear");
+        //invokeMethod(scriptingContainer, "runScriptlet", "ENV['PATH']=''"); // bundler 1.1.x
         
         final Object provider = invokeMethod(scriptingContainer, "getProvider");
         final Object rubyInstanceConfig = invokeMethod(provider, "getRubyInstanceConfig");
@@ -223,7 +224,7 @@ public class WarMain extends JarMain {
         debug("invoking " + executablePath + " with: " + Arrays.toString(executableArgv));
         Object outcome = invokeMethod(runtime, "runFromMain", 
                 new Class[] { InputStream.class, String.class }, 
-                executableInput, executable 
+                executableInput, executablePath 
         );
         return ( outcome instanceof Number ) ? ( (Number) outcome ).intValue() : 0;
     }
@@ -237,7 +238,7 @@ public class WarMain extends JarMain {
         debug("setting GEM_HOME to " + gemsDir);
         debug("... and BUNDLE_GEMFILE to " + gemfile);
         return
-        "ENV['GEM_HOME'] = '"+ gemsDir +"' \n" + 
+        "ENV['GEM_HOME'] = ENV['GEM_PATH'] = '"+ gemsDir +"' \n" + 
         "ENV['BUNDLE_GEMFILE'] = '"+ gemfile +"' \n" + 
         "begin\n" +
         "  require 'META-INF/init.rb' \n" +
