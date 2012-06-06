@@ -45,7 +45,8 @@ module Warbler
 
     def run_javac(config, compiled_ruby_files)
       # Need to use the version of JRuby in the application to compile it
-      %x{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} org.jruby.Main -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
+      version_flag = RUBY_VERSION =~ /^1\.9/ ? '--1.9' : ''
+      %x{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} org.jruby.Main #{version_flag} -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
     end
 
     def replace_compiled_ruby_files(config, compiled_ruby_files)
