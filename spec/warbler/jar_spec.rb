@@ -209,6 +209,40 @@ describe Warbler::Jar do
         contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
       end
     end
+
+    context "when in ruby 1.9 mode" do
+      before(:all) do
+        silence { Warbler::Jar.const_set 'RUBY_VERSION', '1.9.3' }
+      end
+
+      it "compiles ruby 1.9 classes" do
+        config.compiled_ruby_files = %w(lib/ruby_19.rb)
+        jar.compile(config)
+        jar.apply(config)
+        file_list(%r{^sample_jar/lib/ruby_19\.class$}).should_not be_empty
+      end
+
+      after(:all) do
+        silence { Warbler::Jar.const_set 'RUBY_VERSION', RUBY_VERSION }
+      end
+    end
+
+    context "when in ruby 1.8 mode" do
+      before(:all) do
+        silence { Warbler::Jar.const_set 'RUBY_VERSION', '1.8.7' }
+      end
+
+      it "fails to compile ruby 1.9 classes" do
+        config.compiled_ruby_files = %w(lib/ruby_19.rb)
+        jar.compile(config)
+        jar.apply(config)
+        file_list(%r{^sample_jar/lib/ruby_19\.class$}).should be_empty
+      end
+
+      after(:all) do
+        silence { Warbler::Jar.const_set 'RUBY_VERSION', RUBY_VERSION }
+      end
+    end
   end
 
   context "in a war project" do
