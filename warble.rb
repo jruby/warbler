@@ -109,6 +109,13 @@ Warbler::Config.new do |config|
   # Pathmaps for controlling how public HTML files are copied into the .war
   # config.pathmaps.public_html = ["%{public/,}p"]
 
+  # Embedded webserver to use with the 'executable' feature. Currently supported
+  # webservers are:
+  # * <tt>winstone</tt> (default) - Winstone 0.9.10 from sourceforge
+  # * <tt>jenkins-ci.winstone</tt> - Improved Winstone from Jenkins CI
+  # * <tt>jetty</tt> - Embedded Jetty from Eclipse
+  # config.webserver = 'jetty'
+
   # Value of RAILS_ENV for the webapp -- default as shown below
   # config.webxml.rails.env = ENV['RAILS_ENV'] || 'production'
 
