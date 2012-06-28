@@ -65,7 +65,7 @@ PROPS
 
   class JenkinsWinstoneServer < WinstoneServer
     def initialize
-      @artifact = Artifact.new("http://maven.jenkins-ci.org/content/groups/artifacts",
+      @artifact = Artifact.new("http://maven.jenkins-ci.org/content/repositories/releases",
                                "org.jenkins-ci", "winstone",
                                ENV["WEBSERVER_VERSION"] || "0.9.10-jenkins-35")
     end
