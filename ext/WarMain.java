@@ -58,14 +58,14 @@ public class WarMain implements Runnable {
     public static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
 
     private String[] args;
-    private String path, warfile;
+    private String warfile;
     private boolean debug;
     private File webroot;
 
     public WarMain(String[] args) throws Exception {
         this.args = args;
         URL mainClass = getClass().getResource(MAIN);
-        this.path = mainClass.toURI().getSchemeSpecificPart();
+        String path = mainClass.toURI().getSchemeSpecificPart();
         this.warfile = this.path.replace("!" + MAIN, "").replace("file:", "");
         this.debug = isDebug();
         this.webroot = File.createTempFile("warbler", "webroot");
@@ -77,7 +77,7 @@ public class WarMain implements Runnable {
     }
 
     private URL extractWebserver() throws Exception {
-        InputStream jarStream = new URL("jar:" + path.replace(MAIN, WEBSERVER_JAR)).openStream();
+        InputStream jarStream = getClass().getResourceAsStream(WEBSERVER_JAR);
         File jarFile = File.createTempFile("webserver", ".jar");
         jarFile.deleteOnExit();
         FileOutputStream outStream = new FileOutputStream(jarFile);
