@@ -33,8 +33,13 @@ module Warbler
       end
 
       def default_executable
-        exes = Dir['bin/*']
-        exe = exes.grep(/#{config.jar_name}/).first || exes.first
+        exes = Dir['bin/*'].sort
+        unless(exe = exes.grep(/#{config.jar_name}/).first)
+          exe = exes.first
+          if exe
+            warn "No executable matching config.jar_name found, using #{exe}"
+          end
+        end
         raise "No executable script found" unless exe
         exe
       end
