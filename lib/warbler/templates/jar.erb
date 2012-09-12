@@ -1,5 +1,5 @@
 <% if config.relative_gem_path.empty? %>
-ENV['GEM_HOME'] ||= File.expand_path('../..', __FILE__)
+ENV['GEM_HOME'] = File.expand_path('../..', __FILE__)
 <% else %>
 ENV['GEM_HOME'] ||= File.expand_path('../../<%= config.relative_gem_path %>', __FILE__)
 <% end %>
