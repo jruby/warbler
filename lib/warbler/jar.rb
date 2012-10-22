@@ -44,7 +44,7 @@ module Warbler
     end
 
     def run_javac(config, compiled_ruby_files)
-      if config.webxml.context_params.has_key?('jruby.compat.version')
+      if config.webxml && config.webxml.context_params.has_key?('jruby.compat.version')
         compat_version = "--#{config.webxml.jruby.compat.version}"
       else
         compat_version = ''
