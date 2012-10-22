@@ -109,6 +109,22 @@ describe Warbler::Task do
     end
   end
 
+  it "should compile ruby 1.9 mode" do
+    config.features << "compiled"
+    config.webxml.jruby.compat.version = '1.9'
+    silence { run_task "warble" }
+
+    java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
+
+    Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
+      java_class_header     = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.class') {|io| io.read }[0..3]
+      ruby_class_definition = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.rb') {|io| io.read }
+
+      java_class_header.should == java_class_magic_number
+      ruby_class_definition.should == %{require __FILE__.sub(/.rb$/, '.class')}
+    end
+  end
+
   it "should delete .class files after finishing the jar" do
     config.features << "compiled"
     silence { run_task "warble" }
