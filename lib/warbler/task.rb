@@ -162,13 +162,13 @@ module Warbler
 
     def define_pluginize_task
       task "pluginize" do
-        if !Dir["vendor/plugins/warbler*"].empty? && ENV["FORCE"].nil?
-          puts "I found an old nest in vendor/plugins; please trash it so I can make a new one"
-          puts "(directory vendor/plugins/warbler* exists)"
+        if !Dir["lib/tasks/warbler*"].empty? && ENV["FORCE"].nil?
+          puts "I found an old nest in lib/tasks; please trash it so I can make a new one"
+          puts "(directory lib/tasks/warbler* exists)"
         else
-          rm_rf FileList["vendor/plugins/warbler*"], :verbose => false
-          mkdir_p "vendor/plugins/warbler/tasks"
-          File.open("vendor/plugins/warbler/tasks/warbler.rake", "w") do |f|
+          rm_rf FileList["lib/tasks/warbler*"], :verbose => false
+          mkdir_p "lib/tasks/warbler"
+          File.open("lib/tasks/warbler/warbler.rake", "w") do |f|
             f.puts "require 'warbler'"
             f.puts "Warbler::Task.new"
           end
