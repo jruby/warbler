@@ -1,4 +1,4 @@
-= Warbler
+= Warbler {<img src="https://travis-ci.org/jruby/warbler.png" />}[https://travis-ci.org/jruby/warbler]
 
 Warbler is a gem to make a Java jar or war file out of any Ruby,
 Rails, Merb, or Rack application. Warbler provides a minimal,
