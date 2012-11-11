@@ -5,6 +5,7 @@
  * See the file LICENSE.txt for details.
  */
 
+import java.net.URI;
 import java.net.URLClassLoader;
 import java.net.URL;
 import java.lang.reflect.Method;
@@ -77,7 +78,7 @@ public class WarMain implements Runnable {
     }
 
     private URL extractWebserver() throws Exception {
-        InputStream jarStream = new URL("jar:" + path.replace(MAIN, WEBSERVER_JAR)).openStream();
+        InputStream jarStream = new URI("jar", path.replace(MAIN, WEBSERVER_JAR), "").toURL().openStream();
         File jarFile = File.createTempFile("webserver", ".jar");
         jarFile.deleteOnExit();
         FileOutputStream outStream = new FileOutputStream(jarFile);
