@@ -58,7 +58,7 @@ public class JarMain implements Runnable {
     }
 
     private URL extractJar(String jarpath) throws Exception {
-        InputStream jarStream = new URI("jar", path.replace(MAIN, jarpath), "").toURL().openStream();
+        InputStream jarStream = new URI("jar", path.replace(MAIN, jarpath), null).toURL().openStream();
         String jarname = jarpath.substring(jarpath.lastIndexOf("/") + 1, jarpath.lastIndexOf("."));
         File jarFile = new File(extractRoot, jarname + ".jar");
         jarFile.deleteOnExit();

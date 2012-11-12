@@ -78,7 +78,7 @@ public class WarMain implements Runnable {
     }
 
     private URL extractWebserver() throws Exception {
-        InputStream jarStream = new URI("jar", path.replace(MAIN, WEBSERVER_JAR), "").toURL().openStream();
+        InputStream jarStream = new URI("jar", path.replace(MAIN, WEBSERVER_JAR), null).toURL().openStream();
         File jarFile = File.createTempFile("webserver", ".jar");
         jarFile.deleteOnExit();
         FileOutputStream outStream = new FileOutputStream(jarFile);
