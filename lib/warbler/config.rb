@@ -96,7 +96,7 @@ module Warbler
     attr_accessor :bundler
 
     # An array of Bundler groups to avoid including in the war file.
-    # Defaults to ["development", "test"].
+    # Defaults to ["development", "test", "assets"].
     attr_accessor :bundle_without
 
     # Path to the pre-bundled gem directory inside the war file. Default is '/WEB-INF/gems'.
