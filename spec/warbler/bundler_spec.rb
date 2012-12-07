@@ -96,7 +96,7 @@ describe Warbler::Jar, "with Bundler" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
       contents.should =~ /ENV\['BUNDLE_WITHOUT'\]/
-      contents.should =~ /'development:test'/
+      contents.should =~ /'development:test:assets'/
     end
 
     it "adds BUNDLE_GEMFILE to init.rb" do
