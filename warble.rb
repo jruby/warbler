@@ -41,7 +41,7 @@ Warbler::Config.new do |config|
   # config.bundler = false
 
   # An array of Bundler groups to avoid including in the war file.
-  # Defaults to ["development", "test"].
+  # Defaults to ["development", "test", "assets"].
   # config.bundle_without = []
 
   # Other gems to be included. If you don't use Bundler or a gemspec

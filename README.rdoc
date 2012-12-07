@@ -124,8 +124,8 @@ in the project will be included in the archive.
 Applications that use Bundler[http://gembundler.com/], detected via
 presence of a +Gemfile+, will have the gems packaged up into the
 archive along with the Gemfile. The Bundler groups named
-+:development+ and +:test+ will be excluded by default, unless you
-specify with +config.bundle_without+ in +config/warble.rb+.
++:development+ +:test+ and +:assets+ will be excluded by default, unless
+you specify with +config.bundle_without+ in +config/warble.rb+.
 
 Warbler supports Bundler for gems and git repositories, but not for
 plain path components. Warbler will warn when a +:path+ component is
