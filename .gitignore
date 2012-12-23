@@ -4,3 +4,4 @@ doc
 .bundle
 nbproject
 target
+Gemfile.lock

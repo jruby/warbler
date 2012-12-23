@@ -1,15 +1,11 @@
 source "http://rubygems.org/"
 
-gem "rake"
-gem "rubyzip"
-gem "jruby-jars"
-gem "jruby-rack"
+gemspec
 
 group :development do
   gem "jruby-openssl", :platform => :jruby
-  gem "rspec"
   gem "diff-lcs"
-  gem "rcov", ">= 0.9.8"
-  gem "rdoc"
   gem "childprocess", :platform => :mri
+  gem "rdoc"
+  gem "rcov", ">= 0.9.8", :platform => :mri
 end
