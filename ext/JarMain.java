@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -22,23 +23,27 @@ import java.util.jar.JarFile;
 public class JarMain implements Runnable {
     public static final String MAIN = "/" + JarMain.class.getName().replace('.', '/') + ".class";
 
-    private String[] args;
-    private String path, jarfile;
-    private boolean debug;
+    final boolean debug = isDebug();
+    
+    protected final String[] args;
+    protected final String path, jarfile;
+    
     private File extractRoot;
 
-    public JarMain(String[] args) throws Exception {
+    JarMain(String[] args) {
         this.args = args;
         URL mainClass = getClass().getResource(MAIN);
-        this.path = mainClass.toURI().getSchemeSpecificPart();
+        try {
+            this.path = mainClass.toURI().getSchemeSpecificPart();
+        } 
+        catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
         this.jarfile = this.path.replace("!" + MAIN, "").replace("file:", "");
-        this.debug = isDebug();
-        this.extractRoot = File.createTempFile("jruby", "extract");
-        this.extractRoot.delete();
-        this.extractRoot.mkdirs();
+        
         Runtime.getRuntime().addShutdownHook(new Thread(this));
     }
-
+    
     private URL[] extractJRuby() throws Exception {
         JarFile jf = new JarFile(this.jarfile);
         List<String> jarNames = new ArrayList<String>();
@@ -49,18 +54,22 @@ public class JarMain implements Runnable {
             }
         }
 
+        extractRoot = File.createTempFile("jruby", "extract");
+        extractRoot.delete();
+        extractRoot.mkdirs();
+        
         List<URL> urls = new ArrayList<URL>();
         for (String name : jarNames) {
-            urls.add(extractJar(name));
+            urls.add(extractJar(extractRoot, name));
         }
 
         return (URL[]) urls.toArray(new URL[urls.size()]);
     }
 
-    private URL extractJar(String jarpath) throws Exception {
+    private URL extractJar(File rootDir, String jarpath) throws Exception {
         InputStream jarStream = new URI("jar", path.replace(MAIN, jarpath), null).toURL().openStream();
         String jarname = jarpath.substring(jarpath.lastIndexOf("/") + 1, jarpath.lastIndexOf("."));
-        File jarFile = new File(extractRoot, jarname + ".jar");
+        File jarFile = new File(rootDir, jarname + ".jar");
         jarFile.deleteOnExit();
         FileOutputStream outStream = new FileOutputStream(jarFile);
         try {
@@ -101,18 +110,18 @@ public class JarMain implements Runnable {
                 })).intValue();
     }
 
-    private int start() throws Exception {
+    protected int start() throws Exception {
         URL[] u = extractJRuby();
         return launchJRuby(u);
     }
 
-    private void debug(String msg) {
+    protected void debug(String msg) {
         if (debug) {
             System.out.println(msg);
         }
     }
 
-    private void delete(File f) {
+    protected void delete(File f) {
         if (f.isDirectory()) {
             File[] children = f.listFiles();
             for (int i = 0; i < children.length; i++) {
@@ -121,29 +130,33 @@ public class JarMain implements Runnable {
         }
         f.delete();
     }
-
+    
     public void run() {
-        delete(extractRoot);
+        if ( extractRoot != null ) delete(extractRoot);
     }
 
     public static void main(String[] args) {
+        doStart(new JarMain(args));
+    }
+
+    protected static void doStart(final JarMain main) {
         try {
-            int exit = new JarMain(args).start();
-            System.exit(exit);
+            System.exit( main.start() );
         } catch (Exception e) {
+            System.err.println("error: " + e.toString());
             Throwable t = e;
             while (t.getCause() != null && t.getCause() != t) {
                 t = t.getCause();
             }
-
             if (isDebug()) {
                 t.printStackTrace();
             }
             System.exit(1);
         }
     }
-
-    private static boolean isDebug() {
+    
+    static boolean isDebug() {
         return System.getProperty("warbler.debug") != null;
     }
+    
 }

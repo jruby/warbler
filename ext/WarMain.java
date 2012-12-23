@@ -9,7 +9,6 @@ import java.net.URI;
 import java.net.URLClassLoader;
 import java.net.URL;
 import java.lang.reflect.Method;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,31 +52,26 @@ import java.util.Map;
  * jetty.home = {{webroot}}
  * </pre>
  */
-public class WarMain implements Runnable {
+public class WarMain extends JarMain {
     public static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
     public static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
     public static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
-
-    private String[] args;
-    private String path, warfile;
-    private boolean debug;
+    
+    protected final String warfile;
+            
     private File webroot;
 
-    public WarMain(String[] args) throws Exception {
-        this.args = args;
-        URL mainClass = getClass().getResource(MAIN);
-        this.path = mainClass.toURI().getSchemeSpecificPart();
-        this.warfile = this.path.replace("!" + MAIN, "").replace("file:", "");
-        this.debug = isDebug();
+    WarMain(String[] args) {
+        super(args);
+        this.warfile = this.jarfile;
+    }
+    
+    private URL extractWebserver() throws Exception {
         this.webroot = File.createTempFile("warbler", "webroot");
         this.webroot.delete();
         this.webroot.mkdirs();
         this.webroot = new File(this.webroot, new File(warfile).getName());
         debug("webroot directory is " + this.webroot.getPath());
-        Runtime.getRuntime().addShutdownHook(new Thread(this));
-    }
-
-    private URL extractWebserver() throws Exception {
         InputStream jarStream = new URI("jar", path.replace(MAIN, WEBSERVER_JAR), null).toURL().openStream();
         File jarFile = File.createTempFile("webserver", ".jar");
         jarFile.deleteOnExit();
@@ -152,45 +146,22 @@ public class WarMain implements Runnable {
         return newargs;
     }
 
-    private void start() throws Exception {
+    @Override
+    protected int start() throws Exception {
         URL u = extractWebserver();
         launchWebserver(u);
+        return 0;
     }
 
-    private void debug(String msg) {
-        if (debug) {
-            System.out.println(msg);
-        }
-    }
-
-    private void delete(File f) {
-        if (f.isDirectory()) {
-            File[] children = f.listFiles();
-            for (int i = 0; i < children.length; i++) {
-                delete(children[i]);
-            }
-        }
-        f.delete();
-    }
-
+    @Override
     public void run() {
-        delete(webroot.getParentFile());
+        super.run();
+        if ( webroot != null ) delete(webroot.getParentFile());
     }
 
     public static void main(String[] args) {
-        try {
-            new WarMain(args).start();
-        } catch (Exception e) {
-            System.err.println("error: " + e.toString());
-            if (isDebug()) {
-                e.printStackTrace();
-            }
-            System.exit(1);
-        }
+        doStart(new WarMain(args));
     }
 
-    private static boolean isDebug() {
-        return System.getProperty("warbler.debug") != null;
-    }
 }
 
