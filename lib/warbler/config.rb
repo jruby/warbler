@@ -14,7 +14,7 @@ module Warbler
   class Config
     include RakeHelper
 
-    TOP_DIRS = %w(app config lib log vendor)
+    TOP_DIRS = %w(app db config lib log script vendor)
     FILE = "config/warble.rb"
     BUILD_GEMS = %w(warbler rake rcov)
 
@@ -158,7 +158,7 @@ module Warbler
       @warbler_templates = "#{WARBLER_HOME}/lib/warbler/templates"
       @features          = Set.new
       @dirs              = TOP_DIRS.select {|d| File.directory?(d)}
-      @includes          = FileList[]
+      @includes          = FileList['*file'] # [r/R]akefile gets included
       @excludes          = FileList[]
       @java_libs         = FileList[]
       @java_classes      = FileList[]
@@ -180,6 +180,7 @@ module Warbler
       @compiled_ruby_files ||= FileList[*@dirs.map {|d| "#{d}/**/*.rb"}]
 
       @excludes += ["tmp/war", "tmp/war/**/*"] if File.directory?("tmp/war")
+      @excludes += ["tmp/cache/**/*"] if File.directory?("tmp/cache")
       @excludes += warbler_vendor_excludes(warbler_home)
       @excludes += FileList["**/*.log"] if @exclude_logs
     end
