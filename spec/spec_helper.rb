@@ -15,7 +15,7 @@ raise %{Error: detected running Warbler specs in a Rails app;
 Warbler specs are destructive to application directories.} if File.directory?("app")
 
 require 'rbconfig'
-RUBY_EXE = File.join Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']
+RUBY_EXE = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
 
 require 'fileutils'
 require 'stringio'
