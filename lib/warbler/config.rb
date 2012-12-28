@@ -200,6 +200,9 @@ module Warbler
       task "executable" do
         self.features << "executable"
       end
+      task "runnable" do
+        self.features << "runnable"
+      end
     end
 
     # Deprecated

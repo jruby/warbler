@@ -77,6 +77,7 @@ module Warbler
         add_public_files(jar)
         add_webxml(jar)
         move_jars_to_webinf_lib(jar)
+        add_runnables(jar) if config.features.include?("runnable")
         add_executables(jar) if config.features.include?("executable")
         add_gemjar(jar) if config.features.include?("gemjar")
       end
@@ -99,13 +100,21 @@ module Warbler
         end
       end
 
+      def add_runnables(jar, main_class = 'WarMain')
+        main_class = main_class.sub('.class', '') # handles WarMain.class
+        unless config.manifest_file
+          manifest = Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: #{main_class}\n"
+          jar.files['META-INF/MANIFEST.MF'] = StringIO.new(manifest)
+        end
+        [ 'JarMain', 'WarMain', main_class ].uniq.each do |klass|
+          jar.files["#{klass}.class"] = jar.entry_in_jar(WARBLER_JAR, "#{klass}.class")
+        end
+      end
+      
       def add_executables(jar)
         webserver = WEB_SERVERS[config.webserver.to_s]
         webserver.add(jar)
-        jar.files['META-INF/MANIFEST.MF'] = StringIO.new(Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: WarMain\n")
-        # TODO this will currently only work with "default" WarMain.class but not the jetty one :
-        jar.files['JarMain.class'] = jar.entry_in_jar("#{WARBLER_HOME}/lib/warbler_jar.jar", "JarMain.class")
-        jar.files['WarMain.class'] = jar.entry_in_jar("#{WARBLER_HOME}/lib/warbler_jar.jar", webserver.main_class)
+        add_runnables jar, webserver.main_class || 'WarMain'
       end
 
       def add_gemjar(jar)
