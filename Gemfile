@@ -7,5 +7,5 @@ group :development do
   gem "diff-lcs"
   gem "childprocess", :platform => :mri
   gem "rdoc"
-  gem "rcov", ">= 0.9.8", :platform => :mri
+  gem "rcov", ">= 0.9.8", :platform => :mri_18
 end
