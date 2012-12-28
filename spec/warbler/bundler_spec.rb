@@ -102,7 +102,7 @@ describe Warbler::Jar, "with Bundler" do
     it "adds BUNDLE_GEMFILE to init.rb" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ Regexp.new(Regexp.quote("ENV['BUNDLE_GEMFILE'] = $servlet_context.getRealPath('/WEB-INF/Gemfile')"))
+      contents.should =~ Regexp.new(Regexp.quote("ENV['BUNDLE_GEMFILE'] ||= $servlet_context.getRealPath('/WEB-INF/Gemfile')"))
     end
 
     it "uses ENV['BUNDLE_GEMFILE'] if set" do

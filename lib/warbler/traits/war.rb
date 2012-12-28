@@ -103,6 +103,8 @@ module Warbler
         webserver = WEB_SERVERS[config.webserver.to_s]
         webserver.add(jar)
         jar.files['META-INF/MANIFEST.MF'] = StringIO.new(Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: WarMain\n")
+        # TODO this will currently only work with "default" WarMain.class but not the jetty one :
+        jar.files['JarMain.class'] = jar.entry_in_jar("#{WARBLER_HOME}/lib/warbler_jar.jar", "JarMain.class")
         jar.files['WarMain.class'] = jar.entry_in_jar("#{WARBLER_HOME}/lib/warbler_jar.jar", webserver.main_class)
       end
 

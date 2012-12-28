@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.Map;
+import java.util.jar.JarEntry;
 
 /**
  * Used as a Main-Class in the manifest for a .war file, so that you can run
@@ -53,26 +54,43 @@ import java.util.Map;
  * </pre>
  */
 public class WarMain extends JarMain {
-    public static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
-    public static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
-    public static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
     
-    protected final String warfile;
+    static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
+    static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
+    static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
+    
+    // whether to launch webserver or run a jruby executable e.g. `rake ...`
+    private final String executable;
+    private final String[] executableArgv;
             
     private File webroot;
 
-    WarMain(String[] args) {
+    WarMain(final String[] args) {
         super(args);
-        this.warfile = this.jarfile;
+        final int sIndex = Arrays.asList(args).indexOf("-S");
+        if ( sIndex == -1 ) {
+            executable = null;
+            executableArgv = null;
+        }
+        else {
+            if ( args.length == sIndex + 1 || args[sIndex + 1].isEmpty() ) {
+                throw new IllegalArgumentException("missing executable after -S");
+            }
+            executable = args[sIndex + 1];
+            executableArgv = new String[ args.length - (sIndex + 2) ];
+            if ( executableArgv.length > 0 ) {
+                System.arraycopy(args, sIndex + 2, executableArgv, 0, executableArgv.length);
+            }
+        }
     }
     
     private URL extractWebserver() throws Exception {
         this.webroot = File.createTempFile("warbler", "webroot");
         this.webroot.delete();
         this.webroot.mkdirs();
-        this.webroot = new File(this.webroot, new File(warfile).getName());
+        this.webroot = new File(this.webroot, new File(archive).getName());
         debug("webroot directory is " + this.webroot.getPath());
-        InputStream jarStream = new URI("jar", path.replace(MAIN, WEBSERVER_JAR), null).toURL().openStream();
+        InputStream jarStream = new URI("jar", entryPath(WEBSERVER_JAR), null).toURL().openStream();
         File jarFile = File.createTempFile("webserver", ".jar");
         jarFile.deleteOnExit();
         FileOutputStream outStream = new FileOutputStream(jarFile);
@@ -94,13 +112,12 @@ public class WarMain extends JarMain {
         Properties props = new Properties();
         try {
             InputStream is = getClass().getResourceAsStream(WEBSERVER_PROPERTIES);
-            props.load(is);
-        } catch (Exception e) {
-        }
+            if ( is != null ) props.load(is);
+        } catch (Exception e) { }
 
         for (Map.Entry entry : props.entrySet()) {
             String val = (String) entry.getValue();
-            val = val.replace("{{warfile}}", warfile).replace("{{webroot}}", webroot.getAbsolutePath());
+            val = val.replace("{{warfile}}", archive).replace("{{webroot}}", webroot.getAbsolutePath());
             entry.setValue(val);
         }
 
@@ -114,7 +131,7 @@ public class WarMain extends JarMain {
         return props;
     }
 
-    private void launchWebserver(URL jar) throws Exception {
+    private void launchWebServer(URL jar) throws Exception {
         URLClassLoader loader = new URLClassLoader(new URL[] {jar});
         Thread.currentThread().setContextClassLoader(loader);
         Properties props = getWebserverProperties();
@@ -125,13 +142,13 @@ public class WarMain extends JarMain {
                                                + " is missing 'mainclass' property)");
         }
         Class klass = Class.forName(mainClass, true, loader);
-        Method main = klass.getDeclaredMethod("main", new Class[] {String[].class});
-        String[] newargs = launchArguments(props);
-        debug("invoking webserver with: " + Arrays.deepToString(newargs));
-        main.invoke(null, new Object[] {newargs});
+        Method main = klass.getDeclaredMethod("main", new Class[] { String[].class });
+        String[] newArgs = launchWebServerArguments(props);
+        debug("invoking webserver with: " + Arrays.deepToString(newArgs));
+        main.invoke(null, new Object[] {newArgs});
     }
 
-    private String[] launchArguments(Properties props) {
+    private String[] launchWebServerArguments(Properties props) {
         String[] newargs = args;
 
         if (props.getProperty("args") != null) {
@@ -146,11 +163,118 @@ public class WarMain extends JarMain {
         return newargs;
     }
 
+    // JarMain overrides to make WarMain "launchable" 
+    // e.g. java -jar rails.war -S rake db:migrate
+    
+    @Override
+    protected String getExtractEntryPath(final JarEntry entry) {
+        /* 42
+        if ( entry.isDirectory() ) return null;
+        final String name = entry.getName();
+        final String start = "WEB-INF";
+        if ( name.startsWith(start) ) {
+            // WEB-INF/app/controllers/application_controller.rb -> 
+            // app/controllers/application_controller.rb
+            return name.substring(start.length());
+        }
+        if ( name.indexOf('/') == -1 ) {
+            // 404.html -> public/404.html
+            return "/public/" + name;
+        }
+        return "/" + name; */
+        
+        final String name = entry.getName();
+        if ( name.startsWith("WEB-INF/lib") && name.endsWith(".jar") ) {
+            return name.substring(name.lastIndexOf("/") + 1);
+        }
+        return null; // do not extract entry
+    }
+    
+    @Override
+    protected URL extractEntry(final JarEntry entry, final String path) throws Exception {
+        // always extract but only return class-path entry URLs :
+        final URL entryURL = super.extractEntry(entry, path);
+        return path.endsWith(".jar") ? entryURL : null;
+    }
+    
+    @Override
+    protected int launchJRuby(final URL[] jars) throws Exception {
+        final Object scriptingContainer = newScriptingContainer(jars);
+        
+        invokeMethod(scriptingContainer, "setArgv", (Object) executableArgv);
+        invokeMethod(scriptingContainer, "runScriptlet", "ENV.clear");
+        
+        final Object provider = invokeMethod(scriptingContainer, "getProvider");
+        final Object rubyInstanceConfig = invokeMethod(provider, "getRubyInstanceConfig");
+        
+        invokeMethod(rubyInstanceConfig, "setUpdateNativeENVEnabled", new Class[] { Boolean.TYPE }, false);
+        
+        final String executablePath = (String) 
+            invokeMethod(scriptingContainer, "runScriptlet", locateExecutableScript());
+        if ( executablePath == null ) {
+            throw new IllegalStateException("failed to locate gem executable: '" + executable + "'");
+        }
+        invokeMethod(scriptingContainer, "setScriptFilename", executablePath);
+        
+        invokeMethod(rubyInstanceConfig, "processArguments", (Object) new String[] { "" });
+        
+        Object executableInput = invokeMethod(rubyInstanceConfig, "getScriptSource");
+        Object runtime = invokeMethod(scriptingContainer, "getRuntime");
+        
+        debug("invoking " + executablePath + " with: " + Arrays.toString(executableArgv));
+        Object outcome = invokeMethod(runtime, "runFromMain", 
+                new Class[] { InputStream.class, String.class }, 
+                executableInput, executable 
+        );
+        return ( outcome instanceof Number ) ? ( (Number) outcome ).intValue() : 0;
+    }
+    
+    protected String locateExecutableScript() {
+        /* 42
+        if ( extractRoot == null ) {
+            throw new IllegalStateException("missing extract root");
+        }
+        // /WEB-INF/gems extracted as /gems :
+        final File gemsDir = new File(extractRoot, "gems");
+        // /WEB-INF/Gemfile extracted as /Gemfile :
+        final File gemfile = new File(extractRoot, "Gemfile");
+        return
+        "ENV['GEM_HOME'] = '"+ gemsDir.getAbsolutePath() +"'\n" + 
+        "ENV['BUNDLE_GEMFILE'] = '"+ (gemfile.exists() ? gemfile.getAbsolutePath() : "") +"'\n" + 
+          */
+        if ( executable == null ) {
+            throw new IllegalStateException("no exexutable");
+        }
+        final String gemsDir = "jar://" + archive + "!/WEB-INF/gems";
+        final String gemfile = "jar://" + archive + "!/WEB-INF/Gemfile";
+        debug("setting GEM_HOME to " + gemsDir);
+        debug("... and BUNDLE_GEMFILE to " + gemfile);
+        return
+        "ENV['GEM_HOME'] = '"+ gemsDir +"' \n" + 
+        "ENV['BUNDLE_GEMFILE'] = '"+ gemfile +"' \n" + 
+        "begin\n" +
+        "  require 'META-INF/init.rb' \n" +
+        // locate the executable within gemspecs :
+        "  require 'rubygems' \n" +
+        "  exec = '"+ executable +"' \n" +
+        "  spec = Gem::Specification.find { |s| s.executables.include?(exec) } \n" +
+        "  spec ? spec.bin_file(exec) : nil \n" +
+        // returns the full path to the executable
+        "rescue SystemExit => e\n" +
+        "  e.status\n" +
+        "end";
+    }
+    
     @Override
     protected int start() throws Exception {
-        URL u = extractWebserver();
-        launchWebserver(u);
-        return 0;
+        if (executable == null) {
+            URL server = extractWebserver();
+            launchWebServer(server);
+            return 0;
+        }
+        else {
+            return super.start();
+        }
     }
 
     @Override

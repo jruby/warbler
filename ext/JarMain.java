@@ -8,6 +8,7 @@
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,19 +17,23 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class JarMain implements Runnable {
-    public static final String MAIN = "/" + JarMain.class.getName().replace('.', '/') + ".class";
+    
+    static final String MAIN = "/" + JarMain.class.getName().replace('.', '/') + ".class";
 
     final boolean debug = isDebug();
     
     protected final String[] args;
-    protected final String path, jarfile;
+    protected final String archive;
+    private final String path;
     
-    private File extractRoot;
+    protected File extractRoot;
 
     JarMain(String[] args) {
         this.args = args;
@@ -39,88 +44,122 @@ public class JarMain implements Runnable {
         catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        this.jarfile = this.path.replace("!" + MAIN, "").replace("file:", "");
+        archive = this.path.replace("!" + MAIN, "").replace("file:", "");
         
         Runtime.getRuntime().addShutdownHook(new Thread(this));
     }
     
-    private URL[] extractJRuby() throws Exception {
-        JarFile jf = new JarFile(this.jarfile);
-        List<String> jarNames = new ArrayList<String>();
-        for (Enumeration<JarEntry> eje = jf.entries(); eje.hasMoreElements(); ) {
-            String name = eje.nextElement().getName();
-            if (name.startsWith("META-INF/lib") && name.endsWith(".jar")) {
-                jarNames.add("/" + name);
+    protected URL[] extractArchive() throws Exception {
+        final JarFile jarFile = new JarFile(archive);
+        try {
+            Map<String, JarEntry> jarNames = new HashMap<String, JarEntry>();
+            for (Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); ) {
+                JarEntry entry = e.nextElement();
+                String extractPath = getExtractEntryPath(entry);
+                if ( extractPath != null ) jarNames.put(extractPath, entry);
             }
-        }
 
-        extractRoot = File.createTempFile("jruby", "extract");
-        extractRoot.delete();
-        extractRoot.mkdirs();
-        
-        List<URL> urls = new ArrayList<URL>();
-        for (String name : jarNames) {
-            urls.add(extractJar(extractRoot, name));
-        }
+            extractRoot = File.createTempFile("jruby", "extract");
+            extractRoot.delete(); extractRoot.mkdirs();
 
-        return (URL[]) urls.toArray(new URL[urls.size()]);
+            final List<URL> urls = new ArrayList<URL>();
+            for (Map.Entry<String, JarEntry> e : jarNames.entrySet()) {
+                URL entryURL = extractEntry(e.getValue(), e.getKey());
+                if (entryURL != null) urls.add( entryURL );
+            }
+            return (URL[]) urls.toArray(new URL[urls.size()]);
+        }
+        finally {
+            jarFile.close();
+        }
     }
 
-    private URL extractJar(File rootDir, String jarpath) throws Exception {
-        InputStream jarStream = new URI("jar", path.replace(MAIN, jarpath), null).toURL().openStream();
-        String jarname = jarpath.substring(jarpath.lastIndexOf("/") + 1, jarpath.lastIndexOf("."));
-        File jarFile = new File(rootDir, jarname + ".jar");
-        jarFile.deleteOnExit();
-        FileOutputStream outStream = new FileOutputStream(jarFile);
+    protected String getExtractEntryPath(final JarEntry entry) {
+        final String name = entry.getName();
+        if ( name.startsWith("META-INF/lib") && name.endsWith(".jar") ) {
+            return name.substring(name.lastIndexOf("/") + 1);
+        }
+        return null; // do not extract entry
+    }
+    
+    protected URL extractEntry(final JarEntry entry, final String path) throws Exception {
+        final String entryPath = entryPath(entry.getName());
+        final InputStream entryStream;
         try {
-            byte[] buf = new byte[65536];
+            entryStream = new URI("jar", entryPath, null).toURL().openStream();
+        } 
+        catch (IllegalArgumentException e) {
+            debug("failed to open jar:" + entryPath + " skipping entry: " + entry.getName(), e);
+            return null;
+        }
+        final File file = new File(extractRoot, path);
+        final File parent = file.getParentFile();
+        if ( parent != null && ! parent.exists() ) parent.mkdirs();
+        FileOutputStream outStream = new FileOutputStream(file);
+        final byte[] buf = new byte[65536];
+        try {
             int bytesRead = 0;
-            while ((bytesRead = jarStream.read(buf)) != -1) {
+            while ((bytesRead = entryStream.read(buf)) != -1) {
                 outStream.write(buf, 0, bytesRead);
             }
-        } finally {
-            jarStream.close();
+        } 
+        finally {
+            entryStream.close();
             outStream.close();
+            file.deleteOnExit();
         }
-        debug(jarname + ".jar extracted to " + jarFile.getPath());
-        return jarFile.toURI().toURL();
+        debug(entry.getName() + " extracted to " + file.getPath());
+        return file.toURI().toURL();
     }
 
-    private int launchJRuby(URL[] jars) throws Exception {
+    protected String entryPath(String name) {
+        if ( ! name.startsWith("/") ) name = "/" + name;
+        return path.replace(MAIN, name);
+    }
+
+    protected Object newScriptingContainer(final URL[] jars) throws Exception {
         System.setProperty("org.jruby.embed.class.path", "");
-        URLClassLoader loader = new URLClassLoader(jars);
+        ClassLoader loader = new URLClassLoader(jars);
         Class scriptingContainerClass = Class.forName("org.jruby.embed.ScriptingContainer", true, loader);
         Object scriptingContainer = scriptingContainerClass.newInstance();
 
-        Method argv = scriptingContainerClass.getDeclaredMethod("setArgv", new Class[] {String[].class});
-        argv.invoke(scriptingContainer, new Object[] {args});
-        Method setClassLoader = scriptingContainerClass.getDeclaredMethod("setClassLoader", new Class[] {ClassLoader.class});
-        setClassLoader.invoke(scriptingContainer, new Object[] {loader});
-        debug("invoking " + jarfile + " with: " + Arrays.deepToString(args));
-
-        Method runScriptlet = scriptingContainerClass.getDeclaredMethod("runScriptlet", new Class[] {String.class});
-        return ((Number) runScriptlet.invoke(scriptingContainer, new Object[] {
-                    "begin\n" +
-                    "require 'META-INF/init.rb'\n" +
-                    "require 'META-INF/main.rb'\n" +
-                    "0\n" +
-                    "rescue SystemExit => e\n" +
-                    "e.status\n" +
-                    "end"
-                })).intValue();
+        invokeMethod(scriptingContainer, "setArgv", (Object) args);
+        invokeMethod(scriptingContainer, "setClassLoader", new Class[] { ClassLoader.class }, loader);
+        return scriptingContainer;
+    }
+    
+    protected int launchJRuby(final URL[] jars) throws Exception {
+        final Object scriptingContainer = newScriptingContainer(jars);
+        debug("invoking " + archive + " with: " + Arrays.deepToString(args));
+        Object outcome = invokeMethod(scriptingContainer, "runScriptlet", launchScript());
+        return ( outcome instanceof Number ) ? ( (Number) outcome ).intValue() : 0;
     }
 
+    protected String launchScript() {
+        return 
+        "begin\n" +
+        "  require 'META-INF/init.rb'\n" +
+        "  require 'META-INF/main.rb'\n" +
+        "  0\n" +
+        "rescue SystemExit => e\n" +
+        "  e.status\n" +
+        "end";
+    }
+    
     protected int start() throws Exception {
-        URL[] u = extractJRuby();
-        return launchJRuby(u);
+        final URL[] jars = extractArchive();
+        return launchJRuby(jars);
     }
 
     protected void debug(String msg) {
-        if (debug) {
-            System.out.println(msg);
-        }
+        debug(msg, null);
     }
 
+    protected void debug(String msg, Throwable t) {
+        if (debug) System.out.println(msg);
+        if (debug && t != null) t.printStackTrace(System.out);
+    }
+    
     protected void delete(File f) {
         if (f.isDirectory()) {
             File[] children = f.listFiles();
@@ -142,7 +181,8 @@ public class JarMain implements Runnable {
     protected static void doStart(final JarMain main) {
         try {
             System.exit( main.start() );
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.err.println("error: " + e.toString());
             Throwable t = e;
             while (t.getCause() != null && t.getCause() != t) {
@@ -155,8 +195,23 @@ public class JarMain implements Runnable {
         }
     }
     
+    protected static Object invokeMethod(final Object self, final String name, final Object... args) 
+        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        
+        final Class[] signature = new Class[args.length];
+        for ( int i = 0; i < args.length; i++ ) signature[i] = args[i].getClass();
+        return invokeMethod(self, name, signature, args);
+    }
+
+    protected static Object invokeMethod(final Object self, final String name, final Class[] signature, final Object... args) 
+        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        
+        Method method = self.getClass().getDeclaredMethod(name, signature);
+        return method.invoke(self, args);
+    }
+    
     static boolean isDebug() {
-        return System.getProperty("warbler.debug") != null;
+        return Boolean.getBoolean("warbler.debug");
     }
     
 }
