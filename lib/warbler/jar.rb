@@ -49,8 +49,10 @@ module Warbler
       else
         compat_version = ''
       end
+
       # Need to use the version of JRuby in the application to compile it
       %x{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} org.jruby.Main #{compat_version} -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
+      raise "Cannot compile Ruby files" unless $?.success?
     end
 
     def replace_compiled_ruby_files(config, compiled_ruby_files)
