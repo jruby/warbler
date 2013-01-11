@@ -59,7 +59,7 @@ module Warbler
       config.excludes += compiled_ruby_files
 
       compiled_ruby_files.each do |ruby_source|
-        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("require __FILE__.sub(/\.rb$/, '.class')")
+        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("load __FILE__.sub(/\.rb$/, '.class')")
       end
     end
 
@@ -222,8 +222,8 @@ module Warbler
             zipfile.get_output_stream(entry) {|f| f << src.read }
           elsif src.nil? || File.directory?(src)
             if File.symlink?(entry) && ! defined?(JRUBY_VERSION)
-              $stderr.puts "directory symlinks are not followed unless using JRuby; " + 
-                           "#{entry.inspect} contents not in archive" 
+              $stderr.puts "directory symlinks are not followed unless using JRuby; " +
+                           "#{entry.inspect} contents not in archive"
             end
             zipfile.mkdir(entry.dup) # in case it's frozen rubyzip 0.9.6.1 workaround
           elsif File.symlink?(src)
