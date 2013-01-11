@@ -61,7 +61,7 @@ module Warbler
       config.excludes += compiled_ruby_files
 
       compiled_ruby_files.each do |ruby_source|
-        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("load __FILE__.sub(/\.rb$/, '.class')")
+        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("load __FILE__.sub(/(\.rb)?$/, '.class')")
       end
     end
 
