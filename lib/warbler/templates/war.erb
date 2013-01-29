@@ -1,6 +1,4 @@
 ENV['GEM_HOME'] ||= $servlet_context.getRealPath('<%= config.gem_path %>')
 <% if config.bundler && config.bundler[:gemfile_path] %>
-ENV['BUNDLE_GEMFILE'] = $servlet_context.getRealPath('/<%= config.bundler[:gemfile_path] %>')
+ENV['BUNDLE_GEMFILE'] ||= $servlet_context.getRealPath('/<%= config.bundler[:gemfile_path] %>')
 <% end %>
-
-

@@ -475,16 +475,30 @@ describe Warbler::Jar do
     context "with the executable feature" do
       use_test_webserver
 
-      it "adds a WarMain class" do
+      it "adds WarMain (and JarMain) class" do
         use_config do |config|
           config.webserver = "test"
           config.features << "executable"
         end
         jar.apply(config)
         file_list(%r{^WarMain\.class$}).should_not be_empty
+        file_list(%r{^JarMain\.class$}).should_not be_empty
       end
     end
 
+    context "with the runnable feature" do
+      
+      it "adds WarMain (and JarMain) class" do
+        use_config do |config|
+          config.features << "runnable"
+        end
+        jar.apply(config)
+        file_list(%r{^WarMain\.class$}).should_not be_empty
+        file_list(%r{^JarMain\.class$}).should_not be_empty
+      end
+      
+    end
+    
     context "in a Rails application" do
       before :each do
         @rails = nil
