@@ -15,3 +15,11 @@ matrix:
       env: ''
     - rvm: 1.9.3
       env: ''
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#jruby"
+    on_success: change
+    on_failure: always
+    template:
+      - "%{repository} (%{branch}:%{commit} by %{author}): %{message} (%{build_url})" 
