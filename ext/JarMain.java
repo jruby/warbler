@@ -129,7 +129,7 @@ public class JarMain implements Runnable {
     public static void main(String[] args) {
         try {
             int exit = new JarMain(args).start();
-            System.exit(exit);
+            if(isSystemExitEnabled()) System.exit(exit);
         } catch (Exception e) {
             Throwable t = e;
             while (t.getCause() != null && t.getCause() != t) {
@@ -145,5 +145,14 @@ public class JarMain implements Runnable {
 
     private static boolean isDebug() {
         return System.getProperty("warbler.debug") != null;
+    }
+
+    /**
+     * if warbler.skip_system_exit system property is defined, we will not
+     * call System.exit in the normal flow. System.exit can cause problems
+     * for wrappers like procrun
+     */
+    private static boolean isSystemExitEnabled(){
+        return System.getProperty("warbler.skip_system_exit") == null; //omission enables System.exit use
     }
 }
