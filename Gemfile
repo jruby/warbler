@@ -9,7 +9,7 @@ group :development do
   gem "jruby-openssl", :platform => :jruby
   gem "rspec"
   gem "diff-lcs"
-  gem "rcov", ">= 0.9.8"
+  gem "rcov", ">= 0.9.8", :platform => :mri_18
   gem "rdoc"
   gem "childprocess", :platform => :mri
 end
