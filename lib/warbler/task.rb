@@ -108,7 +108,7 @@ module Warbler
       task "compiled" do
         jar.compile(config)
         task @name do
-          rm_f config.compiled_ruby_files.map {|f| f.sub(/\.rb$/, '.class') }
+          rm_f config.compiled_ruby_files.map {|f| f.sub(/(\.rb)?$/, '.class') }
         end
       end
     end

@@ -33,11 +33,11 @@ module Warbler
       end
 
       def update_archive(jar)
-        (Dir['**/*'] - config.compiled_ruby_files).each do |f|
+        (@spec.files - config.compiled_ruby_files).each do |f|
           jar.files[apply_pathmaps(config, f, :application)] = f
         end
         config.compiled_ruby_files.each do |f|
-          f = f.sub(/\.rb$/, '.class')
+          f = f.sub(/(\.rb)?$/, '.class')
           next unless File.exist?(f)
           jar.files[apply_pathmaps(config, f, :application)] = f
         end

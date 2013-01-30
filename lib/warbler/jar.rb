@@ -49,8 +49,10 @@ module Warbler
       else
         compat_version = ''
       end
+
       # Need to use the version of JRuby in the application to compile it
       %x{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} org.jruby.Main #{compat_version} -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
+      raise "Cannot compile Ruby files" unless $?.success?
     end
 
     def replace_compiled_ruby_files(config, compiled_ruby_files)
@@ -59,7 +61,7 @@ module Warbler
       config.excludes += compiled_ruby_files
 
       compiled_ruby_files.each do |ruby_source|
-        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("require __FILE__.sub(/\.rb$/, '.class')")
+        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("load __FILE__.sub(/(\.rb)?$/, '.class')")
       end
     end
 
@@ -86,6 +88,7 @@ module Warbler
       rm_f path
       ensure_directory_entries
       puts "Creating #{path}"
+      @files.delete("#{config_or_path.jar_name}/#{path}")
       create_jar path, @files
     end
 
@@ -221,8 +224,8 @@ module Warbler
             zipfile.get_output_stream(entry) {|f| f << src.read }
           elsif src.nil? || File.directory?(src)
             if File.symlink?(entry) && ! defined?(JRUBY_VERSION)
-              $stderr.puts "directory symlinks are not followed unless using JRuby; " + 
-                           "#{entry.inspect} contents not in archive" 
+              $stderr.puts "directory symlinks are not followed unless using JRuby; " +
+                           "#{entry.inspect} contents not in archive"
             end
             zipfile.mkdir(entry.dup) # in case it's frozen rubyzip 0.9.6.1 workaround
           elsif File.symlink?(src)
