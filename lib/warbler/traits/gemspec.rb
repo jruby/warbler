@@ -49,7 +49,7 @@ module Warbler
         if !@spec.executables.empty?
           "bin/#{@spec.executables.first}"
         else
-          exe = Dir['bin/*'].first
+          exe = Dir['bin/*'].sort.first
           raise "No executable script found" unless exe
           warn "No default executable found in #{@spec_file}, using #{exe}"
           exe
