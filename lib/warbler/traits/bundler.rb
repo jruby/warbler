@@ -23,7 +23,7 @@ module Warbler
 
       def before_configure
         config.bundler = true
-        config.bundle_without = ["development", "test"]
+        config.bundle_without = ["development", "test", "assets"]
       end
 
       def after_configure

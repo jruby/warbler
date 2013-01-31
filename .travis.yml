@@ -1,12 +1,25 @@
 rvm:
-  - 1.8.7
-  - 1.9.2
-  - jruby-18mode
-  # NOTE: seems to be failing on Travis the same way as jruby-rack did, stack 
-  # seems to overflow when gems are loaded (does not happen locally :() :
-  # SystemStackError: stack level too deep
-  # ./spec/../lib/warbler/traits/bundler.rb:30:in `after_configure'
-  #- jruby-19mode
+  - jruby
+  - jruby-head
 branches:
   only:
     - master
+env:
+  - JRUBY_OPTS="--1.8 --server -Xcext.enabled=false -Xcompile.invokedynamic=false"
+  - JRUBY_OPTS="--1.9 --server -Xcext.enabled=false -Xcompile.invokedynamic=false"
+matrix:
+  include:
+    - rvm: 1.8.7
+      env: ''
+    - rvm: 1.9.2
+      env: ''
+    - rvm: 1.9.3
+      env: ''
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#jruby"
+    on_success: change
+    on_failure: always
+    template:
+      - "%{repository} (%{branch}:%{commit} by %{author}): %{message} (%{build_url})" 

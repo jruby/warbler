@@ -168,11 +168,21 @@ public class WarblerJar {
         return entryInJar(stream, entry);
     }
 
+    private static String trimTrailingSlashes(String path) {
+        if (path.endsWith("/")) {
+            return path.substring(0, path.length() - 1);
+        } else {
+            return path;
+        }
+    }
+
     private static InputStream entryInJar(InputStream jar, String entry) throws IOException {
+        entry = trimTrailingSlashes(entry);
+
         ZipInputStream jstream = new ZipInputStream(jar);
         ZipEntry zentry = null;
         while ((zentry = jstream.getNextEntry()) != null) {
-            if (zentry.getName().equals(entry)) {
+            if (trimTrailingSlashes(zentry.getName()).equals(entry)) {
                 return jstream;
             }
             jstream.closeEntry();

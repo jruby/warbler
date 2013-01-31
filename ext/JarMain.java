@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class JarMain implements Runnable {
     }
 
     private URL extractJar(String jarpath) throws Exception {
-        InputStream jarStream = new URL("jar:" + path.replace(MAIN, jarpath)).openStream();
+        InputStream jarStream = new URI("jar", path.replace(MAIN, jarpath), null).toURL().openStream();
         String jarname = jarpath.substring(jarpath.lastIndexOf("/") + 1, jarpath.lastIndexOf("."));
         File jarFile = new File(extractRoot, jarname + ".jar");
         jarFile.deleteOnExit();
@@ -128,7 +129,7 @@ public class JarMain implements Runnable {
     public static void main(String[] args) {
         try {
             int exit = new JarMain(args).start();
-            System.exit(exit);
+            if(isSystemExitEnabled()) System.exit(exit);
         } catch (Exception e) {
             Throwable t = e;
             while (t.getCause() != null && t.getCause() != t) {
@@ -144,5 +145,14 @@ public class JarMain implements Runnable {
 
     private static boolean isDebug() {
         return System.getProperty("warbler.debug") != null;
+    }
+
+    /**
+     * if warbler.skip_system_exit system property is defined, we will not
+     * call System.exit in the normal flow. System.exit can cause problems
+     * for wrappers like procrun
+     */
+    private static boolean isSystemExitEnabled(){
+        return System.getProperty("warbler.skip_system_exit") == null; //omission enables System.exit use
     }
 }

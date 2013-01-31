@@ -44,8 +44,13 @@ module Warbler
     end
 
     def run_javac(config, compiled_ruby_files)
+      if config.webxml && config.webxml.context_params.has_key?('jruby.compat.version')
+        compat_version = "--#{config.webxml.jruby.compat.version}"
+      else
+        compat_version = ''
+      end
       # Need to use the version of JRuby in the application to compile it
-      %x{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} org.jruby.Main -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
+      %x{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} org.jruby.Main #{compat_version} -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
     end
 
     def replace_compiled_ruby_files(config, compiled_ruby_files)
@@ -81,6 +86,9 @@ module Warbler
       rm_f path
       ensure_directory_entries
       puts "Creating #{path}"
+      if Warbler::Config === config_or_path
+        @files.delete("#{config_or_path.jar_name}/#{path}")
+      end
       create_jar path, @files
     end
 
