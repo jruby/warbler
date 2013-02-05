@@ -37,9 +37,12 @@ class Warbler::Application < Rake::Application
     desc "Feature: package gem repository inside a jar"
     task :gemjar => "#{wt.name}:gemjar"
 
-    desc "Feature: make an executable archive"
+    desc "Feature: make an executable archive (runnable + an embedded web server)"
     task :executable => "#{wt.name}:executable"
 
+    desc "Feature: make a runnable archive (e.g. java -jar rails.war -S rake db:migrate)"
+    task :runnable => "#{wt.name}:runnable"
+    
     desc "Feature: precompile all Ruby files"
     task :compiled => "#{wt.name}:compiled"
 

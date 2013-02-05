@@ -5,17 +5,19 @@
  * See the file LICENSE.txt for details.
  */
 
+import java.lang.reflect.Method;
+import java.io.InputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.net.URI;
 import java.net.URLClassLoader;
 import java.net.URL;
-import java.lang.reflect.Method;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.Map;
+import java.util.jar.JarEntry;
 
 /**
  * Used as a Main-Class in the manifest for a .war file, so that you can run
@@ -53,32 +55,48 @@ import java.util.Map;
  * jetty.home = {{webroot}}
  * </pre>
  */
-public class WarMain implements Runnable {
-    public static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
-    public static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
-    public static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
-
-    private String[] args;
-    private String path, warfile;
-    private boolean debug;
+public class WarMain extends JarMain {
+    
+    static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
+    static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
+    static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
+    
+    // jruby arguments, consider the following command :
+    //   `java -jar rails.was --1.9 -S rake db:migrate`
+    // arguments == [ "--1.9" ]
+    // executable == "rake"
+    // executableArgv == [ "db:migrate" ]
+    private final String[] arguments;
+    // null to launch webserver or != null to run a executable e.g. rake
+    private final String executable;
+    private final String[] executableArgv;
+            
     private File webroot;
 
-    public WarMain(String[] args) throws Exception {
-        this.args = args;
-        URL mainClass = getClass().getResource(MAIN);
-        this.path = mainClass.toURI().getSchemeSpecificPart();
-        this.warfile = this.path.replace("!" + MAIN, "").replace("file:", "");
-        this.debug = isDebug();
+    WarMain(final String[] args) {
+        super(args);
+        final List<String> argsList = Arrays.asList(args);
+        final int sIndex = argsList.indexOf("-S");
+        if ( sIndex == -1 ) {
+            executable = null; executableArgv = null; arguments = null;
+        }
+        else {
+            if ( args.length == sIndex + 1 || args[sIndex + 1].isEmpty() ) {
+                throw new IllegalArgumentException("missing executable after -S");
+            }
+            arguments = argsList.subList(0, sIndex).toArray(new String[0]);
+            executable = argsList.get(sIndex + 1);
+            executableArgv = argsList.subList(sIndex + 2, argsList.size()).toArray(new String[0]);
+        }
+    }
+    
+    private URL extractWebserver() throws Exception {
         this.webroot = File.createTempFile("warbler", "webroot");
         this.webroot.delete();
         this.webroot.mkdirs();
-        this.webroot = new File(this.webroot, new File(warfile).getName());
+        this.webroot = new File(this.webroot, new File(archive).getName());
         debug("webroot directory is " + this.webroot.getPath());
-        Runtime.getRuntime().addShutdownHook(new Thread(this));
-    }
-
-    private URL extractWebserver() throws Exception {
-        InputStream jarStream = new URI("jar", path.replace(MAIN, WEBSERVER_JAR), null).toURL().openStream();
+        InputStream jarStream = new URI("jar", entryPath(WEBSERVER_JAR), null).toURL().openStream();
         File jarFile = File.createTempFile("webserver", ".jar");
         jarFile.deleteOnExit();
         FileOutputStream outStream = new FileOutputStream(jarFile);
@@ -100,13 +118,12 @@ public class WarMain implements Runnable {
         Properties props = new Properties();
         try {
             InputStream is = getClass().getResourceAsStream(WEBSERVER_PROPERTIES);
-            props.load(is);
-        } catch (Exception e) {
-        }
+            if ( is != null ) props.load(is);
+        } catch (Exception e) { }
 
         for (Map.Entry entry : props.entrySet()) {
             String val = (String) entry.getValue();
-            val = val.replace("{{warfile}}", warfile).replace("{{webroot}}", webroot.getAbsolutePath());
+            val = val.replace("{{warfile}}", archive).replace("{{webroot}}", webroot.getAbsolutePath());
             entry.setValue(val);
         }
 
@@ -120,7 +137,7 @@ public class WarMain implements Runnable {
         return props;
     }
 
-    private void launchWebserver(URL jar) throws Exception {
+    private void launchWebServer(URL jar) throws Exception {
         URLClassLoader loader = new URLClassLoader(new URL[] {jar});
         Thread.currentThread().setContextClassLoader(loader);
         Properties props = getWebserverProperties();
@@ -131,66 +148,142 @@ public class WarMain implements Runnable {
                                                + " is missing 'mainclass' property)");
         }
         Class klass = Class.forName(mainClass, true, loader);
-        Method main = klass.getDeclaredMethod("main", new Class[] {String[].class});
-        String[] newargs = launchArguments(props);
-        debug("invoking webserver with: " + Arrays.deepToString(newargs));
-        main.invoke(null, new Object[] {newargs});
+        Method main = klass.getDeclaredMethod("main", new Class[] { String[].class });
+        String[] newArgs = launchWebServerArguments(props);
+        debug("invoking webserver with: " + Arrays.deepToString(newArgs));
+        main.invoke(null, new Object[] { newArgs });
     }
 
-    private String[] launchArguments(Properties props) {
-        String[] newargs = args;
+    private String[] launchWebServerArguments(Properties props) {
+        String[] newArgs = args;
 
         if (props.getProperty("args") != null) {
             String[] insertArgs = props.getProperty("args").split(",");
-            newargs = new String[args.length + insertArgs.length];
+            newArgs = new String[args.length + insertArgs.length];
             for (int i = 0; i < insertArgs.length; i++) {
-                newargs[i] = props.getProperty(insertArgs[i], "");
+                newArgs[i] = props.getProperty(insertArgs[i], "");
             }
-            System.arraycopy(args, 0, newargs, insertArgs.length, args.length);
+            System.arraycopy(args, 0, newArgs, insertArgs.length, args.length);
         }
 
-        return newargs;
+        return newArgs;
     }
 
-    private void start() throws Exception {
-        URL u = extractWebserver();
-        launchWebserver(u);
-    }
-
-    private void debug(String msg) {
-        if (debug) {
-            System.out.println(msg);
+    // JarMain overrides to make WarMain "launchable" 
+    // e.g. java -jar rails.war -S rake db:migrate
+    
+    @Override
+    protected String getExtractEntryPath(final JarEntry entry) {
+        final String name = entry.getName();
+        final String start = "WEB-INF";
+        if ( name.startsWith(start) ) {
+            // WEB-INF/app/controllers/application_controller.rb -> 
+            // app/controllers/application_controller.rb
+            return name.substring(start.length());
         }
+        if ( name.indexOf('/') == -1 ) {
+            // 404.html -> public/404.html
+            return "/public/" + name;
+        }
+        return "/" + name;
     }
-
-    private void delete(File f) {
-        if (f.isDirectory()) {
-            File[] children = f.listFiles();
-            for (int i = 0; i < children.length; i++) {
-                delete(children[i]);
+    
+    @Override
+    protected URL extractEntry(final JarEntry entry, final String path) throws Exception {
+        // always extract but only return class-path entry URLs :
+        final URL entryURL = super.extractEntry(entry, path);
+        return path.endsWith(".jar") ? entryURL : null;
+    }
+    
+    @Override
+    protected int launchJRuby(final URL[] jars) throws Exception {
+        final Object scriptingContainer = newScriptingContainer(jars);
+        
+        invokeMethod(scriptingContainer, "setArgv", (Object) executableArgv);
+        //invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
+        invokeMethod(scriptingContainer, "setCurrentDirectory", extractRoot.getAbsolutePath());
+        //invokeMethod(scriptingContainer, "runScriptlet", "ENV.clear");
+        //invokeMethod(scriptingContainer, "runScriptlet", "ENV['PATH']=''"); // bundler 1.1.x
+        
+        final Object provider = invokeMethod(scriptingContainer, "getProvider");
+        final Object rubyInstanceConfig = invokeMethod(provider, "getRubyInstanceConfig");
+        
+        invokeMethod(rubyInstanceConfig, "setUpdateNativeENVEnabled", new Class[] { Boolean.TYPE }, false);
+        
+        final String executablePath = (String) 
+            invokeMethod(scriptingContainer, "runScriptlet", locateExecutableScript());
+        if ( executablePath == null ) {
+            throw new IllegalStateException("failed to locate gem executable: '" + executable + "'");
+        }
+        invokeMethod(scriptingContainer, "setScriptFilename", executablePath);
+        
+        invokeMethod(rubyInstanceConfig, "processArguments", (Object) arguments);
+        
+        Object executableInput = invokeMethod(rubyInstanceConfig, "getScriptSource");
+        Object runtime = invokeMethod(scriptingContainer, "getRuntime");
+        
+        debug("invoking " + executablePath + " with: " + Arrays.toString(executableArgv));
+        Object outcome = invokeMethod(runtime, "runFromMain", 
+                new Class[] { InputStream.class, String.class }, 
+                executableInput, executablePath 
+        );
+        return ( outcome instanceof Number ) ? ( (Number) outcome ).intValue() : 0;
+    }
+    
+    protected String locateExecutableScript() {
+        if ( executable == null ) {
+            throw new IllegalStateException("no exexutable");
+        }
+        final String gemsDir = new File(extractRoot, "gems").getAbsolutePath();
+        final String gemfile = new File(extractRoot, "Gemfile").getAbsolutePath();
+        debug("setting GEM_HOME to " + gemsDir);
+        debug("... and BUNDLE_GEMFILE to " + gemfile);
+        return
+        "ENV['GEM_HOME'] = ENV['GEM_PATH'] = '"+ gemsDir +"' \n" + 
+        "ENV['BUNDLE_GEMFILE'] = '"+ gemfile +"' \n" + 
+        "begin\n" +
+        "  require 'META-INF/init.rb' \n" +
+        // locate the executable within gemspecs :
+        "  require 'rubygems' \n" +
+        "  exec = '"+ executable +"' \n" +
+        "  spec = Gem::Specification.find { |s| s.executables.include?(exec) } \n" +
+        "  spec ? spec.bin_file(exec) : nil \n" +
+        // returns the full path to the executable
+        "rescue SystemExit => e\n" +
+        "  e.status\n" +
+        "end";
+    }
+    
+    @Override
+    protected int start() throws Exception {
+        if ( executable == null ) {
+            try {
+                URL server = extractWebserver();
+                launchWebServer(server);
             }
+            catch (FileNotFoundException e) {
+                if ( e.getMessage().indexOf("WEB-INF/webserver.jar") > -1 ) {
+                    System.out.println("specify the -S argument followed by the bin file to run e.g. `java -jar rails.war -S rake -T` ...");
+                    System.out.println("(or if you'd like your .war file to start a web server package it using `warbler executable war`)");
+                }
+                throw e;
+            }
+            return 0;
         }
-        f.delete();
+        else {
+            return super.start();
+        }
     }
 
+    @Override
     public void run() {
-        delete(webroot.getParentFile());
+        super.run();
+        if ( webroot != null ) delete(webroot.getParentFile());
     }
 
     public static void main(String[] args) {
-        try {
-            new WarMain(args).start();
-        } catch (Exception e) {
-            System.err.println("error: " + e.toString());
-            if (isDebug()) {
-                e.printStackTrace();
-            }
-            System.exit(1);
-        }
+        doStart(new WarMain(args));
     }
 
-    private static boolean isDebug() {
-        return System.getProperty("warbler.debug") != null;
-    }
 }
 

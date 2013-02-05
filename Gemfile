@@ -1,9 +1,6 @@
 source "http://rubygems.org/"
 
-gem "rake"
-gem "rubyzip"
-gem "jruby-jars"
-gem "jruby-rack"
+gemspec
 
 group :development do
   gem "jruby-openssl", :platform => :jruby
