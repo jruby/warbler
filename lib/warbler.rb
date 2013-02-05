@@ -9,7 +9,8 @@
 # your Ruby applications into .jar or .war files.
 module Warbler
   WARBLER_HOME = File.expand_path(File.dirname(__FILE__) + '/..') unless defined?(WARBLER_HOME)
-
+  WARBLER_JAR = "#{WARBLER_HOME}/lib/warbler_jar.jar" unless defined?(WARBLER_JAR)
+  
   class << self
     # An instance of Warbler::Application used by the +warble+ command.
     attr_accessor :application

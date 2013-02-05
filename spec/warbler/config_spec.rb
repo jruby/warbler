@@ -32,7 +32,7 @@ describe Warbler::Config do
     it "should have suitable default values" do
       config = Warbler::Config.new
       config.dirs.should include(*Warbler::Config::TOP_DIRS.select{|d| File.directory?(d)})
-      config.includes.should be_empty
+      config.excludes.should be_empty
       config.java_libs.should_not be_empty
       config.jar_name.size.should > 0
       config.webxml.should be_kind_of(OpenStruct)

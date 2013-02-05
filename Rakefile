@@ -7,9 +7,10 @@
 
 begin
   require 'bundler/setup'
-rescue LoadError
-  puts $!
-  puts "Please install Bundler and run 'bundle install' to ensure you have all dependencies"
+rescue LoadError => e
+  require('rubygems') && retry
+  puts "Please `gem install bundler' and run `bundle install' to ensure you have all dependencies"
+  raise e
 end
 
 require 'bundler/gem_helper'
