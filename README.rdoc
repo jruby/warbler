@@ -14,7 +14,7 @@ Ruby applications to assemble and Just Work.
 2. Run warbler in the top directory of your application: <tt>warble</tt>.
 
 3a. For a web project, deploy your +myapp.war+ file to your favorite Java 
-    application server.
+application server.
 
 3b. For a standalone applications, just run it: <tt>java -jar myapp.jar</tt>.
 
