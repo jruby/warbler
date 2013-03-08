@@ -7,6 +7,8 @@
 
 import java.lang.reflect.Method;
 import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.io.SequenceInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -210,8 +212,7 @@ public class WarMain extends JarMain {
         
         invokeMethod(rubyInstanceConfig, "setUpdateNativeENVEnabled", new Class[] { Boolean.TYPE }, false);
         
-        final String executablePath = (String) 
-            invokeMethod(scriptingContainer, "runScriptlet", locateExecutableScript());
+        final String executablePath = locateExecutable(scriptingContainer);
         if ( executablePath == null ) {
             throw new IllegalStateException("failed to locate gem executable: '" + executable + "'");
         }
@@ -219,8 +220,10 @@ public class WarMain extends JarMain {
         
         invokeMethod(rubyInstanceConfig, "processArguments", (Object) arguments);
         
-        Object executableInput = invokeMethod(rubyInstanceConfig, "getScriptSource");
         Object runtime = invokeMethod(scriptingContainer, "getRuntime");
+        Object executableInput =
+            new SequenceInputStream(new ByteArrayInputStream(executableScriptEnvPrefix().getBytes()),
+                                    (InputStream) invokeMethod(rubyInstanceConfig, "getScriptSource"));
         
         debug("invoking " + executablePath + " with: " + Arrays.toString(executableArgv));
         Object outcome = invokeMethod(runtime, "runFromMain", 
@@ -230,21 +233,47 @@ public class WarMain extends JarMain {
         return ( outcome instanceof Number ) ? ( (Number) outcome ).intValue() : 0;
     }
     
-    protected String locateExecutableScript() {
+    protected String locateExecutable(final Object scriptingContainer) throws Exception {
         if ( executable == null ) {
             throw new IllegalStateException("no exexutable");
         }
+        final File exec = new File(extractRoot, executable);
+        if ( exec.exists() ) {
+            return exec.getAbsolutePath();
+        }
+        else {
+            final String script = locateExecutableScript(executable);
+            return (String) invokeMethod(scriptingContainer, "runScriptlet", script);
+        }
+    }
+
+    protected String executableScriptEnvPrefix() {
         final String gemsDir = new File(extractRoot, "gems").getAbsolutePath();
         final String gemfile = new File(extractRoot, "Gemfile").getAbsolutePath();
         debug("setting GEM_HOME to " + gemsDir);
         debug("... and BUNDLE_GEMFILE to " + gemfile);
-        return
-        "ENV['GEM_HOME'] = ENV['GEM_PATH'] = '"+ gemsDir +"' \n" + 
+        return "ENV['GEM_HOME'] = ENV['GEM_PATH'] = '"+ gemsDir +"' \n" +
         "ENV['BUNDLE_GEMFILE'] = '"+ gemfile +"' \n" + 
+
+            // FIXME: get this from web.xml config?
+            "ENV['BUNDLE_WITHOUT'] = 'assets:development:test' \n";
+    }
+
+    // TODO move this into an ERB template
+    protected String locateExecutableScript(final String executable) {
+        return executableScriptEnvPrefix() +
         "begin\n" +
         "  require 'META-INF/init.rb' \n" +
         // locate the executable within gemspecs :
         "  require 'rubygems' \n" +
+            "  begin\n" +
+            // add bundler gems to load path:
+            "    require 'bundler' \n" +
+            // TODO: environment from web.xml. Any others?
+            "    Bundler.setup(:default, ENV.values_at('RACK_ENV', 'RAILS_ENV').compact)\n" +
+            "  rescue LoadError\n" +
+            // bundler not used
+            "  end\n" +
         "  exec = '"+ executable +"' \n" +
         "  spec = Gem::Specification.find { |s| s.executables.include?(exec) } \n" +
         "  spec ? spec.bin_file(exec) : nil \n" +
@@ -286,4 +315,3 @@ public class WarMain extends JarMain {
     }
 
 }
-
