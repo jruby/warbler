@@ -246,24 +246,20 @@ public class WarMain extends JarMain {
             return (String) invokeMethod(scriptingContainer, "runScriptlet", script);
         }
     }
-
     protected String executableScriptEnvPrefix() {
         final String gemsDir = new File(extractRoot, "gems").getAbsolutePath();
         final String gemfile = new File(extractRoot, "Gemfile").getAbsolutePath();
         debug("setting GEM_HOME to " + gemsDir);
         debug("... and BUNDLE_GEMFILE to " + gemfile);
-        return "ENV['GEM_HOME'] = ENV['GEM_PATH'] = '"+ gemsDir +"' \n" +
-        "ENV['BUNDLE_GEMFILE'] = '"+ gemfile +"' \n" + 
-
-            // FIXME: get this from web.xml config?
-            "ENV['BUNDLE_WITHOUT'] = 'assets:development:test' \n";
+        return "ENV['GEM_HOME'] ||= ENV['GEM_PATH'] = '"+ gemsDir +"' \n" +
+        "ENV['BUNDLE_GEMFILE'] ||= '"+ gemfile +"' \n" +
+        "require 'META-INF/init.rb' \n";
     }
 
     // TODO move this into an ERB template
     protected String locateExecutableScript(final String executable) {
         return executableScriptEnvPrefix() +
         "begin\n" +
-        "  require 'META-INF/init.rb' \n" +
         // locate the executable within gemspecs :
         "  require 'rubygems' \n" +
             "  begin\n" +
