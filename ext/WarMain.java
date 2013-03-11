@@ -235,7 +235,7 @@ public class WarMain extends JarMain {
     
     protected String locateExecutable(final Object scriptingContainer) throws Exception {
         if ( executable == null ) {
-            throw new IllegalStateException("no exexutable");
+            throw new IllegalStateException("no executable");
         }
         final File exec = new File(extractRoot, executable);
         if ( exec.exists() ) {
