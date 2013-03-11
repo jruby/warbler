@@ -256,7 +256,6 @@ public class WarMain extends JarMain {
         "require 'META-INF/init.rb' \n";
     }
 
-    // TODO move this into an ERB template
     protected String locateExecutableScript(final String executable) {
         return executableScriptEnvPrefix() +
         "begin\n" +
