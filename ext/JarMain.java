@@ -185,7 +185,7 @@ public class JarMain implements Runnable {
 
     protected static void doStart(final JarMain main) {
         try {
-            int exit = new JarMain(args).start();
+            int exit = main.start();
             if(isSystemExitEnabled()) System.exit(exit);
         } catch (Exception e) {
             System.err.println("error: " + e.toString());
