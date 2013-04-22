@@ -6,6 +6,7 @@
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -166,15 +167,32 @@ public class JarMain implements Runnable {
     }
     
     protected void delete(File f) {
-        if (f.isDirectory()) {
-            File[] children = f.listFiles();
-            for (int i = 0; i < children.length; i++) {
-                delete(children[i]);
-            }
+        try {
+          if (f.isDirectory() && !isSymlink(f)) {
+              File[] children = f.listFiles();
+              for (int i = 0; i < children.length; i++) {
+                  delete(children[i]);
+              }
+          }
+          f.delete();
+        } catch (IOException e) {
+            System.err.println("error: " + e.toString());
         }
-        f.delete();
     }
-    
+
+    protected boolean isSymlink(File file) throws IOException {
+      if (file == null)
+        throw new NullPointerException("File must not be null");
+      File canon;
+      if (file.getParent() == null) {
+        canon = file;
+      } else {
+        File canonDir = file.getParentFile().getCanonicalFile();
+        canon = new File(canonDir, file.getName());
+      }
+      return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
+    }
+
     public void run() {
         if ( extractRoot != null ) delete(extractRoot);
     }
