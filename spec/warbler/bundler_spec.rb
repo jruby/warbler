@@ -170,4 +170,15 @@ describe Warbler::Jar, "with Bundler" do
       contents.split("\n").grep(/ENV\['BUNDLE_FROZEN'\] = '1'/).should_not be_empty
     end
   end
+
+  context "when deployment" do
+    run_in_directory "spec/sample_bundler"
+
+    it "includes the bundler gem" do
+      `#{RUBY_EXE} -S bundle install --deployment`
+      jar.apply(config)
+      file_list(%r{gems/rake-0.8.7/lib}).should_not be_empty
+      file_list(%r{gems/bundler-1.3.5/lib}).should_not be_empty
+    end
+  end
 end
