@@ -265,7 +265,7 @@ public class WarMain extends JarMain {
             // add bundler gems to load path:
             "    require 'bundler' \n" +
             // TODO: environment from web.xml. Any others?
-            "    Bundler.setup(:default, ENV.values_at('RACK_ENV', 'RAILS_ENV').compact)\n" +
+            "    Bundler.setup(:default, *ENV.values_at('RACK_ENV', 'RAILS_ENV').compact)\n" +
             "  rescue LoadError\n" +
             // bundler not used
             "  end\n" +
