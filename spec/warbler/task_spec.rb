@@ -105,7 +105,7 @@ describe Warbler::Task do
       ruby_class_definition = zf.get_input_stream('WEB-INF/app/helpers/application_helper.rb') {|io| io.read }
 
       java_class_header.should == java_class_magic_number
-      ruby_class_definition.should == %{require __FILE__.sub(/.rb$/, '.class')}
+      ruby_class_definition.should == %{load __FILE__.sub(/.rb$/, '.class')}
     end
   end
 
@@ -121,7 +121,7 @@ describe Warbler::Task do
       ruby_class_definition = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.rb') {|io| io.read }
 
       java_class_header.should == java_class_magic_number
-      ruby_class_definition.should == %{require __FILE__.sub(/.rb$/, '.class')}
+      ruby_class_definition.should == %{load __FILE__.sub(/.rb$/, '.class')}
     end
   end
 
