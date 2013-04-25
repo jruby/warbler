@@ -137,7 +137,7 @@ describe Warbler::Jar do
         jar.compile(config)
         jar.apply(config)
         file_list(%r{^sample_jar/lib/sample_jar\.class$}).should_not be_empty
-        jar.contents('sample_jar/lib/sample_jar.rb').should =~ /require __FILE__\.sub/
+        jar.contents('sample_jar/lib/sample_jar.rb').should =~ /load __FILE__\.sub/
       end
     end
 
