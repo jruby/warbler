@@ -178,7 +178,8 @@ describe Warbler::Jar, "with Bundler" do
       `#{RUBY_EXE} -S bundle install --deployment`
       jar.apply(config)
       file_list(%r{gems/rake-0.8.7/lib}).should_not be_empty
-      file_list(%r{gems/bundler-1.3.5/lib}).should_not be_empty
+      file_list(%r{gems/bundler-}).should_not be_empty
+      file_list(%r{gems/bundler-.*/lib}).should_not be_empty
     end
   end
 end
