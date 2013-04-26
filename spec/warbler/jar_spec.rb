@@ -55,10 +55,17 @@ describe Warbler::Jar do
       contents.split("\n").grep(/require 'rubygems'/).should_not be_empty
     end
 
-    it "adds ENV['GEM_HOME'] to init.rb" do
+    it "does not override ENV['GEM_HOME'] by default" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ /ENV\['GEM_HOME'\]/
+      contents.should =~ %r{ENV['GEM_HOME'] ||=}
+    end
+
+    it "overrides ENV['GEM_HOME'] when allow_gem_home_override is set" do
+      config.allow_gem_home_override = true
+      jar.add_init_file(config)
+      contents = jar.contents('META-INF/init.rb')
+      contents.should =~ /ENV\['GEM_HOME'\] =/
     end
 
     it "adds a main.rb" do
