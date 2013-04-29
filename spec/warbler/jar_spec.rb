@@ -216,6 +216,24 @@ describe Warbler::Jar do
         contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
       end
     end
+
+    context "when configured to respect GEM_HOME" do
+      it "uses current value of GEM_HOME" do
+        config.ignore_gem_home = false
+        jar.apply(config)
+        contents = jar.contents('META-INF/init.rb')
+        contents.split("\n").grep(/GEM_HOME/).first.should include("ENV['GEM_HOME'] ||=")
+      end
+    end
+
+    context "when configured to ignore GEM_HOME" do
+      it "ignores current value of GEM_HOME" do
+        config.ignore_gem_home = true
+        jar.apply(config)
+        contents = jar.contents('META-INF/init.rb')
+        contents.split("\n").grep(/GEM_HOME/).first.should include("ENV['GEM_HOME'] =")
+      end
+    end
   end
 
   context "in a war project" do

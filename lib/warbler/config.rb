@@ -115,7 +115,11 @@ module Warbler
     # If the filename ends in .erb the file will be expanded the same way web.xml.erb is; see below.
     attr_accessor :init_contents
 
-    attr_accessor :allow_gem_home_override
+    # Override GEM_HOME environment variable at runtime. When false, gems in
+    # GEM_HOME will be loaded in preference to those packaged within the jar
+    # file. When true, only gems packaged in the jar file will be loaded.
+    # Defaults to false
+    attr_accessor :override_gem_home
 
     # Extra configuration for web.xml. Controls how the dynamically-generated web.xml
     # file is generated.
@@ -174,7 +178,7 @@ module Warbler
       @webinf_files      = FileList[]
       @init_filename     = 'META-INF/init.rb'
       @init_contents     = ["#{@warbler_templates}/config.erb"]
-      @allow_gem_home_override = false
+      @override_gem_home = false
 
       before_configure
       yield self if block_given?
