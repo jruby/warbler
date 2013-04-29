@@ -90,8 +90,8 @@ Warbler::Config.new do |config|
   # config.compiled_ruby_files = FileList['app/**/*.rb']
 
   # When set to true, Warbler will override the value of ENV['GEM_HOME'] even it
-  # has already been set. This option is ignored when using config.relative_gem_path.
-  # config.allow_gem_home_override = false
+  # has already been set.
+  # config.override_gem_home = false
 
   # === War files only below here ===
 
