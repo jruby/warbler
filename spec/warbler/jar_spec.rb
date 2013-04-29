@@ -61,8 +61,8 @@ describe Warbler::Jar do
       contents.should =~ %r{ENV['GEM_HOME'] ||=}
     end
 
-    it "overrides ENV['GEM_HOME'] when allow_gem_home_override is set" do
-      config.allow_gem_home_override = true
+    it "overrides ENV['GEM_HOME'] when override_gem_home is set" do
+      config.override_gem_home = true
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
       contents.should =~ /ENV\['GEM_HOME'\] =/
