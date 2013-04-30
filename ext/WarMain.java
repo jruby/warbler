@@ -154,6 +154,21 @@ public class WarMain extends JarMain {
         String[] newArgs = launchWebServerArguments(props);
         debug("invoking webserver with: " + Arrays.deepToString(newArgs));
         main.invoke(null, new Object[] { newArgs });
+
+        // the following code is specific to winstone. but a whole winstone module like the jetty module seemed
+        // excessive. if running under jetty (or anything other than wintstone) this will effectively do nothing.
+        ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+        Thread[] threads = new Thread[threadGroup.activeCount()];
+        threadGroup.enumerate(threads);
+        for (Thread thread : threads) {
+            if (thread != null) {
+                String name = thread.getName();
+                if (name.startsWith("LauncherControlThread")) {
+                    debug("joining thread: " + name);
+                    thread.join();
+                }
+            }
+        }
     }
 
     private String[] launchWebServerArguments(Properties props) {
