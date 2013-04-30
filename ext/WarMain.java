@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Map;
 import java.util.jar.JarEntry;
+import java.util.Set;
 
 /**
  * Used as a Main-Class in the manifest for a .war file, so that you can run
@@ -157,16 +158,12 @@ public class WarMain extends JarMain {
 
         // the following code is specific to winstone. but a whole winstone module like the jetty module seemed
         // excessive. if running under jetty (or anything other than wintstone) this will effectively do nothing.
-        ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-        Thread[] threads = new Thread[threadGroup.activeCount()];
-        threadGroup.enumerate(threads);
+        Set<Thread> threads = Thread.getAllStackTraces().keySet();
         for (Thread thread : threads) {
-            if (thread != null) {
-                String name = thread.getName();
-                if (name.startsWith("LauncherControlThread")) {
-                    debug("joining thread: " + name);
-                    thread.join();
-                }
+            String name = thread.getName();
+            if (name.startsWith("LauncherControlThread")) {
+                debug("joining thread: " + name);
+                thread.join();
             }
         }
     }
