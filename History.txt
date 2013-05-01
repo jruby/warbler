@@ -1,3 +1,21 @@
+== 1.3.7
+
+- #154: Use #load in .rb shims
+- #153: Runnable war error
+- #152: Mirror fallback for winstone-jenkins?
+- #150: Don't delete contents of symlinked folder.
+- #148: Resolving issue when an alternate BUNDLE_PATH is used
+- #144: No such file to load -- bundler/setup (with bundler 1.3.4)
+- #141: Support running executables from Bundler gems and project-local scripts
+- #136: java -jar rails.war -S rake db:migrate
+- #125: Fix self executable jar/wars when the filename contains '#' symbols
+- #122: When comparing zip file entries, ignore trailing slashes
+- #118: warble pluginize does not work on rails 3.x
+- #117: Allow compile feature to work in 1.9 mode
+- #112: Reset ENV['GEM_HOME'], limit search to within .jar
+- #105: Pick executables deterministically and warn when doing so
+- #104: Default executable is system-dependent
+
 == 1.3.6
 
 - #100: fix winstone URL
