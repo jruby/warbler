@@ -63,14 +63,19 @@ public class WarMain extends JarMain {
     static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
     static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
     static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
-    
-    // jruby arguments, consider the following command :
-    //   `java -jar rails.was --1.9 -S rake db:migrate`
-    // arguments == [ "--1.9" ]
-    // executable == "rake"
-    // executableArgv == [ "db:migrate" ]
+
+    /**
+     *  jruby arguments, consider the following command :
+     *    `java -jar rails.was --1.9 -S rake db:migrate`
+     *   arguments == [ "--1.9" ]
+     *   executable == "rake"
+     *   executableArgv == [ "db:migrate" ]
+     */
     private final String[] arguments;
-    // null to launch webserver or != null to run a executable e.g. rake
+
+    /**
+     * null to launch webserver or != null to run a executable e.g. rake
+     */
     private final String executable;
     private final String[] executableArgv;
             
@@ -90,6 +95,10 @@ public class WarMain extends JarMain {
             arguments = argsList.subList(0, sIndex).toArray(new String[0]);
             executable = argsList.get(sIndex + 1);
             executableArgv = argsList.subList(sIndex + 2, argsList.size()).toArray(new String[0]);
+
+            if (executable.equals("bundle") && executableArgv.length > 0 && executableArgv[0].equals("exec")) {
+                warn("`bundle exec' may drop out of the Warbler environment and into the system environment");
+            }
         }
     }
     
@@ -214,10 +223,7 @@ public class WarMain extends JarMain {
         final Object scriptingContainer = newScriptingContainer(jars);
         
         invokeMethod(scriptingContainer, "setArgv", (Object) executableArgv);
-        //invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
         invokeMethod(scriptingContainer, "setCurrentDirectory", extractRoot.getAbsolutePath());
-        //invokeMethod(scriptingContainer, "runScriptlet", "ENV.clear");
-        //invokeMethod(scriptingContainer, "runScriptlet", "ENV['PATH']=''"); // bundler 1.1.x
         
         final Object provider = invokeMethod(scriptingContainer, "getProvider");
         final Object rubyInstanceConfig = invokeMethod(provider, "getRubyInstanceConfig");
@@ -263,7 +269,9 @@ public class WarMain extends JarMain {
         final String gemfile = new File(extractRoot, "Gemfile").getAbsolutePath();
         debug("setting GEM_HOME to " + gemsDir);
         debug("... and BUNDLE_GEMFILE to " + gemfile);
-        return "ENV['GEM_HOME'] ||= ENV['GEM_PATH'] = '"+ gemsDir +"' \n" +
+
+        // ideally this would look up the config.override_gem_home setting
+        return "ENV['GEM_HOME'] = ENV['GEM_PATH'] = '"+ gemsDir +"' \n" +
         "ENV['BUNDLE_GEMFILE'] ||= '"+ gemfile +"' \n" +
         "require 'META-INF/init.rb' \n";
     }

@@ -165,6 +165,10 @@ public class JarMain implements Runnable {
         if (debug) System.out.println(msg);
         if (debug && t != null) t.printStackTrace(System.out);
     }
+
+    protected void warn(String msg) {
+        System.out.println("WARNING: " + msg);
+    }
     
     protected void delete(File f) {
         try {
