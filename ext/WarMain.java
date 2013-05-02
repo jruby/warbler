@@ -221,10 +221,22 @@ public class WarMain extends JarMain {
     @Override
     protected int launchJRuby(final URL[] jars) throws Exception {
         final Object scriptingContainer = newScriptingContainer(jars);
-        
+
+        String jrubyStdlibJar = "";
+        for (URL url : jars) {
+            if (url.toString().matches("file:/.*jruby-stdlib-.*jar")) {
+                jrubyStdlibJar = url.toString();
+                debug("using jruby-stdlib: " + jrubyStdlibJar);
+            }
+        }
+
+        invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
         invokeMethod(scriptingContainer, "setArgv", (Object) executableArgv);
         invokeMethod(scriptingContainer, "setCurrentDirectory", extractRoot.getAbsolutePath());
-        
+        invokeMethod(scriptingContainer, "runScriptlet", "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/1.9/site_ruby\"");
+        invokeMethod(scriptingContainer, "runScriptlet", "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/shared\"");
+        invokeMethod(scriptingContainer, "runScriptlet", "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/1.9\"");
+
         final Object provider = invokeMethod(scriptingContainer, "getProvider");
         final Object rubyInstanceConfig = invokeMethod(provider, "getRubyInstanceConfig");
         
