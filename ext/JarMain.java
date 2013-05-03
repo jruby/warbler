@@ -36,6 +36,8 @@ public class JarMain implements Runnable {
     
     protected File extractRoot;
 
+    protected URLClassLoader classLoader;
+
     JarMain(String[] args) {
         this.args = args;
         URL mainClass = getClass().getResource(MAIN);
@@ -125,12 +127,12 @@ public class JarMain implements Runnable {
 
     protected Object newScriptingContainer(final URL[] jars) throws Exception {
         System.setProperty("org.jruby.embed.class.path", "");
-        ClassLoader loader = new URLClassLoader(jars);
-        Class scriptingContainerClass = Class.forName("org.jruby.embed.ScriptingContainer", true, loader);
+        classLoader = new URLClassLoader(jars);
+        Class scriptingContainerClass = Class.forName("org.jruby.embed.ScriptingContainer", true, classLoader);
         Object scriptingContainer = scriptingContainerClass.newInstance();
         debug("scripting container class loader urls: " + Arrays.toString(jars));
         invokeMethod(scriptingContainer, "setArgv", (Object) args);
-        invokeMethod(scriptingContainer, "setClassLoader", new Class[] { ClassLoader.class }, loader);
+        invokeMethod(scriptingContainer, "setClassLoader", new Class[] { ClassLoader.class }, classLoader);
         return scriptingContainer;
     }
     
@@ -198,6 +200,15 @@ public class JarMain implements Runnable {
     }
 
     public void run() {
+        // If the URLClassLoader isn't closed, on Windows, temp JARs won't be cleaned up
+        try {
+            invokeMethod(classLoader, "close");
+        }
+        catch(NoSuchMethodException e) { } // We're not being run on Java >= 7
+        catch(Exception e) {
+            System.err.println("error: " + e.toString());
+        }
+
         if ( extractRoot != null ) delete(extractRoot);
     }
 
