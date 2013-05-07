@@ -1,3 +1,10 @@
+== 1.3.8
+
+- Numerous fixes related to -S option and local environment.
+- #162: Close the URLClassLoader before deleting tempJARs
+- #161: Comment out config.dirs to match default
+- #158: Warbler looking in the wrong directory for bundler gem
+
 == 1.3.7
 
 - #154: Use #load in .rb shims
