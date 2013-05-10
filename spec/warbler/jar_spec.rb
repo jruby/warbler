@@ -532,6 +532,11 @@ describe Warbler::Jar do
         config.gems["rails"].should == "2.1.0"
       end
 
+      it "adds the rails.rb" do
+        jar.apply(config)
+        file_list(%r{^META-INF/rails.rb$}).should_not be_empty
+      end
+
       it "provides Rails gems by default, unless vendor/rails is present" do
         config.gems.should have_key("rails")
 

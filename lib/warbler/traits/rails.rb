@@ -39,6 +39,7 @@ module Warbler
             config.gems << Gem::Dependency.new(g.name, g.requirement) if Dir["vendor/gems/#{g.name}*"].empty?
           end
         end
+        config.script_files << "#{config.warbler_scripts}/rails.rb"
       end
 
       def after_configure

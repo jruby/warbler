@@ -72,6 +72,7 @@ module Warbler
       find_gems_files(config)
       add_manifest(config)
       add_init_file(config)
+      add_script_files(config)
       apply_traits(config)
     end
 
@@ -188,6 +189,12 @@ module Warbler
           end
         end
         @files[config.init_filename] = StringIO.new(contents)
+      end
+    end
+
+    def add_script_files(config)
+      config.script_files.each do |file|
+        @files["META-INF/#{File.basename(file)}"] = StringIO.new(File.read(file))
       end
     end
 
