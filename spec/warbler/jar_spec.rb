@@ -73,6 +73,12 @@ describe Warbler::Jar do
       file_list(%r{^META-INF/main.rb$}).should_not be_empty
     end
 
+    it "adds script_files" do
+      config.script_files << __FILE__
+      jar.apply(config)
+      file_list(%r{^META-INF/#{File.basename(__FILE__)}$}).should_not be_empty
+    end
+
     it "accepts a custom manifest file" do
       touch 'manifest'
       use_config do |config|
@@ -532,9 +538,8 @@ describe Warbler::Jar do
         config.gems["rails"].should == "2.1.0"
       end
 
-      it "adds the rails.rb" do
-        jar.apply(config)
-        file_list(%r{^META-INF/rails.rb$}).should_not be_empty
+      it "adds the rails.rb to the script files" do
+        config.script_files.first.should =~ %r{lib/warbler/scripts/rails.rb$}
       end
 
       it "provides Rails gems by default, unless vendor/rails is present" do
