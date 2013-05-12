@@ -315,13 +315,14 @@ public class WarMain extends JarMain {
             }
         }
 
-        // TODO detect 1.8/1.9 and JRUBY_VERSION > 1.7.0
         invokeMethod(scriptingContainer, "runScriptlet", "" +
-            "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/1.9/site_ruby\"\n" +
+            "ruby = RUBY_VERSION.match(/^\\d\\.\\d/)[0] \n" +
+            "jruby = JRUBY_VERSION.match(/^\\d\\.\\d/)[0].to_f \n" +
+            "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/#{ruby}/site_ruby\"\n" +
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/shared\"\n" +
-            "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/1.9\"\n" +
-            "require 'bcpkix-jdk15on-147.jar'\n" +
-            "require 'bcprov-jdk15on-147.jar'\n");        
+            "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/#{ruby}\"\n" +
+            "require 'bcpkix-jdk15on-147.jar' if jruby >= 1.7 \n" +
+            "require 'bcprov-jdk15on-147.jar' if jruby >= 1.7 \n");        
 
         invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
     }
