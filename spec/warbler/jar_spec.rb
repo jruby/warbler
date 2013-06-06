@@ -146,6 +146,14 @@ describe Warbler::Jar do
         file_list(%r{^sample_jar/lib/sample_jar\.class$}).should_not be_empty
         jar.contents('sample_jar/lib/sample_jar.rb').should =~ /load __FILE__\.sub/
       end
+
+      it "includes only specified dirs" do
+        config.dirs = %w(bin)
+        jar.compile(config)
+        jar.apply(config)
+        file_list(%r{^sample_jar/lib$}).should be_empty
+        file_list(%r{^sample_jar/bin$}).should_not be_empty
+      end
     end
 
     context "with a gemspec without a default executable" do
