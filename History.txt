@@ -1,3 +1,8 @@
+== 1.3.9
+
+- #156: config.dirs seems to be ignored
+- #159: Rails 4.0.0.rc1 fails under warbler with `silence` error
+
 == 1.3.8
 
 - Numerous fixes related to -S option and local environment.
