@@ -155,7 +155,12 @@ module Warbler
     # * <tt>jetty</tt> - Embedded Jetty from Eclipse
     attr_accessor :webserver
 
+    # These file will be placed in the META-INF directory of the jar or war that warbler
+    # produces. They are primarily used as launchers by the runnable feature.
+    attr_accessor :script_files
+
     attr_reader :warbler_templates
+    attr_reader :warbler_scripts
 
     def initialize(warbler_home = WARBLER_HOME)
       super()
@@ -179,6 +184,8 @@ module Warbler
       @init_filename     = 'META-INF/init.rb'
       @init_contents     = ["#{@warbler_templates}/config.erb"]
       @override_gem_home = false
+      @script_files      = []
+      @warbler_scripts = "#{WARBLER_HOME}/lib/warbler/scripts"
 
       before_configure
       yield self if block_given?
