@@ -327,13 +327,6 @@ public class WarMain extends JarMain {
         invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
     }
 
-    protected String railsBinScript() {
-        // this is what Rails generates by default in the bin/ (for Rails4) or script/ (for Rails3)
-        return "APP_PATH = File.expand_path('../../config/application',  __FILE__)\n" +
-        "require_relative '../config/boot'\n" +
-        "require 'rails/commands'\n";
-    }
-
     @Override
     protected int start() throws Exception {
         if ( executable == null ) {
