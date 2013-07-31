@@ -58,14 +58,14 @@ describe Warbler::Jar do
     it "does not override ENV['GEM_HOME'] by default" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ %r{ENV['GEM_HOME'] ||=}
+      contents.should include("ENV['GEM_HOME'] ||=")
     end
 
     it "overrides ENV['GEM_HOME'] when override_gem_home is set" do
       config.override_gem_home = true
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ /ENV\['GEM_HOME'\] =/
+      contents.should include("ENV['GEM_HOME'] =")
     end
 
     it "adds a main.rb" do
@@ -262,8 +262,15 @@ describe Warbler::Jar do
     it "adds ENV['GEM_HOME'] to init.rb" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ /ENV\['GEM_HOME'\]/
+      contents.should include("ENV['GEM_HOME'] ||=")
       contents.should =~ /WEB-INF\/gems/
+    end
+
+    it "overrides ENV['GEM_HOME'] when override_gem_home is set" do
+      config.override_gem_home = true
+      jar.add_init_file(config)
+      contents = jar.contents('META-INF/init.rb')
+      contents.should include("ENV['GEM_HOME'] =")
     end
 
     it "does not include log files by default" do
