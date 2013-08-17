@@ -23,4 +23,7 @@ notifications:
     on_failure: always
     template:
       - "%{repository} (%{branch}:%{commit} by %{author}): %{message} (%{build_url})" 
-before_install: gem install bundler --pre
+before_install: 
+  - git --version
+  - git fetch --depth=9999999
+  - gem install bundler --pre
