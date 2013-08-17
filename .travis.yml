@@ -23,3 +23,4 @@ notifications:
     on_failure: always
     template:
       - "%{repository} (%{branch}:%{commit} by %{author}): %{message} (%{build_url})" 
+before_install: gem install bundler --pre
