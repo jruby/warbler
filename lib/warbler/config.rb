@@ -78,6 +78,12 @@ module Warbler
     # entries in this structure).
     attr_accessor :pathmaps
 
+    # Executable of the jar
+    attr_accessor :executable
+
+    # parameters to pass to the executable
+    attr_accessor :executable_params
+
     # Name of jar or war file (without the extension), defaults to the
     # directory name containing the application.
     attr_accessor :jar_name

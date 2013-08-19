@@ -121,30 +121,11 @@ module Warbler
 
     # Add gems to WEB-INF/gems
     def find_gems_files(config)
-      config.gems.each {|gem, version| find_single_gem_files(config, gem, version) }
+      config.gems.specs(config.gem_dependencies).each {|spec| find_single_gem_files(config, spec) }
     end
 
     # Add a single gem to WEB-INF/gems
-    def find_single_gem_files(config, gem_pattern, version = nil)
-      if Gem::Specification === gem_pattern
-        spec = gem_pattern
-      else
-        gem = case gem_pattern
-              when Gem::Dependency
-                gem_pattern
-              else
-                Gem::Dependency.new(gem_pattern, Gem::Requirement.create(version))
-              end
-
-        # skip development dependencies
-        return if gem.respond_to?(:type) and gem.type != :runtime
-
-        # Deal with deprecated Gem.source_index and #search
-        matched = gem.respond_to?(:to_spec) ? [gem.to_spec] : Gem.source_index.search(gem)
-        fail "gem '#{gem}' not installed" if matched.empty?
-        spec = matched.last
-      end
-
+    def find_single_gem_files(config, spec)
       full_gem_path = Pathname.new(spec.full_gem_path)
 
       # skip gems whose full_gem_path does not exist
@@ -156,8 +137,6 @@ module Warbler
         next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
         @files[apply_pathmaps(config, File.join(spec.full_name, f), :gems)] = src
       end
-
-      spec.dependencies.each {|dep| find_single_gem_files(config, dep) } if config.gem_dependencies
     end
 
     # Add all application directories and files to the archive.
@@ -231,8 +210,8 @@ module Warbler
             zipfile.get_output_stream(entry) {|f| f << src.read }
           elsif src.nil? || File.directory?(src)
             if File.symlink?(entry) && ! defined?(JRUBY_VERSION)
-              $stderr.puts "directory symlinks are not followed unless using JRuby; " + 
-                           "#{entry.inspect} contents not in archive" 
+              $stderr.puts "directory symlinks are not followed unless using JRuby; " +
+                           "#{entry.inspect} contents not in archive"
             end
             zipfile.mkdir(entry.dup) # in case it's frozen rubyzip 0.9.6.1 workaround
           elsif File.symlink?(src)
