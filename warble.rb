@@ -93,6 +93,12 @@ Warbler::Config.new do |config|
   # has already been set.
   # config.override_gem_home = false
 
+  # Allows for specifing custom executables 
+  # config.executable = ["rake", "bin/rake"]
+  
+  # Sets default (prefixed) parameters for the executables
+  # config.executable_params = "do:something"
+
   # === War files only below here ===
 
   # Path to the pre-bundled gem directory inside the war file. Default
