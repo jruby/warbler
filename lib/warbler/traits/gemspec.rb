@@ -12,6 +12,7 @@ module Warbler
     class Gemspec
       include Trait
       include PathmapHelper
+      include ExecutableHelper
 
       def self.detect?
         !Dir['*.gemspec'].empty?
@@ -42,14 +43,14 @@ module Warbler
           next if jar.files[file_key]
           jar.files[file_key] = f
         end
-        
+
         config.compiled_ruby_files.each do |f|
           f = f.sub(/\.rb$/, '.class')
           next unless File.exist?(f)
           jar.files[apply_pathmaps(config, f, :application)] = f
         end
-        bin_path = apply_pathmaps(config, default_executable, :application)
-        add_main_rb(jar, bin_path)
+
+        update_archive_add_executable(jar)
       end
 
       def default_executable
@@ -62,6 +63,7 @@ module Warbler
           exe
         end
       end
+
     end
   end
 end

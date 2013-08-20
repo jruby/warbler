@@ -13,6 +13,7 @@ module Warbler
     class NoGemspec
       include Trait
       include PathmapHelper
+      include ExecutableHelper
 
       def self.detect?
         Jar.detect? && !Gemspec.detect?
@@ -29,7 +30,7 @@ module Warbler
       end
 
       def update_archive(jar)
-        add_main_rb(jar, apply_pathmaps(config, default_executable, :application))
+        update_archive_add_executable(jar)
       end
 
       def default_executable

@@ -80,8 +80,11 @@ module Warbler
       config.init_contents << StringIO.new("$LOAD_PATH.unshift __FILE__.sub(/!.*/, '!/#{path}')\n")
     end
 
-    def add_main_rb(jar, bin_path)
-      jar.files['META-INF/main.rb'] = StringIO.new("load '#{bin_path}'")
+    def add_main_rb(jar, bin_path, params = nil)
+      binary = ""
+      binary << "ARGV.unshift('#{params}')\n" if params
+      binary << "load '#{bin_path}'"
+      jar.files['META-INF/main.rb'] = StringIO.new(binary)
     end
 
     def update_gem_path(default_gem_path)

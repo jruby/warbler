@@ -52,7 +52,7 @@ describe Warbler::Jar do
     it "requires 'rubygems' in init.rb" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.split("\n").grep(/require 'rubygems'/).should_not be_empty
+      contents.should =~ /require 'rubygems'/
     end
 
     it "does not override ENV['GEM_HOME'] by default" do
@@ -105,11 +105,11 @@ describe Warbler::Jar do
         touch "foo.txt"
         mkdir 'bar'
         touch "bar/bar.txt"
-        
+
         use_config do |config|
           config.jar_name = 'sample'
         end
-        
+
         jar.files["foo.txt".freeze] = "foo.txt"
         jar.files["bar".freeze] = "bar" # @see #76 on MRI
         jar.files["bar/bar.txt"] = "bar/bar.txt".freeze
@@ -121,7 +121,7 @@ describe Warbler::Jar do
         rmdir 'bar'
       end
     end
-    
+
     context "with a .gemspec" do
       it "detects a Gemspec trait" do
         config.traits.should include(Warbler::Traits::Gemspec)
@@ -136,13 +136,13 @@ describe Warbler::Jar do
       it "sets load paths in init.rb" do
         jar.add_init_file(config)
         contents = jar.contents('META-INF/init.rb')
-        contents.split("\n").grep(/LOAD_PATH\.unshift.*sample_jar\/lib/).should_not be_empty
+        contents.should =~ /LOAD_PATH\.unshift.*sample_jar\/lib/
       end
 
       it "loads the default executable in main.rb" do
         jar.apply(config)
         contents = jar.contents('META-INF/main.rb')
-        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
+        contents.should =~ /load.*sample_jar\/bin\/sample_jar/
       end
 
       it "includes compiled .rb and .class files" do
@@ -183,7 +183,16 @@ describe Warbler::Jar do
       it "loads the first bin/executable in main.rb" do
         silence { jar.apply(config) }
         contents = jar.contents('META-INF/main.rb')
-        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
+        contents.should =~ /load.*sample_jar\/bin\/another_jar/
+      end
+
+      it "loads the specified bin/executable in main.rb" do
+        use_config do |config|
+          config.executable = 'bin/sample_jar'
+        end
+        silence { jar.apply(config) }
+        contents = jar.contents('META-INF/main.rb')
+        contents.should =~ /load.*sample_jar\/bin\/sample_jar/
       end
     end
 
@@ -221,14 +230,49 @@ describe Warbler::Jar do
       it "sets load paths in init.rb" do
         jar.add_init_file(config)
         contents = jar.contents('META-INF/init.rb')
-        contents.split("\n").grep(/LOAD_PATH\.unshift.*sample_jar\/lib/).should_not be_empty
+        contents.should =~ /LOAD_PATH\.unshift.*sample_jar\/lib/
       end
 
       it "loads the first bin/executable in main.rb" do
         jar.apply(config)
         contents = jar.contents('META-INF/main.rb')
-        contents.split("\n").grep(/load.*sample_jar\/bin\/sample_jar/).should_not be_empty
+        contents.should =~ /load.*sample_jar\/bin\/sample_jar/
       end
+
+      it "loads the specified bin/executable in main.rb" do
+        use_config do |config|
+          config.executable = 'bin/sample_jar_extra'
+        end
+        jar.apply(config)
+        contents = jar.contents('META-INF/main.rb')
+        contents.should =~ /load.*sample_jar\/bin\/sample_jar_extra/
+      end
+
+      it "loads the bin/executable from other gem in main.rb" do
+        use_config do |config|
+          config.gems = [ "rake" ]
+          config.executable = ['rake', 'bin/rake']
+        end
+        jar.apply(config)
+        contents = jar.contents('META-INF/main.rb')
+        contents.should =~ /load.*gems\/rake.*\/bin\/rake/
+      end
+
+      it "does not set parameters in main.rb" do
+        jar.apply(config)
+        contents = jar.contents('META-INF/main.rb')
+        contents.should_not =~ /ARGV.*/m
+      end
+
+      it "does set parameters in main.rb" do
+        use_config do |config|
+          config.executable_params = 'do_something'
+        end
+        jar.apply(config)
+        contents = jar.contents('META-INF/main.rb')
+        contents.should =~ /ARGV\.unshift.*do_something/m
+      end
+
     end
   end
 
@@ -257,6 +301,26 @@ describe Warbler::Jar do
       jar.apply(config)
       file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
       file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec}).should_not be_empty
+    end
+
+    it "collects gem files with dependencies" do
+      use_config do |config|
+        config.gems << "rdoc"
+        config.gem_dependencies = true
+      end
+      jar.apply(config)
+      file_list(%r{WEB-INF/gems/gems/json.*/lib/json.rb}).should_not be_empty
+      file_list(%r{WEB-INF/gems/specifications/json.*\.gemspec}).should_not be_empty
+    end
+
+    it "collects gem files without dependencies" do
+      use_config do |config|
+        config.gems << "rdoc"
+        config.gem_dependencies = false
+      end
+      jar.apply(config)
+      file_list(%r{WEB-INF/gems/gems/json.*/lib/json.rb}).should be_empty
+      file_list(%r{WEB-INF/gems/specifications/json.*\.gemspec}).should be_empty
     end
 
     it "adds ENV['GEM_HOME'] to init.rb" do
@@ -515,7 +579,7 @@ describe Warbler::Jar do
     end
 
     context "with the runnable feature" do
-      
+
       it "adds WarMain (and JarMain) class" do
         use_config do |config|
           config.features << "runnable"
@@ -524,9 +588,9 @@ describe Warbler::Jar do
         file_list(%r{^WarMain\.class$}).should_not be_empty
         file_list(%r{^JarMain\.class$}).should_not be_empty
       end
-      
+
     end
-    
+
     context "in a Rails application" do
       before :each do
         @rails = nil
