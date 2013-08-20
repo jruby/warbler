@@ -20,15 +20,6 @@ describe Warbler::Jar, "with Bundler" do
     @extra_config = block
   end
 
-  def hide_shallow_git_clone
-    git_shallow_marker = File.join(Warbler::WARBLER_HOME, ".git/shallow")
-    tmp_marker = File.join(Warbler::WARBLER_HOME, ".git/shallow.tmp")
-    File.rename(git_shallow_marker, tmp_marker) if File.exists?(git_shallow_marker)
-    yield
-  ensure
-    File.rename(tmp_marker, git_shallow_marker) if File.exist?(tmp_marker)
-  end
-
   let(:config) { drbclient.config(@extra_config) }
   let(:jar) { drbclient.jar }
 
@@ -70,23 +61,19 @@ describe Warbler::Jar, "with Bundler" do
     end
 
     it "works with :git entries in Gemfiles" do
-      hide_shallow_git_clone do
-        File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
-        `#{RUBY_EXE} -S bundle install --local`
-        jar.apply(config)
-        file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
-        file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
-      end
+      File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
+      `#{RUBY_EXE} -S bundle install --local`
+      jar.apply(config)
+      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
+      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
     end
 
     it "bundles only the gemspec for :git entries that are excluded" do
-      hide_shallow_git_clone do
-        File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\nend\n"}
-        `#{RUBY_EXE} -S bundle install --local`
-        jar.apply(config)
-        file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should be_empty
-        file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
-      end
+      File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\nend\n"}
+      `#{RUBY_EXE} -S bundle install --local`
+      jar.apply(config)
+      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should be_empty
+      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
     end
 
     it "does not work with :path entries in Gemfiles" do
@@ -130,16 +117,14 @@ describe Warbler::Jar, "with Bundler" do
     cleanup_temp_files
 
     it "works with :git entries in Gemfiles" do
-      hide_shallow_git_clone do
-        File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
-        `#{RUBY_EXE} -S bundle install --local`
-        jar.apply(config)
-        file_list(%r{^bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
-        file_list(%r{^bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
-        jar.add_init_file(config)
-        contents = jar.contents('META-INF/init.rb')
-        contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
-      end
+      File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
+      `#{RUBY_EXE} -S bundle install --local`
+      jar.apply(config)
+      file_list(%r{^bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
+      file_list(%r{^bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
+      jar.add_init_file(config)
+      contents = jar.contents('META-INF/init.rb')
+      contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
     end
 
     it "adds BUNDLE_GEMFILE to init.rb" do
