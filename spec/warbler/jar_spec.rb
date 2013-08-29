@@ -648,16 +648,7 @@ describe Warbler::Jar do
         config.gems.keys.should include(Gem::Dependency.new("hpricot", Gem::Requirement.new("=0.6")))
       end
 
-      context "with threadsafe! enabled" do
-        before :each do
-          cp "config/environments/production.rb", "config/environments/production.rb.orig"
-          File.open("config/environments/production.rb", "a") {|f| f.puts "", "config.threadsafe!" }
-        end
-
-        after :each do
-          mv "config/environments/production.rb.orig", "config/environments/production.rb"
-        end
-
+      shared_examples_for "jruby runtimes" do
         it "sets the jruby min and max runtimes to 1" do
           ENV["RAILS_ENV"] = nil
           config.webxml.booter.should == :rails
@@ -673,6 +664,33 @@ describe Warbler::Jar do
           config.webxml.jruby.min.runtimes.should == 2
           config.webxml.jruby.max.runtimes.should == 2
         end
+      end
+
+      context "with threadsafe! enabled" do
+        before :each do
+          cp "config/environments/production.rb", "config/environments/production.rb.orig"
+          File.open("config/environments/production.rb", "a") { |f| f.puts "", "config.threadsafe!" }
+        end
+
+        after :each do
+          mv "config/environments/production.rb.orig", "config/environments/production.rb"
+        end
+
+        it_should_behave_like "jruby runtimes"
+      end
+
+
+      context "with rails version 4" do
+        before :each do
+          File.open("Gemfile", "a") { |f| f.puts "", "gem 'rails', '4.0.0'" }
+        end
+
+        after :each do
+          rm "Gemfile"
+        end
+
+        it_should_behave_like "jruby runtimes"
+
       end
 
       it "adds RAILS_ENV to init.rb" do

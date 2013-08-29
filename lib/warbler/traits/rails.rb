@@ -44,20 +44,37 @@ module Warbler
 
       def after_configure
         config.init_contents << "#{config.warbler_templates}/rails.erb"
-        begin
-          rails_env = config.webxml.rails.env
-          unless IO.readlines("config/environments/#{rails_env}.rb").grep(/^\s*config\.threadsafe!/).empty? &&
-                 IO.readlines("config/environment.rb").grep(/^\s*config\.threadsafe!/).empty?
-            config.webxml.jruby.min.runtimes = 1 unless Integer === config.webxml.jruby.min.runtimes
-            config.webxml.jruby.max.runtimes = 1 unless Integer === config.webxml.jruby.max.runtimes
-          end
-        rescue
+
+        if threadsafe_enabled? or rails_4?
+          config.webxml.jruby.min.runtimes = 1 unless Integer === config.webxml.jruby.min.runtimes
+          config.webxml.jruby.max.runtimes = 1 unless Integer === config.webxml.jruby.max.runtimes
         end
       end
 
 
       def default_app_name
         File.basename(File.expand_path(defined?(::Rails.root) ? ::Rails.root : (defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)))
+      end
+
+      def threadsafe_enabled?
+        rails_env = config.webxml.rails.env
+        begin
+          unless IO.readlines("config/environments/#{rails_env}.rb").grep(/^\s*config\.threadsafe!/).empty? &&
+              IO.readlines("config/environment.rb").grep(/^\s*config\.threadsafe!/).empty?
+            return true
+          end
+        rescue
+        end
+      end
+
+      def rails_4?
+        begin
+          unless IO.readlines("Gemfile").grep(/^\s*gem\s('|")rails('|"),\s('|")4\.\d+\.\d+/).empty? &&
+              IO.readlines("Gemfile.lock").grep(/^\s*rails\s\([=~><]*\s*4\.(\d+)\.(\d+).*\)$/).empty?
+            return true
+          end
+        rescue
+        end
       end
     end
   end
