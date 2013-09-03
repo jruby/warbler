@@ -4,6 +4,12 @@
 - Improved runnable so `rails` command works w/o script dir
 - #156: config.dirs seems to be ignored
 - #159: Rails 4.0.0.rc1 fails under warbler with `silence` error
+- #180: Problem with rubyzip 1.0.0
+- #178: Status of config.threadsafe! in rails 4.
+- #179: Jruby min and max runtimes defaults to 1 in rails 4.
+- #182: Jar creation does not honor begin/realSize from contents' ByteList
+- #177: allow specifying executable to run including other gems executables
+- #173: WAR project also should respect `override_gem_home` option
 
 == 1.3.8
 
