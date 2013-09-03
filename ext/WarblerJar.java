@@ -102,9 +102,10 @@ public class WarblerJar {
     private static void addEntry(ThreadContext context, ZipOutputStream zip, String entryName, IRubyObject value) throws IOException {
         if (value.respondsTo("read")) {
             RubyString str = (RubyString) value.callMethod(context, "read").checkStringType();
-            byte[] contents = str.getByteList().getUnsafeBytes();
+            ByteList strByteList = str.getByteList();
+            byte[] contents = strByteList.getUnsafeBytes();
             zip.putNextEntry(new ZipEntry(entryName));
-            zip.write(contents);
+            zip.write(contents, strByteList.getBegin(), strByteList.getRealSize());
         } else {
             File f;
             if (value.isNil() || (f = getFile(value)).isDirectory()) {
