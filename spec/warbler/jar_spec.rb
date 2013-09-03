@@ -648,16 +648,7 @@ describe Warbler::Jar do
         config.gems.keys.should include(Gem::Dependency.new("hpricot", Gem::Requirement.new("=0.6")))
       end
 
-      context "with threadsafe! enabled" do
-        before :each do
-          cp "config/environments/production.rb", "config/environments/production.rb.orig"
-          File.open("config/environments/production.rb", "a") {|f| f.puts "", "config.threadsafe!" }
-        end
-
-        after :each do
-          mv "config/environments/production.rb.orig", "config/environments/production.rb"
-        end
-
+      shared_examples_for "threaded environment" do
         it "sets the jruby min and max runtimes to 1" do
           ENV["RAILS_ENV"] = nil
           config.webxml.booter.should == :rails
@@ -674,6 +665,49 @@ describe Warbler::Jar do
           config.webxml.jruby.max.runtimes.should == 2
         end
       end
+
+      context "with threadsafe! enabled" do
+        before :each do
+          cp "config/environments/production.rb", "config/environments/production.rb.orig"
+          File.open("config/environments/production.rb", "a") { |f| f.puts "", "config.threadsafe!" }
+        end
+
+        after :each do
+          mv "config/environments/production.rb.orig", "config/environments/production.rb"
+        end
+
+        it_should_behave_like "threaded environment"
+      end
+
+      context "with rails version 4" do
+
+        context "When rails version is specified in Gemfile" do
+          before :each do
+            File.open("Gemfile", "a") { |f| f.puts "gem 'rails', '4.0.0'" }
+          end
+
+          after :each do
+            rm "Gemfile"
+          end
+
+          it_should_behave_like "threaded environment"
+        end
+
+        context "when rails version is not specified in Gemfile" do
+          before :each do
+            File.open("Gemfile", "a") { |f| f.puts "gem 'rails'" }
+            File.open("Gemfile.lock", "a") { |f| f.puts " rails (4.0.0)" }
+          end
+
+          after :each do
+            rm "Gemfile"
+            rm "Gemfile.lock"
+          end
+
+          it_should_behave_like "threaded environment"
+        end
+      end
+
 
       it "adds RAILS_ENV to init.rb" do
         ENV["RAILS_ENV"] = nil
