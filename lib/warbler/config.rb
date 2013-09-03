@@ -124,7 +124,7 @@ module Warbler
     # Override GEM_HOME environment variable at runtime. When false, gems in
     # GEM_HOME will be loaded in preference to those packaged within the jar
     # file. When true, only gems packaged in the jar file will be loaded.
-    # Defaults to false
+    # Defaults to true
     attr_accessor :override_gem_home
 
     # Extra configuration for web.xml. Controls how the dynamically-generated web.xml
@@ -189,7 +189,7 @@ module Warbler
       @webinf_files      = FileList[]
       @init_filename     = 'META-INF/init.rb'
       @init_contents     = ["#{@warbler_templates}/config.erb"]
-      @override_gem_home = false
+      @override_gem_home = true
       @script_files      = []
       @warbler_scripts = "#{WARBLER_HOME}/lib/warbler/scripts"
 

@@ -19,7 +19,7 @@ describe Warbler::Config do
       config = Warbler::Config.new
       config.includes.should be_empty
       config.jar_name.size.should > 0
-      config.override_gem_home.should be_false
+      config.override_gem_home.should be_true
     end
   end
 
@@ -39,7 +39,7 @@ describe Warbler::Config do
       config.webxml.should be_kind_of(OpenStruct)
       config.pathmaps.should be_kind_of(OpenStruct)
       config.pathmaps.public_html.should == ["%{public/,}p"]
-      config.override_gem_home.should be_false
+      config.override_gem_home.should be_true
     end
 
     it "should allow configuration through an initializer block" do

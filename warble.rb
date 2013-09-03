@@ -90,8 +90,9 @@ Warbler::Config.new do |config|
   # config.compiled_ruby_files = FileList['app/**/*.rb']
 
   # When set to true, Warbler will override the value of ENV['GEM_HOME'] even it
-  # has already been set.
-  # config.override_gem_home = false
+  # has already been set. When set to false it will use any existing value of
+  # GEM_HOME if it is set.
+  # config.override_gem_home = true
 
   # Allows for specifing custom executables 
   # config.executable = ["rake", "bin/rake"]
