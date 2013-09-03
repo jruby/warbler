@@ -507,13 +507,13 @@ describe Warbler::Jar do
     end
 
     it "allows specification of dependency by Gem::Dependency" do
-      spec = mock "gem spec"
-      spec.stub!(:name).and_return "hpricot"
-      spec.stub!(:full_name).and_return "hpricot-0.6.157"
-      spec.stub!(:full_gem_path).and_return "hpricot-0.6.157"
-      spec.stub!(:loaded_from).and_return "hpricot.gemspec"
-      spec.stub!(:files).and_return ["Rakefile"]
-      spec.stub!(:dependencies).and_return []
+      spec = double "gem spec"
+      spec.stub(:name).and_return "hpricot"
+      spec.stub(:full_name).and_return "hpricot-0.6.157"
+      spec.stub(:full_gem_path).and_return "hpricot-0.6.157"
+      spec.stub(:loaded_from).and_return "hpricot.gemspec"
+      spec.stub(:files).and_return ["Rakefile"]
+      spec.stub(:dependencies).and_return []
       dep = Gem::Dependency.new("hpricot", "> 0.6")
       dep.should_receive(:to_spec).and_return spec
       use_config do |config|
@@ -629,19 +629,19 @@ describe Warbler::Jar do
         config.gems.should be_empty
 
         rm_rf "vendor/rails"
-        @rails.stub!(:vendor_rails?).and_return true
+        @rails.stub(:vendor_rails?).and_return true
         config = Warbler::Config.new
         config.gems.should be_empty
       end
 
       it "automatically adds Rails.configuration.gems to the list of gems" do
         task :environment do
-          config = mock "config"
-          @rails.stub!(:configuration).and_return(config)
-          gem = mock "gem"
-          gem.stub!(:name).and_return "hpricot"
-          gem.stub!(:requirement).and_return Gem::Requirement.new("=0.6")
-          config.stub!(:gems).and_return [gem]
+          config = double "config"
+          @rails.stub(:configuration).and_return(config)
+          gem = double "gem"
+          gem.stub(:name).and_return "hpricot"
+          gem.stub(:requirement).and_return Gem::Requirement.new("=0.6")
+          config.stub(:gems).and_return [gem]
         end
 
         config.webxml.booter.should == :rails

@@ -132,8 +132,8 @@ module ExampleGroupHelpers
   def use_test_webserver
     before :each do
       webserver = double('server').as_null_object
-      webserver.stub!(:main_class).and_return 'WarMain.class'
-      webserver.stub!(:add).and_return do |jar|
+      webserver.stub(:main_class).and_return 'WarMain.class'
+      webserver.stub(:add).and_return do |jar|
         jar.files['WEB-INF/webserver.jar'] = StringIO.new
       end
       Warbler::WEB_SERVERS['test'] = webserver
