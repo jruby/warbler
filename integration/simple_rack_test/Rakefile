@@ -1,0 +1,9 @@
+task :create_war do
+  gem 'warbler', '=1.4.0.dev'
+  require 'warbler'
+
+  Dir.chdir("src/main/ruby") do
+     Warbler::Task.new(:warble)
+     Rake::Task['warble'].invoke
+  end
+end

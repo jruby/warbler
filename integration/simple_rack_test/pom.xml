@@ -1,0 +1,112 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.jruby.warbler</groupId>
+  <artifactId>simple_rack_test</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>simple_rack_test</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jruby.version>1.7.4</jruby.version>
+    <warbler.version>1.4.0.dev</warbler.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <defaultGoal>verify</defaultGoal>
+    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>${basedir}/src/main/ruby</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.9</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>maven-jetty-plugin</artifactId>
+        <configuration>
+          <webApp>target/test.war</webApp>
+          <stopPort>9966</stopPort>
+          <stopKey>warbler_stop</stopKey>
+        </configuration>
+        <executions>
+          <execution>
+            <id>start-jetty</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>run-war</goal>
+            </goals>
+            <configuration>
+              <scanIntervalSeconds>0</scanIntervalSeconds>
+              <daemon>true</daemon>
+            </configuration>
+          </execution>
+          <execution>
+            <id>stop-jetty</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jruby.plugins</groupId>
+        <artifactId>jruby-rake-plugin</artifactId>
+        <version>${jruby.version}</version>
+        <executions>
+          <execution>
+            <id>build-warbler-gem</id>
+            <phase>prepare-package</phase>
+            <goals><goal>jruby</goal></goals>
+            <configuration>
+              <args>-C../.. -S gem build warbler.gemspec</args>
+            </configuration>
+          </execution>
+          <execution>
+            <id>gem-install-warbler</id>
+            <phase>prepare-package</phase>
+            <goals><goal>jruby</goal></goals>
+            <configuration>
+              <args>-S gem install ${basedir}/../../warbler-${warbler.version}.gem</args>
+            </configuration>
+          </execution>
+          <execution>
+            <id>create-war</id>
+            <phase>prepare-package</phase>
+            <goals><goal>jruby</goal></goals>
+            <configuration>
+              <args>-Csrc/main/ruby -S warble</args>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
