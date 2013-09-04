@@ -10,40 +10,28 @@
   <name>simple_rack_test</name>
   <url>http://maven.apache.org</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jruby.version>1.7.4</jruby.version>
-    <warbler.version>1.4.0.dev</warbler.version>
-  </properties>
-
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.8.1</version>
-      <scope>test</scope>
+      <groupId>${groupId}</groupId>
+      <artifactId>gem-initializer</artifactId>
+      <version>${version}</version>
+      <type>pom</type>
     </dependency>
   </dependencies>
 
   <build>
-    <defaultGoal>verify</defaultGoal>
-    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>${basedir}/src/main/ruby</directory>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.9</version>
+        <groupId>org.jruby.plugins</groupId>
+        <artifactId>jruby-rake-plugin</artifactId>
         <executions>
           <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
+            <id>create-war</id>
+            <phase>pre-integration-test</phase>
+            <goals><goal>jruby</goal></goals>
+            <configuration>
+              <args>-Csrc/main/ruby -S warble</args>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -73,37 +61,6 @@
             <goals>
               <goal>stop</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.jruby.plugins</groupId>
-        <artifactId>jruby-rake-plugin</artifactId>
-        <version>${jruby.version}</version>
-        <executions>
-          <execution>
-            <id>build-warbler-gem</id>
-            <phase>prepare-package</phase>
-            <goals><goal>jruby</goal></goals>
-            <configuration>
-              <args>-C../.. -S gem build warbler.gemspec</args>
-            </configuration>
-          </execution>
-          <execution>
-            <id>gem-install-warbler</id>
-            <phase>prepare-package</phase>
-            <goals><goal>jruby</goal></goals>
-            <configuration>
-              <args>-S gem install ${basedir}/../../warbler-${warbler.version}.gem</args>
-            </configuration>
-          </execution>
-          <execution>
-            <id>create-war</id>
-            <phase>prepare-package</phase>
-            <goals><goal>jruby</goal></goals>
-            <configuration>
-              <args>-Csrc/main/ruby -S warble</args>
-            </configuration>
           </execution>
         </executions>
       </plugin>
