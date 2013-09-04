@@ -250,6 +250,17 @@ and run specs, you need to have Bundler installed and run <tt>bundle</tt> once.
 
 After that, simply run <tt>rake</tt>.
 
+=== Integration Tests
+
+There are a few integration tests in the `integration` directory that build WAR file
+with Warbler, and run some basic smoke tests against them.  You can run these like so:
+
+    cd integration
+    mvn verify
+
+You'll need to have Maven installed, of course:
+http://maven.apache.org/
+
 == License
 
 Warbler is provided under the terms of the MIT license.

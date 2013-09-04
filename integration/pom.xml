@@ -10,12 +10,12 @@
   <modules>
     <module>gem-initializer</module>
     <module>simple_rack_test</module>
-    <!--<module>simple-webapp</module>-->
   </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jruby.version>1.7.4</jruby.version>
+    <warbler.version>1.4.0.dev</warbler.version>
   </properties>
 
   <dependencies>

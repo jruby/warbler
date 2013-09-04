@@ -2,14 +2,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.jruby.warbler</groupId>
+  <parent>
+    <groupId>org.jruby.warbler</groupId>
+    <artifactId>integration-tests</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
   <artifactId>gem-initializer</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-
-  <properties>
-    <warbler.version>1.4.0.dev</warbler.version>
-  </properties>
 
   <build>
     <plugins>
