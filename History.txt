@@ -10,6 +10,7 @@
 - #182: Jar creation does not honor begin/realSize from contents' ByteList
 - #177: allow specifying executable to run including other gems executables
 - #173: WAR project also should respect `override_gem_home` option
+- #168: The -S rails command is not compatible with Ruby 1.8
 
 == 1.3.8
 
