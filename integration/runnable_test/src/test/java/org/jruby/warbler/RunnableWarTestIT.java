@@ -15,7 +15,8 @@ public class RunnableWarTestIT
     @Test
     public void testApp() throws Exception
     {
-        File f = new File("/Users/jkutner/test-file.tmp");
-        Assert.assertTrue("test-file.tmp should exist", f.exists());
+        String testFilename = System.getProperty("testFilename");
+        File f = new File(testFilename);
+        Assert.assertTrue(testFilename + "should exist", f.exists());
     }
 }

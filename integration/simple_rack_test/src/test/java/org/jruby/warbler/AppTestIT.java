@@ -31,6 +31,6 @@ public class AppTestIT
             content = inputLine;
         in.close();
 
-        assertEquals("Hello, World", content);
+        Assert.assertEquals("Hello, World", content);
     }
 }

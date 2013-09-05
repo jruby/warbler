@@ -256,10 +256,12 @@ There are a few integration tests in the `integration` directory that build WAR 
 with Warbler, and run some basic smoke tests against them.  You can run these like so:
 
     cd integration
+    export MAVEN_OPTS="-XX:MaxPermSize=128m"
     mvn verify
 
-You'll need to have Maven installed, of course:
+The increased PermGen space is for the Rails4 test. And You'll need to have Maven installed, of course:
 http://maven.apache.org/
+
 
 == License
 
