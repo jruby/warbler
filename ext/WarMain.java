@@ -66,7 +66,7 @@ public class WarMain extends JarMain {
 
     /**
      *  jruby arguments, consider the following command :
-     *    `java -jar rails.was --1.9 -S rake db:migrate`
+     *    `java -jar rails.war --1.9 -S rake db:migrate`
      *   arguments == [ "--1.9" ]
      *   executable == "rake"
      *   executableArgv == [ "db:migrate" ]
