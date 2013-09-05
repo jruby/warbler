@@ -10,6 +10,7 @@
   <modules>
     <module>gem-initializer</module>
     <module>simple_rack_test</module>
+    <module>rails4_test</module>
   </modules>
 
   <properties>
@@ -23,6 +24,12 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <version>1.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -49,11 +56,45 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.jruby.plugins</groupId>
-        <artifactId>jruby-rake-plugin</artifactId>
-        <version>${jruby.version}</version>
-      </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.jruby.plugins</groupId>
+          <artifactId>jruby-rake-plugin</artifactId>
+          <version>${jruby.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>maven-jetty-plugin</artifactId>
+          <version>6.1.26</version>
+          <configuration>
+            <webApp>target/test.war</webApp>
+            <stopPort>9966</stopPort>
+            <stopKey>warbler_stop</stopKey>
+          </configuration>
+          <executions>
+            <execution>
+              <id>start-jetty</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>run-war</goal>
+              </goals>
+              <configuration>
+                <scanIntervalSeconds>0</scanIntervalSeconds>
+                <daemon>true</daemon>
+              </configuration>
+            </execution>
+            <execution>
+              <id>stop-jetty</id>
+              <phase>post-integration-test</phase>
+              <goals>
+                <goal>stop</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>
