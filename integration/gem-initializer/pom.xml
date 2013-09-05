@@ -18,7 +18,7 @@
         <executions>
           <execution>
             <id>build-warbler-gem</id>
-            <phase>initialize</phase>
+            <phase>pre-integration-test</phase>
             <goals><goal>jruby</goal></goals>
             <configuration>
               <args>-C../../ -S gem build warbler.gemspec</args>
@@ -26,7 +26,7 @@
           </execution>
           <execution>
             <id>gem-install-warbler</id>
-            <phase>initialize</phase>
+            <phase>pre-integration-test</phase>
             <goals><goal>jruby</goal></goals>
             <configuration>
               <args>-S gem install ${basedir}/../../warbler-${warbler.version}.gem</args>
