@@ -666,7 +666,7 @@ describe Warbler::Jar do
         end
       end
 
-      context "with threadsafe! enabled" do
+      context "with threadsafe! enabled in production.rb" do
         before :each do
           cp "config/environments/production.rb", "config/environments/production.rb.orig"
           File.open("config/environments/production.rb", "a") { |f| f.puts "", "config.threadsafe!" }
@@ -674,6 +674,19 @@ describe Warbler::Jar do
 
         after :each do
           mv "config/environments/production.rb.orig", "config/environments/production.rb"
+        end
+
+        it_should_behave_like "threaded environment"
+      end
+
+      context "with threadsafe! enabled in environment.rb" do
+        before :each do
+          cp "config/environment.rb", "config/environment.rb.orig"
+          File.open("config/environment.rb", "a") { |f| f.puts "", "config.threadsafe!" }
+        end
+
+        after :each do
+          mv "config/environment.rb.orig", "config/environment.rb"
         end
 
         it_should_behave_like "threaded environment"
