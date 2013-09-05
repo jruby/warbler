@@ -58,7 +58,11 @@ class Warbler::Application < Rake::Application
     Rake.application = app
     Rake::Application::DEFAULT_RAKEFILES.each do |rf|
       if File.exist?(rf)
-        load rf
+        begin
+          load rf
+        rescue LoadError => e
+          load File.join(Dir.getwd, rf)
+        end
         break
       end
     end
