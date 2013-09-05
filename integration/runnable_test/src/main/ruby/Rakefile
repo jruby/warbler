@@ -1,0 +1,4 @@
+task :create_test_file, :test_filename do |t, args|
+  puts "Creating test file '#{args.test_filename}'"
+  File.open(args.test_filename, 'w') {|f| f.write("hello world") }
+end

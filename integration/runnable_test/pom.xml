@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jruby.warbler</groupId>
+    <artifactId>integration-tests</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>runnable_test</artifactId>
+  <packaging>pom</packaging>
+
+  <name>runnable_test</name>
+  <url>http://maven.apache.org</url>
+
+
+  <properties>
+    <test-file>test-file.tmp</test-file>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>gem-initializer</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>auto-clean</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <configuration>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+              <filesets>
+                <fileset>
+                  <directory>target</directory>
+                  <includes>
+                    <include>${test-file}</include>
+                  </includes>
+                </fileset>
+              </filesets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jruby.plugins</groupId>
+        <artifactId>jruby-rake-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-war</id>
+            <phase>pre-integration-test</phase>
+            <goals><goal>jruby</goal></goals>
+            <configuration>
+              <args>-Csrc/main/ruby -S warble</args>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>test-rake-task</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <executable>java</executable>
+          <workingDirectory>${project.basedir}/target</workingDirectory>
+          <arguments>
+            <argument>-jar</argument>
+            <argument>test.war</argument>
+            <argument>-S</argument>
+            <argument>rake</argument>
+            <argument>create_test_file[${project.basedir}/target/${test-file}]</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+      <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-surefire-plugin</artifactId>-->
+        <!--<configuration>-->
+          <!--<systemProperties>-->
+            <!--<property>-->
+              <!--<name>testFileName</name>-->
+              <!--<value>${project.basedir}/${test-file}</value>-->
+            <!--</property>-->
+          <!--</systemProperties>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
+    </plugins>
+  </build>
+</project>
