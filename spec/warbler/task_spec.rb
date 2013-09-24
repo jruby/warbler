@@ -100,7 +100,7 @@ describe Warbler::Task do
 
     java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
 
-    Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
+    Zip::File.open("#{config.jar_name}.war") do |zf|
       java_class_header     = zf.get_input_stream('WEB-INF/app/helpers/application_helper.class') {|io| io.read }[0..3]
       ruby_class_definition = zf.get_input_stream('WEB-INF/app/helpers/application_helper.rb') {|io| io.read }
 
@@ -116,7 +116,7 @@ describe Warbler::Task do
 
     java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
 
-    Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
+    Zip::File.open("#{config.jar_name}.war") do |zf|
       java_class_header     = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.class') {|io| io.read }[0..3]
       ruby_class_definition = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.rb') {|io| io.read }
 
@@ -139,7 +139,7 @@ describe Warbler::Task do
         File.open("config/special.txt", "wb") {|f| f << "special"}
         Dir.chdir("config") { FileUtils.ln_s "special.txt", "link.txt" }
         silence { run_task "warble" }
-        Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
+        Zip::File.open("#{config.jar_name}.war") do |zf|
           special = zf.get_input_stream('WEB-INF/config/special.txt') {|io| io.read }
           link = zf.get_input_stream('WEB-INF/config/link.txt') {|io| io.read }
           link.should == special
@@ -149,7 +149,7 @@ describe Warbler::Task do
       it "should process directory symlinks by copying the whole subdirectory" do
         Dir.chdir("lib") { FileUtils.ln_s "tasks", "rakelib" }
         silence { run_task "warble" }
-        Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
+        Zip::File.open("#{config.jar_name}.war") do |zf|
           zf.find_entry("WEB-INF/lib/tasks/utils.rake").should_not be_nil
           zf.find_entry("WEB-INF/lib/rakelib/").should_not be_nil
           zf.find_entry("WEB-INF/lib/rakelib/utils.rake").should_not be_nil if defined?(JRUBY_VERSION)
@@ -183,7 +183,7 @@ describe Warbler::Task do
        silence { run_task "warble" } 
       end
       
-      Zip::ZipFile.open("#{config.jar_name}.war") do |zf|
+      Zip::File.open("#{config.jar_name}.war") do |zf|
         rspec = config.gems.keys.detect { |spec| spec.name == 'rspec' }
         rspec.should_not be_nil, "expected rspec gem among: #{config.gems.keys.join(' ')}"
         zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec.version}.gemspec").should_not be_nil
