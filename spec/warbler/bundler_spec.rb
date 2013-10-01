@@ -60,12 +60,28 @@ describe Warbler::Jar, "with Bundler" do
       file_list(%r{WEB-INF/jewels/specifications/rspec}).should_not be_empty
     end
 
-    it "works with :git entries in Gemfiles" do
-      File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
-      `#{RUBY_EXE} -S bundle install --local`
-      jar.apply(config)
-      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
-      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
+    context 'with :git entries in the Gemfile' do
+      before do
+        File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
+        `#{RUBY_EXE} -S bundle install --local`
+      end
+
+      it "works with :git entries in Gemfiles" do
+        jar.apply(config)
+        file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
+        file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
+      end
+
+      it "can run commands in the generated warfile" do
+        use_config do |config|
+          config.features = %w{runnable}
+          config.override_gem_home = false
+        end
+        jar.apply(config)
+        jar.create('foo.war')
+        `java -jar foo.war -S rake -T`
+        $?.exitstatus.should == 0
+      end
     end
 
     it "bundles only the gemspec for :git entries that are excluded" do
