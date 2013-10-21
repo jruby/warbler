@@ -26,6 +26,13 @@ describe Warbler::Jar do
   let(:config) { Warbler::Config.new {|c| apply_extra_config(c) } }
   let(:jar) { Warbler::Jar.new }
 
+  before do
+    # We repeatedly load the same gemspec, but we modify it between
+    # loads. RubyGems treats the filename as the cache key, not taking
+    # into account the modification time or contents.
+    Gem::Specification.reset
+  end
+
   context "in a jar project" do
     run_in_directory "spec/sample_jar"
     cleanup_temp_files
