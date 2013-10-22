@@ -5,7 +5,7 @@
 # See the file LICENSE.txt for details.
 #++
 
-require 'zip/zip'
+require 'zip'
 require 'stringio'
 require 'pathname'
 
@@ -203,7 +203,7 @@ module Warbler
     end
 
     def create_jar(jar_path, entries)
-      Zip::ZipFile.open(jar_path, Zip::ZipFile::CREATE) do |zipfile|
+      Zip::File.open(jar_path, Zip::File::CREATE) do |zipfile|
         entries.keys.sort.each do |entry|
           src = entries[entry]
           if src.respond_to?(:read)
@@ -224,7 +224,7 @@ module Warbler
     end
 
     def entry_in_jar(jar, entry)
-      Zip::ZipFile.open(jar) do |zf|
+      Zip::File.open(jar) do |zf|
         zf.get_input_stream(entry) {|io| StringIO.new(io.read) }
       end
     end
