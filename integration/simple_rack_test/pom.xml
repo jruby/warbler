@@ -26,8 +26,8 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.jruby.plugins</groupId>
-        <artifactId>jruby-rake-plugin</artifactId>
+        <groupId>de.saumya.mojo</groupId>
+        <artifactId>jruby-maven-plugin</artifactId>
         <executions>
           <execution>
             <id>create-war</id>

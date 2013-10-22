@@ -13,21 +13,33 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.jruby.plugins</groupId>
-        <artifactId>jruby-rake-plugin</artifactId>
+        <groupId>de.saumya.mojo</groupId>
+        <artifactId>jruby-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>build-warbler-gem</id>
-            <phase>pre-integration-test</phase>
-            <goals><goal>jruby</goal></goals>
+            <id>build-warbler</id>
+            <inherited>true</inherited>
+            <phase>compile</phase>
+            <goals>
+              <goal>jruby</goal>
+            </goals>
             <configuration>
               <args>-C../../ -S gem build warbler.gemspec</args>
             </configuration>
           </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>de.saumya.mojo</groupId>
+        <artifactId>jruby-maven-plugin</artifactId>
+        <executions>
           <execution>
-            <id>gem-install-warbler</id>
-            <phase>pre-integration-test</phase>
-            <goals><goal>jruby</goal></goals>
+            <id>install-warbler</id>
+            <inherited>true</inherited>
+            <phase>compile</phase>
+            <goals>
+              <goal>jruby</goal>
+            </goals>
             <configuration>
               <args>-S gem install ${basedir}/../../warbler-${warbler.version}.gem</args>
             </configuration>
