@@ -317,12 +317,20 @@ public class WarMain extends JarMain {
 
         invokeMethod(scriptingContainer, "runScriptlet", "" +
             "ruby = RUBY_VERSION.match(/^\\d\\.\\d/)[0] \n" +
-            "jruby = JRUBY_VERSION.match(/^\\d\\.\\d/)[0].to_f \n" +
+            "jruby_major_version = JRUBY_VERSION.match(/^\\d\\.\\d/)[0].to_f \n" +
+            "jruby_minor_version = JRUBY_VERSION.split('.')[2].to_i\n" +
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/#{ruby}/site_ruby\"\n" +
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/shared\"\n" +
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/#{ruby}\"\n" +
-            "require 'bcpkix-jdk15on-147.jar' if jruby >= 1.7 \n" +
-            "require 'bcprov-jdk15on-147.jar' if jruby >= 1.7 \n");        
+            "if jruby_major_version >= 1.7\n" +
+            "  if jruby_minor_version >= 5\n" +
+            "    require 'bcpkix-jdk15on-1.47.jar'\n" +
+            "    require 'bcprov-jdk15on-1.47.jar'\n" +
+            "  else\n" +
+            "    require 'bcpkix-jdk15on-147.jar'\n" +
+            "    require 'bcprov-jdk15on-147.jar'\n" +
+            "  end\n" +
+            "end");
 
         invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
     }
