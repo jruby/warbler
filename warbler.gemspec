@@ -28,4 +28,5 @@ deployment to a Java environment.}
   gem.add_runtime_dependency 'jruby-rack', [">= 1.0.0"]
   gem.add_runtime_dependency 'rubyzip', [">= 1.0"]
   gem.add_development_dependency 'rspec', "~> 2.10"
+  gem.add_development_dependency 'rdoc', ">= 2.4.2"
 end
