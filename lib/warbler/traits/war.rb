@@ -144,7 +144,7 @@ module Warbler
           t = Tempfile.new(["empty", "jar"])
           path = t.path
           t.close!
-          Zip::File.open(path, Zip::File::CREATE) do |zipfile|
+          Zip::ZipFile.open(path, Zip::ZipFile::CREATE) do |zipfile|
             zipfile.mkdir("META-INF")
             zipfile.get_output_stream("META-INF/MANIFEST.MF") {|f| f << ::Warbler::Jar::DEFAULT_MANIFEST }
           end
