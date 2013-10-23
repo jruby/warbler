@@ -13,10 +13,10 @@ Ruby applications to assemble and Just Work.
 
 2. Run warbler in the top directory of your application: <tt>warble</tt>.
 
-3a. For a web project, deploy your +myapp.war+ file to your favorite Java 
+3. (a) For a web project, deploy your +myapp.war+ file to your favorite Java
 application server.
 
-3b. For a standalone applications, just run it: <tt>java -jar myapp.jar</tt>.
+3. (b) For a standalone applications, just run it: <tt>java -jar myapp.jar</tt>.
 
 == Usage
 
@@ -259,8 +259,8 @@ with Warbler, and run some basic smoke tests against them.  You can run these li
     export MAVEN_OPTS="-XX:MaxPermSize=128m"
     mvn verify
 
-The increased PermGen space is for the Rails4 test. And You'll need to have Maven installed, of course:
-http://maven.apache.org/
+The increased PermGen space is for the Rails4 test. And You'll need to have Maven 3.1.1 installed, of course:
+http://maven.apache.org/ Be aware the homebrew installs 3.0.5, which doesn't work (and I don't really know why).
 
 
 == License
