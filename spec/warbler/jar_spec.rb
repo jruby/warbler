@@ -136,7 +136,7 @@ describe Warbler::Jar do
 
       it "detects gem dependencies" do
         jar.apply(config)
-        file_list(%r{^gems/rubyzip.*/lib/zip/zip.rb}).should_not be_empty
+        file_list(%r{^gems/rubyzip.*/lib/(zip/)?zip.rb}).should_not be_empty
         file_list(%r{^specifications/rubyzip.*\.gemspec}).should_not be_empty
       end
 
