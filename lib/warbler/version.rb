@@ -6,5 +6,5 @@
 #++
 
 module Warbler
-  VERSION = "1.4.0.dev"
+  VERSION = "1.4.0.beta2"
 end
