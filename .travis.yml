@@ -16,7 +16,8 @@ matrix:
       env: ''
     - rvm: 1.9.3
       env: ''
-    - jdk: openjdk7
+    - rvm: jruby
+      env: MAVEN_OPTS="-XX:MaxPermSize=128m"
       script: mvn clean verify
   allow_failures:
     - rvm: jruby-head
