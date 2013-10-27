@@ -7,6 +7,7 @@ Gem::Specification.new do |gem|
   gem.version = Warbler::VERSION
   gem.platform = Gem::Platform::RUBY
   gem.homepage = "http://caldersphere.rubyforge.org/warbler"
+  gem.license = 'MIT'
   gem.authors = ["Nick Sieger"]
   gem.email = "nick@nicksieger.com"
   gem.summary = "Warbler chirpily constructs .war files of your Rails applications."
