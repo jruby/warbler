@@ -26,3 +26,4 @@ notifications:
 before_install: 
   - git fetch --unshallow
   - gem install bundler --pre
+  - mvn -v
