@@ -1,5 +1,5 @@
 rvm:
-  - jruby
+  - jruby-1.7.6
   - jruby-head
 branches:
   only:
