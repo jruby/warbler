@@ -63,7 +63,7 @@
             <phase>pre-integration-test</phase>
             <goals><goal>jruby</goal></goals>
             <configuration>
-              <args>-C src/main/ruby -S warble</args>
+              <args>-C src/main/ruby -S ${rubygems.home}/bin/warble</args>
             </configuration>
           </execution>
         </executions>
