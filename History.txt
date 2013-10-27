@@ -11,6 +11,11 @@
 - #177: allow specifying executable to run including other gems executables
 - #173: WAR project also should respect `override_gem_home` option
 - #168: The -S rails command is not compatible with Ruby 1.8
+- #190 and #206: Add zip adapter to support for rubyzip 0.9 and 1.0
+- #197: Extra characters at the end of web.xml file
+- #202: Recompile the booster jar after changes for "unsafe" bytes
+- #204: Reset RubyGems gemspec cache between tests
+- #203: Test ordering issue when running with RubyGems 2.1.9
 
 == 1.3.8
 
