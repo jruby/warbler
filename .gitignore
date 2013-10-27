@@ -11,3 +11,4 @@ warbler.iws
 warbler.ipr
 warbler-*.gem
 log
+integration/**/*.iml
