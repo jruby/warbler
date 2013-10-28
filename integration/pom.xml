@@ -39,7 +39,6 @@
 
   <build>
     <defaultGoal>verify</defaultGoal>
-    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
     <resources>
       <resource>
         <directory>${basedir}/src/main/ruby</directory>
