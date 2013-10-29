@@ -31,40 +31,12 @@
         <artifactId>jruby-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>install-bundler</id>
-            <phase>compile</phase>
-            <goals><goal>jruby</goal></goals>
-            <configuration>
-              <args>-S gem install bundler</args>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>de.saumya.mojo</groupId>
-        <artifactId>jruby-maven-plugin</artifactId>
-        <executions>
-          <execution>
             <id>bundle-install</id>
-            <phase>pre-integration-test</phase>
-            <goals><goal>jruby</goal></goals>
-            <configuration>
-              <args>-C src/main/ruby -S bundle install</args>
-            </configuration>
+            <phase>initialize</phase>
           </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>de.saumya.mojo</groupId>
-        <artifactId>jruby-maven-plugin</artifactId>
-        <executions>
           <execution>
             <id>create-war</id>
             <phase>pre-integration-test</phase>
-            <goals><goal>jruby</goal></goals>
-            <configuration>
-              <args>-C src/main/ruby -S ${rubygems.home}/bin/warble</args>
-            </configuration>
           </execution>
         </executions>
       </plugin>

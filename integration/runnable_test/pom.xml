@@ -60,10 +60,6 @@
           <execution>
             <id>create-war</id>
             <phase>pre-integration-test</phase>
-            <goals><goal>jruby</goal></goals>
-            <configuration>
-              <args>-Csrc/main/ruby -S ${rubygems.home}/bin/warble</args>
-            </configuration>
           </execution>
         </executions>
       </plugin>

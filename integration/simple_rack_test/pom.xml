@@ -30,26 +30,16 @@
         <artifactId>jruby-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>bundle-install</id>
-            <phase>pre-integration-test</phase>
+            <id>install-gems</id>
+            <phase>initialize</phase>
             <goals><goal>jruby</goal></goals>
             <configuration>
-              <args>-C src/main/ruby -S bundle install</args>
+              <args>-S gem install bouncy-castle-java -v 1.5.0147</args>
             </configuration>
           </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>de.saumya.mojo</groupId>
-        <artifactId>jruby-maven-plugin</artifactId>
-        <executions>
           <execution>
             <id>create-war</id>
             <phase>pre-integration-test</phase>
-            <goals><goal>jruby</goal></goals>
-            <configuration>
-              <args>-Csrc/main/ruby -S ${rubygems.home}/bin/warble</args>
-            </configuration>
           </execution>
         </executions>
       </plugin>

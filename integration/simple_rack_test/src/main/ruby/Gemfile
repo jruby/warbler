@@ -1,3 +1,0 @@
-source 'https://rubygems.org'
-
-gem "bouncy-castle-java", "1.5.0147"

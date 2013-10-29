@@ -143,6 +143,22 @@
             <jrubySwitches>--1.9</jrubySwitches>
             <jrubyVersion>${jruby.version}</jrubyVersion>
           </configuration>
+          <executions>
+            <execution>
+              <id>bundle-install</id>
+              <goals><goal>jruby</goal></goals>
+              <configuration>
+                <args>-C ${basedir}/src/main/ruby -S bundle install</args>
+              </configuration>
+            </execution>
+            <execution>
+              <id>create-war</id>
+              <goals><goal>jruby</goal></goals>
+              <configuration>
+                <args>-C ${basedir}/src/main/ruby -S ${rubygems.home}/bin/warble</args>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
