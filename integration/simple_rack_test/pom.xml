@@ -38,6 +38,14 @@
             </configuration>
           </execution>
           <execution>
+            <id>install-gems</id>
+            <phase>initialize</phase>
+            <goals><goal>jruby</goal></goals>
+            <configuration>
+              <args>-S gem install rake -v 10.1.0</args>
+            </configuration>
+          </execution>
+          <execution>
             <id>create-war</id>
             <phase>pre-integration-test</phase>
           </execution>

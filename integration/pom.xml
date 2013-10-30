@@ -148,7 +148,7 @@
               <id>bundle-install</id>
               <goals><goal>jruby</goal></goals>
               <configuration>
-                <args>-C ${basedir}/src/main/ruby -S bundle install</args>
+                <args>-C ${basedir}/src/main/ruby -S ${rubygems.home}/bin/bundle install</args>
               </configuration>
             </execution>
             <execution>
