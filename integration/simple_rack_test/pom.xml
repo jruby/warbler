@@ -30,7 +30,7 @@
         <artifactId>jruby-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>install-gems</id>
+            <id>install-gems-bouncy-castle</id>
             <phase>initialize</phase>
             <goals><goal>jruby</goal></goals>
             <configuration>
@@ -38,7 +38,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>install-gems</id>
+            <id>install-gems-rake</id>
             <phase>initialize</phase>
             <goals><goal>jruby</goal></goals>
             <configuration>
