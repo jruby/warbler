@@ -18,7 +18,7 @@
     <version.jruby-maven-plugins>0.28.4</version.jruby-maven-plugins>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jruby.version>1.7.6</jruby.version>
-    <warbler.version>1.4.0.dev</warbler.version>
+    <warbler.version>1.4.0</warbler.version>
     <rubygems.home>${session.executionRootDirectory}/target/rubygems</rubygems.home>
   </properties>
 
