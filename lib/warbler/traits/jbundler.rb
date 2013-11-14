@@ -30,7 +30,18 @@ module Warbler
       end
 
       def add_jbundler_jars
-        require 'jbundler'
+        begin
+          require 'jbundler'
+        rescue LoadError
+          classpath = File.join( '.jbundler', 'classpath.rb' )
+          if File.exists?( classpath )
+            require File.expand_path( classpath )
+          else
+            raise 'jbundler support needs jruby to create a local config: jruby -S jbundle install'
+          end
+        end
+        # use only the jars from jbundler
+        config.java_libs.clear
         JBUNDLER_CLASSPATH.each do |jar|
           config.java_libs << jar
         end
