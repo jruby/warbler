@@ -132,6 +132,11 @@ Warbler supports Bundler for gems and git repositories, but not for plain path
 components. Warbler will warn when a +:path+ component is found in the +Gemfile+
 and will refuse to include it in the archive.
 
+=== JBundler (experimental)
+
+Applications that use JBundler[http://github.com/mkristian/jbundler], detected
+via presence of a +Jarfile+, will have the jars packaged up into the archive. the JBundler gem is **not** needed for runtime since all jars are already part of the classloader.
+
 == War Files
 
 === Rails applications
