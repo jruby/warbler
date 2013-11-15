@@ -41,7 +41,6 @@ describe Warbler::Jar, "with JBundler" do
         config.java_libs << "local.jar"
       end
       jar.apply(config)
-      #file_list(%r{WEB-INF/libs/some.jar}).should_not be_empty
       file_list(%r{WEB-INF/libs/local.jar}).should be_empty
     end
 
