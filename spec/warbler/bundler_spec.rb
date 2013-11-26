@@ -167,4 +167,15 @@ describe Warbler::Jar, "with Bundler" do
       file_list(%r{gems/bundler-.*/lib}).should_not be_empty
     end
   end
+
+  context "in a rack app" do
+    run_in_directory "spec/sample_rack_war"
+    cleanup_temp_files
+
+    it "should have default load path" do
+      jar.add_init_file(config)
+      contents = jar.contents('META-INF/init.rb')
+      contents.should =~ /\$LOAD_PATH\.unshift \$servlet_context\.getRealPath\('\/WEB-INF'\) if \$servlet_context/
+    end
+  end
 end

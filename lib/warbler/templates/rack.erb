@@ -1,1 +1,3 @@
 ENV['RACK_ENV'] = '<%= (params = config.webxml.context_params; params['rack.env']) %>'
+
+$LOAD_PATH.unshift $servlet_context.getRealPath('/WEB-INF') if $servlet_context
