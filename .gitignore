@@ -12,3 +12,4 @@ warbler.ipr
 warbler-*.gem
 log
 integration/**/*.iml
+build.log

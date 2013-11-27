@@ -14,6 +14,7 @@
   <name>rails4_test</name>
   <url>http://maven.apache.org</url>
 
+<!--
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -23,6 +24,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+-->
 
   <build>
     <plugins>

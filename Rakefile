@@ -5,12 +5,9 @@
 # See the file LICENSE.txt for details.
 #++
 
-begin
-  require 'bundler/setup'
-rescue LoadError => e
-  require('rubygems') && retry
-  puts "Please `gem install bundler' and run `bundle install' to ensure you have all dependencies"
-  raise e
+unless defined? Bundler
+  puts "\nPlease `gem install bundler' and run `bundle install' to ensure you have all dependencies and run ininside a bundler context 'bundle exec rake'.\n\n"
+  raise
 end
 
 require 'bundler/gem_helper'
@@ -28,28 +25,12 @@ end
 
 task :default => :spec
 
-jar_file = "lib/warbler_jar.jar"
-begin
-  require 'ant'
-  directory "pkg/classes"
-  CLEAN << "pkg"
+# use Mavenfile to define :jar task
+require 'maven/ruby/tasks'
 
-  file jar_file => FileList['ext/*.java', 'pkg/classes'] do
-    rm_rf FileList['pkg/classes/**/*']
-    ant.javac :srcdir => "ext", :includes => "*.java", :destdir => "pkg/classes",
-      :source => "1.5", :target => "1.5", :debug => true,
-      :classpath => "${java.class.path}:${sun.boot.class.path}",
-      :includeantRuntime => false
-
-    ant.jar :basedir => "pkg/classes", :destfile => jar_file, :includes => "*.class"
-  end
-
-  desc "Compile and jar the Warbler Java helper classes"
-  task :jar => jar_file
-rescue LoadError
-  task :jar do
-    puts "Run 'jar' with JRuby to re-compile the java jar booster"
-  end
+desc 'run some integration test'
+task :integration do
+  maven.verify
 end
 
 # Make sure jar gets compiled before the gem is built

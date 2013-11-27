@@ -13,7 +13,7 @@
 
   <name>simple_rack_test</name>
   <url>http://maven.apache.org</url>
-
+<!--
   <dependencies>
     <dependency>
       <groupId>${groupId}</groupId>
@@ -22,13 +22,14 @@
       <type>pom</type>
     </dependency>
   </dependencies>
-
+-->
   <build>
     <plugins>
       <plugin>
         <groupId>de.saumya.mojo</groupId>
         <artifactId>jruby-maven-plugin</artifactId>
         <executions>
+<!--
           <execution>
             <id>install-gems</id>
             <phase>initialize</phase>
@@ -37,6 +38,7 @@
               <args>-S ${basedir}/src/main/ruby/bin/install-gems.rb</args>
             </configuration>
           </execution>
+-->
           <execution>
             <id>create-war</id>
             <phase>pre-integration-test</phase>
