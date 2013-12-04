@@ -31,5 +31,5 @@ notifications:
     template:
       - "%{repository} (%{branch}:%{commit} by %{author}): %{message} (%{build_url})" 
 before_install: 
-  - git fetch --unshallow
+  - git fetch
   - gem install bundler --pre
