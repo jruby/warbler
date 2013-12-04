@@ -31,5 +31,6 @@ notifications:
     template:
       - "%{repository} (%{branch}:%{commit} by %{author}): %{message} (%{build_url})" 
 before_install: 
+  - sudo apt-get update && sudo apt-get install git
   - git fetch --unshallow
   - gem install bundler --pre
