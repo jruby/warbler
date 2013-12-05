@@ -105,6 +105,9 @@ module Warbler
     # Defaults to ["development", "test", "assets"].
     attr_accessor :bundle_without
 
+    # Use JBundler to locate gems if Jarfile is found. Default is true.
+    attr_accessor :jbundler
+
     # Path to the pre-bundled gem directory inside the war file. Default is '/WEB-INF/gems'.
     # This also sets 'gem.path' inside web.xml.
     attr_accessor :gem_path
