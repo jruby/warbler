@@ -14,18 +14,6 @@
   <name>rails4_test</name>
   <url>http://maven.apache.org</url>
 
-<!--
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>gem-initializer</artifactId>
-      <version>${project.version}</version>
-      <type>pom</type>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
--->
-
   <build>
     <plugins>
       <plugin>

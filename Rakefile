@@ -1,3 +1,4 @@
+#-*- mode: ruby -*-
 #--
 # Copyright (c) 2010-2012 Engine Yard, Inc.
 # Copyright (c) 2007-2009 Sun Microsystems, Inc.
@@ -6,8 +7,7 @@
 #++
 
 unless defined? Bundler
-  puts "\nPlease `gem install bundler' and run `bundle install' to ensure you have all dependencies and run ininside a bundler context 'bundle exec rake'.\n\n"
-  raise
+  warn "\nPlease `gem install bundler' and run `bundle install' to ensure you have all dependencies and run inside a bundler context 'bundle exec rake'.\n\n"
 end
 
 require 'bundler/gem_helper'
@@ -16,7 +16,7 @@ gem_helper.install
 gemspec = gem_helper.gemspec
 
 require 'rake/clean'
-CLEAN << "pkg" << "doc"
+CLEAN << "pkg" << "doc" << Dir['integration/**/target']
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |t|
@@ -33,7 +33,13 @@ task :integration do
   maven.verify
 end
 
+desc 'generate the pom.xml from the Mavenfile'
+task :pom do
+  maven.validate
+end
+
 # Make sure jar gets compiled before the gem is built
+# the jar tasks is part of maven-tasks
 task :build => :jar
 
 require 'rdoc/task'
