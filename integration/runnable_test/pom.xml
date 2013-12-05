@@ -17,16 +17,7 @@
   <properties>
     <test-file>test-file.tmp</test-file>
   </properties>
-<!--
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>gem-initializer</artifactId>
-      <version>${project.version}</version>
-      <type>pom</type>
-    </dependency>
-  </dependencies>
--->
+
   <build>
     <plugins>
       <plugin>
