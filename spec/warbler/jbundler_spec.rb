@@ -68,14 +68,16 @@ describe Warbler::Jar, "with JBundler" do
     run_in_directory "spec/sample_jbundler"
 
     it "does not include the jbundler gem (as it is in the development group)" do
+      pending( "needs JRuby to work" ) unless defined? JRUBY_VERSION
       jar.apply(config)
       config.gems.detect{|k,v| k.name == 'jbundler'}.should be_nil
       file_list(/jbundler-/).should be_empty
     end
 
     it "does not include the jbundler runtime config" do
+      pending( "needs JRuby to work" ) unless defined? JRUBY_VERSION
       jar.apply(config)
-      file_list(%r{.jbundler}).should be_empty
+      file_list(%r{WEB-INF/.jbundler}).should be_empty
     end
   end
 end
