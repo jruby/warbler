@@ -6,7 +6,7 @@ gemspec( :jar => 'warbler_jar.jar',
          :source => 'ext' )
 
 # just dump the POM as pom.xml as read-only file
-properties( 'tesla.dump.pom' => 'pom.xml'
+properties( 'tesla.dump.pom' => 'pom.xml',
             'tesla.dump.readOnly' => true )
 
 # dependencies needed for compilation
@@ -20,5 +20,6 @@ plugin :compiler, '3.1', :source => '1.5', :target => '1.5'
 plugin :invoker, '1.8' do
   execute_goals( :install, :run,
                  :id => 'integration-test',
-                 :projectsDirectory => 'integration' )
+                 :projectsDirectory => 'integration',
+                 :streamLogs => true )
 end
