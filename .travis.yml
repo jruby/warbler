@@ -18,7 +18,7 @@ matrix:
       env: ''
     - rvm: jruby
       env: MAVEN_OPTS="-XX:MaxPermSize=128m"
-      script: cd integration && mvn clean verify
+      script: mvn clean verify
   allow_failures:
     - rvm: jruby
     - rvm: jruby-head
@@ -33,3 +33,5 @@ notifications:
 before_install: 
   - git fetch --unshallow
   - gem install bundler --pre
+  # that is for some reasons needed for jruby-head
+  - gem install rake -v 0.8.7
