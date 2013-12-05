@@ -1,0 +1,1 @@
+JBUNDLER_CLASSPATH = ['some.jar']
