@@ -1,3 +1,7 @@
+== 1.4.1
+- Support for JBundler
+- #165: Problem with bundler git gems
+
 == 1.4.0
 
 - Support for Rails 4.x
