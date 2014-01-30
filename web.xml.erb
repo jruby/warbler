@@ -2,9 +2,8 @@
   "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
   "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
-<% if webxml.customkey['display-name'] %>
-  <display-name><%= webxml.customkey['display-name'] %></display-name>
-<% end %>
+<!-- <display-name><%= (Rails rescue NameError) == NameError ? 
+"" : Rails.application.class.parent %></display-name> -->
 
 <% webxml.context_params.each do |k,v| %>
   <context-param>
