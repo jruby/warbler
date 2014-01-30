@@ -2,6 +2,8 @@
   "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
   "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
+<display-name><%= %></display-name>
+
 <% webxml.context_params.each do |k,v| %>
   <context-param>
     <param-name><%= k %></param-name>
