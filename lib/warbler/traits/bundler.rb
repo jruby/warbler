@@ -62,9 +62,11 @@ module Warbler
             config.bundler[:git_specs] ||= []
             config.bundler[:git_specs] << spec
           when ::Bundler::Source::Path
-            $stderr.puts("warning: Bundler `path' components are not currently supported.",
-                         "The `#{spec.full_name}' component was not bundled.",
-                         "Your application may fail to boot!")
+            unless bundler_source_is_warbled_gem_itself?(spec.source)
+              $stderr.puts("warning: Bundler `path' components are not currently supported.",
+                           "The `#{spec.full_name}' component was not bundled.",
+                           "Your application may fail to boot!")
+            end
           else
             config.gems << spec
           end
@@ -140,6 +142,10 @@ module Warbler
         excluded_git_specs = (all - requested).select {|spec| ::Bundler::Source::Git === spec.source }
         excluded_git_specs.each {|spec| spec.groups << :warbler_excluded }
         requested + excluded_git_specs
+      end
+
+      def bundler_source_is_warbled_gem_itself?(source)
+        source.path.to_s == '.'
       end
     end
   end
