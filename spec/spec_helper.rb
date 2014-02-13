@@ -73,11 +73,12 @@ module ExampleGroupHelpers
     end
   end
 
-  def cleanup_temp_files
+  def cleanup_temp_files(*except_files)
     after(:each) do
-      FileUtils.rm_rf FileList["log", ".bundle", "tmp/war"]
-      FileUtils.rm_f  FileList["*.war", "*.foobar", "**/config.ru", "*web.xml*", "config/web.xml*", "config/warble.rb",
-                               "file.txt", 'manifest', '*Gemfile*', 'MANIFEST.MF*', 'init.rb*', '**/*.class']
+      FileUtils.rm_rf FileList[*(["log", ".bundle", "tmp/war"] - except_files)]
+      FileUtils.rm_f  FileList[*(["*.war", "*.foobar", "**/config.ru", "*web.xml*", "config/web.xml*",
+                                 "config/warble.rb", "file.txt", 'manifest', '*Gemfile*', 'MANIFEST.MF*', 'init.rb*',
+                                 '**/*.class'] - except_files)]
     end
   end
 

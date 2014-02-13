@@ -807,9 +807,15 @@ describe Warbler::Jar do
 
     context "in a Rack application" do
       before :each do
+        mkdir 'tmp' unless Dir.exists?('tmp')
         Dir.chdir('tmp')
         rackup = "run Proc.new {|env| [200, {}, ['Hello World']]}"
         File.open("config.ru", "w") {|f| f << rackup }
+      end
+
+      after :each do
+        Dir.chdir('..')
+        rm_rf 'tmp'
       end
 
       it "detects a Rack trait" do
