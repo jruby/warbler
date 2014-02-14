@@ -1,5 +1,5 @@
 rvm:
-  - jruby-1.7.7
+  - jruby-1.7.8
 branches:
   only:
     - master
