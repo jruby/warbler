@@ -1,3 +1,11 @@
+== 1.4.1
+- Support for JBundler
+- #165: Problem with bundler git gems
+- #239: Supresses a warning when using bundler
+- #221: Adding WEB-INF to $LOAD_PATH for simple Rack-only apps
+- #220: For Rack-only apps, WEB-INF should be added to $LOAD_PATH
+- #218: Invoke jrubyc using system to ensure that STDERR from jrubyc is shown
+
 == 1.4.0
 
 - Support for Rails 4.x

@@ -15,6 +15,10 @@ describe Warbler::Config do
   context "in an unknown application" do
     run_in_directory 'spec/sample_war/tmp'
 
+    after :each do
+      rm_rf "../tmp"
+    end
+
     it "has suitable default values" do
       config = Warbler::Config.new
       config.includes.should be_empty
