@@ -1,3 +1,4 @@
+#-*- mode: ruby -*-
 #--
 # Copyright (c) 2010-2012 Engine Yard, Inc.
 # Copyright (c) 2007-2009 Sun Microsystems, Inc.
@@ -5,12 +6,8 @@
 # See the file LICENSE.txt for details.
 #++
 
-begin
-  require 'bundler/setup'
-rescue LoadError => e
-  require('rubygems') && retry
-  puts "Please `gem install bundler' and run `bundle install' to ensure you have all dependencies"
-  raise e
+unless defined? Bundler
+  warn "\nPlease `gem install bundler' and run `bundle install' to ensure you have all dependencies and run inside a bundler context 'bundle exec rake'.\n\n"
 end
 
 require 'bundler/gem_helper'
@@ -19,7 +16,7 @@ gem_helper.install
 gemspec = gem_helper.gemspec
 
 require 'rake/clean'
-CLEAN << "pkg" << "doc"
+CLEAN << "pkg" << "doc" << Dir['integration/**/target']
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |t|
@@ -28,31 +25,21 @@ end
 
 task :default => :spec
 
-jar_file = "lib/warbler_jar.jar"
-begin
-  require 'ant'
-  directory "pkg/classes"
-  CLEAN << "pkg"
+# use Mavenfile to define :jar task
+require 'maven/ruby/tasks'
 
-  file jar_file => FileList['ext/*.java', 'pkg/classes'] do
-    rm_rf FileList['pkg/classes/**/*']
-    ant.javac :srcdir => "ext", :includes => "*.java", :destdir => "pkg/classes",
-      :source => "1.5", :target => "1.5", :debug => true,
-      :classpath => "${java.class.path}:${sun.boot.class.path}",
-      :includeantRuntime => false
+desc 'run some integration test'
+task :integration do
+  maven.verify
+end
 
-    ant.jar :basedir => "pkg/classes", :destfile => jar_file, :includes => "*.class"
-  end
-
-  desc "Compile and jar the Warbler Java helper classes"
-  task :jar => jar_file
-rescue LoadError
-  task :jar do
-    puts "Run 'jar' with JRuby to re-compile the java jar booster"
-  end
+desc 'generate the pom.xml from the Mavenfile'
+task :pom do
+  maven.validate
 end
 
 # Make sure jar gets compiled before the gem is built
+# the jar tasks is part of maven-tasks
 task :build => :jar
 
 require 'rdoc/task'

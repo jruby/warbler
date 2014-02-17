@@ -20,7 +20,7 @@ matrix:
       env: ''
     - rvm: jruby
       env: MAVEN_OPTS="-XX:MaxPermSize=128m"
-      script: cd integration && mvn clean verify
+      script: mvn clean verify
   allow_failures:
     - rvm: jruby
     - rvm: jruby-head

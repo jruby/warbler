@@ -8,21 +8,43 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>gem-initializer</module>
     <module>simple_rack_test</module>
+
     <module>rails4_test</module>
+
     <module>runnable_test</module>
   </modules>
 
   <properties>
-    <version.jruby-maven-plugins>0.28.4</version.jruby-maven-plugins>
+    <version.jruby-maven-plugins>1.0.0-rc</version.jruby-maven-plugins>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jruby.version>1.7.9</jruby.version>
-    <warbler.version>1.4.1.dev</warbler.version>
-    <rubygems.home>${session.executionRootDirectory}/target/rubygems</rubygems.home>
+    <!-- prereleased gems ARE snapshots -->
+    <warbler.version>1.4.1.dev-SNAPSHOT</warbler.version>
+    <gem.home>${session.executionRootDirectory}/target/rubygems</gem.home>
+    <gem.path>${session.executionRootDirectory}/target/rubygems</gem.path>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>rubygems-releases</id>
+      <url>http://rubygems-proxy.torquebox.org/releases</url>
+    </repository>
+  </repositories>
+
   <dependencies>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>bundler</artifactId>
+      <version>1.5.3</version>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>warbler</artifactId>
+      <version>${warbler.version}</version>
+      <type>gem</type>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -47,35 +69,6 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>create-target-dir</id>
-            <phase>process-resources</phase>
-            <configuration>
-              <tasks>
-                <mkdir dir="target"/>
-                <mkdir dir="${rubygems.home}"/>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <excludes>
-            <exclude>${basedir}/src/main/ruby</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>2.9</version>
         <executions>
@@ -87,6 +80,16 @@
           </execution>
         </executions>
       </plugin>
+        <plugin>
+          <groupId>de.saumya.mojo</groupId>
+          <artifactId>gem-maven-plugin</artifactId>
+          <version>${version.jruby-maven-plugins}</version>
+	  <executions>
+            <execution>
+	      <goals><goal>initialize</goal></goals>
+	    </execution>
+	  </executions>
+	</plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -137,25 +140,27 @@
           <groupId>de.saumya.mojo</groupId>
           <artifactId>jruby-maven-plugin</artifactId>
           <version>${version.jruby-maven-plugins}</version>
-          <extensions>true</extensions>
           <configuration>
-            <gemHome>${rubygems.home}</gemHome>
+            <gemHome>${gem.home}</gemHome>
             <jrubySwitches>--1.9</jrubySwitches>
             <jrubyVersion>${jruby.version}</jrubyVersion>
           </configuration>
           <executions>
+
             <execution>
               <id>bundle-install</id>
-              <goals><goal>jruby</goal></goals>
+              
+	      <goals><goal>jruby</goal></goals>
               <configuration>
-                <args>-C ${basedir}/src/main/ruby -S ${rubygems.home}/bin/bundle install</args>
+                <args>-C ${basedir}/src/main/ruby -S ${gem.home}/bin/bundle install</args>
               </configuration>
             </execution>
+	     
             <execution>
               <id>create-war</id>
               <goals><goal>jruby</goal></goals>
               <configuration>
-                <args>-C ${basedir}/src/main/ruby -S ${rubygems.home}/bin/warble</args>
+                <args>-C ${basedir}/src/main/ruby -S ${gem.home}/bin/warble</args>
               </configuration>
             </execution>
           </executions>

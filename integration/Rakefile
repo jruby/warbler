@@ -1,0 +1,10 @@
+#-*- mode: ruby -*-
+
+require 'maven/ruby/tasks'
+
+task :default do
+  # chdir might not work with jruby, in that case run 'rake verify' from the parrent dir
+  Dir.chdir '..' do
+    maven.install
+  end
+end
