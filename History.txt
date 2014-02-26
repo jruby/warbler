@@ -1,3 +1,6 @@
+== 1.4.2
+- #241: jars from jruby.jar itself do not get copied over to WEB-INF/lib
+
 == 1.4.1
 - Support for JBundler
 - #165: Problem with bundler git gems
