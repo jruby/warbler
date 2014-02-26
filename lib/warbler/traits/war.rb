@@ -76,7 +76,7 @@ module Warbler
       def update_archive(jar)
         add_public_files(jar)
         add_webxml(jar)
-        move_jars_to_webinf_lib(jar)
+        #move_jars_to_webinf_lib(jar)
         add_runnables(jar) if config.features.include?("runnable")
         add_executables(jar) if config.features.include?("executable")
         add_gemjar(jar) if config.features.include?("gemjar")
