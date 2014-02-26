@@ -76,7 +76,6 @@ module Warbler
       def update_archive(jar)
         add_public_files(jar)
         add_webxml(jar)
-        #move_jars_to_webinf_lib(jar)
         add_runnables(jar) if config.features.include?("runnable")
         add_executables(jar) if config.features.include?("executable")
         add_gemjar(jar) if config.features.include?("gemjar")
@@ -129,14 +128,6 @@ module Warbler
         mkdir_p "tmp"
         gem_jar.add_manifest
         gem_jar.create("tmp/gems.jar")
-      end
-
-      def move_jars_to_webinf_lib(jar)
-        jar.files.keys.select {|k| k =~ /^WEB-INF\/.*\.jar$/ }.each do |k|
-          next if k =~ /^WEB-INF\/lib\/([^\/]+)\.jar$/ # skip jars already in WEB-INF/lib
-          jar.files["WEB-INF/lib/#{k.sub('WEB-INF','')[1..-1].gsub(/[\/\\]/,'-')}"] = jar.files[k]
-          jar.files[k] = empty_jar
-        end
       end
 
       def empty_jar
