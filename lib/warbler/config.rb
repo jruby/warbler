@@ -164,6 +164,10 @@ module Warbler
     # * <tt>jetty</tt> - Embedded Jetty from Eclipse
     attr_accessor :webserver
 
+    # If set to true, Warbler will move jar files into the WEB-INF/lib directory of the
+    # created war file. This may be needed for some web servers. Defaults to false.
+    attr_accessor :move_jars_to_webinf_lib
+
     # These file will be placed in the META-INF directory of the jar or war that warbler
     # produces. They are primarily used as launchers by the runnable feature.
     attr_accessor :script_files
@@ -195,6 +199,7 @@ module Warbler
       @override_gem_home = true
       @script_files      = []
       @warbler_scripts = "#{WARBLER_HOME}/lib/warbler/scripts"
+      @move_jars_to_webinf_lib = false
 
       before_configure
       yield self if block_given?
