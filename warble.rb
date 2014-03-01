@@ -100,6 +100,11 @@ Warbler::Config.new do |config|
   # Sets default (prefixed) parameters for the executables
   # config.executable_params = "do:something"
 
+  # If set to true, moves jar files into WEB-INF/lib. Prior to version 1.4.2 of Warbler this was done
+  # by default. But since 1.4.2 this config defaults to false. It may need to be set to true for
+  # web servers that do not explode the WAR file.
+  # config.move_jars_to_webinf_lib = false
+
   # === War files only below here ===
 
   # Path to the pre-bundled gem directory inside the war file. Default
