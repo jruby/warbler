@@ -671,6 +671,10 @@ describe Warbler::Jar do
         config.gems.keys.should include(Gem::Dependency.new("hpricot", Gem::Requirement.new("=0.6")))
       end
 
+      it "automatically adds asset pipeline manifest file to the included files" do
+        config.includes.should include("public/assets/manifest.yml")
+      end
+
       shared_examples_for "threaded environment" do
         it "sets the jruby min and max runtimes to 1" do
           ENV["RAILS_ENV"] = nil
@@ -717,6 +721,23 @@ describe Warbler::Jar do
 
       context "with rails version 4" do
 
+        let (:manifest_file) { "public/assets/manifest-1234.json" }
+
+        shared_examples_for "asset pipeline" do
+          it "automatically adds asset pipeline manifest file to the included files" do
+            config.includes.should include(manifest_file)
+          end
+        end
+
+        before do
+          mkdir File.dirname(manifest_file)
+          File.open(manifest_file, "w")
+        end
+
+        after do
+          rm_rf File.dirname(manifest_file)
+        end
+
         context "When rails version is specified in Gemfile" do
           before :each do
             File.open("Gemfile", "a") { |f| f.puts "gem 'rails', '4.0.0'" }
@@ -727,6 +748,7 @@ describe Warbler::Jar do
           end
 
           it_should_behave_like "threaded environment"
+          it_should_behave_like "asset pipeline"
         end
 
         context "when rails version is not specified in Gemfile" do
@@ -741,6 +763,7 @@ describe Warbler::Jar do
           end
 
           it_should_behave_like "threaded environment"
+          it_should_behave_like "asset pipeline"
         end
       end
 
