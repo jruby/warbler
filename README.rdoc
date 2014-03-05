@@ -150,6 +150,14 @@ The following items are set up for you:
 * Other gems configured in Rails.configuration.gems are packaged (2.1 - 2.3)
 * Multi-thread-safe execution (as introduced in Rails 2.2) is detected and 
   runtime pooling is disabled.
+  
+==== Rails 3.1+ and Java Container
+
+The assets files are included at the root of the generated +war+ file and thus not in the +public+ folder.
+On Rails 3.1+ you then need to include the +manifest+ files so they can be detected and used by the Asset Pipeline.
+Use the +config.includes+ option in your +warble.rb+ file :
+
+    config.includes = FileList["public/assets/manifest-*.json"]
 
 === Other Rack-based applications
 
