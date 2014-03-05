@@ -671,10 +671,6 @@ describe Warbler::Jar do
         config.gems.keys.should include(Gem::Dependency.new("hpricot", Gem::Requirement.new("=0.6")))
       end
 
-      it "automatically adds asset pipeline manifest file to the included files" do
-        config.includes.should include("public/assets/manifest.yml")
-      end
-
       shared_examples_for "threaded environment" do
         it "sets the jruby min and max runtimes to 1" do
           ENV["RAILS_ENV"] = nil
@@ -690,6 +686,23 @@ describe Warbler::Jar do
           end
           config.webxml.jruby.min.runtimes.should == 2
           config.webxml.jruby.max.runtimes.should == 2
+        end
+      end
+
+      context "with asset_pipeline" do
+        let (:manifest_file) { "public/assets/manifest.yml" }
+
+        before do
+          mkdir File.dirname(manifest_file)
+          File.open(manifest_file, "w")
+        end
+
+        after do
+          rm_rf File.dirname(manifest_file)
+        end
+
+        it "automatically adds asset pipeline manifest file to the included files" do
+          config.includes.should include("public/assets/manifest.yml")
         end
       end
 

@@ -52,13 +52,12 @@ module Warbler
 
         if asset_pipeline_enabled?
           if rails_4?
-            config.includes += FileList["public/assets/manifest-*.json"]
+            config.includes += FileList["public/assets/manifest-*.json"].existing
           else
-            config.includes += FileList["public/assets/manifest.yml"]
+            config.includes += FileList["public/assets/manifest.yml"].existing
           end
         end
       end
-
 
       def default_app_name
         File.basename(File.expand_path(defined?(::Rails.root) ? ::Rails.root : (defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)))
