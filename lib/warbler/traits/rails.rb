@@ -50,13 +50,8 @@ module Warbler
           config.webxml.jruby.max.runtimes = 1 unless Integer === config.webxml.jruby.max.runtimes
         end
 
-        if asset_pipeline_enabled?
-          if rails_4?
-            config.includes += FileList["public/assets/manifest-*.json"].existing
-          else
-            config.includes += FileList["public/assets/manifest.yml"].existing
-          end
-        end
+        config.includes += FileList["public/assets/manifest-*.json"].existing
+        config.includes += FileList["public/assets/manifest.yml"].existing
       end
 
       def default_app_name
@@ -81,14 +76,6 @@ module Warbler
             return true
           end
         rescue
-        end
-      end
-
-      def asset_pipeline_enabled?
-        begin
-          return IO.readlines("config/application.rb").grep(/^\s*config\.assets\.enabled(\s)*=(\s)*false/).empty?
-        rescue
-          return true
         end
       end
     end
