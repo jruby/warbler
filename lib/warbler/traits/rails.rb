@@ -49,8 +49,10 @@ module Warbler
           config.webxml.jruby.min.runtimes = 1 unless Integer === config.webxml.jruby.min.runtimes
           config.webxml.jruby.max.runtimes = 1 unless Integer === config.webxml.jruby.max.runtimes
         end
-      end
 
+        config.includes += FileList["public/assets/manifest-*.json"].existing
+        config.includes += FileList["public/assets/manifest.yml"].existing
+      end
 
       def default_app_name
         File.basename(File.expand_path(defined?(::Rails.root) ? ::Rails.root : (defined?(RAILS_ROOT) ? RAILS_ROOT : Dir.getwd)))
