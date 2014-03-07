@@ -19,6 +19,7 @@ module Warbler
   class Jar
     include PathmapHelper
     include RakeHelper
+    include PlatformHelper
 
     DEFAULT_MANIFEST = %{Manifest-Version: 1.0\nCreated-By: Warbler #{Warbler::VERSION}\n\n}
 
@@ -50,7 +51,12 @@ module Warbler
         compat_version = ''
       end
       # Need to use the version of JRuby in the application to compile it
-      system %Q{env -i java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} org.jruby.Main #{compat_version} -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
+      javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} org.jruby.Main #{compat_version} -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
+      if which('env')
+        system %Q{env -i #{javac_cmd}}
+      else
+        system javac_cmd
+      end
       raise "Compile failed" if $?.exitstatus > 0
     end
 
