@@ -4,6 +4,7 @@
 - #247: better support for Rails 4 asset pipeline
 - #169: Compile war not loading assets
 - #243: Added the move_jars_to_webinf_lib method back in...
+- #249: Warbler 1.4.1 fails to compile on Windows
 
 == 1.4.1
 - Support for JBundler
