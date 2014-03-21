@@ -167,6 +167,15 @@ describe Warbler::Jar do
         file_list(%r{^sample_jar/lib$}).should be_empty
         file_list(%r{^sample_jar/bin$}).should_not be_empty
       end
+
+      it "excludes .rb and .class files from compile" do
+        config.compiled_ruby_files = %w(lib/sample_jar.rb)
+        config.excludes += FileList["lib/sample_jar.*"]
+        jar.compile(config)
+        jar.apply(config)
+        file_list(%r{^sample_jar/lib/sample_jar\.class$}).should be_empty
+        jar.contents('sample_jar/lib/sample_jar.rb').should_not =~ /load __FILE__\.sub/
+      end
     end
 
     context "with a gemspec without a default executable" do
