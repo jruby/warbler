@@ -1,3 +1,7 @@
+== 1.4.3
+- #167: Excluding rb and class files when using compiled flag
+- #254: Fixes #167 by excluding config.excludes from compiled files
+
 == 1.4.2
 - #241: jars from jruby.jar itself do not get copied over to WEB-INF/lib
 - #199: javascript_include_tag and stylesheet_link_tag not generating digestions
