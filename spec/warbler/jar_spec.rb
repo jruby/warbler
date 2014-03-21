@@ -129,6 +129,24 @@ describe Warbler::Jar do
       end
     end
 
+    context "when files have a space in the path" do
+      before do
+        mkdir "some dir"
+        touch "some dir/foobar.rb"
+      end
+
+      after do
+        rm_rf "some dir"
+      end
+
+      it "compiles" do
+        config.compiled_ruby_files = ["some dir/foobar.rb"]
+        jar.compile(config)
+        jar.apply(config)
+        file_list(%r{^sample_jar/some dir/foobar\.class$}).should_not be_empty
+      end
+    end
+
     context "with a .gemspec" do
       it "detects a Gemspec trait" do
         config.traits.should include(Warbler::Traits::Gemspec)
