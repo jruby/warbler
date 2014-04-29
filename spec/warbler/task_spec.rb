@@ -125,6 +125,25 @@ describe Warbler::Task do
     end
   end
 
+  it "should allow bytecode version in config" do
+    config.features << "compiled"
+    config.bytecode_version = '1.6'
+    silence { run_task "warble" }
+
+    java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
+    # 0x32 is version 50, i.e. Java6
+    java6_version_bytes = [0x00,0x32].map { |magic_char| magic_char.chr }.join
+
+    Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
+      class_file_bytes = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.class') {|io| io.read }
+      java_class_header     = class_file_bytes[0..3]
+      bytecode_version      = class_file_bytes[6..7]
+      
+      java_class_header.should == java_class_magic_number
+      bytecode_version.should == java6_version_bytes
+    end
+  end
+
   it "should delete .class files after finishing the jar" do
     config.features << "compiled"
     silence { run_task "warble" }
