@@ -226,7 +226,7 @@ simply add the following code somewhere in the +Rakefile+ :
 If you're using Bundler, you'll want to add Warbler to your +Gemfile+ :
 
     group :development do
-      gem "warbler"
+      gem "warbler", :require => false
     end
 
 Now you should be able to invoke <tt>rake war</tt> to create your war file.
