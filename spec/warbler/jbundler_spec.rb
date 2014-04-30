@@ -54,7 +54,7 @@ describe Warbler::Jar, "with JBundler" do
     it "adds JBUNDLE_SKIP to init.rb" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ /ENV\['JBUNDLE_SKIP'\]/
+      contents.should =~ /ENV\['JBUNDLE_SKIP'\] = 'true'/
     end
 
     it "uses ENV['JBUNDLE_JARFILE'] if set" do
