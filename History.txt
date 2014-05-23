@@ -1,4 +1,8 @@
 == 1.4.3
+- Fixed a bug w/ symlinks that was introduced around jruby-1.7.10
+- #258: Bytecode version option for compiled class files
+- #259: Update README.rdoc to not require warbler in Gemfile
+- #260: Can't convert TrueClass into String
 - #167: Excluding rb and class files when using compiled flag
 - #254: Fixes #167 by excluding config.excludes from compiled files
 
