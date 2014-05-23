@@ -130,6 +130,10 @@ module Warbler
     # Defaults to true
     attr_accessor :override_gem_home
 
+    # Explicit bytecode version for compiled ruby files. If given bytecode version is
+    # specified when ruby files are compiled using jrubyc
+    attr_accessor :bytecode_version
+
     # Extra configuration for web.xml. Controls how the dynamically-generated web.xml
     # file is generated.
     #
