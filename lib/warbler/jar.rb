@@ -160,7 +160,7 @@ module Warbler
       end.each do |d|
         @files[apply_pathmaps(config, d, :application)] = nil
       end
-      @app_filelist = FileList[*(config.dirs.map{|d| "#{d}/**/*"})]
+      @app_filelist = FileList[*(config.dirs.map{|d| %W{#{d}/**/*/**/* #{d}/*}}.flatten)]
       @app_filelist.include *(config.includes.to_a)
       @app_filelist.exclude *(config.excludes.to_a)
       @app_filelist.map {|f| add_with_pathmaps(config, f, :application) }
