@@ -51,8 +51,7 @@ module Warbler
       end
 
       def default_jar_files
-        require 'jruby-jars'
-        FileList[JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path]
+        jruby_jars
       end
     end
   end
