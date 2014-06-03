@@ -97,6 +97,11 @@ module Warbler
         config.webxml["gem"]["path"] = config.gem_path if config.webxml
       end
     end
+
+    def jruby_jars
+      require 'jruby-jars'
+      FileList[JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path]
+    end
   end
 end
 
