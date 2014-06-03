@@ -36,13 +36,14 @@ module Warbler
     end
 
     def compile(config)
+      find_gems_files(config)
       # Compiling all Ruby files we can find -- do we need to allow an
       # option to configure what gets compiled?
-      return if config.compiled_ruby_files.nil? || config.compiled_ruby_files.empty?
+      return if (config.compiled_ruby_files.nil? || config.compiled_ruby_files.empty?) && files.empty?
 
-      compiled_ruby_files = config.compiled_ruby_files - config.excludes.to_a
-      run_javac(config, compiled_ruby_files)
-      replace_compiled_ruby_files(config, compiled_ruby_files)
+      ruby_files = gather_all_rb_files(config)
+      run_javac(config, ruby_files)
+      replace_compiled_ruby_files(config, ruby_files)
     end
 
     def run_javac(config, compiled_ruby_files)
@@ -52,13 +53,14 @@ module Warbler
         compat_version = ''
       end
       # Need to use the version of JRuby in the application to compile it
-      javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main #{compat_version} -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
+      javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main #{compat_version} -S jrubyc \"#{compiled_ruby_files.values.join('" "')}\"}
       if which('env')
-        system %Q{env -i #{javac_cmd}}
+        `env -i #{javac_cmd}`
       else
         system javac_cmd
       end
       raise "Compile failed" if $?.exitstatus > 0
+      @compiled = true
     end
     
     def java_version(config)
@@ -68,11 +70,46 @@ module Warbler
     def replace_compiled_ruby_files(config, compiled_ruby_files)
       # Exclude the rb files and recreate them. This
       # prevents the original contents being used.
-      config.excludes += compiled_ruby_files
+      config.excludes += compiled_ruby_files.keys
 
-      compiled_ruby_files.each do |ruby_source|
-        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("load __FILE__.sub(/\.rb$/, '.class')")
+      compiled_ruby_files.each do |inside_jar, file_system_location|
+        # The gems are already inside the gems folder inside the jar, however when using the :gems pathmap, they will
+        # get put into the gems/gems folder, to prevent this we chop off the first gems folder directory
+        inside_jar = inside_jar.dup
+        if inside_jar.split(File::SEPARATOR).first == 'gems'
+          inside_jar = inside_jar.split(File::SEPARATOR)[1..-1].join(File::SEPARATOR)
+          pathmap = :gems
+        else
+          pathmap = :application
+        end
+        files[apply_pathmaps(config, inside_jar, pathmap)] = StringIO.new("load __FILE__.sub(/\.rb$/, '.class')")
+        files[apply_pathmaps(config, inside_jar.sub(/\.rb$/, '.class'), pathmap)] = file_system_location.sub(/\.rb$/, '.class')
       end
+    end
+
+    #
+    def gather_all_rb_files(config)
+      FileUtils.mkdir_p('tmp')
+      # Gather all the files in the files list and copy them to the tmp directory
+      gems_to_compile = files.select {|k, f| !f.is_a?(StringIO) && f =~ /\.rb$/ }
+      gems_to_compile.each do |jar_file, rb|
+        FileUtils.mkdir_p(File.dirname(File.join('tmp', jar_file)))
+        new_rb = File.join('tmp', jar_file)
+        FileUtils.copy(rb, new_rb)
+        gems_to_compile[jar_file] = new_rb
+      end
+      # Gather all the application files which the user wrote (not dependencies)
+      main_files_to_compile = config.compiled_ruby_files - config.excludes.to_a
+      main_files_to_compile.each do |f|
+        FileUtils.mkdir_p(File.dirname(File.join('tmp', f)))
+        FileUtils.copy(f, File.join('tmp', f))
+      end
+      main_files_to_compile = main_files_to_compile.inject({}) {|h,f| h.merge!(f => f) }
+      files.keys.each do |k|
+        # Update files list to point to the temporary file
+        files[k] = gems_to_compile[k] || main_files_to_compile[k] || files[k]
+      end
+      main_files_to_compile.merge(gems_to_compile)
     end
 
     # Apply the information in a Warbler::Config object in order to
@@ -133,7 +170,9 @@ module Warbler
 
     # Add gems to WEB-INF/gems
     def find_gems_files(config)
-      config.gems.specs(config.gem_dependencies).each {|spec| find_single_gem_files(config, spec) }
+      unless @compiled
+        config.gems.specs(config.gem_dependencies).each {|spec| find_single_gem_files(config, spec) }
+      end
     end
 
     # Add a single gem to WEB-INF/gems

@@ -176,6 +176,15 @@ describe Warbler::Jar do
         file_list(%r{^sample_jar/lib/sample_jar\.class$}).should be_empty
         jar.contents('sample_jar/lib/sample_jar.rb').should_not =~ /load __FILE__\.sub/
       end
+
+      it "compiles included gems as well" do
+        config.compiled_ruby_files = %w(lib/sample_jar.rb)
+        jar.compile(config)
+        jar.apply(config)
+        file_list(%r{sample_jar.*\.rb$}).size.should == 2
+        file_list(%r{gems.*\.class$}).size.should == 38
+      end
+
     end
 
     context "with a gemspec without a default executable" do
