@@ -92,6 +92,10 @@ module Warbler
       FileUtils.mkdir_p('tmp')
       # Gather all the files in the files list and copy them to the tmp directory
       gems_to_compile = files.select {|k, f| !f.is_a?(StringIO) && f =~ /\.rb$/ }
+      # 1.8.7 Support, convert back to hash
+      if gems_to_compile.is_a?(Array)
+        gems_to_compile = gems_to_compile.inject({}) {|h,z| h.merge!(z[0] => z[1]) }
+      end
       gems_to_compile.each do |jar_file, rb|
         FileUtils.mkdir_p(File.dirname(File.join('tmp', jar_file)))
         new_rb = File.join('tmp', jar_file)
