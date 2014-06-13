@@ -238,7 +238,7 @@ itself continues to support Ruby 1.8. However, many gems are choosing
 to drop 1.8 support; one of these gems is
 {rubyzip}(https://github.com/rubyzip/rubyzip), which Warbler relies
 on. If you need to use Warbler in a 1.8 environment, you will need to
-lock the `rubyzip` gem to a version before 1.0.0.
+lock the <tt>rubyzip</tt> gem to a version before 1.0.0.
 
 == Troubleshooting
 
