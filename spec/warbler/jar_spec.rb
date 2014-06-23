@@ -177,7 +177,8 @@ describe Warbler::Jar do
         jar.contents('sample_jar/lib/sample_jar.rb').should_not =~ /load __FILE__\.sub/
       end
 
-      it "compiles included gems as well" do
+      it "compiles included gems when compile_gems is true" do
+        config.compile_gems = true
         config.compiled_ruby_files = %w(lib/sample_jar.rb)
         jar.compile(config)
         jar.apply(config)
@@ -187,6 +188,19 @@ describe Warbler::Jar do
         else
           # 1.8.7 uses an older version of rubyzip and so the number of files compiled changes
           file_list(%r{gems.*\.class$}).size.should == 32
+        end
+      end
+
+      it "does not compile included gems by default" do
+        config.compiled_ruby_files = %w(lib/sample_jar.rb)
+        jar.compile(config)
+        jar.apply(config)
+        file_list(%r{sample_jar.*\.rb$}).size.should == 2
+        if RUBY_VERSION >= '1.9'
+          file_list(%r{gems.*\.class$}).size.should == 0
+        else
+          # 1.8.7 uses an older version of rubyzip and so the number of files compiled changes
+          file_list(%r{gems.*\.class$}).size.should == 0
         end
       end
 
@@ -1009,4 +1023,3 @@ describe Warbler::Jar do
     end
   end
 end
-

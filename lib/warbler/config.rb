@@ -116,6 +116,10 @@ module Warbler
     # compile all .rb files in the application.
     attr_accessor :compiled_ruby_files
 
+    # Determines if ruby files in supporting gems will be compiled.
+    # Ignored unless compile feature is used.
+    attr_accessor :compile_gems
+
     # Warbler writes an "init" file into the war at this location. JRuby-Rack and possibly other
     # launchers may use this to initialize the Ruby environment.
     attr_accessor :init_filename
@@ -204,6 +208,7 @@ module Warbler
       @script_files      = []
       @warbler_scripts = "#{WARBLER_HOME}/lib/warbler/scripts"
       @move_jars_to_webinf_lib = false
+      @compile_gems      = false
 
       before_configure
       yield self if block_given?

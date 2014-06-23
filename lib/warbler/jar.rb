@@ -41,9 +41,15 @@ module Warbler
       # option to configure what gets compiled?
       return if (config.compiled_ruby_files.nil? || config.compiled_ruby_files.empty?) && files.empty?
 
-      ruby_files = gather_all_rb_files(config)
-      run_javac(config, ruby_files)
-      replace_compiled_ruby_files(config, ruby_files)
+      if config.compile_gems
+        ruby_files = gather_all_rb_files(config)
+        run_javac(config, ruby_files.values)
+        replace_compiled_ruby_files_and_gems(config, ruby_files)
+      else
+        compiled_ruby_files = config.compiled_ruby_files - config.excludes.to_a
+        run_javac(config, compiled_ruby_files)
+        replace_compiled_ruby_files(config, compiled_ruby_files)
+      end
     end
 
     def run_javac(config, compiled_ruby_files)
@@ -53,7 +59,7 @@ module Warbler
         compat_version = ''
       end
       # Need to use the version of JRuby in the application to compile it
-      javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main #{compat_version} -S jrubyc \"#{compiled_ruby_files.values.join('" "')}\"}
+      javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main #{compat_version} -S jrubyc \"#{compiled_ruby_files.join('" "')}\"}
       if which('env')
         `env -i #{javac_cmd}`
       else
@@ -62,12 +68,22 @@ module Warbler
       raise "Compile failed" if $?.exitstatus > 0
       @compiled = true
     end
-    
+
     def java_version(config)
       config.bytecode_version ? "-Djava.specification.version=#{config.bytecode_version}" : ''
     end
 
     def replace_compiled_ruby_files(config, compiled_ruby_files)
+      # Exclude the rb files and recreate them. This
+      # prevents the original contents being used.
+      config.excludes += compiled_ruby_files
+
+      compiled_ruby_files.each do |ruby_source|
+        files[apply_pathmaps(config, ruby_source, :application)] = StringIO.new("load __FILE__.sub(/\.rb$/, '.class')")
+      end
+    end
+
+    def replace_compiled_ruby_files_and_gems(config, compiled_ruby_files)
       # Exclude the rb files and recreate them. This
       # prevents the original contents being used.
       config.excludes += compiled_ruby_files.keys
@@ -174,7 +190,7 @@ module Warbler
 
     # Add gems to WEB-INF/gems
     def find_gems_files(config)
-      unless @compiled
+      unless @compiled and config.compile_gems
         config.gems.specs(config.gem_dependencies).each {|spec| find_single_gem_files(config, spec) }
       end
     end
