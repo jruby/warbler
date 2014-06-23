@@ -75,7 +75,7 @@ module ExampleGroupHelpers
 
   def cleanup_temp_files(*except_files)
     after(:each) do
-      FileUtils.rm_rf FileList[*(["log", ".bundle", "tmp/war"] - except_files)]
+      FileUtils.rm_rf FileList[*(["log", ".bundle", "tmp"] - except_files)]
       FileUtils.rm_f  FileList[*(["*.war", "*.foobar", "**/config.ru", "*web.xml*", "config/web.xml*",
                                  "config/warble.rb", "file.txt", 'manifest', '*Gemfile*', 'MANIFEST.MF*', 'init.rb*',
                                  '**/*.class'] - except_files)]
@@ -94,7 +94,7 @@ module ExampleGroupHelpers
         ready, error = nil, nil
         300.times do # timeout 30 secs (300 * 0.1)
           begin
-            break if ready = drbclient.ready? 
+            break if ready = drbclient.ready?
           rescue DRb::DRbConnError => e
             error = e; sleep 0.1
           end
