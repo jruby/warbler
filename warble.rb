@@ -88,7 +88,11 @@ Warbler::Config.new do |config|
   # files will be compiled. Default is to compile all \.rb files in
   # the application.
   # config.compiled_ruby_files = FileList['app/**/*.rb']
-  
+
+  # Determines if ruby files in supporting gems will be compiled.
+  # Ignored unless compile feature is used.
+  # config.compile_gems = false
+
   # When set it specify the bytecode version for compiled class files
   # config.bytecode_version = "1.6"
 
@@ -97,9 +101,9 @@ Warbler::Config.new do |config|
   # GEM_HOME if it is set.
   # config.override_gem_home = true
 
-  # Allows for specifing custom executables 
+  # Allows for specifing custom executables
   # config.executable = ["rake", "bin/rake"]
-  
+
   # Sets default (prefixed) parameters for the executables
   # config.executable_params = "do:something"
 
