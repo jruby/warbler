@@ -176,6 +176,20 @@ describe Warbler::Jar do
         file_list(%r{^sample_jar/lib/sample_jar\.class$}).should be_empty
         jar.contents('sample_jar/lib/sample_jar.rb').should_not =~ /load __FILE__\.sub/
       end
+
+      it "compiles included gems as well" do
+        config.compiled_ruby_files = %w(lib/sample_jar.rb)
+        jar.compile(config)
+        jar.apply(config)
+        file_list(%r{sample_jar.*\.rb$}).size.should == 2
+        if RUBY_VERSION >= '1.9'
+          file_list(%r{gems.*\.class$}).size.should == 38
+        else
+          # 1.8.7 uses an older version of rubyzip and so the number of files compiled changes
+          file_list(%r{gems.*\.class$}).size.should == 32
+        end
+      end
+
     end
 
     context "with a gemspec without a default executable" do
