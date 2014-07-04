@@ -471,7 +471,7 @@ describe Warbler::Jar do
       mkdir_p "config"
       File.open("config/web.xml.erb", "w") {|f| f << "Hi <%= webxml.public.root %>" }
       jar.apply(config)
-      jar.files["WEB-INF/web.xml"].should_not be_nil
+      jar.files["WEB-INF/web.xml"].should_not be nil
       jar.files["WEB-INF/web.xml"].read.should == "Hi /"
     end
 

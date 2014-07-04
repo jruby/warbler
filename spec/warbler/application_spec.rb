@@ -45,10 +45,10 @@ describe Warbler::Application do
   end
 
   it "should copy a fresh config file into place" do
-    File.exists?("config/warble.rb").should_not be_true
+    File.exists?("config/warble.rb").should_not be true
     ARGV.unshift "config"
     silence { Warbler::Application.new.run }
-    File.exists?("config/warble.rb").should be_true
+    File.exists?("config/warble.rb").should be true
   end
 
   it "should refuse to copy over an existing config file" do
@@ -71,13 +71,13 @@ describe Warbler::Application do
     mkdir_p "lib/tasks/warbler"
     ARGV.unshift "pluginize"
     silence { Warbler::Application.new.run }
-    File.exist?("lib/tasks/warbler/warbler.rake").should_not be_true
+    File.exist?("lib/tasks/warbler/warbler.rake").should_not be true
   end
 
   it "should define a pluginize task for adding the tasks to a Rails application" do
     ARGV.unshift "pluginize"
     silence { Warbler::Application.new.run }
-    File.exist?("lib/tasks/warbler/warbler.rake").should be_true
+    File.exist?("lib/tasks/warbler/warbler.rake").should be true
   end
 
   it "should provide a means to load the project Rakefile" do

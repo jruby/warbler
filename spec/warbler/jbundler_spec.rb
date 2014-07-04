@@ -70,7 +70,7 @@ describe Warbler::Jar, "with JBundler" do
     it "does not include the jbundler gem (as it is in the development group)" do
       pending( "needs JRuby to work" ) unless defined? JRUBY_VERSION
       jar.apply(config)
-      config.gems.detect{|k,v| k.name == 'jbundler'}.should be_nil
+      config.gems.detect{|k,v| k.name == 'jbundler'}.should be nil
       file_list(/jbundler-/).should be_empty
     end
 

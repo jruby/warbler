@@ -156,7 +156,7 @@ describe Warbler::Jar, "with Bundler" do
 
     it "includes the bundler gem" do
       jar.apply(config)
-      config.gems.detect{|k,v| k.name == 'bundler'}.should_not be_nil
+      config.gems.detect{|k,v| k.name == 'bundler'}.should_not be nil
       file_list(/bundler-/).should_not be_empty
     end
 

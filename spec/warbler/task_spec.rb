@@ -138,7 +138,7 @@ describe Warbler::Task do
       class_file_bytes = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.class') {|io| io.read }
       java_class_header     = class_file_bytes[0..3]
       bytecode_version      = class_file_bytes[6..7]
-      
+
       java_class_header.should == java_class_magic_number
       bytecode_version.should == java6_version_bytes
     end
@@ -147,13 +147,13 @@ describe Warbler::Task do
   it "should delete .class files after finishing the jar" do
     config.features << "compiled"
     silence { run_task "warble" }
-    File.exist?('app/helpers/application_helper.class').should be_false
+    File.exist?('app/helpers/application_helper.class').should be false
   end
 
   context "where symlinks are available" do
     begin
       FileUtils.ln_s "README.txt", "r.txt.symlink", :verbose => false
-      
+
       it "should process symlinks by storing a file in the archive that has the same contents as the source" do
         File.open("config/special.txt", "wb") {|f| f << "special"}
         Dir.chdir("config") { FileUtils.ln_s "special.txt", "link.txt" }
@@ -169,9 +169,9 @@ describe Warbler::Task do
         Dir.chdir("lib") { FileUtils.ln_s "tasks", "rakelib" }
         silence { run_task "warble" }
         Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
-          zf.find_entry("WEB-INF/lib/tasks/utils.rake").should_not be_nil
-          zf.find_entry("WEB-INF/lib/rakelib/").should_not be_nil
-          zf.find_entry("WEB-INF/lib/rakelib/utils.rake").should_not be_nil if defined?(JRUBY_VERSION)
+          zf.find_entry("WEB-INF/lib/tasks/utils.rake").should_not be nil
+          zf.find_entry("WEB-INF/lib/rakelib/").should_not be nil
+          zf.find_entry("WEB-INF/lib/rakelib/utils.rake").should_not be nil if defined?(JRUBY_VERSION)
         end
       end
 
@@ -181,7 +181,7 @@ describe Warbler::Task do
   end
 
   context "with a Bundler Gemfile" do
-    
+
     run_out_of_process_with_drb if DRB = true
 
     after do
@@ -194,18 +194,18 @@ describe Warbler::Task do
 
     it "includes gems from the Gemfile" do
       File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
-      
+
       if DRB
         drbclient.run_task "warble"
         config = drbclient.config
       else
-       silence { run_task "warble" } 
+       silence { run_task "warble" }
       end
-      
+
       Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
         rspec = config.gems.keys.detect { |spec| spec.name == 'rspec' }
-        rspec.should_not be_nil, "expected rspec gem among: #{config.gems.keys.join(' ')}"
-        zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec.version}.gemspec").should_not be_nil
+        rspec.should_not be(nil), "expected rspec gem among: #{config.gems.keys.join(' ')}"
+        zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec.version}.gemspec").should_not be nil
       end
     end
   end
