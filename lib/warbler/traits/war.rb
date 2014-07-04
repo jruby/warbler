@@ -76,7 +76,7 @@ module Warbler
       def update_archive(jar)
         add_public_files(jar)
         add_webxml(jar)
-        move_jars_to_webinf_lib(jar) if config.move_jars_to_webinf_lib
+        move_jars_to_webinf_lib(jar, config.move_jars_to_webinf_lib)
         add_runnables(jar) if config.features.include?("runnable")
         add_executables(jar) if config.features.include?("executable")
         add_gemjar(jar) if config.features.include?("gemjar")
@@ -110,7 +110,7 @@ module Warbler
           jar.files["#{klass}.class"] = jar.entry_in_jar(WARBLER_JAR, "#{klass}.class")
         end
       end
-      
+
       def add_executables(jar)
         webserver = WEB_SERVERS[config.webserver.to_s]
         webserver.add(jar)
@@ -131,10 +131,14 @@ module Warbler
         gem_jar.create("tmp/gems.jar")
       end
 
-      def move_jars_to_webinf_lib(jar)
-        jar.files.keys.select {|k| k =~ /^WEB-INF\/.*\.jar$/ }.each do |k|
+      def move_jars_to_webinf_lib(jar, filter = nil)
+        return unless filter # default is false
+        filter = /.*/ if filter == true # move all if not a RegExp given
+        jar.files.keys.select { |k| k =~ /^WEB-INF\/.*\.jar$/ }.each do |k|
+          next unless filter =~ File.basename(k)
           next if k =~ /^WEB-INF\/lib\/([^\/]+)\.jar$/ # skip jars already in WEB-INF/lib
-          jar.files["WEB-INF/lib/#{k.sub('WEB-INF','')[1..-1].gsub(/[\/\\]/,'-')}"] = jar.files[k]
+          name = k.sub('WEB-INF', '')[1..-1].gsub(/[\/\\]/, '-')
+          jar.files["WEB-INF/lib/#{name}"] = jar.files[k]
           jar.files[k] = empty_jar
         end
       end
@@ -155,7 +159,7 @@ module Warbler
 
       # Helper class for holding arbitrary config.webxml values for injecting into +web.xml+.
       class WebxmlOpenStruct < OpenStruct
-        
+
         %w(java com org javax gem).each do |name|
           class_eval "def #{name}; method_missing(:#{name}); end"
         end

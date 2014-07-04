@@ -622,6 +622,30 @@ describe Warbler::Jar do
           file_list(%r{WEB-INF/app/sample.jar}).should_not be_empty
         end
       end
+
+      context "with move_jars_to_webinf_lib set to pattern" do
+        before :each do
+          use_config do |config|
+            config.move_jars_to_webinf_lib = /sample/
+          end
+        end
+
+        before :each do
+          touch FileList["app/another.jar", "app/sample2.jar"]
+        end
+        after :each do
+          rm_f FileList["app/another.jar", "app/sample2.jar"]
+        end
+
+        it "moves jar files that match to WEB-INF/lib" do
+          jar.apply(config)
+          file_list(%r{WEB-INF/lib/app-sample.jar}).should_not be_empty
+          file_list(%r{WEB-INF/lib/app-sample2.jar}).should_not be_empty
+          file_list(%r{WEB-INF/lib/.*?another.jar}).should be_empty
+        end
+
+      end
+
     end
 
     context "with the executable feature" do
