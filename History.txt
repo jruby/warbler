@@ -1,3 +1,10 @@
+== 1.4.4
+- #273: filtering support with `config.move_jars_to_webinf_lib`
+- #270: don't swallow compiler errors with backticks
+- #265: Compile feature only compiles application sources (not gems)
+- #264: JBundler with compiled feature crashes with java.lang.ClassNotFoundException: org.jruby.Main
+- #269: Argument list too long
+
 == 1.4.3
 - Fixed a bug w/ symlinks that was introduced around jruby-1.7.10
 - #258: Bytecode version option for compiled class files
