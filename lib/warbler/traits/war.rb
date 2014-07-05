@@ -131,19 +131,19 @@ module Warbler
         gem_jar.create("tmp/gems.jar")
       end
 
-      def move_jars_to_webinf_lib(jar, filter = nil)
-        return unless filter # default is false
-        filter = /.*/ if filter == true # move all if not a RegExp given
+      def move_jars_to_webinf_lib(jar, selector = nil)
+        return unless selector # default is false
+        selector = /.*/ if selector == true # move all if not a RegExp given
         default_jars = default_jar_files.map { |file| File.basename(file) }
         jar.files.keys.select { |k| k =~ /^WEB-INF\/.*\.jar$/ }.each do |k|
           if k.start_with?('WEB-INF/lib/') # .jar already in WEB-INF/lib
             if default_jars.include? k.sub('WEB-INF/lib/', '')
-              # exclude default jar (if it's not matched by filter) :
-              jar.files.delete(k) unless filter =~ File.basename(k)
+              # exclude default jar (if it's not matched by selector) :
+              jar.files.delete(k) unless selector =~ File.basename(k)
             end
             next
           end
-          next unless filter =~ File.basename(k)
+          next unless selector =~ File.basename(k)
           name = k.sub('WEB-INF', '')[1..-1].gsub(/[\/\\]/, '-')
           jar.files["WEB-INF/lib/#{name}"] = jar.files[k]
           jar.files[k] = empty_jar

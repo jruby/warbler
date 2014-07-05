@@ -110,6 +110,9 @@ Warbler::Config.new do |config|
   # If set to true, moves jar files into WEB-INF/lib. Prior to version 1.4.2 of Warbler this was done
   # by default. But since 1.4.2 this config defaults to false. It may need to be set to true for
   # web servers that do not explode the WAR file.
+  # Alternatively, this option can be set to a regular expression, which will
+  # act as a jar selector -- only jar files that match the pattern will be 
+  # included in the archive.
   # config.move_jars_to_webinf_lib = false
 
   # === War files only below here ===
