@@ -308,10 +308,18 @@ public class WarMain extends JarMain {
 
     protected void initJRubyScriptingEnv(Object scriptingContainer, final URL[] jars) throws Exception {
         String jrubyStdlibJar = "";
+        String bcpkixJar = "";
+        String bcprovJar = "";
         for (URL url : jars) {
             if (url.toString().matches("file:/.*jruby-stdlib-.*jar")) {
                 jrubyStdlibJar = url.toString();
                 debug("using jruby-stdlib: " + jrubyStdlibJar);
+            } else if (url.toString().matches("file:/.*bcpkix-jdk15on-.*jar")) {
+                bcpkixJar = url.toString();
+                debug("using bcpkix: " + bcpkixJar);
+            } else if (url.toString().matches("file:/.*bcprov-jdk15on-.*jar")) {
+                bcprovJar = url.toString();
+                debug("using bcprov: " + bcprovJar);
             }
         }
 
@@ -323,13 +331,8 @@ public class WarMain extends JarMain {
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/shared\"\n" +
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/#{ruby}\"\n" +
             "if jruby_major_version >= 1.7\n" +
-            "  if jruby_minor_version >= 5\n" +
-            "    require 'bcpkix-jdk15on-1.47.jar'\n" +
-            "    require 'bcprov-jdk15on-1.47.jar'\n" +
-            "  else\n" +
-            "    require 'bcpkix-jdk15on-147.jar'\n" +
-            "    require 'bcprov-jdk15on-147.jar'\n" +
-            "  end\n" +
+            "  require \"" + bcpkixJar + "\".gsub('file:', '')\n" +
+            "  require \"" + bcprovJar + "\".gsub('file:', '')\n" +
             "end");
 
         invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
