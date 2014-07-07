@@ -1,4 +1,5 @@
 == 1.4.4
+- #271: LoadError while excute rake command with runnable .war archive
 - #273: filtering support with `config.move_jars_to_webinf_lib`
 - #270: don't swallow compiler errors with backticks
 - #265: Compile feature only compiles application sources (not gems)
