@@ -80,7 +80,7 @@ describe Warbler::Jar, "with Bundler" do
         end
         jar.apply(config)
         jar.create('foo.war')
-        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake asdf')
+        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake -T')
         wait_thr.value.success?.should be(true), stderr.readlines.join
       end
     end
@@ -98,7 +98,7 @@ describe Warbler::Jar, "with Bundler" do
         end
         jar.apply(config)
         jar.create('foo.war')
-        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake asdf')
+        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake -T')
         wait_thr.value.success?.should be(true), stderr.readlines.join
       end
     end

@@ -331,8 +331,8 @@ public class WarMain extends JarMain {
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/shared\"\n" +
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/#{ruby}\"\n" +
             "if jruby_major_version >= 1.7\n" +
-            "  require \"" + bcpkixJar + "\".gsub('file:', '')\n" +
-            "  require \"" + bcprovJar + "\".gsub('file:', '')\n" +
+            "  require \"" + bcpkixJar + "\".gsub('file:', '') unless \"" + bcpkixJar + "\".empty?\n" +
+            "  require \"" + bcprovJar + "\".gsub('file:', '') unless \"" + bcprovJar + "\".empty?\n" +
             "end");
 
         invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
