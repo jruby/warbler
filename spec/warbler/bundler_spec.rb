@@ -6,6 +6,7 @@
 #++
 
 require File.expand_path('../../spec_helper', __FILE__)
+require 'open3'
 
 describe Warbler::Jar, "with Bundler" do
   use_fresh_rake_application
@@ -79,8 +80,8 @@ describe Warbler::Jar, "with Bundler" do
         end
         jar.apply(config)
         jar.create('foo.war')
-        `java -jar foo.war -S rake -T`
-        $?.exitstatus.should == 0
+        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake asdf')
+        wait_thr.value.success?.should be(true), stderr.readlines.join
       end
     end
 
@@ -97,8 +98,8 @@ describe Warbler::Jar, "with Bundler" do
         end
         jar.apply(config)
         jar.create('foo.war')
-        `java -jar foo.war -S rake -T`
-        $?.exitstatus.should == 0
+        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake asdf')
+        wait_thr.value.success?.should be(true), stderr.readlines.join
       end
     end
 
