@@ -85,24 +85,6 @@ describe Warbler::Jar, "with Bundler" do
       end
     end
 
-    context 'with a standard Gemfile' do
-      before do
-        File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngem 'bouncy-castle-java'\n"}
-        `#{RUBY_EXE} -S bundle install --local`
-      end
-
-      it "can run commands in the generated warfile" do
-        use_config do |config|
-          config.features = %w{runnable}
-          config.override_gem_home = false
-        end
-        jar.apply(config)
-        jar.create('foo.war')
-        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake -T')
-        wait_thr.value.success?.should be(true), stderr.readlines.join
-      end
-    end
-
     it "bundles only the gemspec for :git entries that are excluded" do
       File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\nend\n"}
       `#{RUBY_EXE} -S bundle install --local`
