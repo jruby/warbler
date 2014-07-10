@@ -330,7 +330,7 @@ public class WarMain extends JarMain {
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/#{ruby}/site_ruby\"\n" +
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/shared\"\n" +
             "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/#{ruby}\"\n" +
-            "if jruby_major_version >= 1.7\n" +
+            "if jruby_major_version >= 1.7 and jruby_minor_version < 13\n" +
             "  require \"" + bcpkixJar + "\".gsub('file:', '') unless \"" + bcpkixJar + "\".empty?\n" +
             "  require \"" + bcprovJar + "\".gsub('file:', '') unless \"" + bcprovJar + "\".empty?\n" +
             "end");
