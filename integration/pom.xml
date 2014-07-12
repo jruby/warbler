@@ -18,7 +18,7 @@
   <properties>
     <version.jruby-maven-plugins>1.0.0-rc</version.jruby-maven-plugins>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jruby.version>1.7.12</jruby.version>
+    <jruby.version>1.7.13</jruby.version>
     <!-- prereleased gems ARE snapshots -->
     <warbler.version>1.4.4.dev-SNAPSHOT</warbler.version>
     <gem.home>${session.executionRootDirectory}/target/rubygems</gem.home>
@@ -146,16 +146,13 @@
             <jrubyVersion>${jruby.version}</jrubyVersion>
           </configuration>
           <executions>
-
             <execution>
               <id>bundle-install</id>
-              
-	      <goals><goal>jruby</goal></goals>
+	            <goals><goal>jruby</goal></goals>
               <configuration>
                 <args>-C ${basedir}/src/main/ruby -S ${gem.home}/bin/bundle install</args>
               </configuration>
             </execution>
-	     
             <execution>
               <id>create-war</id>
               <goals><goal>jruby</goal></goals>
