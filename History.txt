@@ -5,6 +5,9 @@
 - #265: Compile feature only compiles application sources (not gems)
 - #264: JBundler with compiled feature crashes with java.lang.ClassNotFoundException: org.jruby.Main
 - #269: Argument list too long
+- #236: Adds comment hinting at how to put a display name in web.xml.erb file.
+- #275: for jruby-1.7.13 we do not want to force load bouncy-castle jars
+- #276: unnecessary rubyzip dependency on "< 1.1"
 
 == 1.4.3
 - Fixed a bug w/ symlinks that was introduced around jruby-1.7.10
