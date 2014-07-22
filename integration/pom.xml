@@ -20,7 +20,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jruby.version>1.7.13</jruby.version>
     <!-- prereleased gems ARE snapshots -->
-    <warbler.version>1.4.4.dev-SNAPSHOT</warbler.version>
+    <warbler.version>1.4.4-SNAPSHOT</warbler.version>
     <gem.home>${session.executionRootDirectory}/target/rubygems</gem.home>
     <gem.path>${session.executionRootDirectory}/target/rubygems</gem.path>
   </properties>
