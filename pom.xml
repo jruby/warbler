@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>rubygems</groupId>
   <artifactId>warbler</artifactId>
-  <version>1.4.4-SNAPSHOT</version>
+  <version>1.4.5.dev-SNAPSHOT</version>
   <packaging>gem</packaging>
   <name>Warbler chirpily constructs .war files of your Rails applications.</name>
   <description>Warbler is a gem to make a Java jar or war file out of any Ruby,
