@@ -25,15 +25,15 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class JarMain implements Runnable {
-    
+
     static final String MAIN = "/" + JarMain.class.getName().replace('.', '/') + ".class";
 
     final boolean debug = isDebug();
-    
+
     protected final String[] args;
     protected final String archive;
     private final String path;
-    
+
     protected File extractRoot;
 
     protected URLClassLoader classLoader;
@@ -43,15 +43,15 @@ public class JarMain implements Runnable {
         URL mainClass = getClass().getResource(MAIN);
         try {
             this.path = mainClass.toURI().getSchemeSpecificPart();
-        } 
+        }
         catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
         archive = this.path.replace("!" + MAIN, "").replace("file:", "");
-        
+
         Runtime.getRuntime().addShutdownHook(new Thread(this));
     }
-    
+
     protected URL[] extractArchive() throws Exception {
         final JarFile jarFile = new JarFile(archive);
         try {
@@ -65,12 +65,12 @@ public class JarMain implements Runnable {
             extractRoot = File.createTempFile("jruby", "extract");
             extractRoot.delete(); extractRoot.mkdirs();
 
-            final List<URL> urls = new ArrayList<URL>();
+            final List<URL> urls = new ArrayList<URL>(jarNames.size());
             for (Map.Entry<String, JarEntry> e : jarNames.entrySet()) {
                 URL entryURL = extractEntry(e.getValue(), e.getKey());
                 if (entryURL != null) urls.add( entryURL );
             }
-            return (URL[]) urls.toArray(new URL[urls.size()]);
+            return urls.toArray(new URL[urls.size()]);
         }
         finally {
             jarFile.close();
@@ -84,18 +84,18 @@ public class JarMain implements Runnable {
         }
         return null; // do not extract entry
     }
-    
+
     protected URL extractEntry(final JarEntry entry, final String path) throws Exception {
         final File file = new File(extractRoot, path);
         if ( entry.isDirectory() ) {
-            file.mkdirs(); 
+            file.mkdirs();
             return null;
         }
         final String entryPath = entryPath(entry.getName());
         final InputStream entryStream;
         try {
             entryStream = new URI("jar", entryPath, null).toURL().openStream();
-        } 
+        }
         catch (IllegalArgumentException e) {
             // TODO gems '%' file name "encoding" ?!
             debug("failed to open jar:" + entryPath + " skipping entry: " + entry.getName(), e);
@@ -110,7 +110,7 @@ public class JarMain implements Runnable {
             while ((bytesRead = entryStream.read(buf)) != -1) {
                 outStream.write(buf, 0, bytesRead);
             }
-        } 
+        }
         finally {
             entryStream.close();
             outStream.close();
@@ -135,7 +135,7 @@ public class JarMain implements Runnable {
         invokeMethod(scriptingContainer, "setClassLoader", new Class[] { ClassLoader.class }, classLoader);
         return scriptingContainer;
     }
-    
+
     protected int launchJRuby(final URL[] jars) throws Exception {
         final Object scriptingContainer = newScriptingContainer(jars);
         debug("invoking " + archive + " with: " + Arrays.deepToString(args));
@@ -144,7 +144,7 @@ public class JarMain implements Runnable {
     }
 
     protected String launchScript() {
-        return 
+        return
         "begin\n" +
         "  require 'META-INF/init.rb'\n" +
         "  require 'META-INF/main.rb'\n" +
@@ -153,7 +153,7 @@ public class JarMain implements Runnable {
         "  e.status\n" +
         "end";
     }
-    
+
     protected int start() throws Exception {
         final URL[] jars = extractArchive();
         return launchJRuby(jars);
@@ -168,10 +168,23 @@ public class JarMain implements Runnable {
         if (debug && t != null) t.printStackTrace(System.out);
     }
 
+    protected static void debug(Throwable t) {
+        if (isDebug()) t.printStackTrace(System.out);
+    }
+
     protected void warn(String msg) {
         System.out.println("WARNING: " + msg);
     }
-    
+
+    protected static void error(Throwable t) {
+        error(t.toString(), t);
+    }
+
+    protected static void error(String msg, Throwable t) {
+        System.err.println("ERROR: " + msg);
+        debug(t);
+    }
+
     protected void delete(File f) {
         try {
           if (f.isDirectory() && !isSymlink(f)) {
@@ -181,22 +194,19 @@ public class JarMain implements Runnable {
               }
           }
           f.delete();
-        } catch (IOException e) {
-            System.err.println("error: " + e.toString());
         }
+        catch (IOException e) { error(e); }
     }
 
     protected boolean isSymlink(File file) throws IOException {
-      if (file == null)
-        throw new NullPointerException("File must not be null");
-      File canon;
-      if (file.getParent() == null) {
-        canon = file;
-      } else {
-        File canonDir = file.getParentFile().getCanonicalFile();
-        canon = new File(canonDir, file.getName());
-      }
-      return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
+        if (file == null) throw new NullPointerException("File must not be null");
+        final File canonical;
+        if ( file.getParent() == null ) canonical = file;
+        else {
+            File parentDir = file.getParentFile().getCanonicalFile();
+            canonical = new File(parentDir, file.getName());
+        }
+        return ! canonical.getCanonicalFile().equals( canonical.getAbsoluteFile() );
     }
 
     public void run() {
@@ -204,10 +214,8 @@ public class JarMain implements Runnable {
         try {
             invokeMethod(classLoader, "close");
         }
-        catch(NoSuchMethodException e) { } // We're not being run on Java >= 7
-        catch(Exception e) {
-            System.err.println("error: " + e.toString());
-        }
+        catch (NoSuchMethodException e) { } // We're not being run on Java >= 7
+        catch (Exception e) { error(e); }
 
         if ( extractRoot != null ) delete(extractRoot);
     }
@@ -219,29 +227,27 @@ public class JarMain implements Runnable {
     protected static void doStart(final JarMain main) {
         try {
             int exit = main.start();
-            if(isSystemExitEnabled()) System.exit(exit);
-        } catch (Exception e) {
-            System.err.println("error: " + e.toString());
+            if (isSystemExitEnabled()) System.exit(exit);
+        }
+        catch (Exception e) {
             Throwable t = e;
-            while (t.getCause() != null && t.getCause() != t) {
+            while ( t.getCause() != null && t.getCause() != t ) {
                 t = t.getCause();
             }
-            if (isDebug()) {
-                t.printStackTrace();
-            }
+            error(e.toString(), t);
             System.exit(1);
         }
     }
-    
-    protected static Object invokeMethod(final Object self, final String name, final Object... args) 
+
+    protected static Object invokeMethod(final Object self, final String name, final Object... args)
         throws NoSuchMethodException, IllegalAccessException, Exception {
-        
+
         final Class[] signature = new Class[args.length];
         for ( int i = 0; i < args.length; i++ ) signature[i] = args[i].getClass();
         return invokeMethod(self, name, signature, args);
     }
 
-    protected static Object invokeMethod(final Object self, final String name, final Class[] signature, final Object... args) 
+    protected static Object invokeMethod(final Object self, final String name, final Class[] signature, final Object... args)
         throws NoSuchMethodException, IllegalAccessException, Exception {
         Method method = self.getClass().getDeclaredMethod(name, signature);
         try {
@@ -255,7 +261,7 @@ public class JarMain implements Runnable {
             throw e;
         }
     }
-    
+
     static boolean isDebug() {
         return Boolean.getBoolean("warbler.debug");
     }
