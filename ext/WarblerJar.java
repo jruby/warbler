@@ -37,8 +37,9 @@ public class WarblerJar {
     }
 
     @JRubyMethod
-    public static IRubyObject create_jar(ThreadContext context, IRubyObject recv, IRubyObject jar_path, IRubyObject entries) {
-        final Ruby runtime = recv.getRuntime();
+    public static IRubyObject create_jar(ThreadContext context, IRubyObject self,
+        IRubyObject jar_path, IRubyObject entries) {
+        final Ruby runtime = context.runtime;
 
         if (!(entries instanceof RubyHash)) {
             throw runtime.newArgumentError("expected a hash for the second argument");
@@ -56,7 +57,7 @@ public class WarblerJar {
             }
         } catch (IOException e) {
             if (runtime.isDebug()) {
-                e.printStackTrace();
+                e.printStackTrace(runtime.getOut());
             }
             throw runtime.newIOErrorFromException(e);
         }
@@ -65,8 +66,9 @@ public class WarblerJar {
     }
 
     @JRubyMethod
-    public static IRubyObject entry_in_jar(ThreadContext context, IRubyObject recv, IRubyObject jar_path, IRubyObject entry) {
-        final Ruby runtime = recv.getRuntime();
+    public static IRubyObject entry_in_jar(ThreadContext context, IRubyObject self,
+        IRubyObject jar_path, IRubyObject entry) {
+        final Ruby runtime = context.runtime;
         try {
             InputStream entryStream = getStream(jar_path.convertToString().getUnicodeValue(),
                                                 entry.convertToString().getUnicodeValue());
@@ -84,7 +86,7 @@ public class WarblerJar {
             }
         } catch (IOException e) {
             if (runtime.isDebug()) {
-                e.printStackTrace();
+                e.printStackTrace(runtime.getOut());
             }
             throw runtime.newIOErrorFromException(e);
         }
@@ -120,7 +122,7 @@ public class WarblerJar {
                 try {
                     zip.putNextEntry(new ZipEntry(entryName));
                     byte[] buf = new byte[16384];
-                    int bytesRead = -1;
+                    int bytesRead;
                     while ((bytesRead = inFile.read(buf)) != -1) {
                         zip.write(buf, 0, bytesRead);
                     }
@@ -181,7 +183,7 @@ public class WarblerJar {
         entry = trimTrailingSlashes(entry);
 
         ZipInputStream jstream = new ZipInputStream(jar);
-        ZipEntry zentry = null;
+        ZipEntry zentry;
         while ((zentry = jstream.getNextEntry()) != null) {
             if (trimTrailingSlashes(zentry.getName()).equals(entry)) {
                 return jstream;
