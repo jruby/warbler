@@ -1,12 +1,13 @@
 module Warbler
   class WebServer
     class Artifact < Struct.new(:repo, :group_id, :artifact_id, :version)
+
       def path_fragment
         @path_fragment ||= "#{group_id.gsub('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.jar"
       end
 
       def cached_path
-        @cached_path ||= File.expand_path("~/.m2/repository/#{path_fragment}")
+        @cached_path ||= File.join(local_repository, path_fragment)
       end
 
       def download_url
@@ -33,6 +34,11 @@ module Warbler
         end
         cached_path
       end
+
+      def local_repository
+        File.expand_path('~/.m2/repository')
+      end
+
     end
 
     def add(jar)
@@ -90,9 +96,9 @@ PROPS
     end
   end
 
-  WEB_SERVERS = Hash.new {|h,k| h["jenkins-ci.winstone"] }
-  WEB_SERVERS.update({ "winstone" => WinstoneServer.new,
-                       "jenkins-ci.winstone" => JenkinsWinstoneServer.new,
-                       "jetty" => JettyServer.new
-                     })
+  WEB_SERVERS = Hash.new { |hash,_| hash['jetty'] }
+  WEB_SERVERS['winstone'] = WinstoneServer.new
+  WEB_SERVERS['jenkins-ci.winstone'] = JenkinsWinstoneServer.new,
+  WEB_SERVERS['jetty'] = JettyServer.new
+
 end
