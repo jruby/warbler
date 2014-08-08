@@ -1,8 +1,8 @@
 <% assignment_operator = config.override_gem_home ? "=" : "||=" %>
 if $servlet_context.nil?
-  ENV['GEM_HOME'] <%= assignment_operator %> File.expand_path('../../WEB-INF', __FILE__)
+  ENV['GEM_HOME'] <%= assignment_operator %> File.expand_path(File.join('..', '..', '<%= config.gem_path %>'), __FILE__)
 <% if config.bundler && config.bundler[:gemfile_path] %>
-  ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../<%= config.bundler[:gemfile_path] %>', __FILE__)
+  ENV['BUNDLE_GEMFILE'] ||= File.expand_path(File.join('..', '..', '<%= config.bundler[:gemfile_path] %>'), __FILE__)
 <% end %>
 else
   ENV['GEM_HOME'] <%= assignment_operator %> $servlet_context.getRealPath('<%= config.gem_path %>')
