@@ -1,3 +1,6 @@
+== 1.4.5
+- #282: Wrong default GEM_HOME in generated META-INF/init.rb
+
 == 1.4.4
 - #271: LoadError while excute rake command with runnable .war archive
 - #273: filtering support with `config.move_jars_to_webinf_lib`
