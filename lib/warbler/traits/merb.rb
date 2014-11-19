@@ -15,8 +15,8 @@ module Warbler
         File.exist?("config/init.rb")
       end
 
-      def self.requires?(trait)
-        trait == Traits::War
+      def self.requirements
+        [ Traits::War ]
       end
 
       def before_configure

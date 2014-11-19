@@ -17,8 +17,8 @@ module Warbler
         File.exist?(ENV['BUNDLE_GEMFILE'] || "Gemfile")
       end
 
-      def self.requires?(trait)
-        trait == Traits::War || trait == Traits::Jar
+      def self.requirements
+        [ Traits::War, Traits::Jar ]
       end
 
       def before_configure

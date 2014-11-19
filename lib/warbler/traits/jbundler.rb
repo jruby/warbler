@@ -17,8 +17,8 @@ module Warbler
         File.exist?(ENV['JBUNDLE_JARFILE'] || "Jarfile")
       end
 
-      def self.requires?(trait)
-        trait == Traits::War || trait == Traits::Jar
+      def self.requirements
+        [ Traits::War, Traits::Jar ]
       end
 
       def before_configure

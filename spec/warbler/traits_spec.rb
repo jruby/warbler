@@ -9,9 +9,13 @@ require File.expand_path('../../spec_helper', __FILE__)
 
 describe Warbler::Traits do
   it "are ordered by fewer dependencies first" do
-    traits = [Warbler::Traits::War, Warbler::Traits::Bundler, Warbler::Traits::Rails]
-    result = traits.shuffle.sort
-    result.index(Warbler::Traits::War).should < result.index(Warbler::Traits::Bundler)
-    result.index(Warbler::Traits::War).should < result.index(Warbler::Traits::Rails)
+    traits = Warbler::TraitsDependencyArray.new( Warbler::Traits.constants.map {|t| Warbler::Traits.const_get(t)})
+    result = traits.shuffle!.tsort
+
+    result.each do |trait|
+      trait.requirements.each do |requirement|
+        result.index(requirement).should < result.index(trait)
+      end
+    end
   end
 end

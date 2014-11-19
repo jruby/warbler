@@ -6,6 +6,7 @@
 #++
 
 require 'stringio'
+require 'tsort'
 
 module Warbler
   # Traits are project configuration characteristics that correspond
@@ -21,7 +22,7 @@ module Warbler
     end
 
     def auto_detect_traits
-      Traits.constants.map {|t| Traits.const_get(t)}.select {|tc| tc.detect? }.sort
+      TraitsDependencyArray.new(Traits.constants.map {|t| Traits.const_get(t)}).tsort.select {|tc| tc.detect? }
     end
 
     def before_configure
@@ -49,12 +50,8 @@ module Warbler
   # Each trait class includes this module to receive shared functionality.
   module Trait
     module ClassMethods
-      def <=>(o)
-        requires?(o) ? 1 : (o.requires?(self) ? -1 : 0)
-      end
-
-      def requires?(t)
-        false
+      def requirements
+        []
       end
     end
 
@@ -103,6 +100,16 @@ module Warbler
       FileList[JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path]
     end
   end
+
+  class TraitsDependencyArray < Array
+    include TSort
+
+    alias tsort_each_node each
+    def tsort_each_child(node, &block)
+      node.requirements.each(&block)
+    end
+  end
+
 end
 
 require 'warbler/traits/jar'

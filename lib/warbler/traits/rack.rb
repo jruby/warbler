@@ -15,8 +15,8 @@ module Warbler
         !Rails.detect? && (File.exist?("config.ru") || !Dir['*/config.ru'].empty?)
       end
 
-      def self.requires?(trait)
-        trait == Traits::War
+      def self.requirements
+        [ Traits::War ]
       end
 
       def before_configure
