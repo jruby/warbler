@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+  <profiles>
+    <profile>
+      <id>codehaus</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>codehaus</id>
+          <name>Codehaus Repository</name>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <url>http://repository.codehaus.org</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <localRepository>/usr/local/maven/repo</localRepository>
+</settings>

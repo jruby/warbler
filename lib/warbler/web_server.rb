@@ -35,8 +35,44 @@ module Warbler
         cached_path
       end
 
+      @@local_repository = nil
+
       def local_repository
-        File.expand_path('~/.m2/repository')
+        @@local_repository ||= begin
+          m2_home = File.join(user_home, '.m2')
+          if File.exist?(settings = File.join(m2_home, 'settings.xml'))
+            local_repo = detect_local_repository(settings)
+          end
+          if local_repo.nil? && mvn_home = ENV['M2_HOME'] || ENV['MAVEN_HOME']
+            if File.exist?(settings = File.join(mvn_home, 'conf/settings.xml'))
+              local_repo = detect_local_repository(settings)
+            end
+          end
+          local_repo || File.join(m2_home, 'repository')
+        end
+      end
+
+      private
+
+      def user_home
+        ENV[ 'HOME' ] || begin
+          user_home = Dir.home if Dir.respond_to?(:home)
+          unless user_home
+            user_home = ENV_JAVA[ 'user.home' ] if Object.const_defined?(:ENV_JAVA)
+          end
+          user_home
+        end
+      end
+
+      def detect_local_repository(settings); require 'rexml/document'
+        doc = REXML::Document.new( File.read( settings ) )
+        if local_repo = doc.root.elements['localRepository']
+          if ( local_repo = local_repo.first )
+            local_repo = local_repo.value
+            local_repo = nil if local_repo.empty?
+          end
+        end
+        local_repo
       end
 
     end
