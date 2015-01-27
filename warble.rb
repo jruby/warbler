@@ -80,6 +80,12 @@ Warbler::Config.new do |config|
   # of the project directory.
   # config.jar_name = "mywar"
 
+  # File extension for the archive. Defaults to either 'jar' or 'war'.
+  # config.jar_extension = "jar"
+
+  # Destionation for the created archive. Defaults to project's root directory.
+  # config.autodeploy_dir = "dist/"
+
   # Name of the MANIFEST.MF template for the war file. Defaults to a simple
   # MANIFEST.MF that contains the version of Warbler used to create the war file.
   # config.manifest_file = "config/MANIFEST.MF"
