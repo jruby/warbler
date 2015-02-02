@@ -1,5 +1,10 @@
 == 1.4.5
 - #282: Wrong default GEM_HOME in generated META-INF/init.rb
+- #305: warbler.rb: Document jar_extension, autodeploy_dir options
+- #304: enable ENV['RACK_ENV'] to honor command line environment variable
+- #296: Use a topological sort to order traits by requirements.
+- #291: Include most current gem version in README
+- #280: config.webserver = 'jetty' (by default)
 
 == 1.4.4
 - #271: LoadError while excute rake command with runnable .war archive
