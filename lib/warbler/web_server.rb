@@ -134,7 +134,7 @@ PROPS
 
   WEB_SERVERS = Hash.new { |hash,_| hash['jetty'] }
   WEB_SERVERS['winstone'] = WinstoneServer.new
-  WEB_SERVERS['jenkins-ci.winstone'] = JenkinsWinstoneServer.new,
+  WEB_SERVERS['jenkins-ci.winstone'] = JenkinsWinstoneServer.new
   WEB_SERVERS['jetty'] = JettyServer.new
 
 end
