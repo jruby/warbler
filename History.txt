@@ -1,3 +1,7 @@
+== Master
+- #311: Don't clear the environment if a java executable is found
+- #268: Compile's clearing of ENV vars makes it impossible to use custom compile vars
+
 == 1.4.5
 - #282: Wrong default GEM_HOME in generated META-INF/init.rb
 - #305: warbler.rb: Document jar_extension, autodeploy_dir options
