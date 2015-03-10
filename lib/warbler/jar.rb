@@ -62,7 +62,7 @@ module Warbler
       compiled_ruby_files.each_slice(2500) do |slice|
         # Need to use the version of JRuby in the application to compile it
         javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main #{compat_version} -S jrubyc \"#{slice.join('" "')}\"}
-        if which('env')
+        if which('java').nil? && which('env')
           system %Q{env -i #{javac_cmd}}
         else
           system javac_cmd
