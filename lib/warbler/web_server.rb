@@ -117,7 +117,7 @@ PROPS
     def initialize
       @artifact = Artifact.new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
                                "org.jruby.warbler", "warbler-embedded-jetty",
-                               ENV["WEBSERVER_VERSION"] || "1.0.0")
+                               ENV["WEBSERVER_VERSION"] || "2.0.0")
     end
 
     def add(jar)

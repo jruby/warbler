@@ -73,7 +73,7 @@ deployment to a Java environment.</description>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>8.1.9.v20130131</version>
+      <version>9.2.10.v20150310</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

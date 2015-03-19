@@ -1,7 +1,6 @@
 
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
@@ -27,9 +26,9 @@ public class JettyWarMain {
         webapp.setDefaultsDescriptor(webdefaultPath());
 
         Server server = new Server();
-        Connector connector = new SelectChannelConnector();
+        ServerConnector connector = new ServerConnector(server);
         connector.setPort(Integer.getInteger("jetty.port",8080).intValue());
-        server.setConnectors(new Connector[]{connector});
+        server.addConnector(connector);
         server.setHandler(webapp);
         server.start();
         server.join();
