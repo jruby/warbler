@@ -12,7 +12,7 @@ properties( 'tesla.dump.pom' => 'pom.xml',
 # dependencies needed for compilation
 scope :provided do
   jar 'org.jruby:jruby', '1.7.8'
-  jar 'org.eclipse.jetty:jetty-webapp', '8.1.9.v20130131'
+  jar 'org.eclipse.jetty:jetty-webapp', '9.2.10.v20150310'
 end
 
 plugin :compiler, '3.1', :source => '1.5', :target => '1.5'
