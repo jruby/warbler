@@ -1,8 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
   <groupId>org.jruby.warbler</groupId>
   <artifactId>warbler-embedded-jetty</artifactId>
-  <version>2.0.0</version>
+  <version>2.0.0-SNAPSHOT</version>
   <name>Warbler Embedded Jetty</name>
   <description>An all-in-one-jar embedded Jetty server for use with Warbler's "warble executable war".</description>
   <url>http://github.com/jruby/warbler/</url>
@@ -10,38 +17,36 @@
     <jetty.version>9.2.10.v20150310</jetty.version>
   </properties>
 
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://github.com/jruby/warbler/blob/master/LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
   <distributionManagement>
-    <repository>
-      <id>codehaus-jruby-repository</id>
-      <name>JRuby Central Repository</name>
-      <url>dav:https://dav.codehaus.org/repository/jruby</url>
-    </repository>
     <snapshotRepository>
-      <id>codehaus-jruby-snapshot-repository</id>
-      <name>JRuby Central Development Repository</name>
-      <url>dav:https://dav.codehaus.org/snapshots.repository/jruby</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
+  <scm>
+    <url>https://github.com/jruby/warbler</url>
+    <connection>scm:git:git@github.com:jruby/warbler.git</connection>
+    <developerConnection>scm:git:git@github.com:jruby/warbler.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 
-  <repositories>
-    <repository>
-      <id>codehaus</id>
-      <name>Codehaus Repository</name>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <url>http://repository.codehaus.org</url>
-    </repository>
-  </repositories>
-  
   <developers>
     <developer>
       <id>nicksieger</id>
       <name>Nick Sieger</name>
       <email>nicksieger@gmail.com</email>
+    </developer>
+    <developer>
+      <id>codefinger</id>
+      <name>Joe Kutner</name>
+      <email>jpkutner@gmail.com</email>
     </developer>
   </developers>
 
@@ -100,4 +105,60 @@
       </extension>
     </extensions>
   </build>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>prepareForCentral</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>${source.plugin.version}</version>
+            <executions>
+              <execution>
+                <id>attach-source</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>${javadoc.plugin.version}</version>
+            <executions>
+              <execution>
+                <id>attach-javadoc</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${gpg.plugin.version}</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
