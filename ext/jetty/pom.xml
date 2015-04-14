@@ -14,6 +14,9 @@
   <url>http://github.com/jruby/warbler/</url>
   <properties>
     <jetty.version>9.2.10.v20150310</jetty.version>
+    <source.plugin.version>2.1.2</source.plugin.version>
+    <gpg.plugin.version>1.2</gpg.plugin.version>
+    <javadoc.plugin.version>2.7</javadoc.plugin.version>
   </properties>
 
   <licenses>
