@@ -116,14 +116,14 @@ PROPS
   class JettyServer < WebServer
     def initialize
       @artifact = Artifact.new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
-                               "org.jruby.warbler", "warbler-embedded-jetty",
-                               ENV["WEBSERVER_VERSION"] || "2.0.0")
+                               "org.eclipse.jetty", "jetty-runner",
+                               ENV["WEBSERVER_VERSION"] || "9.2.9.v20150224")
     end
 
     def add(jar)
       super
       jar.files["WEB-INF/webserver.properties"] = StringIO.new(<<-PROPS)
-mainclass = JettyWarMain
+mainclass = org.eclipse.jetty.runner.Runner
 args = args0
 props = jetty.home
 args0 = {{warfile}}
