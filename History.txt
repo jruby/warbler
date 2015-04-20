@@ -1,6 +1,8 @@
 == Master
 
 == 1.4.6
+- #315: Removed custom Jetty launcher in favor of jetty-runner
+- #316: Sprockets manifest name change
 - #313: Update Jetty to 9.2.10
 - #311: Don't clear the environment if a java executable is found
 - #268: Compile's clearing of ENV vars makes it impossible to use custom compile vars
