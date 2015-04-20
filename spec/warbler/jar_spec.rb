@@ -801,7 +801,7 @@ describe Warbler::Jar do
 
       context "with rails version 4" do
 
-        let (:manifest_file) { "public/assets/manifest-1234.json" }
+        let (:manifest_file) { "public/assets/.sprockets-manifest-1234.json" }
 
         shared_examples_for "asset pipeline" do
           it "automatically adds asset pipeline manifest file to the included files" do

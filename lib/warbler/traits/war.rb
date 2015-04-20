@@ -27,7 +27,7 @@ module Warbler
         config.webxml        = default_webxml_config
         config.webinf_files  = default_webinf_files
         config.java_libs     = default_jar_files
-        config.public_html   = FileList["public/**/*"]
+        config.public_html   = FileList["public/**/{.[!.],.??*,*}"] # include dotfiles
         config.jar_extension = 'war'
         config.init_contents << "#{config.warbler_templates}/war.erb"
       end
