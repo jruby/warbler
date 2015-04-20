@@ -50,6 +50,7 @@ module Warbler
           config.webxml.jruby.max.runtimes = 1 unless Integer === config.webxml.jruby.max.runtimes
         end
 
+        config.includes += FileList["public/assets/.sprockets-manifest-*.json"].existing
         config.includes += FileList["public/assets/manifest-*.json"].existing
         config.includes += FileList["public/assets/manifest.yml"].existing
       end
