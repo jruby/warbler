@@ -1,6 +1,7 @@
 == Master
 
 == 1.4.6
+- #318: polish *scripts/rails* - require_relative should no longer be used
 - #315: Removed custom Jetty launcher in favor of jetty-runner
 - #316: Sprockets manifest name change
 - #313: Update Jetty to 9.2.10
