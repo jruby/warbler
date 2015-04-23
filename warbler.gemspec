@@ -24,7 +24,7 @@ bundle up all of your application files for deployment to a Java environment.}
 
   gem.add_runtime_dependency 'rake', [">= 0.9.6"]
   # restrict it for maven not to find jruby-9000.dev
-  if /\A9\.[0-9]\.[0-9]{1,2}\.[0-9]{1,2}\.?(pre[1-9]{1})?\z/.match(JRUBY_VERSION)
+  if defined?(JRUBY_VERSION) && /\A9\.[0-9]\.[0-9]{1,2}\.[0-9]{1,2}\.?(pre[1-9]{1})?\z/.match(JRUBY_VERSION)
     #if using jruby-9k
     gem.add_runtime_dependency 'jruby-jars', [JRUBY_VERSION]
   else
