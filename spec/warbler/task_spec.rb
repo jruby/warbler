@@ -109,9 +109,8 @@ describe Warbler::Task do
     end
   end
 
-  it "should compile ruby 1.9 mode" do
+  it "should compile ruby 2 mode" do
     config.features << "compiled"
-    config.webxml.jruby.compat.version = '1.9'
     silence { run_task "warble" }
 
     java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join

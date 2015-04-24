@@ -8,7 +8,3 @@ group :development do
   gem "childprocess", :platform => :mri
   gem "maven-tools", "~> 0.34.5"
 end
-
-if RUBY_VERSION < "1.9"
-  gem 'rubyzip', '~> 0.9'
-end

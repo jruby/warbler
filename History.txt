@@ -1,4 +1,6 @@
-== Master
+== 2x-dev
+
+- #319: Adds capacity to use the jruby-jars gem version for JRuby 9k.
 
 == 1.4.6
 - #318: polish *scripts/rails* - require_relative should no longer be used
@@ -7,7 +9,6 @@
 - #313: Update Jetty to 9.2.10
 - #311: Don't clear the environment if a java executable is found
 - #268: Compile's clearing of ENV vars makes it impossible to use custom compile vars
-- Adds capacity to use the jruby-jars gem version for JRuby 9k.
 
 == 1.4.5
 - #282: Wrong default GEM_HOME in generated META-INF/init.rb
@@ -252,7 +253,7 @@
 - RailsConf 2009 edition.
 - Only bundled JRuby and JRuby-Rack upgrades. Bug fixes will have to come in 0.9.14.
 - This should also be the last release with bundled JRuby and JRuby-Rack.
-- Upgrade to JRuby 1.3.0RC1 and JRuby-Rack 0.9.4. The latter allows 
+- Upgrade to JRuby 1.3.0RC1 and JRuby-Rack 0.9.4. The latter allows
   Rails 2.3 to work with Warbler.
 
 == 0.9.12

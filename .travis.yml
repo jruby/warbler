@@ -1,26 +1,15 @@
 rvm:
-  - jruby-1.7.8
+  - jruby-9.0.0.0.pre1
 branches:
   only:
     - master
-env:
-  - JRUBY_OPTS="--1.8 --server -Xcext.enabled=false -Xcompile.invokedynamic=false"
-  - JRUBY_OPTS="--1.9 --server -Xcext.enabled=false -Xcompile.invokedynamic=false"
+    - 2.x-dev
 matrix:
   include:
     - rvm: jruby-head
       env: JRUBY_OPTS="--server -Xcext.enabled=false -Xcompile.invokedynamic=false"
-    - rvm: jruby-1.7.19
+    - rvm: jruby-9.0.0.0.pre1
       env: JRUBY_OPTS="--server -Xcext.enabled=false -Xcompile.invokedynamic=false"
-    - rvm: 1.8.7
-      env: ''
-    - rvm: 1.9.2
-      env: ''
-    - rvm: 1.9.3
-      env: ''
-    - rvm: jruby
-      env: MAVEN_OPTS="-XX:MaxPermSize=128m"
-      script: mvn clean verify
   allow_failures:
     - rvm: jruby-head
 notifications:

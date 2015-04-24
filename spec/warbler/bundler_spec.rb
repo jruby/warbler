@@ -80,13 +80,8 @@ describe Warbler::Jar, "with Bundler" do
         end
         jar.apply(config)
         jar.create('foo.war')
-        if RUBY_VERSION >= '1.9'
-          stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake -T')
-          wait_thr.value.success?.should be(true), stderr.readlines.join
-        else
-          `java -jar foo.war -S rake -T`
-          $?.exitstatus.should == 0
-        end
+        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake -T')
+        wait_thr.value.success?.should be(true), stderr.readlines.join
       end
     end
 
@@ -184,7 +179,7 @@ describe Warbler::Jar, "with Bundler" do
     it "includes the bundler gem" do
       `#{RUBY_EXE} -S bundle install --deployment`
       jar.apply(config)
-      file_list(%r{gems/rake-0.8.7/lib}).should_not be_empty
+      file_list(%r{gems/rake-10.4.2/lib}).should_not be_empty
       file_list(%r{gems/bundler-}).should_not be_empty
       file_list(%r{gems/bundler-.*/lib}).should_not be_empty
     end

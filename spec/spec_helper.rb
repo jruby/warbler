@@ -108,9 +108,8 @@ module ExampleGroupHelpers
     if defined?(JRUBY_VERSION)
       require 'jruby'
       let(:drb) do
-        version_arg = JRuby.runtime.is1_9 ? "--1.9" : "--1.8"
         drb_thread = Thread.new do
-          ruby *([ version_arg ] + drb_helper_args)
+          ruby *(drb_helper_args)
         end
         drb_thread.run
         drb_thread
