@@ -126,12 +126,12 @@ describe Warbler::Task do
 
   it "should allow bytecode version in config" do
     config.features << "compiled"
-    config.bytecode_version = '1.6'
+    config.bytecode_version = '1.7'
     silence { run_task "warble" }
 
     java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
-    # 0x32 is version 50, i.e. Java6
-    java6_version_bytes = [0x00,0x32].map { |magic_char| magic_char.chr }.join
+    # 0x33 is version 51, i.e. Java7
+    java7_version_bytes = [0x00,0x33].map { |magic_char| magic_char.chr }.join
 
     Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
       class_file_bytes = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.class') {|io| io.read }
@@ -139,7 +139,7 @@ describe Warbler::Task do
       bytecode_version      = class_file_bytes[6..7]
 
       java_class_header.should == java_class_magic_number
-      bytecode_version.should == java6_version_bytes
+      bytecode_version.should == java7_version_bytes
     end
   end
 
