@@ -61,8 +61,8 @@ Warbler::Config.new do |config|
 
   # You can also use regexps or Gem::Dependency objects for flexibility or
   # finer-grained control.
-  # config.gems << /^merb-/
-  # config.gems << Gem::Dependency.new("merb-core", "= 0.9.3")
+  # config.gems << /^sinatra-/
+  # config.gems << Gem::Dependency.new("sinatra", "= 1.4.5")
 
   # Include gem dependencies not mentioned specifically. Default is
   # true, uncomment to turn off.
@@ -117,7 +117,7 @@ Warbler::Config.new do |config|
   # by default. But since 1.4.2 this config defaults to false. It may need to be set to true for
   # web servers that do not explode the WAR file.
   # Alternatively, this option can be set to a regular expression, which will
-  # act as a jar selector -- only jar files that match the pattern will be 
+  # act as a jar selector -- only jar files that match the pattern will be
   # included in the archive.
   # config.move_jars_to_webinf_lib = false
 
@@ -151,7 +151,7 @@ Warbler::Config.new do |config|
   # Value of RAILS_ENV for the webapp -- default as shown below
   # config.webxml.rails.env = ENV['RAILS_ENV'] || 'production'
 
-  # Application booter to use, one of :rack, :rails, or :merb (autodetected by default)
+  # Application booter to use, either :rack or :rails (autodetected by default)
   # config.webxml.booter = :rails
 
   # Set JRuby to run in 1.9 mode.

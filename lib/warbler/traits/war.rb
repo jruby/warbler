@@ -18,7 +18,7 @@ module Warbler
       DEFAULT_GEM_PATH = '/WEB-INF/gems'
 
       def self.detect?
-        Traits::Rails.detect? || Traits::Merb.detect? || Traits::Rack.detect?
+        Traits::Rails.detect? || Traits::Rack.detect?
       end
 
       def before_configure
@@ -180,8 +180,6 @@ module Warbler
           case self.booter
           when :rack
             "org.jruby.rack.RackServletContextListener"
-          when :merb
-            "org.jruby.rack.merb.MerbServletContextListener"
           else # :rails, default
             "org.jruby.rack.rails.RailsServletContextListener"
           end

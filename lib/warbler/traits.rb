@@ -115,7 +115,6 @@ end
 require 'warbler/traits/jar'
 require 'warbler/traits/war'
 require 'warbler/traits/rails'
-require 'warbler/traits/merb'
 require 'warbler/traits/rack'
 require 'warbler/traits/bundler'
 require 'warbler/traits/jbundler'

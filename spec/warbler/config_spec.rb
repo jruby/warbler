@@ -111,9 +111,6 @@ describe Warbler::Config do
       config.webxml.booter = :rack
       config.webxml.servlet_context_listener.should == "org.jruby.rack.RackServletContextListener"
       config = Warbler::Config.new
-      config.webxml.booter = :merb
-      config.webxml.servlet_context_listener.should == "org.jruby.rack.merb.MerbServletContextListener"
-      config = Warbler::Config.new
       config.webxml.servlet_context_listener.should == "org.jruby.rack.rails.RailsServletContextListener"
     end
 
