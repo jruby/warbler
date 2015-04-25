@@ -1,5 +1,8 @@
 == Master
 
+
+== 1.4.7
+
 - Added the ability to set custom port for Jetty launcher with
   warbler.port or PORT env var
 
