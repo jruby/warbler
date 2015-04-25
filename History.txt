@@ -1,5 +1,8 @@
 == Master
 
+- Added the ability to set custom port for Jetty launcher with
+  warbler.port or PORT env var
+
 == 1.4.6
 - #318: polish *scripts/rails* - require_relative should no longer be used
 - #315: Removed custom Jetty launcher in favor of jetty-runner
