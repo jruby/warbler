@@ -124,9 +124,11 @@ PROPS
       super
       jar.files["WEB-INF/webserver.properties"] = StringIO.new(<<-PROPS)
 mainclass = org.eclipse.jetty.runner.Runner
-args = args0
+args = args0,args1,args2
 props = jetty.home
-args0 = {{warfile}}
+args0 = --port
+args1 = {{port}}
+args2 = {{warfile}}
 jetty.home = {{webroot}}
 PROPS
     end
