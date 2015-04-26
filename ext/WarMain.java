@@ -6,6 +6,7 @@
  */
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.SequenceInputStream;
@@ -234,7 +235,7 @@ public class WarMain extends JarMain {
 
         invokeMethod(scriptingContainer, "setArgv", (Object) executableArgv);
         invokeMethod(scriptingContainer, "setCurrentDirectory", extractRoot.getAbsolutePath());
-        initJRubyScriptingEnv(scriptingContainer, jars);
+        initJRubyScriptingEnv(scriptingContainer);
 
         final Object provider = invokeMethod(scriptingContainer, "getProvider");
         final Object rubyInstanceConfig = invokeMethod(provider, "getRubyInstanceConfig");
@@ -245,14 +246,23 @@ public class WarMain extends JarMain {
         if ( executablePath == null ) {
             throw new IllegalStateException("failed to locate gem executable: '" + executable + "'");
         }
-        invokeMethod(scriptingContainer, "setScriptFilename", executablePath);
+        // invokeMethod(scriptingContainer, "setScriptFilename", executablePath);
 
         invokeMethod(rubyInstanceConfig, "processArguments", (Object) arguments);
 
         Object runtime = invokeMethod(scriptingContainer, "getRuntime");
+
+        ClassLoader classLoader = (ClassLoader) invokeMethod(scriptingContainer, "getClassLoader");
+        Class urlResourceClass = Class.forName("org.jruby.util.URLResource", true, classLoader);
+
+        Class rubyClass = Class.forName("org.jruby.Ruby", true, classLoader);
+        Method method = urlResourceClass.getDeclaredMethod("create", rubyClass, String.class);
+        Object urlResource = method.invoke(null, runtime, executablePath);
+
+        debug("loading resource: " + executablePath);
         Object executableInput =
             new SequenceInputStream(new ByteArrayInputStream(executableScriptEnvPrefix().getBytes()),
-                                    (InputStream) invokeMethod(rubyInstanceConfig, "getScriptSource"));
+                                    (InputStream) invokeMethod(urlResource, "inputStream"));
 
         debug("invoking " + executablePath + " with: " + Arrays.toString(executableArgv));
 
@@ -310,36 +320,12 @@ public class WarMain extends JarMain {
         "end";
     }
 
-    protected void initJRubyScriptingEnv(Object scriptingContainer, final URL[] jars) throws Exception {
-        String jrubyStdlibJar = "";
-        String bcpkixJar = "";
-        String bcprovJar = "";
-        for (URL url : jars) {
-            if (url.toString().matches("file:/.*jruby-stdlib-.*jar")) {
-                jrubyStdlibJar = url.toString();
-                debug("using jruby-stdlib: " + jrubyStdlibJar);
-            } else if (url.toString().matches("file:/.*bcpkix-jdk15on-.*jar")) {
-                bcpkixJar = url.toString();
-                debug("using bcpkix: " + bcpkixJar);
-            } else if (url.toString().matches("file:/.*bcprov-jdk15on-.*jar")) {
-                bcprovJar = url.toString();
-                debug("using bcprov: " + bcprovJar);
-            }
-        }
+    protected void initJRubyScriptingEnv(Object scriptingContainer) throws Exception {
+        // for some reason, the container needs to run a scriptlet in order for it
+        // to be able to find the gem executables later
+        invokeMethod(scriptingContainer, "runScriptlet", "SCRIPTING_CONTAINER_INITIALIZED=true");
 
-        invokeMethod(scriptingContainer, "runScriptlet", "" +
-            "ruby = RUBY_VERSION.match(/^\\d\\.\\d/)[0] \n" +
-            "jruby_major_version = JRUBY_VERSION.match(/^\\d\\.\\d/)[0].to_f \n" +
-            "jruby_minor_version = JRUBY_VERSION.split('.')[2].to_i\n" +
-            "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/#{ruby}/site_ruby\"\n" +
-            "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/shared\"\n" +
-            "$: << \"" + jrubyStdlibJar + "!/META-INF/jruby.home/lib/ruby/#{ruby}\"\n" +
-            "if jruby_major_version >= 1.7 and jruby_minor_version < 13\n" +
-            "  require \"" + bcpkixJar + "\".gsub('file:', '') unless \"" + bcpkixJar + "\".empty?\n" +
-            "  require \"" + bcprovJar + "\".gsub('file:', '') unless \"" + bcprovJar + "\".empty?\n" +
-            "end");
-
-        invokeMethod(scriptingContainer, "setHomeDirectory", "classpath:/META-INF/jruby.home");
+        invokeMethod(scriptingContainer, "setHomeDirectory", "uri:classloader:/META-INF/jruby.home");
     }
 
     @Override

@@ -63,25 +63,58 @@ describe Warbler::Jar, "with Bundler" do
 
     context 'with :git entries in the Gemfile' do
       before do
-        File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
+        @gem_dir = Dir.mktmpdir("tester-#{rand(100)}")
+        cur_dir = Dir.pwd
+        Dir.chdir(@gem_dir) do
+          `git init`
+          # create the gemspec and Gemfile
+          File.open("Gemfile", "w") do |f|
+            f << <<-RUBY
+            source "http://rubygems.org/"
+            gemspec
+            RUBY
+          end
+
+          File.open("tester.gemspec", "w") do |f|
+            f << <<-RUBY
+            # -*- encoding: utf-8 -*-
+            Gem::Specification.new do |gem|
+              gem.name = "tester"
+              gem.version = '1.0'
+              gem.platform = Gem::Platform::RUBY
+              gem.files         = `git ls-files`.split("\n")
+              gem.add_runtime_dependency 'rake', [">= 10.4.2"]
+            end
+            RUBY
+          end
+
+          Dir.mkdir("lib")
+          Dir.mkdir("lib/tester")
+
+          File.open("lib/tester/version.rb", "w") do |f|
+            f << <<-RUBY
+            VERSION = "1.0"
+            RUBY
+          end
+
+          # `bundle install --local`
+          `git add .`
+          `git commit -am "first commit"`
+        end
+        Dir.chdir(cur_dir)
+
+        File.open("Gemfile", "w") {|f| f << "gem 'tester', :git => '#{@gem_dir}'\n"}
         `#{RUBY_EXE} -S bundle install --local`
+      end
+
+      after do
+        FileUtils.remove_entry_secure @gem_dir
       end
 
       it "works with :git entries in Gemfiles" do
         jar.apply(config)
-        file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should_not be_empty
-        file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
-      end
-
-      it "can run commands in the generated warfile" do
-        use_config do |config|
-          config.features = %w{runnable}
-          config.override_gem_home = false
-        end
-        jar.apply(config)
-        jar.create('foo.war')
-        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake -T')
-        wait_thr.value.success?.should be(true), stderr.readlines.join
+        file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb}).should_not be_empty
+        file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec}).should_not be_empty
       end
     end
 
@@ -170,6 +203,35 @@ describe Warbler::Jar, "with Bundler" do
       jar.apply(config)
       contents = jar.contents('META-INF/init.rb')
       contents.split("\n").grep(/ENV\['BUNDLE_FROZEN'\] = '1'/).should_not be_empty
+    end
+
+    context "with the runnable feature" do
+      before do
+        File.open("Rakefile", "w") do |f|
+          f << <<-RUBY
+          task :test_task do
+            puts "success"
+          end
+          RUBY
+        end
+
+        use_config do |config|
+          config.features = %w{runnable}
+        end
+        jar.apply(config)
+      end
+
+      it "adds WarMain and JarMain to file" do
+        file_list(%r{^WarMain\.class$}).should_not be_empty
+        file_list(%r{^JarMain\.class$}).should_not be_empty
+      end
+
+      it "can run commands in the generated warfile" do
+        jar.create('foo.war')
+        out = `java -Dwarbler.debug=true -jar foo.war -S rake test_task`
+        # $?.exitstatus.should be(0)
+        out.should eq("success")
+      end
     end
   end
 
