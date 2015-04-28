@@ -27,7 +27,7 @@ bundle up all of your application files for deployment to a Java environment.</d
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>jruby-jars</artifactId>
-      <version>[9.0.0.0.pre1-SNAPSHOT,)</version>
+      <version>[9.0.0.0.pre2-SNAPSHOT,)</version>
       <type>gem</type>
     </dependency>
     <dependency>

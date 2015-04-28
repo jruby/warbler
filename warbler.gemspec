@@ -22,8 +22,8 @@ bundle up all of your application files for deployment to a Java environment.}
 
   gem.rdoc_options = ["--main", "README.rdoc", "-H", "-f", "darkfish"]
 
-  gem.add_runtime_dependency 'rake', [">= 0.9.6"]
-  gem.add_runtime_dependency 'jruby-jars', [">= 9.0.0.0.pre1"]
+  gem.add_runtime_dependency 'rake', [">= 10.1.0"]
+  gem.add_runtime_dependency 'jruby-jars', [">= 9.0.0.0.pre2"]
   gem.add_runtime_dependency 'jruby-rack', [">= 1.1.1", '< 1.3']
   gem.add_runtime_dependency 'rubyzip', [">= 1.0", "< 1.2"]
   gem.add_development_dependency 'jbundler', "~> 0.5.5"
