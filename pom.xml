@@ -21,7 +21,7 @@ bundle up all of your application files for deployment to a Java environment.</d
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>rake</artifactId>
-      <version>[0.9.6,)</version>
+      <version>[10.1.0,)</version>
       <type>gem</type>
     </dependency>
     <dependency>

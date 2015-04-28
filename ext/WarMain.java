@@ -246,23 +246,16 @@ public class WarMain extends JarMain {
         if ( executablePath == null ) {
             throw new IllegalStateException("failed to locate gem executable: '" + executable + "'");
         }
-        // invokeMethod(scriptingContainer, "setScriptFilename", executablePath);
+        invokeMethod(scriptingContainer, "setScriptFilename", executablePath);
 
         invokeMethod(rubyInstanceConfig, "processArguments", (Object) arguments);
 
         Object runtime = invokeMethod(scriptingContainer, "getRuntime");
 
-        ClassLoader classLoader = (ClassLoader) invokeMethod(scriptingContainer, "getClassLoader");
-        Class urlResourceClass = Class.forName("org.jruby.util.URLResource", true, classLoader);
-
-        Class rubyClass = Class.forName("org.jruby.Ruby", true, classLoader);
-        Method method = urlResourceClass.getDeclaredMethod("create", rubyClass, String.class);
-        Object urlResource = method.invoke(null, runtime, executablePath);
-
         debug("loading resource: " + executablePath);
         Object executableInput =
             new SequenceInputStream(new ByteArrayInputStream(executableScriptEnvPrefix().getBytes()),
-                                    (InputStream) invokeMethod(urlResource, "inputStream"));
+                                    (InputStream) invokeMethod(rubyInstanceConfig, "getScriptSource"));
 
         debug("invoking " + executablePath + " with: " + Arrays.toString(executableArgv));
 

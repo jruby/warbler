@@ -221,6 +221,11 @@ describe Warbler::Jar, "with Bundler" do
         jar.apply(config)
       end
 
+      after do
+        rm_rf "Rakefile"
+        rm_rf "foo.war"
+      end
+
       it "adds WarMain and JarMain to file" do
         file_list(%r{^WarMain\.class$}).should_not be_empty
         file_list(%r{^JarMain\.class$}).should_not be_empty
@@ -228,9 +233,10 @@ describe Warbler::Jar, "with Bundler" do
 
       it "can run commands in the generated warfile" do
         jar.create('foo.war')
-        out = `java -Dwarbler.debug=true -jar foo.war -S rake test_task`
-        # $?.exitstatus.should be(0)
-        out.should eq("success")
+        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake test_task')
+        wait_thr.value.success?.should be(true)
+        stderr.readlines.join.should eq("")
+        stdout.readlines.join.should eq("success\n")
       end
     end
   end
