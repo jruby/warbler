@@ -102,9 +102,6 @@ describe Warbler::Jar, "with Bundler" do
           `git commit -am "first commit"`
         end
         Dir.chdir(cur_dir)
-
-        File.open("Gemfile", "w") {|f| f << "gem 'tester', :git => '#{@gem_dir}'\n"}
-        `#{RUBY_EXE} -S bundle install --local`
       end
 
       after do
@@ -112,25 +109,27 @@ describe Warbler::Jar, "with Bundler" do
       end
 
       it "works with :git entries in Gemfiles" do
+        File.open("Gemfile", "w") {|f| f << "gem 'tester', :git => '#{@gem_dir}'\n"}
+        `#{RUBY_EXE} -S bundle install --local`
         jar.apply(config)
         file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb}).should_not be_empty
         file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec}).should_not be_empty
       end
-    end
 
-    it "bundles only the gemspec for :git entries that are excluded" do
-      File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\nend\n"}
-      `#{RUBY_EXE} -S bundle install --local`
-      jar.apply(config)
-      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should be_empty
-      file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
-    end
+      it "bundles only the gemspec for :git entries that are excluded" do
+        File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'tester', :git => '#{@gem_dir}'\nend\n"}
+        `#{RUBY_EXE} -S bundle install --local`
+        jar.apply(config)
+        file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb}).should be_empty
+        file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec}).should_not be_empty
+      end
 
-    it "does not work with :path entries in Gemfiles" do
-      File.open("Gemfile", "w") {|f| f << "gem 'warbler', :path => '#{Warbler::WARBLER_HOME}'\n"}
-      `#{RUBY_EXE} -S bundle install --local`
-      silence { jar.apply(config) }
-      file_list(%r{warbler}).should be_empty
+      it "does not work with :path entries in Gemfiles" do
+        File.open("Gemfile", "w") {|f| f << "gem 'tester', :path => '#{@gem_dir}'\n"}
+        `#{RUBY_EXE} -S bundle install --local`
+        silence { jar.apply(config) }
+        file_list(%r{tester}).should be_empty
+      end
     end
 
     it "does not bundle dependencies in the test group by default" do
