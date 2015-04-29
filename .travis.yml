@@ -13,6 +13,7 @@ matrix:
     - rvm: jruby-head
       env: JRUBY_OPTS="--server -Xcompile.invokedynamic=false"
   allow_failures:
+    - rvm: jruby
     - rvm: jruby-head
 notifications:
   irc:
