@@ -82,6 +82,54 @@ module ExampleGroupHelpers
     end
   end
 
+  def create_git_gem(gem_name)
+    before do
+      @gem_dir = Dir.mktmpdir("#{gem_name}-#{rand(100)}")
+      cur_dir = Dir.pwd
+      Dir.chdir(@gem_dir) do
+        `git init`
+        # create the gemspec and Gemfile
+        File.open("Gemfile", "w") do |f|
+          f << <<-RUBY
+          source "http://rubygems.org/"
+          gemspec
+          RUBY
+        end
+
+        File.open("#{gem_name}.gemspec", "w") do |f|
+          f << <<-RUBY
+          # -*- encoding: utf-8 -*-
+          Gem::Specification.new do |gem|
+            gem.name = "#{gem_name}"
+            gem.version = '1.0'
+            gem.platform = Gem::Platform::RUBY
+            gem.files = `git ls-files`.split("\n")
+            gem.add_runtime_dependency 'rake', [">= 10.4.2"]
+          end
+          RUBY
+        end
+
+        Dir.mkdir("lib")
+        Dir.mkdir("lib/#{gem_name}")
+
+        File.open("lib/#{gem_name}/version.rb", "w") do |f|
+          f << <<-RUBY
+          VERSION = "1.0"
+          RUBY
+        end
+
+        # `bundle install --local`
+        `git add .`
+        `git commit -am "first commit"`
+      end
+      Dir.chdir(cur_dir)
+    end
+
+    after do
+      FileUtils.remove_entry_secure @gem_dir
+    end
+  end
+
   def run_out_of_process_with_drb
     before :all do
       DRb.start_service
