@@ -63,6 +63,7 @@ public class WarMain extends JarMain {
     static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
     static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
     static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
+    static final String WEBSERVER_CONFIG = "/WEB-INF/webserver.xml";
 
     /**
      *  jruby arguments, consider the following command :
@@ -141,10 +142,14 @@ public class WarMain extends JarMain {
 
         String port = System.getProperty("warbler.port", System.getenv("PORT"));
         port = port == null ? "8080" : port;
+        String webserverConfig = System.getProperty("warbler.webserver_config", System.getenv("WARBLER_WEBSERVER_CONFIG"));
+        String embeddedWebserverConfig = new URI("jar", entryPath(WEBSERVER_CONFIG), null).toURL().toString();
+        webserverConfig = webserverConfig == null ? embeddedWebserverConfig : webserverConfig;
         for (Map.Entry entry : props.entrySet()) {
             String val = (String) entry.getValue();
             val = val.replace("{{warfile}}", archive).
                       replace("{{port}}", port).
+                      replace("{{config}}", webserverConfig).
                       replace("{{webroot}}", webroot.getAbsolutePath());
             entry.setValue(val);
         }
