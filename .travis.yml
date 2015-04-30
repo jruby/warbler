@@ -1,5 +1,5 @@
 rvm:
-  - jruby-9.0.0.0.pre1
+  - jruby-9.0.0.0.pre2
 jdk:
   - oraclejdk8
 branches:
@@ -13,7 +13,6 @@ matrix:
     - rvm: jruby-head
       env: JRUBY_OPTS="--server -Xcompile.invokedynamic=false"
   allow_failures:
-    - rvm: jruby
     - rvm: jruby-head
 notifications:
   irc:
