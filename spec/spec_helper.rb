@@ -88,6 +88,9 @@ module ExampleGroupHelpers
       cur_dir = Dir.pwd
       Dir.chdir(@gem_dir) do
         `git init`
+        `git init user.email "warbler-test@null.com"`
+        `git init user.name  "Warbler Test"`
+
         # create the gemspec and Gemfile
         File.open("Gemfile", "w") do |f|
           f << <<-RUBY
