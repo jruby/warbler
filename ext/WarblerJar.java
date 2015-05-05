@@ -118,16 +118,20 @@ public class WarblerJar {
                     path = value.convertToString().getUnicodeValue();
                 }
 
-                InputStream inFile = getStream(path, null);
                 try {
-                    zip.putNextEntry(new ZipEntry(entryName));
-                    byte[] buf = new byte[16384];
-                    int bytesRead;
-                    while ((bytesRead = inFile.read(buf)) != -1) {
-                        zip.write(buf, 0, bytesRead);
+                    InputStream inFile = getStream(path, null);
+                    try {
+                        zip.putNextEntry(new ZipEntry(entryName));
+                        byte[] buf = new byte[16384];
+                        int bytesRead;
+                        while ((bytesRead = inFile.read(buf)) != -1) {
+                            zip.write(buf, 0, bytesRead);
+                        }
+                    } finally {
+                        close(inFile);
                     }
-                } finally {
-                    close(inFile);
+                } catch (IOException e) {
+                    System.err.println("File not found; " + path + " not in archive");
                 }
             }
         }
