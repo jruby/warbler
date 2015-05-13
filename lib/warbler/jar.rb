@@ -290,8 +290,10 @@ module Warbler
             zipfile.mkdir(entry.dup) # in case it's frozen rubyzip 0.9.6.1 workaround
           elsif File.symlink?(src)
             zipfile.get_output_stream(entry) { |f| f << File.read(src) }
-          else
+          elsif File.exist?(src)
             zipfile.add(entry, src)
+          else
+            $stderr.puts "File not found; #{entry.inspect} not in archive"
           end
         end
       end
