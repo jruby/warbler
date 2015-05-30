@@ -51,8 +51,8 @@ module Warbler
     # Add a single gem to WEB-INF/gems
     def find_single_gem_files(gem_dependencies, gem_pattern, version = nil)
       case gem_pattern
-      when Gem::Specification
-        return gem_pattern
+      when Gem::BasicSpecification
+        return gem_pattern.respond_to?(:to_spec) ? gem_pattern.to_spec : gem_pattern
       when Gem::Dependency
         gem = gem_pattern
       else
