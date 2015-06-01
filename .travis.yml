@@ -8,15 +8,17 @@ branches:
     - master
     - 2.x-dev
     - /^test-.*/
+before_script:
+  - export JRUBY_OPTS="--server -Xcext.enabled=false -Xcompile.invokedynamic=false"
 env:
-  - JRUBY_OPTS="--1.8 --server -Xcext.enabled=false -Xcompile.invokedynamic=false"
-  - JRUBY_OPTS="--1.9 --server -Xcext.enabled=false -Xcompile.invokedynamic=false"
+  - JRUBY_OPTS="--1.8 $JRUBY_OPTS"
+  - JRUBY_OPTS="--1.9 $JRUBY_OPTS"
 matrix:
   include:
     - rvm: jruby-head
-      env: JRUBY_OPTS="--server -Xcext.enabled=false -Xcompile.invokedynamic=false"
+      env: JRUBY_OPTS="$JRUBY_OPTS"
     - rvm: jruby-1.7.20
-      env: JRUBY_OPTS="--server -Xcext.enabled=false -Xcompile.invokedynamic=false"
+      env: JRUBY_OPTS="$JRUBY_OPTS"
     - rvm: 1.8.7
       env: ''
     - rvm: 1.9.2
