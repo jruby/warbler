@@ -8,23 +8,26 @@ branches:
     - master
     - 2.x-dev
     - /^test-.*/
+before_install:
+  - ([ "$BUNDLER_VERSION" ] && gem install bundler -v "$BUNDLER_VERSION") || true
+  - bundle --version
 before_script:
-  - export JRUBY_OPTS="--server -Xcext.enabled=false -Xcompile.invokedynamic=false"
+  - export JRUBY_OPTS="$JRUBY_OPTS --server -Xcext.enabled=false -Xcompile.invokedynamic=false"
 env:
-  - JRUBY_OPTS="--1.8 $JRUBY_OPTS"
-  - JRUBY_OPTS="--1.9 $JRUBY_OPTS"
+  - JRUBY_OPTS="--1.8" BUNDLER_VERSION="~> 1.7.9"
+  - JRUBY_OPTS="--1.9" BUNDLER_VERSION="~> 1.8.9"
 matrix:
   include:
     - rvm: jruby-head
-      env: JRUBY_OPTS="$JRUBY_OPTS"
+      env: JRUBY_OPTS="" BUNDLER_VERSION="~> 1.9.9"
     - rvm: jruby-1.7.20
-      env: JRUBY_OPTS="$JRUBY_OPTS"
+      env: JRUBY_OPTS="" BUNDLER_VERSION="~> 1.10.2"
     - rvm: 1.8.7
-      env: ''
+      env: BUNDLER_VERSION="~> 1.6.9"
     - rvm: 1.9.2
-      env: ''
+      env: BUNDLER_VERSION="~> 1.7.9"
     - rvm: 1.9.3
-      env: ''
+      env: BUNDLER_VERSION="~> 1.8.9"
     - rvm: jruby
       env: MAVEN_OPTS="-XX:MaxPermSize=128m"
       script: mvn clean verify
