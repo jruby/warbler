@@ -6,14 +6,14 @@
 # See the file LICENSE.txt for details.
 #++
 
-unless defined? Bundler
-  warn "\nPlease `gem install bundler' and run `bundle install' to ensure you have all dependencies and run inside a bundler context 'bundle exec rake'.\n\n"
+begin
+  require 'bundler'
+rescue LoadError
+  warn "\nPlease `gem install bundler' and run `bundle install' to ensure you have all dependencies.\n\n"
+else
+  require 'bundler/gem_helper'
+  Bundler::GemHelper.install_tasks :dir => File.dirname(__FILE__)
 end
-
-require 'bundler/gem_helper'
-gem_helper = Bundler::GemHelper.new(File.dirname(__FILE__))
-gem_helper.install
-gemspec = gem_helper.gemspec
 
 require 'rake/clean'
 CLEAN << "pkg" << "doc" << Dir['integration/**/target']
@@ -42,8 +42,13 @@ end
 # the jar tasks is part of maven-tasks
 task :build => :jar
 
+load_gemspec = lambda do
+  Gem::Specification.load(File.expand_path('warbler.gemspec', File.dirname(__FILE__)))
+end
+
 require 'rdoc/task'
 RDoc::Task.new(:docs) do |rd|
+  gemspec = load_gemspec.call
   rd.rdoc_dir = "doc"
   rd.rdoc_files.include("README.rdoc", "History.txt", "LICENSE.txt")
   rd.rdoc_files += gemspec.require_paths
@@ -54,6 +59,7 @@ end
 task :release_docs => :docs do
   config = YAML.load(File.read(File.expand_path("~/.rubyforge/user-config.yml"))) rescue nil
   if config
+    gemspec = load_gemspec.call
     dir  = "/var/www/gforge-projects/#{gemspec.rubyforge_project}/#{gemspec.name}"
     dest = "#{config["username"]}@rubyforge.org:#{dir}"
     sh %{rsync -rl --delete doc/ #{dest}}
