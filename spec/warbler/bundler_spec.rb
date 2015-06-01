@@ -21,6 +21,10 @@ describe Warbler::Jar, "with Bundler" do
     @extra_config = block
   end
 
+  def bundle_install(*args)
+    `cd #{Dir.pwd} && #{RUBY_EXE} -S bundle install #{args.join(' ')}`
+  end
+
   let(:config) { drbclient.config(@extra_config) }
   let(:jar) { drbclient.jar }
 
@@ -64,7 +68,7 @@ describe Warbler::Jar, "with Bundler" do
     context 'with :git entries in the Gemfile' do
       before do
         File.open("Gemfile", "w") {|f| f << "gem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\n"}
-        `#{RUBY_EXE} -S bundle install --local`
+        bundle_install '--local'
       end
 
       it "works with :git entries in Gemfiles" do
@@ -92,7 +96,7 @@ describe Warbler::Jar, "with Bundler" do
 
     it "bundles only the gemspec for :git entries that are excluded" do
       File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'warbler', :git => '#{Warbler::WARBLER_HOME}'\nend\n"}
-      `#{RUBY_EXE} -S bundle install --local`
+      bundle_install '--local'
       jar.apply(config)
       file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/lib/warbler/version\.rb}).should be_empty
       file_list(%r{WEB-INF/gems/bundler/gems/warbler[^/]*/warbler.gemspec}).should_not be_empty
@@ -100,7 +104,7 @@ describe Warbler::Jar, "with Bundler" do
 
     it "does not work with :path entries in Gemfiles" do
       File.open("Gemfile", "w") {|f| f << "gem 'warbler', :path => '#{Warbler::WARBLER_HOME}'\n"}
-      `#{RUBY_EXE} -S bundle install --local`
+      bundle_install '--local'
       silence { jar.apply(config) }
       file_list(%r{warbler}).should be_empty
     end
@@ -150,7 +154,7 @@ describe Warbler::Jar, "with Bundler" do
     end
 
     it "adds BUNDLE_GEMFILE to init.rb" do
-      File.open("Gemfile", "w") {|f| f << "source :rubygems" }
+      File.open("Gemfile", "w") {|f| f << "source 'http://rubygems.org/'" }
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
       contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
@@ -182,7 +186,7 @@ describe Warbler::Jar, "with Bundler" do
     run_in_directory "spec/sample_bundler"
 
     it "includes the bundler gem" do
-      `#{RUBY_EXE} -S bundle install --deployment`
+      bundle_install '--deployment'
       jar.apply(config)
       file_list(%r{gems/rake-0.8.7/lib}).should_not be_empty
       file_list(%r{gems/bundler-}).should_not be_empty
