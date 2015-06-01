@@ -12,6 +12,7 @@ module Warbler
     class Bundler
       include Trait
       include PathmapHelper
+      include BundlerHelper
 
       def self.detect?
         File.exist?(ENV['BUNDLE_GEMFILE'] || "Gemfile")
@@ -37,11 +38,7 @@ module Warbler
         config.bundler = {}
 
         bundler_specs.each do |spec|
-          # JRuby <= 1.7.20 does not handle respond_to? with method_missing right
-          # thus a `spec.respond_to?(:to_spec) ? spec.to_spec : spec` won't do :
-          if ::Bundler.const_defined?(:StubSpecification) # since Bundler 1.10.1
-            spec = spec.to_spec if spec.is_a?(::Bundler::StubSpecification)
-          end
+          spec = to_spec(spec)
           # Bundler HAX -- fixup bad #loaded_from attribute in fake
           # bundler gemspec from bundler/source.rb
           if spec.name == 'bundler'
