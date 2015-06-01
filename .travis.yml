@@ -9,7 +9,7 @@ branches:
     - 2.x-dev
     - /^test-.*/
 before_install:
-  - ([ "$BUNDLER_VERSION" ] && gem install bundler -v "$BUNDLER_VERSION") || true
+  - ([ "$BUNDLER_VERSION" ] && gem uninstall bundler --all --force && gem install bundler -v "$BUNDLER_VERSION") || true
   - bundle --version
 before_script:
   - export JRUBY_OPTS="$JRUBY_OPTS --server -Xcext.enabled=false -Xcompile.invokedynamic=false"
