@@ -37,15 +37,19 @@ module Warbler
         config.bundler = {}
 
         bundler_specs.each do |spec|
+          # JRuby <= 1.7.20 does not handle respond_to? with method_missing right
+          # thus a `spec.respond_to?(:to_spec) ? spec.to_spec : spec` won't do :
+          if ::Bundler.const_defined?(:StubSpecification) # since Bundler 1.10.1
+            spec = spec.to_spec if spec.is_a?(::Bundler::StubSpecification)
+          end
           # Bundler HAX -- fixup bad #loaded_from attribute in fake
           # bundler gemspec from bundler/source.rb
-          if spec.name == "bundler"
+          if spec.name == 'bundler'
             full_gem_path = Pathname.new(spec.full_gem_path)
-
-            while !full_gem_path.join('bundler.gemspec').exist?
+            while ! full_gem_path.join('bundler.gemspec').exist?
               full_gem_path = full_gem_path.dirname
               # if at top of the path, meaning we cannot find bundler.gemspec, abort.
-              if full_gem_path.to_s=~/^[\.\/]$/
+              if full_gem_path.to_s =~ /^[\.\/]$/
                 $stderr.puts("warning: Unable to detect bundler spec under '#{spec.full_gem_path}'' and is sub-dirs")
                 exit
               end
@@ -139,8 +143,8 @@ module Warbler
         definition = ::Bundler.definition
         all = definition.specs.to_a
         requested = definition.specs_for(definition.groups - bundle_without).to_a
-        excluded_git_specs = (all - requested).select {|spec| ::Bundler::Source::Git === spec.source }
-        excluded_git_specs.each {|spec| spec.groups << :warbler_excluded }
+        excluded_git_specs = (all - requested).select { |spec| ::Bundler::Source::Git === spec.source }
+        excluded_git_specs.each { |spec| spec.groups << :warbler_excluded }
         requested + excluded_git_specs
       end
 
