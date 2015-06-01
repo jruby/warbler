@@ -1,3 +1,4 @@
+sudo: false
 rvm:
   - jruby-1.7.8
 branches:
