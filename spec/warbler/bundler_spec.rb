@@ -196,12 +196,17 @@ describe Warbler::Jar, "with Bundler" do
 
       it "can run commands in the generated warfile" do
         jar.create('foo.war')
-        stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake test_task')
-        wait_thr.value.success?.should be(true)
+        if RUBY_VERSION >= '1.9'
+          stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake test_task')
+          wait_thr.value.success?.should be(true)
 
-        # TODO need to update rake or we'll get an warning in stderr
-        # stderr.readlines.join.should eq("")
-        stdout.readlines.join.should include("success\n")
+          # TODO need to update rake or we'll get an warning in stderr
+          # stderr.readlines.join.should eq("")
+          stdout.readlines.join.should include("success\n")
+        else
+          `java -jar foo.war -S rake -T`
+          $?.exitstatus.should == 0
+        end
       end
     end
   end
