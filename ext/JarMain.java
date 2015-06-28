@@ -28,8 +28,6 @@ public class JarMain implements Runnable {
 
     static final String MAIN = "/" + JarMain.class.getName().replace('.', '/') + ".class";
 
-    final boolean debug = isDebug();
-
     protected final String[] args;
     protected final String archive;
     private final String path;
@@ -126,7 +124,7 @@ public class JarMain implements Runnable {
     }
 
     protected Object newScriptingContainer(final URL[] jars) throws Exception {
-        System.setProperty("org.jruby.embed.class.path", "");
+        setSystemProperty("org.jruby.embed.class.path", "");
         classLoader = new URLClassLoader(jars);
         Class scriptingContainerClass = Class.forName("org.jruby.embed.ScriptingContainer", true, classLoader);
         Object scriptingContainer = scriptingContainerClass.newInstance();
@@ -164,12 +162,12 @@ public class JarMain implements Runnable {
     }
 
     protected void debug(String msg, Throwable t) {
-        if (debug) System.out.println(msg);
-        if (debug && t != null) t.printStackTrace(System.out);
+        if ( isDebug() ) System.out.println(msg);
+        if ( isDebug() && t != null ) t.printStackTrace(System.out);
     }
 
     protected static void debug(Throwable t) {
-        if (isDebug()) t.printStackTrace(System.out);
+        if ( isDebug() ) t.printStackTrace(System.out);
     }
 
     protected void warn(String msg) {
@@ -225,9 +223,9 @@ public class JarMain implements Runnable {
     }
 
     protected static void doStart(final JarMain main) {
+        int exit;
         try {
-            int exit = main.start();
-            if (isSystemExitEnabled()) System.exit(exit);
+            exit = main.start();
         }
         catch (Exception e) {
             Throwable t = e;
@@ -235,7 +233,13 @@ public class JarMain implements Runnable {
                 t = t.getCause();
             }
             error(e.toString(), t);
-            System.exit(1);
+            exit = 1;
+        }
+        try {
+            if ( isSystemExitEnabled() ) System.exit(exit);
+        }
+        catch (SecurityException e) {
+            debug(e);
         }
     }
 
@@ -262,9 +266,12 @@ public class JarMain implements Runnable {
         }
     }
 
-    static boolean isDebug() {
-        return Boolean.getBoolean("warbler.debug");
+    private static final boolean debug;
+    static {
+        debug = Boolean.parseBoolean( getSystemProperty("warbler.debug", "false") );
     }
+
+    static boolean isDebug() { return debug; }
 
     /**
      * if warbler.skip_system_exit system property is defined, we will not
@@ -272,7 +279,46 @@ public class JarMain implements Runnable {
      * for wrappers like procrun
      */
     private static boolean isSystemExitEnabled(){
-        return System.getProperty("warbler.skip_system_exit") == null; //omission enables System.exit use
+        return getSystemProperty("warbler.skip_system_exit") == null; //omission enables System.exit use
+    }
+
+    static String getSystemProperty(final String name) {
+        return getSystemProperty(name, null);
+    }
+
+    static String getSystemProperty(final String name, final String defaultValue) {
+        try {
+            return System.getProperty(name);
+        }
+        catch (SecurityException e) {
+            return defaultValue;
+        }
+    }
+
+    static boolean setSystemProperty(final String name, final String value) {
+        try {
+            System.setProperty(name, value);
+            return true;
+        }
+        catch (SecurityException e) {
+            return false;
+        }
+    }
+
+    static String getENV(final String name) {
+        return getENV(name, null);
+    }
+
+    static String getENV(final String name, final String defaultValue) {
+        try {
+            if ( System.getenv().containsKey(name) ) {
+                return System.getenv().get(name);
+            }
+            return defaultValue;
+        }
+        catch (SecurityException e) {
+            return defaultValue;
+        }
     }
 
 }
