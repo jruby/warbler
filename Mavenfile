@@ -7,7 +7,8 @@ gemspec( :jar => 'warbler_jar.jar',
 
 # just dump the POM as pom.xml as read-only file
 properties( 'tesla.dump.pom' => 'pom.xml',
-            'tesla.dump.readOnly' => true )
+            'tesla.dump.readOnly' => true,
+            'jruby.plugins.version' => '1.0.10' )
 
 # dependencies needed for compilation
 scope :provided do
