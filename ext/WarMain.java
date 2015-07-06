@@ -141,12 +141,12 @@ public class WarMain extends JarMain {
             if ( is != null ) props.load(is);
         } catch (Exception e) { }
 
-        String port = System.getProperty("warbler.port", System.getenv("PORT"));
+        String port = getSystemProperty("warbler.port", getENV("PORT"));
         port = port == null ? "8080" : port;
-        String webserverConfig = System.getProperty("warbler.webserver_config", System.getenv("WARBLER_WEBSERVER_CONFIG"));
+        String webserverConfig = getSystemProperty("warbler.webserver_config", getENV("WARBLER_WEBSERVER_CONFIG"));
         String embeddedWebserverConfig = new URI("jar", entryPath(WEBSERVER_CONFIG), null).toURL().toString();
         webserverConfig = webserverConfig == null ? embeddedWebserverConfig : webserverConfig;
-        for (Map.Entry entry : props.entrySet()) {
+        for ( Map.Entry entry : props.entrySet() ) {
             String val = (String) entry.getValue();
             val = val.replace("{{warfile}}", archive).
                       replace("{{port}}", port).
@@ -157,8 +157,8 @@ public class WarMain extends JarMain {
 
         if (props.getProperty("props") != null) {
             String[] propsToSet = props.getProperty("props").split(",");
-            for (String key : propsToSet) {
-                System.setProperty(key, props.getProperty(key));
+            for ( String key : propsToSet ) {
+                setSystemProperty(key, props.getProperty(key));
             }
         }
 

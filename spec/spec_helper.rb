@@ -105,6 +105,8 @@ module ExampleGroupHelpers
           Gem::Specification.new do |gem|
             gem.name = "#{gem_name}"
             gem.version = '1.0'
+            gem.authors = ['John Doe']
+            gem.summary = "Gem for testing"
             gem.platform = Gem::Platform::RUBY
             gem.files = `git ls-files`.split("\n")
             gem.add_runtime_dependency 'rake', [">= 10.4.2"]

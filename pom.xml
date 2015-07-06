@@ -13,7 +13,7 @@ bundle up all of your application files for deployment to a Java environment.</d
   <url>https://github.com/jruby/warbler</url>
   <properties>
     <tesla.dump.readOnly>true</tesla.dump.readOnly>
-    <jruby.plugins.version>1.0.0</jruby.plugins.version>
+    <jruby.plugins.version>1.0.10</jruby.plugins.version>
     <tesla.dump.pom>pom.xml</tesla.dump.pom>
     <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
   </properties>

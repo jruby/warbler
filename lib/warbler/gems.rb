@@ -43,16 +43,19 @@ module Warbler
     end
 
     def specs(gem_dependencies)
-      @specs ||= map{|gem, version| find_single_gem_files(gem_dependencies, gem, version) }.flatten.compact
+      @specs ||= map { |gem, version| find_single_gem_files(gem_dependencies, gem, version) }.flatten.compact
     end
 
   private
 
     # Add a single gem to WEB-INF/gems
     def find_single_gem_files(gem_dependencies, gem_pattern, version = nil)
+      gem_spec_class = Gem::Specification
+      gem_spec_class = Gem::BasicSpecification if Gem.const_defined?(:BasicSpecification)
+      # Gem::Specification < Gem::BasicSpecification (since RGs 2.1)
       case gem_pattern
-      when Gem::Specification
-        return gem_pattern
+      when gem_spec_class
+        return BundlerHelper.to_spec(gem_pattern)
       when Gem::Dependency
         gem = gem_pattern
       else
@@ -62,14 +65,11 @@ module Warbler
       return nil if gem.respond_to?(:type) and gem.type != :runtime
 
       # Deal with deprecated Gem.source_index and #search
-      matched = gem.respond_to?(:to_spec) ? [gem.to_spec] : Gem.source_index.search(gem)
+      matched = gem.respond_to?(:to_spec) ? [ gem.to_spec ] : Gem.source_index.search(gem)
       fail "gem '#{gem}' not installed" if matched.empty?
       spec = matched.last
-      if gem_dependencies
-        [spec] + spec.dependencies.map{|gem| find_single_gem_files(gem_dependencies, gem) }
-      else
-        spec
-      end
+      return spec unless gem_dependencies
+      [spec] + spec.dependencies.map { |gem| find_single_gem_files(gem_dependencies, gem) }
     end
 
   end
