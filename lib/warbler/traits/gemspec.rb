@@ -55,15 +55,32 @@ module Warbler
 
       def default_executable
         if !@spec.executables.empty?
-          "bin/#{@spec.executables.first}"
-        else
-          exe = Dir['bin/*'].sort.first
-          raise "No executable script found" unless exe
-          warn "No default executable found in #{@spec_file}, using #{exe}"
+          bundler_version =
+            Gem.loaded_specs.include?("bundler") ?
+              Gem.loaded_specs["bundler"].version :
+              Gem::Version.create("0.0.0")
+          if (bundler_version <=> Gem::Version.create("1.8.0")) < 0
+            "bin/#{@spec.executables.first}"
+          else
+            exe_script = @spec.executables.first
+            if File.exists?("exe/#{exe_script}")
+              "exe/#{exe_script}"
+            elsif File.exists?("bin/#{exe_script}")
+              "bin/#{exe_script}"
+            else
+              raise "No `#{exe_script}` executable script found"
+            end
+          end
+        elsif exe = Dir['bin/*'].sort.first
+          warn "No default executable found in #{@spec_file}, using bin/#{exe}"
           exe
+        elsif exe = Dir['exe/*'].sort.first
+          warn "No default executable found in #{@spec_file}, using exe/#{exe}"
+          exe
+        else
+          raise "No executable script found" unless exe
         end
       end
-
     end
   end
 end

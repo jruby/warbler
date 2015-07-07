@@ -1,7 +1,7 @@
 = Warbler {<img src="https://badge.fury.io/rb/warbler.svg" alt="Gem Version" />}[http://badge.fury.io/rb/warbler] {<img src="https://travis-ci.org/jruby/warbler.png" />}[https://travis-ci.org/jruby/warbler]
 
-Warbler is a gem to make a Java jar or war file out of any Ruby, Rails or Rack 
-application. Warbler provides a minimal, flexible, Ruby-like way to bundle up 
+Warbler is a gem to make a Java jar or war file out of any Ruby, Rails or Rack
+application. Warbler provides a minimal, flexible, Ruby-like way to bundle up
 all of your application files for deployment to a Java environment.
 
 Warbler provides a sane set of out-of-the box defaults that should allow most
@@ -18,7 +18,7 @@ Version 1.4.x of Warbler supports versions of JRuby up to 1.7.x. The {2.x-dev br
 3. Choose one:
 
 * For a web project, deploy your +myapp.war+ file to your favorite Java application server.
- 
+
 * For a standalone applications, just run it: <tt>java -jar myapp.jar</tt>.
 
 == Usage
@@ -43,9 +43,9 @@ Type <tt>warble</tt> to create the jar or war file.
 
 == Features
 
-Warbler "features" are small Rake tasks that run before the creation of the war 
-file and make manipulations to the archive structure. For instance, the 
-+executable+ feature makes your war file capable of running on its own, 
+Warbler "features" are small Rake tasks that run before the creation of the war
+file and make manipulations to the archive structure. For instance, the
++executable+ feature makes your war file capable of running on its own,
 without a servlet container (using an embedded web server) :
 
     warble executable war
@@ -64,73 +64,73 @@ Currently, the following features are available :
   number of files in the .war. This is mostly useful for Google
   AppEngine where the number of files per application has a limit.
   (Note: not applicable for jar-based applications.)
-* +runnable+: This makes a (standard Java) runnable .war archive thus you can 
-  execute binary bundled (gem) commands e.g. "rake". You should use the -S 
-  switch to specify the binary followed by any arguments in takes e.g. 
+* +runnable+: This makes a (standard Java) runnable .war archive thus you can
+  execute binary bundled (gem) commands e.g. "rake". You should use the -S
+  switch to specify the binary followed by any arguments in takes e.g.
   <tt>java -jar myrailsapp.war -S rake db:migrate</tt>.
-* +executable+: This bundles an embedded web server into the .war so that it 
-  can either be deployed into a traditional java web server or run as a 
+* +executable+: This bundles an embedded web server into the .war so that it
+  can either be deployed into a traditional java web server or run as a
   standalone application using <tt>java -jar myapp.war</tt>.
   (Note: jar-based applications are executable by default.)
 * +compiled+: This uses +jrubyc+ to precompile all .rb files in your application
-  to .class files and includes those in the .war instead of the Ruby sources. 
-  NOTE: The war file will still contain .rb files, but they will be short stubs 
+  to .class files and includes those in the .war instead of the Ruby sources.
+  NOTE: The war file will still contain .rb files, but they will be short stubs
   containing the following code : <tt>load __FILE__.sub(/\.rb$/, '.class')</tt>
 
-Features may form the basis for a third-party plugin system (in the future) 
+Features may form the basis for a third-party plugin system (in the future)
 if there is demand.
 
-NOTE: Feature tasks must be included in the same command invocation and 
-inserted before the +war+ task in order to take effect. For example, 
-<tt>warble compiled; warble war</tt> does not compile and obfuscate +.rb+ 
-sources because the second invocation of +warble+ does not run the +compiled+ 
+NOTE: Feature tasks must be included in the same command invocation and
+inserted before the +war+ task in order to take effect. For example,
+<tt>warble compiled; warble war</tt> does not compile and obfuscate +.rb+
+sources because the second invocation of +warble+ does not run the +compiled+
 feature and creates a basic war with the sources included, make sure you run :
 
     warble compiled war
 
-or, if it's important that the war always be compiled, use the option above to 
+or, if it's important that the war always be compiled, use the option above to
 put the feature in your <tt>config/warble.rb</tt>.
 
 == War or Jar?
 
-War-based projects are for Rails, Merb, or Rack-based web applications. 
-They usually contain a +config/environment.rb+ file, a +config/init.rb+ file, 
+War-based projects are for Rails, Merb, or Rack-based web applications.
+They usually contain a +config/environment.rb+ file, a +config/init.rb+ file,
 or a +config.ru+ file.
-The presence of these files are used to determine if the project is a web 
+The presence of these files are used to determine if the project is a web
 application, and thus a Java EE compatible war file is built for the project.
 
-Jar-based projects are for standalone Ruby applications. Usually a Ruby 
-application has a launcher script in the +bin+ directory and Ruby code 
-in the <tt>lib</tt> directory. Warbler packages the application so that 
+Jar-based projects are for standalone Ruby applications. Usually a Ruby
+application has a launcher script in the +bin+ directory and Ruby code
+in the <tt>lib</tt> directory. Warbler packages the application so that
 <tt>java -jar myapp.jar</tt> runs the launcher script.
 
 == Jar Files
 
 === Gem Specification (gemspec) Files
 
-If your project has a <tt>.gemspec</tt> file in the top directory, it will be 
-used to configure the project's dependencies, launcher script, require paths, 
-and the files to be included in the archive. For best results make sure your 
+If your project has a <tt>.gemspec</tt> file in the top directory, it will be
+used to configure the project's dependencies, launcher script, require paths,
+and the files to be included in the archive. For best results make sure your
 gemspec specifies all of the following attributes:
 
 * +executables+
 * +require_paths+
 * runtime dependencies added with +add_dependency+
 
-If your project do not have a <tt>.gemspec</tt>, Warbler will attempt to guess 
-the launcher from the contents of the <tt>bin</tt> directory and use the 
-<tt>lib</tt> directory as the lone require path. All files in the project 
+If your project do not have a <tt>.gemspec</tt>, Warbler will attempt to guess
+the launcher from the contents of the <tt>bin</tt> directory and use the
+<tt>lib</tt> directory as the lone require path. All files in the project
 will be included in the archive.
 
 === Bundler
 
-Applications that use Bundler[http://gembundler.com/], detected via presence of 
-a +Gemfile+, will have the gems packaged up into the archive along with the 
-Gemfile. The Bundler groups named ":development", ":test" and ":assets" will be 
-excluded by default, unless you specify with <tt>config.bundle_without</tt> in 
+Applications that use Bundler[http://gembundler.com/], detected via presence of
+a +Gemfile+, will have the gems packaged up into the archive along with the
+Gemfile. The Bundler groups named ":development", ":test" and ":assets" will be
+excluded by default, unless you specify with <tt>config.bundle_without</tt> in
 +config/warble.rb+.
 
-Warbler supports Bundler for gems and git repositories, but not for plain path 
+Warbler supports Bundler for gems and git repositories, but not for plain path
 components. Warbler will warn when a +:path+ component is found in the +Gemfile+
 and will refuse to include it in the archive.
 
@@ -146,18 +146,18 @@ via presence of a +Jarfile+, will have the jars packaged up into the archive. th
 Rails applications are detected automatically and configured appropriately.
 The following items are set up for you:
 
-* Your application runs in the +production+ environment by default. 
+* Your application runs in the +production+ environment by default.
   Change it in +config/warble.rb+ (see below).
 * The Rails gem is packaged if you haven't vendored Rails (Rails <= 2.x).
 * Other gems configured in Rails.configuration.gems are packaged (2.1 - 2.3)
-* Multi-thread-safe execution (as introduced in Rails 2.2) is detected and 
+* Multi-thread-safe execution (as introduced in Rails 2.2) is detected and
   runtime pooling is disabled.
 
 === Other Rack-based applications
 
-If you have a +config.ru+ file in the top directory or one of the immediate 
-subdirectories of your application, it will be included and used as the rackup 
-script for your Rack-based application. You will probably need to specify 
+If you have a +config.ru+ file in the top directory or one of the immediate
+subdirectories of your application, it will be included and used as the rackup
+script for your Rack-based application. You will probably need to specify
 framework and application gems in +config/warble.rb+ unless you're using Bundler
 to manage your gems. <tt>ENV['RACK_ENV']</tt> will be set to +production+.
 
@@ -166,13 +166,13 @@ of how to configure Warbler to package Camping and Sinatra apps.
 
 === Configuration auto-detect notes
 
-* Warbler will load the +environment+ Rake task in a Rails application to try 
-  to detect some configuration. If you don't have database access in the 
-  environment where you package your application, you may wish to set 
-  <tt>Warbler.framework_detection = false</tt> at the top of +config.rb+. 
-  In this case you may need to specify additional details such as booter, gems 
+* Warbler will load the +environment+ Rake task in a Rails application to try
+  to detect some configuration. If you don't have database access in the
+  environment where you package your application, you may wish to set
+  <tt>Warbler.framework_detection = false</tt> at the top of +config.rb+.
+  In this case you may need to specify additional details such as booter, gems
   and other settings that would normally be gleaned from the app configuration.
-* Is it possible to more generally detect what gems an application uses? 
+* Is it possible to more generally detect what gems an application uses?
   <tt>Gem.loaded_specs</tt> is available, but the application needs to be
   loaded first before its contents are reliable.
 
@@ -185,7 +185,7 @@ doing this. With the gem, simply run
 
     warble config
 
-Finally, edit the +config/warble.rb+ to your taste. The generated file is 
+Finally, edit the +config/warble.rb+ to your taste. The generated file is
 fully-documented with the available options and default values.
 
 === War layout
@@ -244,7 +244,7 @@ lock the <tt>rubyzip</tt> gem to a version before 1.0.0.
 
 == Troubleshooting
 
-If Warbler isn't packaging the files you were expecting, use the +war:debug+ 
+If Warbler isn't packaging the files you were expecting, use the +war:debug+
 task to give you more insight into what's going on.
 
 If you think you found a bug, please file one at
@@ -262,7 +262,7 @@ https://github.com/jruby/warbler/tarball/master.
 
 == Development
 
-You can develop Warbler with any implementation of Ruby. To write Warbler code 
+You can develop Warbler with any implementation of Ruby. To write Warbler code
 and run specs, you need to have Bundler installed and run <tt>bundle</tt> once.
 
 After that, simply run <tt>rake</tt>.
@@ -284,6 +284,8 @@ http://maven.apache.org/ Be aware the homebrew installs 3.0.5, which doesn't wor
 
 Warbler is provided under the terms of the MIT license.
 
-Warbler (c) 2010-2013 Engine Yard, Inc.
+Warbler (c) 2013-2015 The JRuby project
+
+Warbler (c) 2010-2012 Engine Yard, Inc.
 
 Warbler (c) 2007-2009 Sun Microsystems, Inc.
