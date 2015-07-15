@@ -1,5 +1,6 @@
 == Master
 
+- Fixed a bug in detecting default PORT for executable WAR
 
 == 1.4.7
 
