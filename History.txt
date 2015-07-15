@@ -1,6 +1,7 @@
 == Master
 
 - Fixed a bug in detecting default PORT for executable WAR
+- #332: Warbler not picking up new Bundler convention of 'exe' directory for executables
 
 == 1.4.7
 
