@@ -288,7 +288,7 @@ public class JarMain implements Runnable {
 
     static String getSystemProperty(final String name, final String defaultValue) {
         try {
-            return System.getProperty(name);
+            return System.getProperty(name, defaultValue);
         }
         catch (SecurityException e) {
             return defaultValue;

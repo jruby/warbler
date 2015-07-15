@@ -1,5 +1,9 @@
 == 2x-dev
 
+== 1.4.9
+
+- Fixed a bug in detecting default PORT for executable WAR
+- #332: Warbler not picking up new Bundler convention of 'exe' directory for executables
 
 - Added the ability to set custom port for Jetty launcher with
   warbler.port or PORT env var
