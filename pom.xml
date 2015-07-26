@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>rubygems</groupId>
   <artifactId>warbler</artifactId>
-  <version>2.0.0.dev-SNAPSHOT</version>
+  <version>2.0.0.pre2-SNAPSHOT</version>
   <packaging>gem</packaging>
   <name>Warbler chirpily constructs .war files of your Rails applications.</name>
   <description>Warbler is a gem to make a Java jar or war file out of any Ruby,
@@ -27,7 +27,7 @@ bundle up all of your application files for deployment to a Java environment.</d
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>jruby-jars</artifactId>
-      <version>[9.0.0.0.pre2-SNAPSHOT,)</version>
+      <version>[9.0.0.0,)</version>
       <type>gem</type>
     </dependency>
     <dependency>
@@ -87,16 +87,6 @@ bundle up all of your application files for deployment to a Java environment.</d
     <repository>
       <id>rubygems-releases</id>
       <url>http://rubygems-proxy.torquebox.org/releases</url>
-    </repository>
-    <repository>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>rubygems-prereleases</id>
-      <url>http://rubygems-proxy.torquebox.org/prereleases</url>
     </repository>
   </repositories>
   <build>
