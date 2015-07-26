@@ -293,7 +293,7 @@ public class WarMain extends JarMain {
         // ideally this would look up the config.override_gem_home setting
         return "ENV['GEM_HOME'] = ENV['GEM_PATH'] = '"+ gemsDir +"' \n" +
         "ENV['BUNDLE_GEMFILE'] ||= '"+ gemfile +"' \n" +
-        "require 'META-INF/init.rb' \n";
+        "require 'uri:classloader:/META-INF/init.rb' \n";
     }
 
     protected String locateExecutableScript(final String executable) {
