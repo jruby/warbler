@@ -143,8 +143,6 @@ Warbler::Config.new do |config|
 
   # Embedded webserver to use with the 'executable' feature. Currently supported
   # webservers are:
-  # * <tt>winstone</tt> (default) - Winstone 0.9.10 from sourceforge
-  # * <tt>jenkins-ci.winstone</tt> - Improved Winstone from Jenkins CI
   # * <tt>jetty</tt> - Embedded Jetty from Eclipse
   # config.webserver = 'jetty'
 

@@ -86,33 +86,6 @@ module Warbler
     end
   end
 
-  class WinstoneServer < WebServer
-    def initialize
-      @artifact = Artifact.new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
-                               "net.sourceforge.winstone", "winstone-lite",
-                               ENV["WEBSERVER_VERSION"] || "0.9.10")
-    end
-
-    def add(jar)
-      super
-      jar.files["WEB-INF/webserver.properties"] = StringIO.new(<<-PROPS)
-mainclass = winstone.Launcher
-args = args0,args1,args2
-args0 = --warfile={{warfile}}
-args1 = --webroot={{webroot}}
-args2 = --directoryListings=false
-PROPS
-    end
-  end
-
-  class JenkinsWinstoneServer < WinstoneServer
-    def initialize
-      @artifact = Artifact.new("http://repo.jenkins-ci.org/public",
-                               "org.jenkins-ci", "winstone",
-                               ENV["WEBSERVER_VERSION"] || "0.9.10-jenkins-43")
-    end
-  end
-
   class JettyServer < WebServer
     def initialize
       @artifact = Artifact.new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
@@ -145,8 +118,6 @@ PROPS
   end
 
   WEB_SERVERS = Hash.new { |hash,_| hash['jetty'] }
-  WEB_SERVERS['winstone'] = WinstoneServer.new
-  WEB_SERVERS['jenkins-ci.winstone'] = JenkinsWinstoneServer.new
   WEB_SERVERS['jetty'] = JettyServer.new
 
 end

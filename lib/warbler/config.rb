@@ -167,8 +167,6 @@ module Warbler
     attr_accessor :webxml
 
     # Embedded webserver to use. Currently supported webservers are:
-    # * <tt>winstone</tt> (default) - Winstone 0.9.10 from sourceforge
-    # * <tt>jenkins-ci.winstone</tt> - Improved Winstone from Jenkins CI
     # * <tt>jetty</tt> - Embedded Jetty from Eclipse
     attr_accessor :webserver
 

@@ -39,17 +39,21 @@ import java.util.Set;
  * creates a URL classloader holding the jar, and loads and invokes the
  * <tt>main</tt> method of the main class mentioned in the properties.
  *
- * An example webserver.properties follows for Winstone. The <tt>args</tt>
+ * An example webserver.properties follows for Jetty. The <tt>args</tt>
  * property indicates the names and ordering of other properties to be used
  * as command-line arguments. The special tokens <tt>{{warfile}}</tt> and
  * <tt>{{webroot}}</tt> are substituted with the location of the .war file
  * being run and the temporary work directory, respectively.
  * <pre>
- * mainclass = winstone.Launcher
- * args = args0,args1,args2
- * args0 = --warfile={{warfile}}
- * args1 = --webroot={{webroot}}
- * args2 = --directoryListings=false
+ * mainclass = org.eclipse.jetty.runner.Runner
+ * args = args0,args1,args2,args3,args4
+ * props = jetty.home
+ * args0 = --port
+ * args1 = {{port}}
+ * args2 = --config
+ * args3 = {{config}}
+ * args4 = {{warfile}}
+ * jetty.home = {{webroot}}
  * </pre>
  *
  * System properties can also be set via webserver.properties. For example,
@@ -180,17 +184,6 @@ public class WarMain extends JarMain {
         String[] newArgs = launchWebServerArguments(props);
         debug("invoking webserver with: " + Arrays.deepToString(newArgs));
         main.invoke(null, new Object[] { newArgs });
-
-        // the following code is specific to winstone. but a whole winstone module like the jetty module seemed
-        // excessive. if running under jetty (or anything other than wintstone) this will effectively do nothing.
-        Set<Thread> threads = Thread.getAllStackTraces().keySet();
-        for (Thread thread : threads) {
-            String name = thread.getName();
-            if (name.startsWith("LauncherControlThread")) {
-                debug("joining thread: " + name);
-                thread.join();
-            }
-        }
     }
 
     private String[] launchWebServerArguments(Properties props) {

@@ -21,8 +21,8 @@ describe Warbler::WebServer::Artifact do
   end
 
   let(:sample_artifact) do
-    Warbler::WebServer::Artifact.new("http://repo.jenkins-ci.org/public",
-      "org.jenkins-ci", "winstone", "0.9.10-jenkins-43"
+    Warbler::WebServer::Artifact.new(
+      "http://repo2.maven.org/maven2", "org.eclipse.jetty", "jetty-runner", "9.2.9.v20150224"
     )
   end
 
