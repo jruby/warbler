@@ -142,6 +142,7 @@ public class WarMain extends JarMain {
 
         String port = getSystemProperty("warbler.port", getENV("PORT"));
         port = port == null ? "8080" : port;
+        String host = getSystemProperty("warbler.host", "0.0.0.0");
         String webserverConfig = getSystemProperty("warbler.webserver_config", getENV("WARBLER_WEBSERVER_CONFIG"));
         String embeddedWebserverConfig = new URI("jar", entryPath(WEBSERVER_CONFIG), null).toURL().toString();
         webserverConfig = webserverConfig == null ? embeddedWebserverConfig : webserverConfig;
@@ -149,6 +150,7 @@ public class WarMain extends JarMain {
             String val = (String) entry.getValue();
             val = val.replace("{{warfile}}", archive).
                       replace("{{port}}", port).
+                      replace("{{host}}", host).
                       replace("{{config}}", webserverConfig).
                       replace("{{webroot}}", webroot.getAbsolutePath());
             entry.setValue(val);
