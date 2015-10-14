@@ -802,20 +802,24 @@ describe Warbler::Jar do
       context "with rails version 4" do
 
         let (:manifest_file) { "public/assets/manifest-1234.json" }
+        let (:sprockets_manifest_file) { "public/assets/.sprockets-manifest-1234.json" }
 
         shared_examples_for "asset pipeline" do
           it "automatically adds asset pipeline manifest file to the included files" do
             config.includes.should include(manifest_file)
+            config.includes.should include(sprockets_manifest_file)
           end
         end
 
         before do
           mkdir File.dirname(manifest_file)
           File.open(manifest_file, "w")
+          File.open(sprockets_manifest_file, "w")
         end
 
         after do
           rm_rf File.dirname(manifest_file)
+          rm_rf File.dirname(sprockets_manifest_file)
         end
 
         context "When rails version is specified in Gemfile" do
