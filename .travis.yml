@@ -2,9 +2,7 @@ sudo: false
 language: ruby
 script: bundle exec rake spec
 rvm:
-  - jruby-9.0.0.0.pre2
-jdk:
-  - oraclejdk8
+  - jruby-9.0.4.0
 branches:
   only:
     - master
@@ -36,7 +34,6 @@ matrix:
     - rvm: jruby
       env: MAVEN_OPTS="-XX:MaxPermSize=128m"
       script: mvn clean verify
->>>>>>> master
   allow_failures:
     - rvm: jruby-head
 notifications:
