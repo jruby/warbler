@@ -226,7 +226,7 @@ public class WarMain extends JarMain {
     protected URL extractEntry(final JarEntry entry, final String path) throws Exception {
         // always extract but only return class-path entry URLs :
         final URL entryURL = super.extractEntry(entry, path);
-        return path.endsWith(".jar") ? entryURL : null;
+        return path.endsWith(".jar") && path.startsWith("/lib/") ? entryURL : null;
     }
 
     @Override

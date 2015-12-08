@@ -26,20 +26,26 @@ end
 task :default => :spec
 
 # use Mavenfile to define :jar task
-require 'maven/ruby/tasks'
+require 'maven/ruby/maven'
+mvn = Maven::Ruby::Maven.new
+mvn.inherit_jruby_version
+
+desc 'compile java sources and build jar'
+task :jar do
+  mvn.prepare_package
+end
 
 desc 'run some integration test'
 task :integration do
-  maven.verify
+  mvn.verify
 end
 
 desc 'generate the pom.xml from the Mavenfile'
 task :pom do
-  maven.validate
+  mvn.validate('-Dpolyglot.dump.pom=pom.xml')
 end
 
 # Make sure jar gets compiled before the gem is built
-# the jar tasks is part of maven-tasks
 task :build => :jar
 
 load_gemspec = lambda do
