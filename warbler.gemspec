@@ -26,8 +26,7 @@ bundle up all of your application files for deployment to a Java environment.}
   gem.add_runtime_dependency 'jruby-jars', [">= 9.0.0.0"]
   gem.add_runtime_dependency 'jruby-rack', [">= 1.1.1", '< 1.3']
   gem.add_runtime_dependency 'rubyzip', [">= 1.0", "< 1.2"]
-  gem.add_development_dependency 'jbundler', "~> 0.5.5"
-  gem.add_development_dependency 'ruby-maven', '~> 3.1.1.0'
+  gem.add_development_dependency 'jbundler', "~> 0.9"
   gem.add_development_dependency 'rspec', "~> 2.10"
   gem.add_development_dependency 'rdoc', ">= 2.4.2"
 end
