@@ -23,4 +23,4 @@ notifications:
 before_install:
   - sudo apt-get update && sudo apt-get install git
   - git fetch --unshallow
-  - gem install bundler --pre
+  - gem install bundler
