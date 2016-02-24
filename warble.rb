@@ -152,9 +152,6 @@ Warbler::Config.new do |config|
   # Application booter to use, either :rack or :rails (autodetected by default)
   # config.webxml.booter = :rails
 
-  # Set JRuby to run in 1.9 mode.
-  # config.webxml.jruby.compat.version = "1.9"
-
   # When using the :rack booter, "Rackup" script to use.
   # - For 'rackup.path', the value points to the location of the rackup
   # script in the web archive file. You need to make sure this file
