@@ -26,7 +26,7 @@ import java.util.jar.JarFile;
 
 public class JarMain implements Runnable {
 
-    static final String MAIN = "/" + JarMain.class.getName().replace('.', '/') + ".class";
+    static final String MAIN = '/' + JarMain.class.getName().replace('.', '/') + ".class";
 
     protected final String[] args;
     protected final String archive;
@@ -78,7 +78,7 @@ public class JarMain implements Runnable {
     protected String getExtractEntryPath(final JarEntry entry) {
         final String name = entry.getName();
         if ( name.startsWith("META-INF/lib") && name.endsWith(".jar") ) {
-            return name.substring(name.lastIndexOf("/") + 1);
+            return name.substring(name.lastIndexOf('/') + 1);
         }
         return null; // do not extract entry
     }

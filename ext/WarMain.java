@@ -6,7 +6,6 @@
  */
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Constructor;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.SequenceInputStream;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Map;
 import java.util.jar.JarEntry;
-import java.util.Set;
 
 /**
  * Used as a Main-Class in the manifest for a .war file, so that you can run
@@ -65,7 +63,7 @@ import java.util.Set;
  */
 public class WarMain extends JarMain {
 
-    static final String MAIN = "/" + WarMain.class.getName().replace('.', '/') + ".class";
+    static final String MAIN = '/' + WarMain.class.getName().replace('.', '/') + ".class";
     static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
     static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
     static final String WEBSERVER_CONFIG = "/WEB-INF/webserver.xml";
@@ -219,7 +217,7 @@ public class WarMain extends JarMain {
             // 404.html -> public/404.html
             return "/public/" + name;
         }
-        return "/" + name;
+        return '/' + name;
     }
 
     @Override

@@ -74,13 +74,13 @@ public class WarblerJar {
                                                 entry.convertToString().getUnicodeValue());
             try {
                 byte[] buf = new byte[16384];
-                ByteList blist = new ByteList();
-                int bytesRead = -1;
+                ByteList bytes = new ByteList();
+                int bytesRead;
                 while ((bytesRead = entryStream.read(buf)) != -1) {
-                    blist.append(buf, 0, bytesRead);
+                    bytes.append(buf, 0, bytesRead);
                 }
                 IRubyObject stringio = runtime.getModule("StringIO");
-                return stringio.callMethod(context, "new", runtime.newString(blist));
+                return stringio.callMethod(context, "new", runtime.newString(bytes));
             } finally {
                 close(entryStream);
             }
