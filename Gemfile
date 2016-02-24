@@ -7,3 +7,5 @@ group :development do
   gem "rcov", ">= 0.9.8", :platform => :mri_18
   gem "childprocess", :platform => :mri
 end
+
+gem 'rubyzip', ENV['RUBYZIP_VERSION'] if ENV['RUBYZIP_VERSION']
