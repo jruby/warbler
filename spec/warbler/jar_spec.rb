@@ -183,7 +183,7 @@ describe Warbler::Jar do
         jar.compile(config)
         jar.apply(config)
         file_list(%r{sample_jar.*\.rb$}).size.should == 2
-        file_list(%r{gems.*\.class$}).size.should == 80
+        file_list(%r{gems.*\.class$}).size.should == 83
       end
 
       it "does not compile included gems by default" do
