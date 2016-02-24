@@ -53,15 +53,9 @@ module Warbler
     end
 
     def run_javac(config, compiled_ruby_files)
-      if config.webxml && config.webxml.context_params.has_key?('jruby.compat.version')
-        compat_version = "--#{config.webxml.jruby.compat.version}"
-      else
-        compat_version = ''
-      end
-
       compiled_ruby_files.each_slice(2500) do |slice|
         # Need to use the version of JRuby in the application to compile it
-        javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main #{compat_version} -S jrubyc \"#{slice.join('" "')}\"}
+        javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main -S jrubyc \"#{slice.join('" "')}\"}
         if which('java').nil? && which('env')
           system %Q{env -i #{javac_cmd}}
         else
