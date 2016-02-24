@@ -57,12 +57,12 @@ Warbler::Config.new do |config|
 
   # The most recent versions of gems are used.
   # You can specify versions of gems by using a hash assignment:
-  # config.gems["rails"] = "2.3.10"
+  # config.gems["rails"] = "4.2.5"
 
   # You can also use regexps or Gem::Dependency objects for flexibility or
   # finer-grained control.
   # config.gems << /^sinatra-/
-  # config.gems << Gem::Dependency.new("sinatra", "= 1.4.5")
+  # config.gems << Gem::Dependency.new("sinatra", "= 1.4.7")
 
   # Include gem dependencies not mentioned specifically. Default is
   # true, uncomment to turn off.
