@@ -184,7 +184,7 @@ describe Warbler::Jar do
         jar.apply(config)
         file_list(%r{sample_jar.*\.rb$}).size.should == 2
         if RUBY_VERSION >= '1.9'
-          file_list(%r{gems.*\.class$}).size.should == 80
+          file_list(%r{gems.*\.class$}).size.should >= 80 # depending on RubyZip version
         else
           # 1.8.7 uses an older version of rubyzip and so the number of files compiled changes
           file_list(%r{gems.*\.class$}).size.should == 32

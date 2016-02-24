@@ -9,6 +9,8 @@ group :development do
   gem "maven-tools", "~> 0.34.5"
 end
 
-if RUBY_VERSION < "1.9"
+if ENV['RUBYZIP_VERSION']
+  gem 'rubyzip', ENV['RUBYZIP_VERSION']
+elsif RUBY_VERSION < "1.9"
   gem 'rubyzip', '~> 0.9'
 end
