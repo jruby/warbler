@@ -210,7 +210,7 @@ module Warbler
             end
           end
           extra_ignored = Array === ignored ? ignored : []
-          params.delete_if {|k,v| ['ignored', *extra_ignored].include?(k.to_s) }
+          params.delete_if { |k,_| ['ignored', *extra_ignored].include?(k.to_s) }
           params
         end
 
