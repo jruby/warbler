@@ -242,17 +242,8 @@ module Warbler
       end
     end
 
-    # Deprecated
-    def war_name
-      $stderr.puts "config.war_name deprecated; replace with config.jar_name" #:nocov:
-      jar_name                  #:nocov:
-    end
-
-    # Deprecated
-    def war_name=(w)
-      $stderr.puts "config.war_name deprecated; replace with config.jar_name" #:nocov:
-      self.jar_name = w         #:nocov:
-    end
+    alias_method :war_name, :jar_name
+    alias_method :war_name=, :jar_name=
 
     private
     def warbler_vendor_excludes(warbler_home)
