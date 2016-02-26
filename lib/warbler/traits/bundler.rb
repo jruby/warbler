@@ -47,7 +47,7 @@ module Warbler
               full_gem_path = full_gem_path.dirname
               # if at top of the path, meaning we cannot find bundler.gemspec, abort.
               if full_gem_path.to_s =~ /^[\.\/]$/
-                $stderr.puts("warning: Unable to detect bundler spec under '#{spec.full_gem_path}'' and is sub-dirs")
+                warn("Unable to detect bundler spec under '#{spec.full_gem_path}'' and its sub-dirs")
                 exit
               end
             end
@@ -64,9 +64,9 @@ module Warbler
             config.bundler[:git_specs] << spec
           when ::Bundler::Source::Path
             unless bundler_source_is_warbled_gem_itself?(spec.source)
-              $stderr.puts("warning: Bundler `path' components are not currently supported.",
-                           "The `#{spec.full_name}' component was not bundled.",
-                           "Your application may fail to boot!")
+              warn("Bundler `path' components are not currently supported.\n" +
+                   "The `#{spec.full_name}' component was not bundled.\n" +
+                   "Your application may fail to boot!")
             end
           else
             config.gems << spec

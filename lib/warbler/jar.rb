@@ -199,7 +199,7 @@ module Warbler
       full_gem_path = Pathname.new(spec.full_gem_path)
 
       # skip gems whose full_gem_path does not exist
-      ($stderr.puts "warning: skipping #{spec.name} (#{full_gem_path.to_s} does not exist)" ; return) unless full_gem_path.exist?
+      (warn "skipping #{spec.name} (#{full_gem_path.to_s} does not exist)" ; return) unless full_gem_path.exist?
 
       @files[apply_pathmaps(config, "#{spec.full_name}.gemspec", :gemspecs)] = StringIO.new(spec.to_ruby)
       FileList["#{full_gem_path.to_s}/**/*"].each do |src|
@@ -213,7 +213,7 @@ module Warbler
     def find_application_files(config)
       config.dirs.select do |d|
         exists = File.directory?(d)
-        $stderr.puts "warning: application directory `#{d}' does not exist or is not a directory; skipping" unless exists
+        warn "application directory `#{d}' does not exist or is not a directory; skipping" unless exists
         exists
       end.each do |d|
         @files[apply_pathmaps(config, d, :application)] = nil
@@ -280,8 +280,8 @@ module Warbler
             zipfile.get_output_stream(entry) {|f| f << src.read }
           elsif src.nil? || File.directory?(src)
             if File.symlink?(entry) && ! defined?(JRUBY_VERSION)
-              $stderr.puts "directory symlinks are not followed unless using JRuby; " +
-                           "#{entry.inspect} contents not in archive"
+              warn "directory symlinks are not followed unless using JRuby; " +
+                   "#{entry.inspect} contents not in archive"
             end
             zipfile.mkdir(entry.dup) # in case it's frozen rubyzip 0.9.6.1 workaround
           elsif File.symlink?(src)
@@ -289,7 +289,7 @@ module Warbler
           elsif File.exist?(src)
             zipfile.add(entry, src)
           else
-            $stderr.puts "File not found; #{entry.inspect} not in archive"
+            warn "file not found; #{entry.inspect} not in archive"
           end
         end
       end
@@ -310,7 +310,7 @@ module Warbler
   class War < Jar
     def initialize(*)
       super
-      $stderr.puts "Warbler::War is deprecated. Please replace all occurrences with Warbler::Jar."
+      warn "Warbler::War is deprecated. Please replace all occurrences with Warbler::Jar."
     end
   end
 end
