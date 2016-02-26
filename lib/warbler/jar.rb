@@ -52,10 +52,15 @@ module Warbler
       end
     end
 
+    DEFAULT_COMPILED_FILES_SLICE = 2500
+
     def run_jrubyc(config, compiled_ruby_files)
-      compiled_ruby_files.each_slice(2500) do |slice|
+      slice_size = (ENV['WARBLER_COMPILED_FILES_SLICE'] || 0).to_i
+      slice_size = DEFAULT_COMPILED_FILES_SLICE if slice_size <= 0
+      compiled_ruby_files.each_slice(slice_size) do |files|
+        files = "\"#{files.join('" "')}\""
         # Need to use the version of JRuby in the application to compile it
-        javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main -S jrubyc \"#{slice.join('" "')}\"}
+        javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main -S jrubyc #{files}}
         if which('java').nil? && which('env')
           system %Q{env -i #{javac_cmd}}
         else
