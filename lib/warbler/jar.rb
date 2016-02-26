@@ -43,16 +43,16 @@ module Warbler
 
       if config.compile_gems
         ruby_files = gather_all_rb_files(config)
-        run_javac(config, ruby_files.values)
+        run_jrubyc(config, ruby_files.values)
         replace_compiled_ruby_files_and_gems(config, ruby_files)
       else
         compiled_ruby_files = config.compiled_ruby_files - config.excludes.to_a
-        run_javac(config, compiled_ruby_files)
+        run_jrubyc(config, compiled_ruby_files)
         replace_compiled_ruby_files(config, compiled_ruby_files)
       end
     end
 
-    def run_javac(config, compiled_ruby_files)
+    def run_jrubyc(config, compiled_ruby_files)
       compiled_ruby_files.each_slice(2500) do |slice|
         # Need to use the version of JRuby in the application to compile it
         javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main -S jrubyc \"#{slice.join('" "')}\"}
@@ -65,6 +65,8 @@ module Warbler
       end
       @compiled = true
     end
+    # @deprecated only due compatibility
+    alias_method :run_javac, :run_jrubyc
 
     def java_version(config)
       config.bytecode_version ? "-Djava.specification.version=#{config.bytecode_version}" : ''
