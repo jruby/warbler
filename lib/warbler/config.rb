@@ -120,6 +120,10 @@ module Warbler
     # Ignored unless compile feature is used.
     attr_accessor :compile_gems
 
+    # Desired options passed to JRuby compiler if compiling to class files.
+    # Ignored unless compile feature is used.
+    attr_accessor :jrubyc_options
+
     # Warbler writes an "init" file into the war at this location. JRuby-Rack and possibly other
     # launchers may use this to initialize the Ruby environment.
     attr_accessor :init_filename

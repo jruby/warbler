@@ -35,7 +35,7 @@ describe Warbler::Jar do
 
   context "in a jar project" do
     run_in_directory "spec/sample_jar"
-    cleanup_temp_files
+    cleanup_temp_files include: '*.java'
 
     it "detects a Jar trait" do
       config.traits.should include(Warbler::Traits::Jar)
@@ -192,6 +192,14 @@ describe Warbler::Jar do
         jar.apply(config)
         file_list(%r{sample_jar.*\.rb$}).size.should == 2
         file_list(%r{gems.*\.class$}).size.should == 0
+      end
+
+      it "compiles with jrubyc options when specified" do
+        config.jrubyc_options = [ '--java' ]
+        config.compiled_ruby_files = %w(lib/sample_jar.rb)
+        jar.compile(config)
+        jar.apply(config)
+        expect( FileList['*'] ).to include 'SampleJar.java'
       end
 
     end

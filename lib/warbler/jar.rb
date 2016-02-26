@@ -60,18 +60,30 @@ module Warbler
       compiled_ruby_files.each_slice(slice_size) do |files|
         files = "\"#{files.join('" "')}\""
         # Need to use the version of JRuby in the application to compile it
-        javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main -S jrubyc #{files}}
+        javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main -S jrubyc #{jrubyc_options(config)} #{files}}
         if which('java').nil? && which('env')
-          system %Q{env -i #{javac_cmd}}
+          execute %Q{env -i #{javac_cmd}}
         else
-          system javac_cmd
+          execute javac_cmd
         end
-        raise "Compile failed" if $?.exitstatus > 0
       end
       @compiled = true
     end
     # @deprecated only due compatibility
     alias_method :run_javac, :run_jrubyc
+
+    def execute(cmd)
+      puts cmd if $VERBOSE
+      system cmd
+      raise "Compilation of .rb files failed" if $?.exitstatus > 0
+    end
+
+    def jrubyc_options(config)
+      options = ENV['WARBLER_JRUBYC_OPTIONS'] || config.jrubyc_options
+      options = options.join(' ') if options.is_a?(Array)
+      options || ''
+    end
+    private :jrubyc_options
 
     def java_version(config)
       config.bytecode_version ? "-Djava.specification.version=#{config.bytecode_version}" : ''
