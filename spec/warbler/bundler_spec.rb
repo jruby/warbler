@@ -218,7 +218,7 @@ describe Warbler::Jar, "with Bundler" do
 
   context "in a rack app" do
     run_in_directory "spec/sample_rack_war"
-    cleanup_temp_files '**/config.ru'
+    cleanup_temp_files except: '**/config.ru'
 
     it "should have default load path" do
       jar.add_init_file(config)
