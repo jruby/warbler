@@ -62,9 +62,9 @@ module Warbler
         # Need to use the version of JRuby in the application to compile it
         javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main -S jrubyc #{jrubyc_options(config)} #{files}}
         if which('java').nil? && which('env')
-          execute %Q{env -i #{javac_cmd}}
+          sh_jrubyc %Q{env -i #{javac_cmd}}
         else
-          execute javac_cmd
+          sh_jrubyc javac_cmd
         end
       end
       @compiled = true
@@ -72,11 +72,12 @@ module Warbler
     # @deprecated only due compatibility
     alias_method :run_javac, :run_jrubyc
 
-    def execute(cmd)
-      puts cmd if $VERBOSE
-      system cmd
-      raise "Compilation of .rb files failed" if $?.exitstatus > 0
+    def sh_jrubyc(cmd)
+      sh(cmd) do |ok, res|
+        raise "Compilation of .rb files failed (#{res})" unless ok
+      end
     end
+    private :sh_jrubyc
 
     def jrubyc_options(config)
       options = ENV['WARBLER_JRUBYC_OPTIONS'] || config.jrubyc_options
@@ -171,10 +172,10 @@ module Warbler
       end
       rm_f path
       ensure_directory_entries
-      puts "Creating #{path}" unless silent?
       if Warbler::Config === config_or_path
         @files.delete("#{config_or_path.jar_name}/#{path}")
       end
+      puts "Creating #{path}" unless silent?
       create_jar path, @files
     end
 
