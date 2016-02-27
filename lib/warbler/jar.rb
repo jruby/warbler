@@ -59,8 +59,9 @@ module Warbler
       slice_size = DEFAULT_COMPILED_FILES_SLICE if slice_size <= 0
       compiled_ruby_files.each_slice(slice_size) do |files|
         files = "\"#{files.join('" "')}\""
+        classpath = config.java_libs.map { |lib| "\"#{lib.gsub('"', '\\"')}\"" }.join(File::PATH_SEPARATOR)
         # Need to use the version of JRuby in the application to compile it
-        javac_cmd = %Q{java -classpath #{config.java_libs.join(File::PATH_SEPARATOR)} #{java_version(config)} org.jruby.Main -S jrubyc #{jrubyc_options(config)} #{files}}
+        javac_cmd = %Q{java -classpath #{classpath} #{java_version(config)} org.jruby.Main -S jrubyc #{jrubyc_options(config)} #{files}}
         if which('java').nil? && which('env')
           sh_jrubyc %Q{env -i #{javac_cmd}}
         else
