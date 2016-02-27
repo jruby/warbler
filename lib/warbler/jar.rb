@@ -158,7 +158,7 @@ module Warbler
       end
       rm_f path
       ensure_directory_entries
-      puts "Creating #{path}"
+      puts "Creating #{path}" unless silent?
       if Warbler::Config === config_or_path
         @files.delete("#{config_or_path.jar_name}/#{path}")
       end

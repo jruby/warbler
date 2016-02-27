@@ -25,5 +25,12 @@ module Warbler
         base.extend Rake::FileUtilsExt
       end
     end
+
+    private
+
+    def silent?
+      Rake.application.options.silent rescue nil
+    end
+
   end
 end
