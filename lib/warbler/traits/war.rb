@@ -68,8 +68,8 @@ module Warbler
       end
 
       def default_jar_files
-        require 'jruby-jars'
-        require 'jruby-rack'
+        require 'jruby-jars' unless defined? JRubyJars.core_jar_path
+        require 'jruby-rack' unless defined? JRubyJars.jruby_rack_jar_path
         FileList[JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path, JRubyJars.jruby_rack_jar_path]
       end
 
