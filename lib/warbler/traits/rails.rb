@@ -45,9 +45,12 @@ module Warbler
       def after_configure
         config.init_contents << "#{config.warbler_templates}/rails.erb"
 
-        if threadsafe_enabled? or rails_4?
-          config.webxml.jruby.min.runtimes = 1 unless Integer === config.webxml.jruby.min.runtimes
-          config.webxml.jruby.max.runtimes = 1 unless Integer === config.webxml.jruby.max.runtimes
+        if config.webxml.jruby.min.runtimes.is_a?(OpenStruct) &&
+           config.webxml.jruby.max.runtimes.is_a?(OpenStruct) # not set
+           if rails_major_version(0) >= 4 || threadsafe_enabled?
+             config.webxml.jruby.min.runtimes = 1
+             config.webxml.jruby.max.runtimes = 1
+           end
         end
 
         config.includes += FileList["public/assets/.sprockets-manifest-*.json"].existing
@@ -70,14 +73,17 @@ module Warbler
         end
       end
 
-      def rails_4?
+      def rails_major_version(default = 0)
         begin
-          unless IO.readlines("Gemfile").grep(/^\s*gem\s('|")rails('|"),\s('|")4\.\d+\.\d+/).empty? &&
-              IO.readlines("Gemfile.lock").grep(/^\s*rails\s\([=~><]*\s*4\.(\d+)\.(\d+).*\)$/).empty?
-            return true
+          File.open("#{ENV['BUNDLE_GEMFILE'] || 'Gemfile'}.lock") do |file|
+            file.each_line do |line|
+              match = line.match /^\s*rails\s\(\s*(\d)\.\d+\.\d+.*\)$/
+              return match[1].to_i if match
+            end
           end
         rescue
         end
+        default
       end
     end
   end
