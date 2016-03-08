@@ -176,15 +176,6 @@ module Warbler
           @table = Hash.new { |h, k| h[k] = WebxmlOpenStruct.new(k) }
         end
 
-        def servlet_context_listener
-          case self.booter
-          when :rack
-            "org.jruby.rack.RackServletContextListener"
-          else # :rails, default
-            "org.jruby.rack.rails.RailsServletContextListener"
-          end
-        end
-
         def [](key)
           new_ostruct_member(key)
           send(key)
@@ -193,6 +184,35 @@ module Warbler
         def []=(key, value)
           new_ostruct_member(key)
           send("#{key}=", value)
+        end
+
+        def method_missing(mid, *args)
+          len = args.length
+          if mname = mid[/.*(?==\z)/m]
+            if len != 1
+              raise ArgumentError, "wrong number of arguments (#{len} for 1)", caller(1)
+            end
+            modifiable[new_ostruct_member(mname)] = args[0]
+          elsif len == 0
+            @table[mid]
+          else
+            err = NoMethodError.new "undefined method `#{mid}' for #{self}", mid, args
+            err.set_backtrace caller(1)
+            raise err
+          end
+        end
+
+        def respond_to_missing?(mid, include_private = false)
+          @table.key?(mid.to_s.chomp('=').to_sym) || super
+        end
+
+        def servlet_context_listener
+          case self.booter
+          when :rack
+            "org.jruby.rack.RackServletContextListener"
+          else # :rails, default
+            "org.jruby.rack.rails.RailsServletContextListener"
+          end
         end
 
         def context_params(escape = true)
