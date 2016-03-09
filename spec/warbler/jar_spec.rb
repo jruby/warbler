@@ -816,23 +816,23 @@ describe Warbler::Jar do
           rm_rf File.dirname(manifest_file)
         end
 
-        context "When rails version is specified in Gemfile" do
+        context "when rails version is found in Gemfile.lock" do
           before :each do
-            File.open("Gemfile", "a") { |f| f.puts "gem 'rails', '4.0.0'" }
-          end
-
-          after :each do
-            rm "Gemfile"
+            ENV['BUNDLE_GEMFILE'] = File.expand_path('../rails4_stub/Gemfile', File.dirname(__FILE__))
           end
 
           it_should_behave_like "threaded environment"
           it_should_behave_like "asset pipeline"
         end
 
-        context "when rails version is not specified in Gemfile" do
+        context "when rails version is not found in Gemfile.lock" do
           before :each do
-            File.open("Gemfile", "a") { |f| f.puts "gem 'rails'" }
-            File.open("Gemfile.lock", "a") { |f| f.puts " rails (4.0.0)" }
+            File.open("Gemfile", 'w') { |f| f.puts "gem 'rails-name'\n\n" }
+            File.open("Gemfile.lock", 'w') do |f|
+              f.puts " rails-name (4.0.0)"
+              f.puts " apry-rails (4.2.0)"
+              f.puts ""
+            end
           end
 
           after :each do
@@ -840,7 +840,11 @@ describe Warbler::Jar do
             rm "Gemfile.lock"
           end
 
-          it_should_behave_like "threaded environment"
+          it "doesn't set runtime numbers to 1" do
+            config.webxml.jruby.min.runtimes.should_not == 1
+            config.webxml.jruby.max.runtimes.should_not == 1
+          end
+
           it_should_behave_like "asset pipeline"
         end
       end
