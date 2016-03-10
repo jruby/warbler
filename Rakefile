@@ -18,6 +18,12 @@ end
 require 'rake/clean'
 CLEAN << "pkg" << "doc" << Dir['integration/**/target']
 
+unless Rake::Application.method_defined? :last_comment
+  Rake::Application.module_eval do
+    alias_method :last_comment, :last_description
+  end
+end # Rake 11 compatibility (due rspec/core/rake_task < 3.0)
+
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.rspec_opts = ['--color', "--format documentation"]
