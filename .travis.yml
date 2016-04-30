@@ -6,8 +6,7 @@ rvm:
 branches:
   only:
     - master
-    - 2.x-dev
-    - /^test-.*/
+    - /-dev|-feature|-fix/
 before_install:
   - ([ "$BUNDLER_VERSION" ] && gem uninstall bundler --all --force && gem install bundler -v "$BUNDLER_VERSION") || true
   - bundle --version
