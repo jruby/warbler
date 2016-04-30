@@ -910,10 +910,10 @@ describe Warbler::Jar do
 
       it "skips Merb development dependencies" do
         task :merb_env do
-          @merb.dependencies = [Gem::Dependency.new("rake", "= #{RAKEVERSION}", :development)]
+          @merb.dependencies = [Gem::Dependency.new("rake", "= #{Rake::VERSION}", :development)]
         end
         jar.apply(config)
-        file_list(/rake-#{RAKEVERSION}/).should be_empty
+        file_list(/rake-#{Rake::VERSION}/).should be_empty
       end
 
       it "warns about using Merb < 1.0" do
