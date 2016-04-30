@@ -2,7 +2,7 @@ sudo: false
 language: ruby
 script: bundle exec rake spec
 rvm:
-  - jruby-1.7.8
+  - jruby-1.7.24
 branches:
   only:
     - master
@@ -13,13 +13,16 @@ before_install:
 before_script:
   - export JRUBY_OPTS="$JRUBY_OPTS --server -Xcext.enabled=false -Xcompile.invokedynamic=false"
 env:
-  - JRUBY_OPTS="--1.8" BUNDLER_VERSION="~> 1.7.9"
-  - JRUBY_OPTS="--1.9" BUNDLER_VERSION="~> 1.8.9"
+  - BUNDLER_VERSION="~> 1.10"
 matrix:
   include:
-    - rvm: jruby-head
-      env: JRUBY_OPTS="" BUNDLER_VERSION="~> 1.9.9"
-    - rvm: jruby-1.7.20
+    - rvm: jruby-1.7.24
+      env: JRUBY_OPTS="--1.8" BUNDLER_VERSION="~> 1.7.9"
+    - rvm: jruby-1.7.24
+      env: JRUBY_OPTS="--1.9" BUNDLER_VERSION="~> 1.11.2"
+    - rvm: jruby-1.7.8
+      env: JRUBY_OPTS="--1.8" BUNDLER_VERSION="~> 1.8.9"
+    - rvm: jruby-1.7.16
       env: JRUBY_OPTS="" BUNDLER_VERSION="~> 1.10.2"
     - rvm: 1.8.7
       env: BUNDLER_VERSION="~> 1.6.9"
@@ -32,7 +35,6 @@ matrix:
       script: mvn clean verify
   allow_failures:
     - rvm: jruby
-    - rvm: jruby-head
 notifications:
   irc:
     channels:
