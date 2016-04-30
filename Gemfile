@@ -9,8 +9,9 @@ group :development do
   gem "maven-tools", "~> 0.34.5"
 end
 
-if ENV['RAKE_VERSION']
-  gem 'rake', ENV['RAKE_VERSION'], :require => nil
+group :development, :test do
+  gem 'rdoc', '~> 2.4.2', :require => nil
+  gem 'rake', ENV['RAKE_VERSION'], :require => nil if ENV['RAKE_VERSION']
 end
 
 if ENV['RUBYZIP_VERSION']
