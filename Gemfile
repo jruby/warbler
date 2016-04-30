@@ -10,7 +10,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'rdoc', '~> 2.4.2', :require => nil
+  gem 'rdoc', '~> 3.10', :require => nil
   gem 'rake', ENV['RAKE_VERSION'], :require => nil if ENV['RAKE_VERSION']
 end
 
