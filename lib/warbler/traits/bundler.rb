@@ -53,8 +53,6 @@ module Warbler
             end
 
             spec.loaded_from = full_gem_path.join('bundler.gemspec').to_s
-            # RubyGems 1.8.x: @full_gem_path is cached, so we have to set it
-            def spec.full_gem_path=(p); @full_gem_path = p; end
             spec.full_gem_path = full_gem_path.to_s
           end
 
