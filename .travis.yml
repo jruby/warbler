@@ -3,7 +3,7 @@ rvm:
 branches:
   only:
     - master
-    - 2.x-dev
+    - /-dev|-feature|-fix/
 env:
   - JRUBY_OPTS="--server -Xcompile.invokedynamic=false"
 matrix:
