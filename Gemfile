@@ -9,3 +9,4 @@ group :development do
 end
 
 gem 'rubyzip', ENV['RUBYZIP_VERSION'] if ENV['RUBYZIP_VERSION']
+gem 'rake', ENV['RAKE_VERSION'], :require => nil if ENV['RAKE_VERSION']
