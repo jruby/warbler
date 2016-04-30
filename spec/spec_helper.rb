@@ -111,7 +111,7 @@ module ExampleGroupHelpers
             gem.summary = "Gem for testing"
             gem.platform = Gem::Platform::RUBY
             gem.files = `git ls-files`.split("\n")
-            gem.add_runtime_dependency 'rake', [">= 10.4.2"]
+            gem.add_runtime_dependency 'rake', ['>= 0.8.7']
           end
           RUBY
         end
