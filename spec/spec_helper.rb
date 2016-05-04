@@ -86,50 +86,17 @@ module ExampleGroupHelpers
 
   def create_git_gem(gem_name)
     before do
-      @gem_dir = Dir.mktmpdir("#{gem_name}-#{rand(100)}")
-      cur_dir = Dir.pwd
-      Dir.chdir(@gem_dir) do
+      @gem_dir = generate_gem(gem_name) do |gem_dir|
         `git init`
         `git config user.email "warbler-test@null.com"`
         `git config user.name  "Warbler Test"`
 
-        # create the gemspec and Gemfile
-        File.open("Gemfile", "w") do |f|
-          f << <<-RUBY
-          source "http://rubygems.org/"
-          gemspec
-          RUBY
-        end
-
-        File.open("#{gem_name}.gemspec", "w") do |f|
-          f << <<-RUBY
-          # -*- encoding: utf-8 -*-
-          Gem::Specification.new do |gem|
-            gem.name = "#{gem_name}"
-            gem.version = '1.0'
-            gem.authors = ['John Doe']
-            gem.summary = "Gem for testing"
-            gem.platform = Gem::Platform::RUBY
-            gem.files = `git ls-files`.split("\n")
-            gem.add_runtime_dependency 'rake', ['>= 0.8.7']
-          end
-          RUBY
-        end
-
-        Dir.mkdir("lib")
-        Dir.mkdir("lib/#{gem_name}")
-
-        File.open("lib/#{gem_name}/version.rb", "w") do |f|
-          f << <<-RUBY
-          VERSION = "1.0"
-          RUBY
-        end
-
         # `bundle install --local`
         `git add .`
         `git commit -am "first commit"`
+
+        gem_dir
       end
-      Dir.chdir(cur_dir)
     end
 
     after do
@@ -197,11 +164,56 @@ module ExampleGroupHelpers
       Warbler::WEB_SERVERS.delete('test')
     end
   end
+
+  module InstanceMethods
+
+    def generate_gem(gem_name, gem_dir = Dir.mktmpdir("#{gem_name}-#{Time.now.to_i}"))
+      Dir.chdir(gem_dir) do
+
+        # create the gemspec and Gemfile
+        File.open("Gemfile", "w") do |f|
+          f << <<-RUBY
+          source "http://rubygems.org/"
+          gemspec
+          RUBY
+        end
+
+        File.open("#{gem_name}.gemspec", "w") do |f|
+          f << <<-RUBY
+          # -*- encoding: utf-8 -*-
+          Gem::Specification.new do |gem|
+            gem.name = "#{gem_name}"
+            gem.version = '1.0'
+            gem.authors = ['John Doe']
+            gem.summary = "Gem for testing"
+            gem.platform = Gem::Platform::RUBY
+            gem.files = `git ls-files`.split("\n")
+            gem.add_runtime_dependency 'rake', ['>= 0.8.7']
+          end
+          RUBY
+        end
+
+        Dir.mkdir("lib")
+        Dir.mkdir("lib/#{gem_name}")
+
+        File.open("lib/#{gem_name}/version.rb", "w") do |f|
+          f << <<-RUBY
+          VERSION = "1.0"
+          RUBY
+        end
+
+        block_given? ? yield(gem_dir) : gem_dir
+      end
+    end
+
+  end
+
 end
 
 RSpec.configure do |config|
   config.include Warbler::RakeHelper
   config.extend ExampleGroupHelpers
+  config.include ExampleGroupHelpers::InstanceMethods
 
   class << ::Object
     public :remove_const
