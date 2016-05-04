@@ -42,7 +42,7 @@ class Warbler::Application < Rake::Application
 
     desc "Feature: make a runnable archive (e.g. java -jar rails.war -S rake db:migrate)"
     task :runnable => "#{wt.name}:runnable"
-    
+
     desc "Feature: precompile all Ruby files"
     task :compiled => "#{wt.name}:compiled"
 
@@ -54,26 +54,28 @@ class Warbler::Application < Rake::Application
   def load_project_rakefile
     return if @project_loaded
     # Load any application rakefiles to aid in autodetecting applications
-    app = Warbler.project_application = Rake::Application.new
-    Rake.application = app
+    set_application Warbler.project_application = Rake::Application.new
     Rake::Application::DEFAULT_RAKEFILES.each do |rf|
       if File.exist?(rf)
         begin
           load rf
-        rescue LoadError => e
+        rescue LoadError
           load File.join(Dir.getwd, rf)
         end
         break
       end
     end
-    Rake.application = self
+    set_application
     @project_loaded = true
   end
 
   # Run the application: The equivalent code for the +warble+ command
-  # is simply <tt>Warbler::Application.new.run</tt>.
+  # is simply <tt>Warbler::Application.run</tt>.
+  def self.run; new.run end
+
+  # Run the application.
   def run
-    Rake.application = self
+    set_application
     super
   end
 
@@ -92,4 +94,11 @@ class Warbler::Application < Rake::Application
       end
     end
   end
+
+  private
+
+  def set_application(app = self)
+    Rake.application = app
+  end
+
 end

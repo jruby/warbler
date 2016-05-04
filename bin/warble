@@ -8,4 +8,4 @@
 #++
 
 require 'warbler'
-Warbler::Application.new.run
+Warbler::Application.run
