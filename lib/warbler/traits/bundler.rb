@@ -15,7 +15,7 @@ module Warbler
       include BundlerHelper
 
       def self.detect?
-        File.exist?(ENV['BUNDLE_GEMFILE'] || "Gemfile")
+        File.exist?(ENV['BUNDLE_GEMFILE'] || 'Gemfile')
       end
 
       def self.requirements
@@ -24,7 +24,7 @@ module Warbler
 
       def before_configure
         config.bundler = true
-        config.bundle_without = ["development", "test", "assets"]
+        config.bundle_without = ['development', 'test', 'assets']
       end
 
       def after_configure
@@ -62,9 +62,16 @@ module Warbler
             config.bundler[:git_specs] << spec
           when ::Bundler::Source::Path
             unless bundler_source_is_warbled_gem_itself?(spec.source)
-              warn("Bundler `path' components are not currently supported.\n" +
-                   "The `#{spec.full_name}' component was not bundled.\n" +
-                   "Your application may fail to boot!")
+              if spec.source.path && spec.source.path.relative?
+                # include (assuming) relative *[APP_ROOT]/gem/path*
+                # NOTE: might be tuned to only add gemspec.files ...
+                config.includes += FileList[File.join(spec.source.path, '**/*')]
+                config.gems << spec # probably not really needed
+              else
+                warn("Bundler `path' components are not fully supported.\n" +
+                     "The `#{spec.full_name}' component was not bundled.\n" +
+                     "Your application may fail to boot!")
+              end
             end
           else
             config.gems << spec

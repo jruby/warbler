@@ -84,12 +84,36 @@ describe Warbler::Jar, "with Bundler" do
         file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec}).should_not be_empty
       end
 
-      it "does not work with :path entries in Gemfiles" do
+    end
+
+    context 'with :path entries in the Gemfile' do
+
+      after { FileUtils.rm_r(@gem_dir) rescue nil if @gem_dir }
+
+      it "does not work with absolute :path" do
+        @gem_dir = generate_gem('tester', Dir.mktmpdir("gems-#{Time.now.to_i}"))
         File.open("Gemfile", "w") {|f| f << "gem 'tester', :path => '#{@gem_dir}'\n"}
         bundle_install '--local'
         silence { jar.apply(config) }
         file_list(%r{tester}).should be_empty
       end
+
+      it "does work with relative :path" do
+        gem_dir = File.join(Dir.pwd, 'gems/tester')
+        #begin
+          Dir.mkdir(gem_dir)
+          @gem_dir = generate_gem('tester', 'gems/tester') # spec/sample_war/gems
+          File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngem 'tester', :path => 'gems/tester'\n"}
+          bundle_install '--local'
+          jar.apply(config)
+          file_list(%r{tester}).should_not be_empty # included from :path as is
+          file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb}).should be_empty
+          file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec}).should be_empty
+        #ensure
+          #FileUtils.rm_r(gem_dir) rescue nil
+        #end
+      end
+
     end
 
     it "does not bundle dependencies in the test group by default" do
