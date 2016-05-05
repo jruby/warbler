@@ -167,7 +167,7 @@ module ExampleGroupHelpers
 
   module InstanceMethods
 
-    def generate_gem(gem_name, gem_dir = Dir.mktmpdir("#{gem_name}-#{Time.now.to_i}"))
+    def generate_gem(gem_name, gem_dir = Dir.mktmpdir("#{gem_name}-#{Time.now.to_f}"))
       Dir.chdir(gem_dir) do
 
         # create the gemspec and Gemfile

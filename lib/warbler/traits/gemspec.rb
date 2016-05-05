@@ -21,8 +21,8 @@ module Warbler
       def before_configure
         @spec_file = Dir['*.gemspec'].first
         require 'yaml'
-        @spec = File.open(@spec_file) {|f| Gem::Specification.from_yaml(f) } rescue Gem::Specification.load(@spec_file)
-        @spec.runtime_dependencies.each {|g| config.gems << g }
+        @spec = File.open(@spec_file) { |f| Gem::Specification.from_yaml(f) } rescue Gem::Specification.load(@spec_file)
+        @spec.runtime_dependencies.each { |g| config.gems << g }
         config.dirs = []
         config.compiled_ruby_files = @spec.files.select {|f| f =~ /\.rb$/}
       end
@@ -54,11 +54,11 @@ module Warbler
       end
 
       def default_executable
-        if !@spec.executables.empty?
+        if ! @spec.executables.empty?
           bundler_version =
             Gem.loaded_specs.include?("bundler") ?
               Gem.loaded_specs["bundler"].version :
-              Gem::Version.create("0.0.0")
+                Gem::Version.create("0.0.0")
           if (bundler_version <=> Gem::Version.create("1.8.0")) < 0
             "bin/#{@spec.executables.first}"
           else
