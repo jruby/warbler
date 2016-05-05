@@ -234,7 +234,7 @@ describe Warbler::Jar, "with Bundler" do
     it "includes the bundler gem" do
       bundle_install '--deployment'
       jar.apply(config)
-      file_list(%r{gems/rake-10.4.2/lib}).should_not be_empty
+      file_list(%r{gems/rake-10.5.0/lib}).should_not be_empty
       file_list(%r{gems/bundler-}).should_not be_empty
       file_list(%r{gems/bundler-.*/lib}).should_not be_empty
     end
