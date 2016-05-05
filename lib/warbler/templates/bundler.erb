@@ -1,2 +1,4 @@
 ENV['BUNDLE_WITHOUT'] = '<%= config.bundle_without.join(':') %>'
-<% if config.bundler[:frozen] %>ENV['BUNDLE_FROZEN'] = '1'<% end %>
+<% if config.bundler[:frozen] -%>
+ENV['BUNDLE_FROZEN'] = '1'
+<% end -%>
