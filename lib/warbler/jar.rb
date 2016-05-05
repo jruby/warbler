@@ -208,7 +208,7 @@ module Warbler
 
     # Add gems to WEB-INF/gems
     def find_gems_files(config)
-      unless @compiled and config.compile_gems
+      unless @compiled && config.compile_gems
         config.gems.specs(config.gem_dependencies).each {|spec| find_single_gem_files(config, spec) }
       end
     end

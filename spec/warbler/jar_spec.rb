@@ -338,7 +338,7 @@ describe Warbler::Jar do
 
     it "collects gem files" do
       use_config do |config|
-        config.gems << "rake"
+        config.gems << 'rake'
       end
       jar.apply(config)
       file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb}).should_not be_empty
@@ -347,22 +347,39 @@ describe Warbler::Jar do
 
     it "collects gem files with dependencies" do
       use_config do |config|
-        config.gems << "rdoc"
+        config.gems << 'virtus'
         config.gem_dependencies = true
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/gems/gems/json.*/lib/json.rb}).should_not be_empty
-      file_list(%r{WEB-INF/gems/specifications/json.*\.gemspec}).should_not be_empty
+      file_list(%r{WEB-INF/gems/gems/axiom-types.*/lib}).should_not be_empty
+      file_list(%r{WEB-INF/gems/specifications/axiom-types.*\.gemspec}).should_not be_empty
+      file_list(%r{WEB-INF/gems/gems/equalizer.*/lib/equalizer/version.rb$}).should_not be_empty
+      # NOTE: rdoc is tricky as its dependency json is a default gem
+      #use_config do |config|
+      #  config.gems << "rdoc"
+      #  config.gem_dependencies = true
+      #end
+      #jar.apply(config)
+      #file_list(%r{WEB-INF/gems/gems/json.*/lib/json.rb}).should_not be_empty
+      #file_list(%r{WEB-INF/gems/specifications/json.*\.gemspec}).should_not be_empty
     end
 
     it "collects gem files without dependencies" do
       use_config do |config|
-        config.gems << "rdoc"
+        config.gems << 'virtus'
         config.gem_dependencies = false
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/gems/gems/json.*/lib/json.rb}).should be_empty
-      file_list(%r{WEB-INF/gems/specifications/json.*\.gemspec}).should be_empty
+      file_list(%r{WEB-INF/gems/gems/axiom-types.*/lib}).should be_empty
+      file_list(%r{WEB-INF/gems/specifications/axiom-types.*\.gemspec}).should be_empty
+      file_list(%r{WEB-INF/gems/gems/equalizer.*/lib/equalizer/version.rb$}).should be_empty
+      #use_config do |config|
+      #  config.gems << "rdoc"
+      #  config.gem_dependencies = false
+      #end
+      #jar.apply(config)
+      #file_list(%r{WEB-INF/gems/gems/json.*/lib/json.rb}).should be_empty
+      #file_list(%r{WEB-INF/gems/specifications/json.*\.gemspec}).should be_empty
     end
 
     it "adds ENV['GEM_HOME'] to init.rb" do
