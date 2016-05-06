@@ -110,14 +110,41 @@ describe Warbler::Config do
       config = Warbler::Config.new
       config.webxml.booter = :rack
       config.webxml.servlet_context_listener.should == "org.jruby.rack.RackServletContextListener"
+      config.webxml.booter = :rails
+      config.webxml.servlet_context_listener.should == "org.jruby.rack.rails.RailsServletContextListener"
       config = Warbler::Config.new
       config.webxml.servlet_context_listener.should == "org.jruby.rack.rails.RailsServletContextListener"
     end
 
+    it "allows for adjusting of context listeners" do
+      config = Warbler::Config.new
+      config.webxml.booter = :rack
+      config.webxml.servlet_context_listeners.should == [ 'org.jruby.rack.RackServletContextListener' ]
+      config.webxml.servlet_context_listeners.clear
+      config.webxml.servlet_context_listeners.should == [ ]
+
+      config = Warbler::Config.new
+      config.webxml.booter = :rails
+      config.webxml.servlet_context_listeners << 'org.kares.jruby.rack.WorkerContextListener'
+      config.webxml.servlet_context_listeners.should == [ 'org.jruby.rack.rails.RailsServletContextListener', 'org.kares.jruby.rack.WorkerContextListener' ]
+
+      config.webxml.context_params.should_not have_key('servlet_context_listener')
+    end
+
+    it "provides rack filter defaults" do
+      config = Warbler::Config.new
+      config.webxml.servlet_filter.should == 'org.jruby.rack.RackFilter'
+      config.webxml.servlet_filter_name.should == 'RackFilter'
+      config.webxml.servlet_filter_url_pattern.should == '/*'
+      config.webxml.servlet_filter_async
+    end
+
     it "should not include ignored webxml keys in the context params hash" do
+      config = Warbler::Config.new
+      config.webxml.booter = :rack
+      config.webxml.context_params.should_not have_key('booter')
       Warbler::Config.new.webxml.context_params.should_not have_key('ignored')
       Warbler::Config.new.webxml.context_params.should_not have_key('jndi')
-      Warbler::Config.new.webxml.context_params.should_not have_key('booter')
     end
 
     it "should have a helpful string representation for an empty key" do

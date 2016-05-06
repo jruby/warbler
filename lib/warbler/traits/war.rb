@@ -177,6 +177,8 @@ module Warbler
         def initialize(key = 'webxml')
           @key = key
           @table = Hash.new { |h, k| h[k] = WebxmlOpenStruct.new(k) }
+
+          @servlet_filter_async = nil # true/false
         end
 
         def [](key)
@@ -209,23 +211,38 @@ module Warbler
           @table.key?(mid.to_s.chomp('=').to_sym) || super
         end
 
+        def servlet_filter; @servlet_filter ||= 'org.jruby.rack.RackFilter' end
+        attr_writer :servlet_filter
+
+        def servlet_filter_name; @servlet_filter_name ||= 'RackFilter' end
+        attr_writer :servlet_filter_name
+
+        def servlet_filter_url_pattern; @servlet_filter_url_pattern ||= '/*' end
+        attr_writer :servlet_filter_url_pattern
+
+        attr_accessor :servlet_filter_async
+
         def servlet_context_listener
-          case self.booter
+          case booter
           when :rack
-            "org.jruby.rack.RackServletContextListener"
-          else # :rails, default
-            "org.jruby.rack.rails.RailsServletContextListener"
+            'org.jruby.rack.RackServletContextListener'
+          when :rails
+            'org.jruby.rack.rails.RailsServletContextListener'
+          else # default (due compatibility)
+            'org.jruby.rack.rails.RailsServletContextListener'
           end
         end
 
-        def context_params(escape = true)
-          require 'cgi'
-          params = {}
+        def servlet_context_listeners
+          @cservlet_ontext_listeners ||= [ servlet_context_listener ]
+        end
+
+        def servlet_context_params(escape = true)
+          require 'cgi'; params = {}
           @table.each do |k,v|
             case v
             when WebxmlOpenStruct
-              nested_params = v.context_params
-              nested_params.each do |nk,nv|
+              v.context_params.each do |nk,nv|
                 params["#{escape ? CGI::escapeHTML(k.to_s) : k.to_s}.#{nk}"] = nv
               end
             else
@@ -236,6 +253,8 @@ module Warbler
           params.delete_if { |k,_| ['ignored', *extra_ignored].include?(k.to_s) }
           params
         end
+        # @deprecated
+        alias_method :context_params, :servlet_context_params
 
         def to_s
           "No value for '#@key' found"

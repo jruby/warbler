@@ -411,6 +411,7 @@ describe Warbler::Jar do
 
     it "creates a web.xml file" do
       use_config do |config|
+        config.webxml.booter = :rack
         config.webxml.jruby.max.runtimes = 5
       end
       elements = expand_webxml
@@ -420,6 +421,26 @@ describe Warbler::Jar do
       elements.to_a(
                     "context-param/param-name[text()='jruby.max.runtimes']/../param-value"
                     ).first.text.should == "5"
+
+      filters = elements.to_a("filter/filter-class")
+      expect( filters.size ).to eql 1
+      expect( filters.first.text ).to eql 'org.jruby.rack.RackFilter'
+      filters = elements.to_a("filter/filter-name")
+      expect( filters.size ).to eql 1
+      expect( filters.first.text ).to eql 'RackFilter'
+      filters = elements.to_a("filter/async-supported")
+      expect( filters.size ).to eql 1
+      expect( filters.first.text ).to eql 'false'
+      filters = elements.to_a("filter-mapping/filter-name")
+      expect( filters.size ).to eql 1
+      expect( filters.first.text ).to eql 'RackFilter'
+      filters = elements.to_a("filter-mapping/url-pattern")
+      expect( filters.size ).to eql 1
+      expect( filters.first.text ).to eql '/*'
+
+      listeners = elements.to_a("listener/listener-class")
+      expect( listeners.size ).to eql 1
+      expect( listeners.first.text ).to eql 'org.jruby.rack.RackServletContextListener'
     end
 
     it "includes custom context parameters in web.xml" do

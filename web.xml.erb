@@ -5,13 +5,25 @@
   <!--
   <display-name>Uncomment and put name :here: for Tomcat Dashboard</display-name>-->
 
-<% webxml.context_params.each do |k,v| -%>
+  <%# NOTE: to be renamed to servlet_context_params %>
+  <%- webxml.context_params.each do |name, value| -%>
   <context-param>
-    <param-name><%= k %></param-name>
-    <param-value><%= v %></param-value>
+    <param-name><%= name %></param-name>
+    <param-value><%= value %></param-value>
   </context-param>
-<% end -%>
+  <%- end -%>
 
+  <%- if webxml.respond_to?(:servlet_filter) -%>
+  <filter>
+    <filter-class><%= webxml.servlet_filter %></filter-class>
+    <filter-name><%= webxml.servlet_filter_name %></filter-name>
+    <async-supported><%= !! webxml.servlet_filter_async %></async-supported>
+  </filter>
+  <filter-mapping>
+    <filter-name><%= webxml.servlet_filter_name %></filter-name>
+    <url-pattern><%= webxml.servlet_filter_url_pattern %></url-pattern>
+  </filter-mapping>
+  <%- else -%> <%# NOTE: due compatibility when warbler gets downgraded to 2.0.0 %>
   <filter>
     <filter-name>RackFilter</filter-name>
     <filter-class>org.jruby.rack.RackFilter</filter-class>
@@ -21,16 +33,25 @@
     <filter-name>RackFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  <%- end -%>
 
+  <%- if webxml.respond_to?(:servlet_context_listeners) -%>
+  <%- webxml.servlet_context_listeners.each do |listener| -%>
+  <listener>
+    <listener-class><%= listener %></listener-class>
+  </listener>
+  <%- end -%>
+  <%- else -%> <%# NOTE: due compatibility when warbler gets downgraded to 2.0.0 %>
   <listener>
     <listener-class><%= webxml.servlet_context_listener %></listener-class>
   </listener>
+  <%- end -%>
 
-<% if webxml.jndi then [webxml.jndi].flatten.each do |jndi| -%>
+  <%- [webxml.jndi].flatten.each do |jndi| -%>
   <resource-ref>
     <res-ref-name><%= jndi %></res-ref-name>
     <res-type>javax.sql.DataSource</res-type>
     <res-auth>Container</res-auth>
   </resource-ref>
-<% end; end -%>
+  <%- end if webxml.jndi -%>
 </web-app>
