@@ -12,7 +12,7 @@ module Warbler
       include Trait
 
       def self.detect?
-        File.exist?("config/environment.rb")
+        File.exist?('config/environment.rb')
       end
 
       def self.requirements
@@ -24,15 +24,15 @@ module Warbler
         config.webxml.rails.env = ENV['RAILS_ENV'] || 'production'
 
         return unless Warbler.framework_detection
-        return false unless task = Warbler.project_application.lookup("environment")
+        return false unless task = Warbler.project_application.lookup('environment')
 
         task.invoke rescue nil
         return false unless defined?(::Rails)
 
-        config.dirs << "tmp" if File.directory?("tmp")
+        config.dirs << 'tmp' if File.directory?('tmp')
         config.webxml.booter = :rails
-        unless (defined?(::Rails.vendor_rails?) && ::Rails.vendor_rails?) || File.directory?("vendor/rails")
-          config.gems["rails"] = ::Rails::VERSION::STRING
+        unless (defined?(::Rails.vendor_rails?) && ::Rails.vendor_rails?) || File.directory?('vendor/rails')
+          config.gems['rails'] = ::Rails::VERSION::STRING unless Bundler.detect?
         end
         if defined?(::Rails.configuration.gems)
           ::Rails.configuration.gems.each do |g|
