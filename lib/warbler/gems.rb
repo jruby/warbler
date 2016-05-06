@@ -11,6 +11,7 @@ module Warbler
   # It would be easier to just use a hash.
   class Gems < Hash
     ANY_VERSION = nil
+    private_constant :ANY_VERSION
 
     def initialize(gems = nil)
       if gems.is_a?(Hash)
