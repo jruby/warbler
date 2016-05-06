@@ -5,9 +5,10 @@
 Warbler::Config.new do |config|
   # Features: additional options controlling how the jar is built.
   # Currently the following features are supported:
-  # - gemjar: package the gem repository in a jar file in WEB-INF/lib
-  # - executable: embed a web server and make the war executable
-  # - compiled: compile .rb files to .class files
+  # - *gemjar*: package the gem repository in a jar file in WEB-INF/lib
+  # - *executable*: embed a web server and make the war executable
+  # - *runnable*: allows to run bin scripts e.g. `java -jar my.war -S rake -T`
+  # - *compiled*: compile .rb files to .class files
   # config.features = %w(gemjar)
 
   # Application directories to be included in the webapp.
@@ -123,6 +124,11 @@ Warbler::Config.new do |config|
 
   # === War files only below here ===
 
+  # Embedded webserver to use with the 'executable' feature. Currently supported
+  # webservers are:
+  # - *jetty* - Embedded Jetty from Eclipse
+  # config.webserver = 'jetty'
+
   # Path to the pre-bundled gem directory inside the war file. Default
   # is 'WEB-INF/gems'. Specify path if gems are already bundled
   # before running Warbler. This also sets 'gem.path' inside web.xml.
@@ -141,13 +147,11 @@ Warbler::Config.new do |config|
   # Pathmaps for controlling how public HTML files are copied into the .war
   # config.pathmaps.public_html = ["%{public/,}p"]
 
-  # Embedded webserver to use with the 'executable' feature. Currently supported
-  # webservers are:
-  # * <tt>jetty</tt> - Embedded Jetty from Eclipse
-  # config.webserver = 'jetty'
-
   # Value of RAILS_ENV for the webapp -- default as shown below
   # config.webxml.rails.env = ENV['RAILS_ENV'] || 'production'
+
+  # Public ROOT mapping, by default assets are copied into .war ROOT directory.
+  # config.public.root = ''
 
   # Application booter to use, either :rack or :rails (autodetected by default)
   # config.webxml.booter = :rails
