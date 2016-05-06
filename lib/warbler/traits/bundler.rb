@@ -23,19 +23,18 @@ module Warbler
       end
 
       def before_configure
-        config.bundler = true
-        config.bundle_without = ["development", "test", "assets"]
+        config.bundler ||= true
+        config.bundle_without = ['development', 'test', 'assets']
       end
 
       def after_configure
         add_bundler_gems if config.bundler
       end
 
-      def add_bundler_gems
-        require 'bundler'
-        config.gems.clear
+      def add_bundler_gems; require 'bundler'
+        # config.gems.clear allow to add `config.gems` on top of those bundled
         config.gem_dependencies = false # Bundler takes care of these
-        config.bundler = {}
+        config.bundler = {} if config.bundler == true
 
         bundler_specs.each do |spec|
           spec = to_spec(spec)
