@@ -15,8 +15,8 @@
 
   <%- if webxml.respond_to?(:servlet_filter) -%>
   <filter>
-    <filter-class><%= webxml.servlet_filter %></filter-class>
     <filter-name><%= webxml.servlet_filter_name %></filter-name>
+    <filter-class><%= webxml.servlet_filter %></filter-class>
     <async-supported><%= !! webxml.servlet_filter_async %></async-supported>
   </filter>
   <filter-mapping>
