@@ -180,7 +180,7 @@ public class WarMain extends JarMain {
                                                + WEBSERVER_PROPERTIES
                                                + " is missing 'mainclass' property)");
         }
-        Class klass = Class.forName(mainClass, true, loader);
+        Class<?> klass = Class.forName(mainClass, true, loader);
         Method main = klass.getDeclaredMethod("main", new Class[] { String[].class });
         String[] newArgs = launchWebServerArguments(props);
         debug("invoking webserver with: " + Arrays.deepToString(newArgs));
@@ -310,18 +310,16 @@ public class WarMain extends JarMain {
     }
 
     protected String locateExecutableScript(final String executable, final CharSequence envPreScript) {
-        return envPreScript + " \n" +
-        "begin\n" +
-        // locate the executable within gemspecs :
-        "  require 'rubygems' \n" +
-            "  begin\n" +
-            // add bundler gems to load path:
-            "    require 'bundler' \n" +
-            // TODO: environment from web.xml. Any others?
-            "    Bundler.setup(:default, *ENV.values_at('RACK_ENV', 'RAILS_ENV').compact)\n" +
-            "  rescue LoadError\n" +
-            // bundler not used
-            "  end\n" +
+        return ( envPreScript == null ? "" : envPreScript + " \n" ) +
+        "begin\n" + // locate the executable within gemspecs :
+        "  require 'rubygems' unless defined?(Gem) \n" +
+          "  begin\n" + // add bundled gems to load path :
+          "    require 'bundler' \n" +
+          "  rescue LoadError\n" + // bundler not used
+          "  else\n" +
+          "    env = ENV['RAILS_ENV'] || ENV['RACK_ENV'] \n" + // init.rb sets ENV['RAILS_ENV'] ||= ...
+          "    env ? Bundler.setup(:default, env) : Bundler.setup(:default) \n" +
+          "  end\n" +
         "  exec = '"+ executable +"' \n" +
         "  spec = Gem::Specification.find { |s| s.executables.include?(exec) } \n" +
         "  spec ? spec.bin_file(exec) : nil \n" +
