@@ -347,7 +347,8 @@ public class WarMain extends JarMain {
                 launchWebServer(server);
             }
             catch (FileNotFoundException e) {
-                if ( e.getMessage().indexOf("WEB-INF/webserver.jar") > -1 ) {
+                final String msg = e.getMessage();
+                if ( msg != null && msg.contains("WEB-INF/webserver.jar") ) {
                     System.out.println("specify the -S argument followed by the bin file to run e.g. `java -jar rails.war -S rake -T` ...");
                     System.out.println("(or if you'd like your .war file to start a web server package it using `warbler executable war`)");
                 }
@@ -355,9 +356,7 @@ public class WarMain extends JarMain {
             }
             return 0;
         }
-        else {
-            return super.start();
-        }
+        return super.start();
     }
 
     @Override
