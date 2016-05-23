@@ -104,7 +104,7 @@ public class JarMain implements Runnable {
         FileOutputStream outStream = new FileOutputStream(file);
         final byte[] buf = new byte[65536];
         try {
-            int bytesRead = 0;
+            int bytesRead;
             while ((bytesRead = entryStream.read(buf)) != -1) {
                 outStream.write(buf, 0, bytesRead);
             }

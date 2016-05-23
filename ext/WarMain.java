@@ -125,7 +125,7 @@ public class WarMain extends JarMain {
         FileOutputStream outStream = new FileOutputStream(jarFile);
         try {
             byte[] buf = new byte[4096];
-            int bytesRead = 0;
+            int bytesRead;
             while ((bytesRead = jarStream.read(buf)) != -1) {
                 outStream.write(buf, 0, bytesRead);
             }
