@@ -153,7 +153,7 @@ public class WarblerJar {
         }
     }
 
-    private static Pattern PROTOCOL = Pattern.compile("^[a-z][a-z0-9]+:");
+    private static final Pattern PROTOCOL = Pattern.compile("^[a-z][a-z0-9]+:");
 
     private static InputStream getStream(String jar, String entry) throws IOException {
         Matcher m = PROTOCOL.matcher(jar);
