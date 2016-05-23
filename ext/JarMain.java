@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -114,7 +115,7 @@ public class JarMain implements Runnable {
             outStream.close();
             file.deleteOnExit();
         }
-        if (false) debug(entry.getName() + " extracted to " + file.getPath());
+        // if (false) debug(entry.getName() + " extracted to " + file.getPath());
         return file.toURI().toURL();
     }
 
@@ -167,7 +168,11 @@ public class JarMain implements Runnable {
     }
 
     protected static void debug(Throwable t) {
-        if ( isDebug() ) t.printStackTrace(System.out);
+        debug(t, System.out);
+    }
+
+    private static void debug(Throwable t, PrintStream out) {
+        if ( isDebug() ) t.printStackTrace(out);
     }
 
     protected void warn(String msg) {
@@ -180,7 +185,7 @@ public class JarMain implements Runnable {
 
     protected static void error(String msg, Throwable t) {
         System.err.println("ERROR: " + msg);
-        debug(t);
+        debug(t, System.err);
     }
 
     protected void delete(File f) {
