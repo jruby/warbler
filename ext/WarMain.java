@@ -319,7 +319,7 @@ public class WarMain extends JarMain {
           "  else\n" +
           "    env = ENV['RAILS_ENV'] || ENV['RACK_ENV'] \n" + // init.rb sets ENV['RAILS_ENV'] ||= ...
           "    env ? Bundler.setup(:default, env) : Bundler.setup(:default) \n" +
-          "  end\n" +
+          "  end if ENV_JAVA['warbler.bundler.setup'] != 'false' \n" + // java -Dwarbler.bundler.setup=false -jar my.war -S pry
         "  exec = '"+ executable +"' \n" +
         "  spec = Gem::Specification.find { |s| s.executables.include?(exec) } \n" +
         "  spec ? spec.bin_file(exec) : nil \n" +
