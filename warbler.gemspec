@@ -15,7 +15,11 @@ Gem::Specification.new do |gem|
 Rails, or Rack application. Warbler provides a minimal, flexible, Ruby-like way to
 bundle up all of your application files for deployment to a Java environment.}
 
-  gem.files         = `git ls-files`.split("\n")
+  gem.files         = `git ls-files`.split("\n").
+    reject { |file| file =~ /^\./ }. # .gitignore, .travis.yml
+    reject { |file| file =~ /^spec|test\// }. # spec/**/*.spec
+    reject { |file| file =~ /^integration\// }. # (un-used) *.rake files
+    reject { |file| file =~ /^rakelib\// } # (un-used) *.rake files
   gem.test_files    = `git ls-files -- {test,spec,features,integration}/*`.split("\n")
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.require_paths = ["lib"]
