@@ -74,7 +74,9 @@ module Warbler
     end
 
     def add_init_load_path(path)
-      config.init_contents << StringIO.new("$LOAD_PATH.unshift __FILE__.sub(/!.*/, '!/#{path}')\n")
+      config.init_contents << StringIO.new("$LOAD_PATH.unshift File.expand_path(File.join('..', '..', '#{path}'), __FILE__)\n")
+      # with __FILE__ = "uri:classloader:/META-INF/init.rb"
+      # ...  will end up as "uri:classloader://xxx-gem/lib"
     end
 
     def add_main_rb(jar, bin_path, params = nil)
