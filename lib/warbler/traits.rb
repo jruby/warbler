@@ -80,7 +80,7 @@ module Warbler
     end
 
     def add_main_rb(jar, bin_path, params = nil)
-      binary = ""
+      binary = "".dup
       binary << "ARGV.unshift('#{params}')\n" if params
       binary << "load '#{bin_path}'"
       jar.files['META-INF/main.rb'] = StringIO.new(binary)
