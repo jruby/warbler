@@ -1,4 +1,4 @@
-<% if params = config.webxml.context_params && params['rack.env'] -%>
+<% if (params = config.webxml.context_params) && params['rack.env'] -%>
 ENV['RACK_ENV'] ||= '<%= params['rack.env'] %>'
 <% end -%>
 
