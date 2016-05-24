@@ -32,7 +32,7 @@ module Warbler
 
     def contents(entry)
       file = files[entry]
-      file.respond_to?(:read) ? file.read : File.open(file) {|f| f.read }
+      file.respond_to?(:read) ? file.read : File.read(file)
     end
 
     def compile(config)
@@ -125,16 +125,12 @@ module Warbler
     def gather_all_rb_files(config)
       FileUtils.mkdir_p('tmp')
       # Gather all the files in the files list and copy them to the tmp directory
-      gems_to_compile = files.select {|k, f| !f.is_a?(StringIO) && f =~ /\.rb$/ }
-      # 1.8.7 Support, convert back to hash
-      if gems_to_compile.is_a?(Array)
-        gems_to_compile = gems_to_compile.inject({}) {|h,z| h.merge!(z[0] => z[1]) }
-      end
-      gems_to_compile.each do |jar_file, rb|
+      files_to_compile = files.select { |_, f| !f.is_a?(StringIO) && f.end_with?('.rb') }
+      files_to_compile.each do |jar_file, rb|
         FileUtils.mkdir_p(File.dirname(File.join('tmp', jar_file)))
         new_rb = File.join('tmp', jar_file)
         FileUtils.copy(rb, new_rb)
-        gems_to_compile[jar_file] = new_rb
+        files_to_compile[jar_file] = new_rb
       end
       # Gather all the application files which the user wrote (not dependencies)
       main_files_to_compile = config.compiled_ruby_files - config.excludes.to_a
@@ -145,9 +141,9 @@ module Warbler
       main_files_to_compile = main_files_to_compile.inject({}) {|h,f| h.merge!(f => f) }
       files.keys.each do |k|
         # Update files list to point to the temporary file
-        files[k] = gems_to_compile[k] || main_files_to_compile[k] || files[k]
+        files[k] = files_to_compile[k] || main_files_to_compile[k] || files[k]
       end
-      main_files_to_compile.merge(gems_to_compile)
+      main_files_to_compile.merge(files_to_compile)
     end
 
     # Apply the information in a Warbler::Config object in order to
@@ -187,7 +183,7 @@ module Warbler
 
     # Add a manifest file either from config or by making a default manifest.
     def add_manifest(config = nil)
-      unless @files.keys.detect{|k| k =~ /^META-INF\/MANIFEST\.MF$/i}
+      unless @files.keys.detect{ |k| k =~ /^META-INF\/MANIFEST\.MF$/i }
         if config && config.manifest_file
           @files['META-INF/MANIFEST.MF'] = config.manifest_file
         else
@@ -198,12 +194,12 @@ module Warbler
 
     # Add java libraries to WEB-INF/lib.
     def find_java_libs(config)
-      config.java_libs.map {|lib| add_with_pathmaps(config, lib, :java_libs) }
+      config.java_libs.map { |lib| add_with_pathmaps(config, lib, :java_libs) }
     end
 
     # Add java classes to WEB-INF/classes.
     def find_java_classes(config)
-      config.java_classes.map {|f| add_with_pathmaps(config, f, :java_classes) }
+      config.java_classes.map { |f| add_with_pathmaps(config, f, :java_classes) }
     end
 
     # Add gems to WEB-INF/gems
@@ -296,7 +292,7 @@ module Warbler
         entries.keys.sort.each do |entry|
           src = entries[entry]
           if src.respond_to?(:read)
-            zipfile.get_output_stream(entry) {|f| f << src.read }
+            zipfile.get_output_stream(entry) { |f| f << src.read }
           elsif src.nil? || File.directory?(src)
             if File.symlink?(entry) && ! defined?(JRUBY_VERSION)
               warn "directory symlinks are not followed unless using JRuby; " +
