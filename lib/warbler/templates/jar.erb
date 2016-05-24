@@ -4,7 +4,7 @@ ENV['GEM_HOME'] <%= config.override_gem_home ? '=' : '||=' %> File.expand_path('
 ENV['GEM_HOME'] <%= config.override_gem_home ? '=' : '||=' %> File.expand_path('../../<%= config.relative_gem_path %>', __FILE__)
 <% end -%>
 <% if config.override_gem_home -%>
-ENV['GEM_PATH'] = ENV['GEM_HOME']
+ENV['GEM_PATH'] = nil # RGs sets Gem.paths.path = Gem.default_path + [ GEM_HOME ]
 <% end -%>
 <% if config.bundler && config.bundler[:gemfile_path] -%>
 ENV['BUNDLE_GEMFILE'] = File.expand_path('../../<%= config.bundler[:gemfile_path] %>', __FILE__)
