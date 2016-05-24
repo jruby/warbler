@@ -214,7 +214,16 @@ module Warbler
       full_gem_path = Pathname.new(spec.full_gem_path)
 
       # skip gems whose full_gem_path does not exist
-      (warn "skipping #{spec.name} (#{full_gem_path.to_s} does not exist)" ; return) unless full_gem_path.exist?
+      unless full_gem_path.exist?
+        # its very likely that its a default gem e.g. json/jruby-openssl :
+        if (Gem.default_dir rescue nil) && full_gem_path.to_s.start_with?(Gem.default_dir)
+          # OK if the gem does not exists as its un-packed on the "shared" path
+          # ... at least gem spec.spec_file should exists although not crucial
+        else
+          warn "skipping #{spec.name} gem (#{full_gem_path.to_s} does not exist)"
+        end
+        return
+      end
 
       @files[apply_pathmaps(config, "#{spec.full_name}.gemspec", :gemspecs)] = StringIO.new(spec.to_ruby)
       FileList["#{full_gem_path.to_s}/**/*"].each do |src|
