@@ -29,7 +29,7 @@ module Warbler
       end
 
       def after_configure
-        config.init_contents << StringIO.new("require 'rubygems'\n")
+        config.init_contents << StringIO.new("require 'rubygems' unless defined?(Gem)\n")
       end
 
       def update_archive(jar)
