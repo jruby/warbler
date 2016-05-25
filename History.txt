@@ -1,4 +1,18 @@
-== 2x-dev
+== 2.0.2
+
+- #380: exclude spec/integration/rakelib and dot-files being packed into .gem
+- #379: 2.0.1 regression due forcing GEM_PATH = GEM_HOME
+
+== 2.0.1
+
+- #367: avoid duplicate .jar copies in WEB-INF/lib
+- #364: support for compiling .rb files using jrubyc with options
+- #362: limit rubyzip version to not match too far
+- #363: [backport] support for running with (recent) rubyzip 1.2.0
+
+== 2.0.0
+
+- Initial release with 9k support
 
 == 1.4.9
 
