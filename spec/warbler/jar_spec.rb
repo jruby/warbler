@@ -149,7 +149,7 @@ describe Warbler::Jar do
       it "loads the default executable in main.rb" do
         jar.apply(config)
         contents = jar.contents('META-INF/main.rb')
-        contents.should =~ /load.*sample_jar\/bin\/sample_jar/
+        contents.should == "load 'sample_jar/sbin/sample_jar'"
       end
 
       it "includes compiled .rb and .class files" do

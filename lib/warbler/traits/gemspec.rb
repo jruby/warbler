@@ -18,18 +18,17 @@ module Warbler
         !Dir['*.gemspec'].empty?
       end
 
-      def before_configure
+      def before_configure; require 'yaml'
         @spec_file = Dir['*.gemspec'].first
-        require 'yaml'
-        @spec = File.open(@spec_file) {|f| Gem::Specification.from_yaml(f) } rescue Gem::Specification.load(@spec_file)
-        @spec.runtime_dependencies.each {|g| config.gems << g }
+        @spec = File.open(@spec_file) { |f| Gem::Specification.from_yaml(f) } rescue Gem::Specification.load(@spec_file)
+        @spec.runtime_dependencies.each { |g| config.gems << g }
         config.dirs = []
-        config.compiled_ruby_files = @spec.files.select {|f| f =~ /\.rb$/}
+        config.compiled_ruby_files = @spec.files.select { |f| f =~ /\.rb$/ }
       end
 
       def after_configure
         @spec.require_paths.each do |p|
-          add_init_load_path(config.pathmaps.application.inject(p) {|pm,x| pm.pathmap(x)})
+          add_init_load_path( config.pathmaps.application.inject(p) { |pm,x| pm.pathmap(x) } )
         end
       end
 
@@ -54,33 +53,27 @@ module Warbler
       end
 
       def default_executable
-        if !@spec.executables.empty?
-          bundler_version =
-            Gem.loaded_specs.include?("bundler") ?
-              Gem.loaded_specs["bundler"].version :
-              Gem::Version.create("0.0.0")
-          if (bundler_version <=> Gem::Version.create("1.8.0")) < 0
-            "bin/#{@spec.executables.first}"
+        if ! @spec.executables.empty?
+          exe_script = @spec.executables.first
+          exe_path = File.join(@spec.bindir, exe_script) # bin/script
+          if File.exists?(exe_path)
+            exe_path
+          elsif File.exists?("bin/#{exe_script}") # compatibility
+            "bin/#{exe_script}" # ... should probably remove this
           else
-            exe_script = @spec.executables.first
-            if File.exists?("exe/#{exe_script}")
-              "exe/#{exe_script}"
-            elsif File.exists?("bin/#{exe_script}")
-              "bin/#{exe_script}"
-            else
-              raise "No `#{exe_script}` executable script found"
-            end
+            raise "no `#{exe_script}` executable script found"
           end
-        elsif exe = Dir['bin/*'].sort.first
-          warn "No default executable found in #{@spec_file}, using bin/#{exe}"
-          exe
-        elsif exe = Dir['exe/*'].sort.first
-          warn "No default executable found in #{@spec_file}, using exe/#{exe}"
-          exe
+        elsif exe_path = Dir['bin/*'].sort.first
+          warn "no executables found in #{@spec_file}, using #{exe_path}"
+          exe_path
+        elsif exe_path = Dir['exe/*'].sort.first
+          warn "no executables found in #{@spec_file}, using #{exe_path}"
+          exe_path
         else
-          raise "No executable script found" unless exe
+          raise "no executable script found"
         end
       end
+
     end
   end
 end
