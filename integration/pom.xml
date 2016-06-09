@@ -4,25 +4,17 @@
 
   <groupId>org.jruby.warbler</groupId>
   <artifactId>integration-tests</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>simple_rack_test</module>
-
-    <module>rails4_test</module>
-
-    <module>runnable_test</module>
-  </modules>
-
   <properties>
-    <version.jruby-maven-plugins>1.0.0-rc</version.jruby-maven-plugins>
+    <jruby.plugins.version>1.1.5</jruby.plugins.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jruby.version>1.7.13</jruby.version>
-    <!-- prereleased gems ARE snapshots -->
-    <warbler.version>1.4.5.dev-SNAPSHOT</warbler.version>
-    <gem.home>${session.executionRootDirectory}/target/rubygems</gem.home>
-    <gem.path>${session.executionRootDirectory}/target/rubygems</gem.path>
+    <jruby.version>9.1.2.0</jruby.version>
+    <warbler.version>2.0.4</warbler.version>
+    <bundler.version>1.12.3</bundler.version>
+    <gem.home>${basedir}/../../pkg/rubygems</gem.home>
+    <gem.path>${basedir}/../../pkg/rubygems</gem.path>
   </properties>
 
   <repositories>
@@ -36,7 +28,7 @@
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>bundler</artifactId>
-      <version>1.5.3</version>
+      <version>${bundler.version}</version>
       <type>gem</type>
     </dependency>
     <dependency>
@@ -83,7 +75,7 @@
         <plugin>
           <groupId>de.saumya.mojo</groupId>
           <artifactId>gem-maven-plugin</artifactId>
-          <version>${version.jruby-maven-plugins}</version>
+          <version>${jruby.plugins.version}</version>
 	  <executions>
             <execution>
 	      <goals><goal>initialize</goal></goals>
@@ -106,7 +98,7 @@
           <artifactId>maven-jetty-plugin</artifactId>
           <version>6.1.26</version>
           <configuration>
-            <webApp>target/test.war</webApp>
+            <webApp>${project.build.directory}/test.war</webApp>
             <stopPort>9966</stopPort>
             <stopKey>warbler_stop</stopKey>
           </configuration>
@@ -139,22 +131,21 @@
         <plugin>
           <groupId>de.saumya.mojo</groupId>
           <artifactId>jruby-maven-plugin</artifactId>
-          <version>${version.jruby-maven-plugins}</version>
+          <version>${jruby.plugins.version}</version>
           <configuration>
             <gemHome>${gem.home}</gemHome>
-            <jrubySwitches>--1.9</jrubySwitches>
             <jrubyVersion>${jruby.version}</jrubyVersion>
           </configuration>
           <executions>
             <execution>
               <id>bundle-install</id>
-	            <goals><goal>jruby</goal></goals>
+	      <goals><goal>jruby</goal></goals>
               <configuration>
                 <args>-C ${basedir}/src/main/ruby -S ${gem.home}/bin/bundle install</args>
               </configuration>
             </execution>
             <execution>
-              <id>create-war</id>
+              <id>warble</id>
               <goals><goal>jruby</goal></goals>
               <configuration>
                 <args>-C ${basedir}/src/main/ruby -S ${gem.home}/bin/warble</args>

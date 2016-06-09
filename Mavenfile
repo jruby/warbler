@@ -5,13 +5,14 @@
 gemspec( :jar => 'warbler_jar.jar',
          :source => 'ext' )
 
-# just dump the POM as pom.xml as read-only file
-properties( 'jruby.plugins.version' => '1.1.3' )
+properties( 'jruby.plugins.version' => '1.1.5',
+            'jruby.version' => '9.1.2.0',
+            'jetty.version' => '9.2.10.v20150310' )
 
 # dependencies needed for compilation
 scope :provided do
-  jar 'org.jruby:jruby', '1.7.8'
-  jar 'org.eclipse.jetty:jetty-webapp', '9.2.10.v20150310'
+  jar 'org.jruby:jruby', '${jruby.version}'
+  jar 'org.eclipse.jetty:jetty-webapp', '${jetty.version}'
 end
 
 plugin :compiler, '3.1', :source => '1.5', :target => '1.5'
@@ -19,6 +20,13 @@ plugin :compiler, '3.1', :source => '1.5', :target => '1.5'
 plugin :invoker, '1.8' do
   execute_goals( :install, :run,
                  :id => 'integration-test',
+                 :properties => { 'warbler.version' => '${project.version}',
+                                  'jruby.version' => '${jruby.version}',
+                                  'jetty.version' => '${jetty.version}',
+                                  'bundler.version' => '1.12.3',
+                                  'jruby.plugins.version' => '${jruby.plugins.version}' },
+
+                 :goals => ['verify'],
                  :projectsDirectory => 'integration',
                  :streamLogs => true )
 end
