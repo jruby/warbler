@@ -8,10 +8,10 @@
     <version>1.0</version>
   </parent>
 
-  <artifactId>runnable_test</artifactId>
+  <artifactId>runnable_w_bundler_test</artifactId>
   <packaging>jar</packaging>
 
-  <name>runnable_test</name>
+  <name>runnable_w_bundler_test</name>
 
   <properties>
     <test-file>test-file.tmp</test-file>
@@ -70,10 +70,10 @@
           <workingDirectory>${project.build.directory}</workingDirectory>
           <arguments>
             <argument>-jar</argument>
-            <argument>test.war</argument>
+            <argument>test.jar</argument>
             <argument>-S</argument>
-            <argument>rake</argument>
-            <argument>create_test_file[${project.build.directory}/${test-file}]</argument>
+            <argument>run.rb</argument>
+            <argument>${project.build.directory}/${test-file}</argument>
           </arguments>
         </configuration>
       </plugin>
