@@ -234,7 +234,7 @@ module Warbler
         end
 
         def servlet_context_listeners
-          @cservlet_ontext_listeners ||= [ servlet_context_listener ]
+          @servlet_context_listeners ||= [ servlet_context_listener ]
         end
 
         def servlet_context_params(escape = true)
