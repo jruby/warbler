@@ -39,8 +39,8 @@ module Warbler
     end
 
     def full_name_for(name, gem_dependencies)
-      spec = specs(gem_dependencies).detect{ |spec| spec.name == name }
-      spec.nil? ? name : spec.full_name
+      gem_spec = specs(gem_dependencies).detect{ |spec| spec.name == name }
+      gem_spec.nil? ? name : spec.full_name
     end
 
     def specs(gem_dependencies)
@@ -70,7 +70,7 @@ module Warbler
       fail "gem '#{gem}' not installed" if matched.empty?
       spec = matched.last
       return spec unless gem_dependencies
-      [spec] + spec.dependencies.map { |gem| find_single_gem_files(gem_dependencies, gem) }
+      [spec] + spec.dependencies.map { |dependent_gem| find_single_gem_files(gem_dependencies, dependent_gem) }
     end
 
   end
