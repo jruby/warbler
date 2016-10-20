@@ -77,7 +77,7 @@ module Warbler
         begin
           File.open("#{ENV['BUNDLE_GEMFILE'] || 'Gemfile'}.lock") do |file|
             file.each_line do |line|
-              match = line.match /^\s*rails\s\(\s*(\d)\.\d+\.\d+.*\)$/
+              match = line.match( /^\s*rails\s\(\s*(\d)\.\d+\.\d+.*\)$/ )
               return match[1].to_i if match
             end
           end
