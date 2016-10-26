@@ -10,7 +10,7 @@
   <properties>
     <jruby.plugins.version>1.1.5</jruby.plugins.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jruby.version>9.1.2.0</jruby.version>
+    <jruby.version>9.1.5.0</jruby.version>
     <warbler.version>2.0.4</warbler.version>
     <bundler.version>1.12.3</bundler.version>
     <gem.home>${basedir}/../../pkg/rubygems</gem.home>
