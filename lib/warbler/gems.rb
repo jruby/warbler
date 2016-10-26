@@ -40,7 +40,7 @@ module Warbler
 
     def full_name_for(name, gem_dependencies)
       gem_spec = specs(gem_dependencies).detect{ |spec| spec.name == name }
-      gem_spec.nil? ? name : spec.full_name
+      gem_spec.nil? ? name : gem_spec.full_name
     end
 
     def specs(gem_dependencies)
