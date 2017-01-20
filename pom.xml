@@ -72,7 +72,7 @@ bundle up all of your application files for deployment to a Java environment.</d
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>9.2.10.v20150310</version>
+      <version>9.2.20.v20161216</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
