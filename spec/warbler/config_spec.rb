@@ -42,7 +42,7 @@ describe Warbler::Config do
       config.jar_name.size.should > 0
       config.webxml.should be_kind_of(OpenStruct)
       config.pathmaps.should be_kind_of(OpenStruct)
-      config.pathmaps.public_html.should == ["%{public/,}p"]
+      config.pathmaps.public_html.should include("%{public/,}p")
       config.override_gem_home.should be true
     end
 

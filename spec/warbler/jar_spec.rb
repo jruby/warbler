@@ -900,6 +900,26 @@ describe Warbler::Jar do
       end
     end
 
+    context 'in Rails app with webpacker' do
+      let(:manifest_files) { %w(public/packs/manifest.json public/packs/manifest.json.gz) }
+
+      before do
+        Warbler::Traits::Rails.stub(:detect?).and_return(true)
+        mkdir_p File.dirname(manifest_files.first)
+        manifest_files.each { |f| touch f }
+      end
+
+      after do
+        rm_rf File.dirname(manifest_files.first)
+      end
+
+      it 'automatically adds webpack manifest files into WEB-INF/public/packs' do
+        jar.apply(config)
+        file_list(%r{^WEB-INF/public/packs/manifest\.json}).should_not be_empty
+        file_list(%r{^WEB-INF/public/packs/manifest\.json.gz}).should_not be_empty
+      end
+    end
+
     context "in a Rack application" do
       before :each do
         mkdir 'tmp' unless File.directory?('tmp')

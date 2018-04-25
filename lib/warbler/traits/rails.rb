@@ -22,6 +22,7 @@ module Warbler
       def before_configure
         config.jar_name = default_app_name
         config.webxml.rails.env = ENV['RAILS_ENV'] || 'production'
+        config.pathmaps.public_html << "%{packs/(manifest.*),WEB-INF/public/packs/\\1}p"
 
         return unless Warbler.framework_detection
         return false unless task = Warbler.project_application.lookup('environment')
