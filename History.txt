@@ -1,3 +1,18 @@
+== 2.0.5
+
+- #427: Check Java properties when looking up RAILS_ENV
+- #424: Rails Webpacker support
+- #397: Avoid warnings under JRuby 9K
+
+== 2.0.4
+
+- fix: an instance variable name typo (@servlet_context_listeners)
+- #383: add bundler monkey patch
+
+== 2.0.3
+
+- Remove test_files from gemspec to save 700k
+
 == 2.0.2
 
 - #380: exclude spec/integration/rakelib and dot-files being packed into .gem

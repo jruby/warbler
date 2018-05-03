@@ -235,15 +235,6 @@ If you're using Bundler, you'll want to add Warbler to your +Gemfile+ :
 
 Now you should be able to invoke <tt>rake war</tt> to create your war file.
 
-== Ruby 1.8 compatibility
-
-Warbler supports versions of JRuby that support Ruby 1.8, so Warbler
-itself continues to support Ruby 1.8. However, many gems are choosing
-to drop 1.8 support; one of these gems is
-{rubyzip}(https://github.com/rubyzip/rubyzip), which Warbler relies
-on. If you need to use Warbler in a 1.8 environment, you will need to
-lock the <tt>rubyzip</tt> gem to a version before 1.0.0.
-
 == Troubleshooting
 
 If Warbler isn't packaging the files you were expecting, use the +war:debug+
