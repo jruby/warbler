@@ -16,6 +16,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -25,7 +29,35 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class JarMain implements Runnable {
+
+/**
+ *
+ *  rrolland - I have been manually building using:
+ *  javac -Xlint:unchecked -cp ./jruby-core-1.7.20.jar:bytelist-1.0.13.jar:jnr-posix-3.0.12.jar -source 1.7 -target 1.7 -d ./build ./ext/*.java
+ *  cd build
+ *  jar cvf warbler_jar.jar *
+ *  cp ./warbler_jar.jar ../lib/
+ *
+ *  The maven prepare-package phase was not working for me. Failing with a:
+ *  maven-plugin:1.0.10:initialize failed: Java returned: 1
+ *
+ *  The changes introduced here are to resolve two issues:
+ *  1) Decompressing the same jar every time
+ *  2) Incomplete cleanup of temp resources, i.e. jar files were not getting deleted and introducing a 25MB hit to the file system on every run. Our
+ *  application runs a small process every 15min so that was not acceptable.
+ *
+ *  This implementation uses the timestamp of the last modified time of the executing war (or jar) to create a temp directory that is then reused until a new
+ *  version of the war (or jar) is baked which causes a new last modified timestamp and a new temp directory to be used.
+ *
+ *  I found this class very difficult to work on because a lot of the logic relies on executing within the context of the jar that you are trying to
+ *  extract the resources out of.
+ *
+ *  Testing for this change was done on a windows 2012 server running Java 1.8. I suspect this works on linux platforms but some additional testing
+ *  would be needed. OS specific call outs for lastModifiedTime and java.io.tmpdir should be confirmed to be appropriate when testing on linux.
+ *
+ *
+ */
+public class JarMain {
 
     static final String MAIN = '/' + JarMain.class.getName().replace('.', '/') + ".class";
 
@@ -38,6 +70,10 @@ public class JarMain implements Runnable {
     protected URLClassLoader classLoader;
 
     JarMain(String[] args) {
+      this(args, null);
+    }
+
+    JarMain(String[] args, String overrideJarPath) {
         this.args = args;
         URL mainClass = getClass().getResource(MAIN);
         try {
@@ -46,9 +82,21 @@ public class JarMain implements Runnable {
         catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        archive = this.path.replace("!" + MAIN, "").replace("file:", "");
+        if(overrideJarPath != null) {
+          archive = overrideJarPath;
+        } else {
+          archive = this.path.replace("!" + MAIN, "").replace("file:", "");
+        }
+    }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(this));
+    private String getJarLastModifiedTimestamp() throws IOException {
+      debug("Using archive:"+archive);
+      File file = new File(archive);
+      Path path = Paths.get(file.getAbsolutePath());
+      BasicFileAttributes attr;
+      attr = Files.readAttributes(path, BasicFileAttributes.class);
+      long millis = attr.lastModifiedTime().toMillis();
+      return Long.toString(millis);
     }
 
     protected URL[] extractArchive() throws Exception {
@@ -61,23 +109,60 @@ public class JarMain implements Runnable {
                 if ( extractPath != null ) jarNames.put(extractPath, entry);
             }
 
-            extractRoot = File.createTempFile("jruby", "extract");
-            extractRoot.delete(); extractRoot.mkdirs();
-
+            String rootTemp = System.getProperty("java.io.tmpdir");
+            File fileToGetName = new File(archive);
+            String workingPath = rootTemp+File.separator+fileToGetName.getName().replace(".", "_")+getJarLastModifiedTimestamp();
+            debug("Using Working Path:"+workingPath);
+            extractRoot = new File(workingPath);
             final List<URL> urls = new ArrayList<URL>(jarNames.size());
-            for (Map.Entry<String, JarEntry> e : jarNames.entrySet()) {
-                URL entryURL = extractEntry(e.getValue(), e.getKey());
-                if (entryURL != null) urls.add( entryURL );
+
+            if(extractRoot.exists()) {
+              ArrayList<File> files = new ArrayList<File>();
+              listf(extractRoot.getAbsolutePath(),files);
+              for(File file : files){
+                if(file.isFile()){
+                  urls.add(file.toURI().toURL());
+                }
+              }
+            } else {
+              extractRoot.mkdirs();
+              for (Map.Entry<String, JarEntry> e : jarNames.entrySet()) {
+                  URL entryURL = extractEntry(e.getValue(), e.getKey());
+                  if (entryURL != null) urls.add( entryURL );
+              }
             }
+
+
             return urls.toArray(new URL[urls.size()]);
+        } catch(Exception e) {
+          e.printStackTrace();
+          throw e;
         }
         finally {
             jarFile.close();
         }
     }
 
+    private void listf(String directoryName, ArrayList<File> files) {
+      File directory = new File(directoryName);
+
+      // get all the files from a directory
+      File[] fList = directory.listFiles();
+      for (File file : fList) {
+        String fileName = file.getName();
+        String fileExtension = getExtension(fileName);
+        fileExtension = fileExtension.toLowerCase();
+        if (file.isFile() && fileExtension.equals("jar")) {
+          files.add(file);
+        } else if (file.isDirectory()) {
+          listf(file.getAbsolutePath(), files);
+        }
+      }
+    }
+
     protected String getExtractEntryPath(final JarEntry entry) {
         final String name = entry.getName();
+        debug(name);
         if ( name.startsWith("META-INF/lib") && name.endsWith(".jar") ) {
             return name.substring(name.lastIndexOf('/') + 1);
         }
@@ -93,7 +178,8 @@ public class JarMain implements Runnable {
         final String entryPath = entryPath(entry.getName());
         final InputStream entryStream;
         try {
-            entryStream = new URI("jar", entryPath, null).toURL().openStream();
+          URL url = new URI("jar", entryPath, null).toURL();
+          entryStream = url.openStream();
         }
         catch (IllegalArgumentException e) {
             // TODO gems '%' file name "encoding" ?!
@@ -113,7 +199,6 @@ public class JarMain implements Runnable {
         finally {
             entryStream.close();
             outStream.close();
-            file.deleteOnExit();
         }
         // if (false) debug(entry.getName() + " extracted to " + file.getPath());
         return file.toURI().toURL();
@@ -155,6 +240,13 @@ public class JarMain implements Runnable {
 
     protected int start() throws Exception {
         final URL[] jars = extractArchive();
+
+        debug("JARS TO LOAD START ===============================================================================");
+        for(URL jar : jars) {
+          debug(jar.toString());
+        }
+        debug("JARS TO LOAD END ===============================================================================");
+
         return launchJRuby(jars);
     }
 
@@ -163,7 +255,7 @@ public class JarMain implements Runnable {
     }
 
     protected void debug(String msg, Throwable t) {
-        if ( isDebug() ) System.out.println(msg);
+        if ( isDebug() ) debug(msg);
         if ( isDebug() && t != null ) t.printStackTrace(System.out);
     }
 
@@ -176,7 +268,7 @@ public class JarMain implements Runnable {
     }
 
     protected void warn(String msg) {
-        System.out.println("WARNING: " + msg);
+        debug("WARNING: " + msg);
     }
 
     protected static void error(Throwable t) {
@@ -212,27 +304,19 @@ public class JarMain implements Runnable {
         return ! canonical.getCanonicalFile().equals( canonical.getAbsoluteFile() );
     }
 
-    public void run() {
-        // If the URLClassLoader isn't closed, on Windows, temp JARs won't be cleaned up
-        try {
-            invokeMethod(classLoader, "close");
-        }
-        catch (NoSuchMethodException e) { } // We're not being run on Java >= 7
-        catch (Exception e) { error(e); }
-
-        if ( extractRoot != null ) delete(extractRoot);
+    public static void main(String[] args) {
+      main(args,null);
     }
 
-    public static void main(String[] args) {
-        doStart(new JarMain(args));
+    public static void main(String[] args,String overridePath) {
+        doStart(new JarMain(args,overridePath));
     }
 
     protected static void doStart(final JarMain main) {
         int exit;
         try {
             exit = main.start();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Throwable t = e;
             while ( t.getCause() != null && t.getCause() != t ) {
                 t = t.getCause();
@@ -324,6 +408,49 @@ public class JarMain implements Runnable {
         catch (SecurityException e) {
             return defaultValue;
         }
+    }
+
+
+    /**
+     * Borrowed Methods from apache.commons.io FilenameUtils:
+     * http://commons.apache.org/proper/commons-io/javadocs/api-2.5/src-html/org/apache/commons/io/FilenameUtils.html
+     *
+     * Avoiding introducing library dependency since these classes are virtually standalone and difficult enough to get running embedded in
+     * warbler environment.
+     */
+    private static final char EXTENSION_SEPARATOR = '.';
+    private static final int NOT_FOUND = -1;
+    private static final char UNIX_SEPARATOR = '/';
+    private static final char WINDOWS_SEPARATOR = '\\';
+
+    private String getExtension(final String filename) {
+      if (filename == null) {
+        return null;
+      }
+      final int index = indexOfExtension(filename);
+      if (index == NOT_FOUND) {
+        return "";
+      } else {
+        return filename.substring(index + 1);
+      }
+    }
+
+    private int indexOfExtension(final String filename) {
+      if (filename == null) {
+        return NOT_FOUND;
+      }
+      final int extensionPos = filename.lastIndexOf(EXTENSION_SEPARATOR);
+      final int lastSeparator = indexOfLastSeparator(filename);
+      return lastSeparator > extensionPos ? NOT_FOUND : extensionPos;
+    }
+
+    private int indexOfLastSeparator(final String filename) {
+      if (filename == null) {
+        return NOT_FOUND;
+      }
+      final int lastUnixPos = filename.lastIndexOf(UNIX_SEPARATOR);
+      final int lastWindowsPos = filename.lastIndexOf(WINDOWS_SEPARATOR);
+      return Math.max(lastUnixPos, lastWindowsPos);
     }
 
 }
