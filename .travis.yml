@@ -1,18 +1,19 @@
 rvm:
   - jruby-9.0.5.0
-  - jruby-9.1.6.0
+  - jruby-9.1.17.0
+  - jruby-9.2.0.0
 branches:
   only:
     - master
     - /-dev|-feature|-fix/
-env:
-  - JRUBY_OPTS="--server -Xcompile.invokedynamic=false"
+#env:
+#  - JRUBY_OPTS="--server -Xcompile.invokedynamic=false"
 script: bundle exec rake $TASK
 matrix:
   include:
     - rvm: jruby-head
-      env: JRUBY_OPTS="--server -Xcompile.invokedynamic=false" TASK=test
-    - rvm: jruby-9.1.6.0
+      env: TASK=test
+    - rvm: jruby-9.1.16.0
       env: TASK=integration
   allow_failures:
     - rvm: jruby-head
@@ -25,6 +26,5 @@ notifications:
     template:
       - "%{repository} (%{branch}:%{commit} by %{author}): %{message} (%{build_url})"
 before_install:
-  - sudo apt-get update && sudo apt-get install git
   - git fetch --unshallow
   - gem install bundler
