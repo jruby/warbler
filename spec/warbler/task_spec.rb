@@ -126,20 +126,16 @@ describe Warbler::Task do
 
   it "should allow bytecode version in config" do
     config.features << "compiled"
-    config.bytecode_version = '1.7'
+    config.bytecode_version = ENV_JAVA['java.version'] < '1.8' ? '1.7' : '1.8'
+    bytecode_version = [0x00, ENV_JAVA['java.version'] < '1.8' ?  0x33 :  0x34] # 0x33 -> version 51 (Java 7)
     silence { run_task "warble" }
-
-    java_class_magic_number = [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
-    # 0x33 is version 51, i.e. Java7
-    java7_version_bytes = [0x00,0x33].map { |magic_char| magic_char.chr }.join
 
     Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
       class_file_bytes = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.class') {|io| io.read }
-      java_class_header     = class_file_bytes[0..3]
-      bytecode_version      = class_file_bytes[6..7]
 
-      java_class_header.should == java_class_magic_number
-      bytecode_version.should == java7_version_bytes
+      class_file_bytes[0..3].should == [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
+      skip('Broken in JRuby <= 9.2.0.0') if JRUBY_VERSION < '9.2.0.1' # NOTE: (9.1 has V1_7 hardcoded)
+      class_file_bytes[6..7].should == bytecode_version.map { |magic_char| magic_char.chr }.join
     end
   end
 
