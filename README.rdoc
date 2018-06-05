@@ -277,7 +277,7 @@ http://maven.apache.org/ Be aware the homebrew installs 3.0.5, which doesn't wor
 
 Warbler is provided under the terms of the MIT license.
 
-Warbler (c) 2013-2015 The JRuby project
+Warbler (c) 2013-2018 The JRuby Team
 
 Warbler (c) 2010-2012 Engine Yard, Inc.
 

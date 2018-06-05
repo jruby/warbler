@@ -6,7 +6,7 @@ gemspec( :jar => 'warbler_jar.jar',
          :source => 'ext' )
 
 properties( 'jruby.plugins.version' => '1.1.5',
-            'jruby.version' => '9.1.6.0',
+            'jruby.version' => '9.1.8.0',
             'jetty.version' => '9.2.10.v20150310' )
 
 # dependencies needed for compilation
@@ -15,7 +15,7 @@ scope :provided do
   jar 'org.eclipse.jetty:jetty-webapp', '${jetty.version}'
 end
 
-plugin :compiler, '3.1', :source => '1.5', :target => '1.5'
+plugin :compiler, '3.1', :source => '1.6', :target => '1.6'
 
 plugin :invoker, '1.8' do
   execute_goals( :install, :run,
