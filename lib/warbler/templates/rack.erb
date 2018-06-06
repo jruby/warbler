@@ -1,5 +1,5 @@
-<% if (params = config.webxml.context_params) && params['rack.env'] -%>
-ENV['RACK_ENV'] ||= '<%= params['rack.env'] %>'
+<% if ((params = config.webxml.context_params) && params['rack.env']) || ENV_JAVA['RACK_ENV'] -%>
+ENV['RACK_ENV'] ||= ENV_JAVA['RACK_ENV'] || '<%= params['rack.env'] %>'
 <% end -%>
 
 $LOAD_PATH.unshift $servlet_context.getRealPath('/WEB-INF') if $servlet_context
