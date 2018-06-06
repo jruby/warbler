@@ -93,7 +93,7 @@ feature and creates a basic war with the sources included, make sure you run :
 or, if it's important that the war always be compiled, use the option above to
 put the feature in your <tt>config/warble.rb</tt>.
 
-== War or Jar?
+== .war or .jar?
 
 War-based projects are for Rails, Merb, or Rack-based web applications.
 They usually contain a +config/environment.rb+ file, a +config/init.rb+ file,
@@ -108,7 +108,7 @@ in the <tt>lib</tt> directory. Warbler packages the application so that
 
 == Jar Files
 
-=== Gem Specification (gemspec) Files
+=== Gem Specification Files
 
 If your project has a <tt>.gemspec</tt> file in the top directory, it will be
 used to configure the project's dependencies, launcher script, require paths,
@@ -155,7 +155,7 @@ The following items are set up for you:
 * Multi-thread-safe execution (as introduced in Rails 2.2) is detected and
   runtime pooling is disabled.
 
-=== Other Rack-based applications
+=== Other Rack Applications
 
 If you have a +config.ru+ file in the top directory or one of the immediate
 subdirectories of your application, it will be included and used as the rackup
@@ -166,7 +166,7 @@ to manage your gems. <tt>ENV['RACK_ENV']</tt> will be set to +production+.
 See {the examples in the jruby-rack project}[http://github.com/jruby/jruby-rack/tree/master/examples/]
 of how to configure Warbler to package Camping and Sinatra apps.
 
-=== Configuration auto-detect notes
+=== Configuration Notes
 
 * Warbler will load the +environment+ Rake task in a Rails application to try
   to detect some configuration. If you don't have database access in the
@@ -178,7 +178,7 @@ of how to configure Warbler to package Camping and Sinatra apps.
   <tt>Gem.loaded_specs</tt> is available, but the application needs to be
   loaded first before its contents are reliable.
 
-== Custom configuration
+== Custom Configuration
 
 If the default settings are not appropriate for your application, you can
 customize Warbler's behavior. To customize files, libraries, and gems included
@@ -190,7 +190,7 @@ doing this. With the gem, simply run
 Finally, edit the +config/warble.rb+ to your taste. The generated file is
 fully-documented with the available options and default values.
 
-=== War layout
+=== Archive Layout
 
 The default configuration puts application files (+app+, +config+, +lib+,
 +log+, +vendor+, +tmp+) under the .war file's +WEB-INF+ directory, and files in
@@ -198,7 +198,7 @@ The default configuration puts application files (+app+, +config+, +lib+,
 automatically be placed in +WEB-INF/lib+ for placement on the web app's
 class-path.
 
-=== Web.xml
+=== web.xml
 
 Java web applications are configured mainly through this file, and Warbler
 creates a suitable default file for you for use. However, if you need to
@@ -219,7 +219,7 @@ customize it in any way, you have two options.
 
 For more information on configuration, see Warbler::Config.
 
-== Rakefile integration
+== Rakefile Integration
 
 If you'd like to control Warbler from your own project's +Rakefile+,
 simply add the following code somewhere in the +Rakefile+ :
@@ -247,11 +247,10 @@ https://github.com/jruby/warbler/issues.
 
 You can get the Warbler source using Git, in any of the following ways:
 
-   git clone git://git.caldersphere.net/warbler.git
    git clone git://github.com/jruby/warbler.git
 
 You can also download a tarball of Warbler source at
-https://github.com/jruby/warbler/tarball/master.
+https://github.com/jruby/warbler/archive/master.zip.
 
 == Development
 
@@ -266,12 +265,9 @@ There are a few integration tests in the `integration` directory that build WAR 
 with Warbler, and run some basic smoke tests against them.  You can run these like so:
 
     cd integration
-    export MAVEN_OPTS="-XX:MaxPermSize=128m"
     mvn verify
 
-The increased PermGen space is for the Rails4 test. And You'll need to have Maven 3.1.1 installed, of course:
-http://maven.apache.org/ Be aware the homebrew installs 3.0.5, which doesn't work (and I don't really know why).
-
+You'll need to have Maven >= 3.1.1 installed, of course: http://maven.apache.org/
 
 == License
 

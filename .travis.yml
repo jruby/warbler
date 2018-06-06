@@ -6,8 +6,8 @@ branches:
   only:
     - master
     - /-dev|-feature|-fix/
-#env:
-#  - JRUBY_OPTS="--server -Xcompile.invokedynamic=false"
+env:
+  - JRUBY_OPTS="-J-Xmx896M"
 script: bundle exec rake $TASK
 matrix:
   include:
