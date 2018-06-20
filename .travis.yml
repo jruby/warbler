@@ -13,8 +13,14 @@ matrix:
   include:
     - rvm: jruby-head
       env: TASK=test
-    - rvm: jruby-9.1.16.0
+    - rvm: jruby-9.1.17.0
       env: TASK=integration
+    - rvm: jruby-9.1.16.0
+      env: RAKE_VERSION="~>10.1"
+    - rvm: jruby-9.1.16.0
+      env: RAKE_VERSION="~>11.2"
+    - rvm: jruby-9.1.16.0
+      env: RAKE_VERSION="~>12.3"
   allow_failures:
     - rvm: jruby-head
 notifications:
