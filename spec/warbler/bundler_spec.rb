@@ -176,6 +176,7 @@ describe Warbler::Jar, "with Bundler" do
     run_in_directory "spec/sample_bundler"
 
     it "includes the bundler gem" do
+      bundle_install
       jar.apply(config)
       config.gems.detect{|k,v| k.name == 'bundler'}.should_not be nil
       file_list(/bundler-/).should_not be_empty
