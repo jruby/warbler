@@ -234,6 +234,11 @@ module Warbler
         next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
         @files[apply_pathmaps(config, File.join(spec.full_name, f), :gems)] = src
       end
+      if File.exist?(spec.gem_build_complete_path)
+        base_dir = Pathname.new(spec.base_dir)
+        gem_build_complete_path = Pathname.new(spec.gem_build_complete_path)
+        @files[File.join(config.relative_gem_path, gem_build_complete_path.relative_path_from(base_dir))] = spec.gem_build_complete_path
+      end
     end
 
     # Add all application directories and files to the archive.
