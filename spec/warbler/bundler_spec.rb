@@ -160,7 +160,7 @@ describe Warbler::Jar, "with Bundler" do
         file_list(%r{^bundler/gems/tester[^/]*/tester.gemspec}).should_not be_empty
         jar.add_init_file(config)
         contents = jar.contents('META-INF/init.rb')
-        contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
+        contents.should =~ /ENV\['BUNDLE_GEMFILE'\] ||= File.expand_path(.*, __FILE__)/
       end
     end
 
@@ -168,7 +168,7 @@ describe Warbler::Jar, "with Bundler" do
       File.open("Gemfile", "w") {|f| f << "source 'http://rubygems.org/'" }
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
+      contents.should =~ /ENV\['BUNDLE_GEMFILE'\] ||= File.expand_path(.*, __FILE__)/
     end
   end
 
