@@ -1010,6 +1010,18 @@ describe Warbler::Jar do
       jar.contents('WEB-INF/myserver-web.xml').should =~ /web-app.*production/
     end
 
+    it "does not overwrite user-specified webserver.properties file" do
+      File.open("webserver.properties", "w") do |f|
+        f << "foo"
+      end
+      use_config do |config|
+        config.webinf_files = FileList['webserver.properties']
+      end
+      jar.apply(config)
+      file_list(%r{WEB-INF/webserver\.properties}).should_not be_empty
+      jar.contents('WEB-INF/webserver.properties').should == 'foo'
+    end
+
     it "excludes test files in gems according to config.gem_excludes" do
       use_config do |config|
         config.gem_excludes += [/^(test|spec)\//]

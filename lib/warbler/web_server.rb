@@ -103,7 +103,7 @@ module Warbler
 </Configure>
 CONFIG
 
-      jar.files["WEB-INF/webserver.properties"] = StringIO.new(<<-PROPS)
+      jar.files["WEB-INF/webserver.properties"] ||= StringIO.new(<<-PROPS)
 mainclass = org.eclipse.jetty.runner.Runner
 args = args0,args1,args2,args3,args4,args5,args6
 props = jetty.home
