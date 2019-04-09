@@ -108,7 +108,13 @@ Warbler::Config.new do |config|
   # GEM_HOME if it is set.
   # config.override_gem_home = true
 
-  # Allows for specifing custom executables
+  # Specify executable
+  # Default: First item from alphabetized Gemspec executables array
+  # Takes either of two forms:
+  #  o String: Relative path to the executable from your project root
+  #  o Two-element Array:
+  #     [0] Name of the gem that contains the executable
+  #     [1] Relative path to the executable from the gem root
   # config.executable = ["rake", "bin/rake"]
 
   # Sets default (prefixed) parameters for the executables
