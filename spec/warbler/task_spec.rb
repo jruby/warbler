@@ -18,6 +18,8 @@ describe Warbler::Task do
       config.gems = ["rake"]
       config.webserver = "test"
       config.webxml.jruby.max.runtimes = 5
+
+      config.compiled_ruby_files = FileList['**/*.rb', '**/.rake']
     end
   end
 
@@ -148,6 +150,12 @@ describe Warbler::Task do
     config.features << "compiled"
     silence { run_task "warble" }
     File.exist?('app/helpers/application_helper.class').should be false
+  end
+
+  it "should not delete another extensions but .class files after finishing the jar" do
+    config.features << "compiled"
+    silence { run_task "warble" }
+    File.exist?('lib/tasks/utils.rake').should be true
   end
 
   context "where symlinks are available" do
