@@ -35,4 +35,7 @@ notifications:
       - "%{repository} (%{branch}:%{commit} by %{author}): %{message} (%{build_url})"
 before_install:
   - git fetch --unshallow
-  - gem install bundler
+  - gem update --system 2.6.14
+  - gem --version
+  - rvm @global do gem uninstall bundler -a -x -I || true
+  - gem install bundler -v '< 2'
