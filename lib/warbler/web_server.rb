@@ -88,7 +88,7 @@ module Warbler
 
   class JettyServer < WebServer
     def initialize
-      @artifact = Artifact.new(ENV["MAVEN_REPO"] || "https://repo1.maven.org/maven2",
+      @artifact = Artifact.new(ENV["MAVEN_REPO"] || "http://repo2.maven.org/maven2",
                                "org.eclipse.jetty", "jetty-runner",
                                ENV["WEBSERVER_VERSION"] || "9.2.9.v20150224")
     end
