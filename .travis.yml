@@ -9,7 +9,8 @@ branches:
     - master
     - /-dev|-feature|-fix/
 env:
-  - JRUBY_OPTS="-J-Xmx896M"
+  global:
+    JRUBY_OPTS: "-J-Xmx896M"
 script: bundle exec rake $TASK
 matrix:
   include:
