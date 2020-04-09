@@ -39,4 +39,5 @@ before_install:
   - gem update --system 2.6.14
   - gem --version
   - rvm @global do gem uninstall bundler -a -x -I || true
+  - gem uninstall bundler -a -x -I || true
   - gem install bundler -v '< 2'
