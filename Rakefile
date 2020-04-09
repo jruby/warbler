@@ -56,13 +56,9 @@ end
 # Make sure jar gets compiled before the gem is built
 task :build => :jar
 
-load_gemspec = lambda do
-  Gem::Specification.load(File.expand_path('warbler.gemspec', File.dirname(__FILE__)))
-end
-
 require 'rdoc/task'
 RDoc::Task.new(:docs) do |rd|
-  gemspec = load_gemspec.call
+  gemspec = Gem::Specification.load(File.expand_path('warbler.gemspec', File.dirname(__FILE__)))
   rd.rdoc_dir = "doc"
   rd.rdoc_files.include("README.rdoc", "History.txt", "LICENSE.txt")
   rd.rdoc_files += gemspec.require_paths
@@ -70,13 +66,4 @@ RDoc::Task.new(:docs) do |rd|
   rd.options += gemspec.rdoc_options
 end
 
-task :release_docs => :docs do
-  config = YAML.load(File.read(File.expand_path("~/.rubyforge/user-config.yml"))) rescue nil
-  if config
-    gemspec = load_gemspec.call
-    dir  = "/var/www/gforge-projects/#{gemspec.rubyforge_project}/#{gemspec.name}"
-    dest = "#{config["username"]}@rubyforge.org:#{dir}"
-    sh %{rsync -rl --delete doc/ #{dest}}
-  end
-end
-task :release => :release_docs
+task :release => :docs
