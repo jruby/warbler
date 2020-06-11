@@ -15,7 +15,7 @@ scope :provided do
   jar 'org.eclipse.jetty:jetty-webapp', '${jetty.version}'
 end
 
-plugin :compiler, '3.1', :source => '1.6', :target => '1.6'
+plugin :compiler, '3.1', :source => '8', :target => '8'
 
 plugin :invoker, '1.8' do
   execute_goals( :install, :run,

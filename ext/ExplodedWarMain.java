@@ -5,27 +5,27 @@
  * See the file LICENSE.txt for details.
  */
 
-import java.lang.reflect.Method;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.SequenceInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import java.net.URI;
 import java.net.URLClassLoader;
 import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Map;
-import java.util.jar.JarEntry;
 
-import java.io.IOException;
 
 public class ExplodedWarMain {
     // Shell arguments
@@ -96,12 +96,7 @@ public class ExplodedWarMain {
     //----------------------------------------------------------------------------------------------
     protected int launchJRubyCommand(String command, String args[]) throws Exception {
         // Find the path for the file to execute for the given command
-        final File commandFile = new File(webRoot, command);
-        debug("locating script: " + commandFile);
-        if (!commandFile.exists()) {
-            throw new IllegalStateException("Failed to locate the command file: '" + commandFile + "'");
-        }
-        final String executablePath = commandFile.getAbsolutePath();
+        final String executablePath = findExecutableFile(command);
 
         // Set the executable file and process arguments on jruby
         invokeMethod(jruby, "setScriptFilename", executablePath);
@@ -129,6 +124,13 @@ public class ExplodedWarMain {
 
         /// Cast the result of the script into an exit code
         return (outcome instanceof Number) ? ((Number) outcome).intValue() : 0;
+    }
+
+    //----------------------------------------------------------------------------------------------
+    private String findExecutableFile(String command) {
+        final File commandFile = new File(webRoot, command);
+        if (commandFile.exists()) return commandFile.getAbsolutePath();
+        throw new IllegalStateException("Failed to locate the command file: '" + commandFile + "'");
     }
 
     //----------------------------------------------------------------------------------------------
@@ -162,7 +164,7 @@ public class ExplodedWarMain {
 
     static String getENV(final String name, final String defaultValue) {
         try {
-            if ( System.getenv().containsKey(name) ) {
+            if (System.getenv().containsKey(name)) {
                 return System.getenv().get(name);
             }
             return defaultValue;
@@ -212,16 +214,10 @@ public class ExplodedWarMain {
 
     //----------------------------------------------------------------------------------------------
     protected void initJRubyContainer(String[] commandArgs) throws Exception {
-        final URL[] jars = loadJarUrls(webRoot);
-        this.jruby = newScriptingContainer(jars);
+        this.jruby = newScriptingContainer(loadJarUrls(webRoot));
 
         invokeMethod(jruby, "setArgv", (Object) commandArgs);
-        debug("setArgv: " + Arrays.toString(commandArgs));
-
-        String rootPath = webRoot.getAbsolutePath();
-        invokeMethod(jruby, "setCurrentDirectory", rootPath);
-        debug("setCurrentDirectory: " + rootPath);
-
+        invokeMethod(jruby, "setCurrentDirectory", webRoot.getAbsolutePath());
         invokeMethod(jruby, "setHomeDirectory", "uri:classloader:/META-INF/jruby.home");
 
         // for some reason, the container needs to run a scriptlet in order for it
@@ -240,9 +236,8 @@ public class ExplodedWarMain {
         debug("Loading webserver properties file: " + propsFilePath);
 
         Properties props = new Properties();
-        try {
-            InputStream is = new FileInputStream(propsFilePath);
-            props.load(is);
+        try(InputStream propsStream = new FileInputStream(propsFilePath)) {
+            props.load(propsStream);
         } catch (Exception e) {
             debug("Error while loading webserver properties file: " + e);
         }
@@ -282,13 +277,8 @@ public class ExplodedWarMain {
 
     //----------------------------------------------------------------------------------------------
     public void launchWebServer() throws Exception {
-        // Find the Jetty jar file
-        File jarFile = new File(webRoot, "webserver.jar");
-        debug("Jetty webserver.jar is at" + jarFile.getPath());
-
         // Load web server properties file
         Properties props = getWebserverProperties();
-        debug("Web server props: " + props.toString());
 
         // Get the name of the main jetty class
         String mainClass = props.getProperty("mainclass");
@@ -297,6 +287,7 @@ public class ExplodedWarMain {
         }
 
         // Load Jetty jar file
+        File jarFile = new File(webRoot, "webserver.jar");
         URLClassLoader loader = new URLClassLoader(new URL[] {jarFile.toURI().toURL()});
         Thread.currentThread().setContextClassLoader(loader);
 
@@ -305,9 +296,7 @@ public class ExplodedWarMain {
         Method main = klass.getDeclaredMethod("main", new Class[] { String[].class });
 
         // Start jetty
-        String[] newArgs = launchWebServerArguments(props);
-        debug("invoking webserver with: " + Arrays.deepToString(newArgs));
-        main.invoke(null, new Object[] { newArgs });
+        main.invoke(null, new Object[] { launchWebServerArguments(props) });
     }
 
     //----------------------------------------------------------------------------------------------
@@ -330,12 +319,12 @@ public class ExplodedWarMain {
     // Finds all jar files in the lib directory of the project and returns them as an array
     public static URL[] loadJarUrls(File root) throws Exception {
         List<URL> jars = new ArrayList<URL>();
+        File libDir = new File(root, "lib");
 
-        File[] files = new File(root, "lib").listFiles();
-
-        for (File f : files) {
-          if (f.isFile() && f.getName().endsWith(".jar"))
-            jars.add(f.toURI().toURL());
+        for (File f : libDir.listFiles()) {
+            if (f.isFile() && f.getName().endsWith(".jar")) {
+                jars.add(f.toURI().toURL());
+            }
         }
         return jars.toArray(new URL[jars.size()]);
     }
@@ -347,8 +336,6 @@ public class ExplodedWarMain {
         URLClassLoader classLoader = new URLClassLoader(jars);
         Class scriptingContainerClass = Class.forName("org.jruby.embed.ScriptingContainer", true, classLoader);
         Object jruby = scriptingContainerClass.newInstance();
-
-        debug("scripting container class loader urls: " + Arrays.toString(jars));
         invokeMethod(jruby, "setClassLoader", new Class[] { ClassLoader.class }, classLoader);
 
         return jruby;
