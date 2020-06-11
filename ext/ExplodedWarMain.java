@@ -45,12 +45,8 @@ public class ExplodedWarMain {
     // Constructor getting args from the system
     ExplodedWarMain(String[] arguments) throws IOException {
         this.arguments = arguments;
-
         this.warRoot = new File(new File("./lib/war").getCanonicalPath());
-        debug("Exploded WAR directory: " + warRoot.toString());
-
         this.webRoot = new File(warRoot, "/WEB-INF/");
-        debug("Web Application root: " + webRoot.toString());
     }
 
     //----------------------------------------------------------------------------------------------
@@ -64,13 +60,13 @@ public class ExplodedWarMain {
         final List<String> argsList = Arrays.asList(arguments);
         final int sIndex = argsList.indexOf("-S");
 
+        // No command specified, so starting the web server by default
         if (sIndex == -1) {
-            debug("No command specified, starting a web server");
             launchWebServer();
-            debug("Started web server");
             return 0;
         }
 
+        // Extract the command from the args list and launch it in jruby
         String execArg = argsList.get(sIndex + 1);
         String[] executableArgv = argsList.subList(sIndex + 2, argsList.size()).toArray(new String[0]);
         return launchCommand(execArg, executableArgv);
@@ -85,10 +81,10 @@ public class ExplodedWarMain {
             return 1;
         }
 
-        debug("Initializing JRuby scripting environment...");
+        // Setup jruby environment in preparation for running the script
         initJRubyContainer(commandArgs);
 
-        debug("Launching jruby with command '" + command + "' and arguments: " + Arrays.toString(commandArgs));
+        // Execute the ruby script
         return launchJRubyCommand(command, commandArgs);
     }
 
@@ -105,7 +101,6 @@ public class ExplodedWarMain {
         final CharSequence execScriptEnvPre = executableScriptEnvPrefix();
 
         // Load the command script and prepend it with the initialization code
-        debug("Loading command script: " + executablePath);
         Object executableInput = new SequenceInputStream(
             new ByteArrayInputStream(execScriptEnvPre.toString().getBytes()),
             (InputStream) invokeMethod(rubyInstanceConfig, "getScriptSource")
@@ -113,8 +108,6 @@ public class ExplodedWarMain {
 
         // Finally, ask jruby to execute the script
         Object runtime = invokeMethod(jruby, "getRuntime");
-
-        debug("invoking " + executablePath + " with: " + Arrays.toString(args));
         Object outcome = invokeMethod(runtime, "runFromMain",
             new Class[] { InputStream.class, String.class },
             executableInput,
@@ -200,10 +193,7 @@ public class ExplodedWarMain {
     protected CharSequence executableScriptEnvPrefix() {
         final String gemsDir = new File(webRoot, "gems").getAbsolutePath();
         final String gemfile = new File(webRoot, "Gemfile").getAbsolutePath();
-        System.out.println("setting GEM_HOME to " + gemsDir);
-        System.out.println("... and BUNDLE_GEMFILE to " + gemfile);
 
-        // ideally this would look up the config.override_gem_home setting
         return (
             "ENV['GEM_HOME'] = ENV['GEM_PATH'] = '"+ gemsDir +"' \n" +
             "ENV['BUNDLE_GEMFILE'] ||= '"+ gemfile +"' \n" +
@@ -232,7 +222,6 @@ public class ExplodedWarMain {
     //----------------------------------------------------------------------------------------------
     private Properties getWebserverProperties() throws Exception {
         File propsFilePath = new File(webRoot, "/webserver.properties");
-        debug("Loading webserver properties file: " + propsFilePath);
 
         Properties props = new Properties();
         try(InputStream propsStream = new FileInputStream(propsFilePath)) {
