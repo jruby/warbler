@@ -71,7 +71,6 @@ public class ExplodedWarMain {
             return 0;
         }
 
-        String[] arguments = argsList.subList(0, sIndex).toArray(new String[0]);
         String execArg = argsList.get(sIndex + 1);
         String[] executableArgv = argsList.subList(sIndex + 2, argsList.size()).toArray(new String[0]);
         return launchCommand(execArg, executableArgv);
@@ -320,12 +319,16 @@ public class ExplodedWarMain {
     public static URL[] loadJarUrls(File root) throws Exception {
         List<URL> jars = new ArrayList<URL>();
         File libDir = new File(root, "lib");
+        File[] libFiles = libDir.listFiles();
 
-        for (File f : libDir.listFiles()) {
-            if (f.isFile() && f.getName().endsWith(".jar")) {
-                jars.add(f.toURI().toURL());
+        if (libFiles != null) {
+            for (File f : libFiles) {
+                if (f.isFile() && f.getName().endsWith(".jar")) {
+                    jars.add(f.toURI().toURL());
+                }
             }
         }
+
         return jars.toArray(new URL[jars.size()]);
     }
 
