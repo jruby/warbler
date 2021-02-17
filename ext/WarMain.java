@@ -241,7 +241,7 @@ public class WarMain extends JarMain {
 
         invokeMethod(rubyInstanceConfig, "setUpdateNativeENVEnabled", new Class[] { Boolean.TYPE }, false);
 
-        final CharSequence execScriptEnvPre = executableScriptEnvPrefix();
+        final CharSequence execScriptEnvPre = "require File.expand_path('META-INF/init.rb')";
 
         final String executablePath = locateExecutable(scriptingContainer, execScriptEnvPre);
         if ( executablePath == null ) {
@@ -267,21 +267,6 @@ public class WarMain extends JarMain {
         return ( outcome instanceof Number ) ? ( (Number) outcome ).intValue() : 0;
     }
 
-    @Deprecated
-    protected String locateExecutable(final Object scriptingContainer) throws Exception {
-        if ( executable == null ) {
-            throw new IllegalStateException("no executable");
-        }
-        final File exec = new File(extractRoot, executable);
-        if ( exec.exists() ) {
-            return exec.getAbsolutePath();
-        }
-        else {
-            final String script = locateExecutableScript(executable, executableScriptEnvPrefix());
-            return (String) invokeMethod(scriptingContainer, "runScriptlet", script);
-        }
-    }
-
     protected String locateExecutable(final Object scriptingContainer, final CharSequence envPreScript)
         throws Exception {
         if ( executable == null ) {
@@ -295,18 +280,6 @@ public class WarMain extends JarMain {
             final String script = locateExecutableScript(executable, envPreScript);
             return (String) invokeMethod(scriptingContainer, "runScriptlet", script);
         }
-    }
-
-    protected CharSequence executableScriptEnvPrefix() {
-        final String gemsDir = new File(extractRoot, "gems").getAbsolutePath();
-        final String gemfile = new File(extractRoot, "Gemfile").getAbsolutePath();
-        debug("setting GEM_HOME to " + gemsDir);
-        debug("... and BUNDLE_GEMFILE to " + gemfile);
-
-        // ideally this would look up the config.override_gem_home setting
-        return "ENV['GEM_HOME'] = ENV['GEM_PATH'] = '"+ gemsDir +"' \n" +
-        "ENV['BUNDLE_GEMFILE'] ||= '"+ gemfile +"' \n" +
-        "require 'uri:classloader:/META-INF/init.rb'";
     }
 
     protected String locateExecutableScript(final String executable, final CharSequence envPreScript) {

@@ -160,7 +160,7 @@ describe Warbler::Jar, "with Bundler" do
         file_list(%r{^bundler/gems/tester[^/]*/tester.gemspec}).should_not be_empty
         jar.add_init_file(config)
         contents = jar.contents('META-INF/init.rb')
-        contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
+        contents.should =~ /ENV\['BUNDLE_GEMFILE'\] ||= File.expand_path(.*, __FILE__)/
       end
     end
 
@@ -168,7 +168,7 @@ describe Warbler::Jar, "with Bundler" do
       File.open("Gemfile", "w") {|f| f << "source 'http://rubygems.org/'" }
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
+      contents.should =~ /ENV\['BUNDLE_GEMFILE'\] ||= File.expand_path(.*, __FILE__)/
     end
   end
 
@@ -194,15 +194,18 @@ describe Warbler::Jar, "with Bundler" do
     end
 
     context "with the runnable feature" do
+      let(:bundle_gemfile) { nil }
+
       before do
         File.open("Rakefile", "w") do |f|
           f << <<-RUBY
           task :test_task do
-            puts "success"
+            puts Rake::VERSION
           end
           RUBY
         end
 
+        ENV['BUNDLE_GEMFILE'] = bundle_gemfile if bundle_gemfile
         use_config do |config|
           config.features = %w{runnable}
         end
@@ -221,10 +224,24 @@ describe Warbler::Jar, "with Bundler" do
 
       it "can run commands in the generated warfile" do
         jar.create('foo.war')
+        ENV['BUNDLE_GEMFILE'] = nil
         stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake test_task')
         wait_thr.value.success?.should be(true)
         stderr.readlines.join.should eq("")
-        stdout.readlines.join.should eq("success\n")
+        stdout.readlines.join.should eq("10.5.0\n")
+      end
+
+      context "with a custom Gemfile" do
+        let(:bundle_gemfile) { 'Special-Gemfile' }
+
+        it "uses the correct gems" do
+          jar.create('foo.war')
+          ENV['BUNDLE_GEMFILE'] = nil
+          stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake test_task')
+          wait_thr.value.success?.should be(true)
+          stderr.readlines.join.should eq("")
+          stdout.readlines.join.should eq("12.3.1\n")
+        end
       end
     end
   end
