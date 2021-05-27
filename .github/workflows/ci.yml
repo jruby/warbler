@@ -39,13 +39,13 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler: 1.17.3
+          bundler: 2.3.20
 
       - name: Install fixed rubygems version
         run: gem update --system 3.3.20
 
       - name: Install dependencies
-        run: bundle _1.17.3_ install --jobs=3 --retry=3
+        run: bundle _2.3.20_ install --jobs=3 --retry=3
         working-directory: warbler
 
       - name: Checkout jbundler
