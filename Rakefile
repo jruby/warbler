@@ -34,7 +34,7 @@ task :default => :spec
 # use Mavenfile to define :jar task
 require 'maven/ruby/maven'
 mvn = Maven::Ruby::Maven.new
-if defined?(JRUBY_VERISON) && ! (JRUBY_VERSION =~ /^9.0/)
+if defined?(JRUBY_VERSION) && ! (JRUBY_VERSION =~ /^9.0/)
   mvn.inherit_jruby_version
 end
 
