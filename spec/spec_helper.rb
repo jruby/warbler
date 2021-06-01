@@ -213,6 +213,8 @@ RSpec.configure do |config|
   config.extend ExampleGroupHelpers
   config.include ExampleGroupHelpers::InstanceMethods
 
+  config.example_status_persistence_file_path = '.rspec_status'
+
   class << ::Object
     public :remove_const
   end

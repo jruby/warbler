@@ -14,3 +14,4 @@ log
 integration/**/*.iml
 build.log
 .ruby-version
+.rspec_status
