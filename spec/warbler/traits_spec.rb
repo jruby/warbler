@@ -14,7 +14,7 @@ describe Warbler::Traits do
 
     result.each do |trait|
       trait.requirements.each do |requirement|
-        result.index(requirement).should < result.index(trait)
+        expect(result.index(requirement)).to be <= result.index(trait)
       end
     end
   end

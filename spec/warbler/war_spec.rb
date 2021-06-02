@@ -9,6 +9,6 @@ require File.expand_path('../../spec_helper', __FILE__)
 
 describe Warbler::War do
   it "is deprecated, replace occurrences with Warbler::Jar" do
-    capture { Warbler::War.new }.should =~ /deprecated/
+    expect(capture { Warbler::War.new }).to match /deprecated/
   end
 end

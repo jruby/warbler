@@ -37,7 +37,7 @@ describe Warbler::Jar, "with Bundler" do
     end
 
     it "detects a Bundler trait" do
-      config.traits.should include(Warbler::Traits::Bundler)
+      expect(config.traits).to include(Warbler::Traits::Bundler)
     end
 
     it "detects a Gemfile and process only its gems" do
@@ -45,16 +45,16 @@ describe Warbler::Jar, "with Bundler" do
         config.gems << "rake"
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/Gemfile}).should_not be_empty
-      file_list(%r{WEB-INF/gems/specifications/rspec}).should_not be_empty
-      file_list(%r{WEB-INF/gems/specifications/rake}).should be_empty
+      expect(file_list(%r{WEB-INF/Gemfile})).to_not be_empty
+      expect(file_list(%r{WEB-INF/gems/specifications/rspec})).to_not be_empty
+      expect(file_list(%r{WEB-INF/gems/specifications/rake})).to be_empty
     end
 
     it "copies Gemfiles into the war" do
       File.open("Gemfile.lock", "w") {|f| f << "GEM"}
       jar.apply(config)
-      file_list(%r{WEB-INF/Gemfile}).should_not be_empty
-      file_list(%r{WEB-INF/Gemfile.lock}).should_not be_empty
+      expect(file_list(%r{WEB-INF/Gemfile})).to_not be_empty
+      expect(file_list(%r{WEB-INF/Gemfile.lock})).to_not be_empty
     end
 
     it "allows overriding of the gem path when using Bundler" do
@@ -62,7 +62,7 @@ describe Warbler::Jar, "with Bundler" do
         config.gem_path = '/WEB-INF/jewels'
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/jewels/specifications/rspec}).should_not be_empty
+      expect(file_list(%r{WEB-INF/jewels/specifications/rspec})).to_not be_empty
     end
 
     context 'with :git entries in the Gemfile' do
@@ -72,16 +72,16 @@ describe Warbler::Jar, "with Bundler" do
         File.open("Gemfile", "w") {|f| f << "gem 'tester', :git => '#{@gem_dir}'\n"}
         bundle_install '--local'
         jar.apply(config)
-        file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb}).should_not be_empty
-        file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec}).should_not be_empty
+        expect(file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb})).to_not be_empty
+        expect(file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec})).to_not be_empty
       end
 
       it "bundles only the gemspec for :git entries that are excluded" do
         File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'tester', :git => '#{@gem_dir}'\nend\n"}
         bundle_install '--local'
         jar.apply(config)
-        file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb}).should be_empty
-        file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec}).should_not be_empty
+        expect(file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb})).to be_empty
+        expect(file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec})).to_not be_empty
       end
 
     end
@@ -95,7 +95,7 @@ describe Warbler::Jar, "with Bundler" do
         File.open("Gemfile", "w") {|f| f << "gem 'tester', :path => '#{@gem_dir}'\n"}
         bundle_install '--local'
         silence { jar.apply(config) }
-        file_list(%r{tester}).should be_empty
+        expect(file_list(%r{tester})).to be_empty
       end
 
       it "does work with relative :path" do
@@ -106,9 +106,9 @@ describe Warbler::Jar, "with Bundler" do
           File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngem 'tester', :path => 'gems/tester'\n"}
           bundle_install '--local'
           jar.apply(config)
-          file_list(%r{tester}).should_not be_empty # included from :path as is
-          file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb}).should be_empty
-          file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec}).should be_empty
+          expect(file_list(%r{tester})).to_not be_empty # included from :path as is
+          expect(file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb})).to be_empty
+          expect(file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/tester.gemspec})).to be_empty
         #ensure
           #FileUtils.rm_r(gem_dir) rescue nil
         #end
@@ -119,29 +119,29 @@ describe Warbler::Jar, "with Bundler" do
     it "does not bundle dependencies in the test group by default" do
       File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'rspec'\nend\n"}
       jar.apply(config)
-      file_list(%r{WEB-INF/gems/gems/rake[^/]*/}).should_not be_empty
-      file_list(%r{WEB-INF/gems/gems/rspec[^/]*/}).should be_empty
-      file_list(%r{WEB-INF/gems/specifications/rake}).should_not be_empty
-      file_list(%r{WEB-INF/gems/specifications/rspec}).should be_empty
+      expect(file_list(%r{WEB-INF/gems/gems/rake[^/]*/})).to_not be_empty
+      expect(file_list(%r{WEB-INF/gems/gems/rspec[^/]*/})).to be_empty
+      expect(file_list(%r{WEB-INF/gems/specifications/rake})).to_not be_empty
+      expect(file_list(%r{WEB-INF/gems/specifications/rspec})).to be_empty
     end
 
     it "adds BUNDLE_WITHOUT to init.rb" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ /ENV\['BUNDLE_WITHOUT'\]/
-      contents.should =~ /'development:test:assets'/
+      expect(contents).to match /ENV\['BUNDLE_WITHOUT'\]/
+      expect(contents).to match /'development:test:assets'/
     end
 
     it "adds BUNDLE_GEMFILE to init.rb" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ Regexp.new(Regexp.quote("ENV['BUNDLE_GEMFILE'] ||= $servlet_context.getRealPath('/WEB-INF/Gemfile')"))
+      expect(contents).to match Regexp.new(Regexp.quote("ENV['BUNDLE_GEMFILE'] ||= $servlet_context.getRealPath('/WEB-INF/Gemfile')"))
     end
 
     it "uses ENV['BUNDLE_GEMFILE'] if set" do
       mv "Gemfile", "Special-Gemfile"
       ENV['BUNDLE_GEMFILE'] = "Special-Gemfile"
-      config.traits.should include(Warbler::Traits::Bundler)
+      expect(config.traits).to include(Warbler::Traits::Bundler)
     end
   end
 
@@ -156,11 +156,11 @@ describe Warbler::Jar, "with Bundler" do
         File.open("Gemfile", "w") {|f| f << "gem 'tester', :git => '#{@gem_dir}'\n"}
         bundle_install '--local'
         jar.apply(config)
-        file_list(%r{^bundler/gems/tester[^/]*/lib/tester/version\.rb}).should_not be_empty
-        file_list(%r{^bundler/gems/tester[^/]*/tester.gemspec}).should_not be_empty
+        expect(file_list(%r{^bundler/gems/tester[^/]*/lib/tester/version\.rb})).to_not be_empty
+        expect(file_list(%r{^bundler/gems/tester[^/]*/tester.gemspec})).to_not be_empty
         jar.add_init_file(config)
         contents = jar.contents('META-INF/init.rb')
-        contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
+        expect(contents).to match /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
       end
     end
 
@@ -168,7 +168,7 @@ describe Warbler::Jar, "with Bundler" do
       File.open("Gemfile", "w") {|f| f << "source 'http://rubygems.org/'" }
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
+      expect(contents).to match /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
     end
   end
 
@@ -178,19 +178,19 @@ describe Warbler::Jar, "with Bundler" do
     it "includes the bundler gem" do
       bundle_install
       jar.apply(config)
-      config.gems.detect{|k,v| k.name == 'bundler'}.should_not be nil
-      file_list(/bundler-/).should_not be_empty
+      expect(config.gems.detect{|k,v| k.name == 'bundler'}).to_not be nil
+      expect(file_list(/bundler-/)).to_not be_empty
     end
 
     it "does not include the bundler cache directory" do
       jar.apply(config)
-      file_list(%r{vendor/bundle}).should be_empty
+      expect(file_list(%r{vendor/bundle})).to be_empty
     end
 
     it "includes ENV['BUNDLE_FROZEN'] in init.rb" do
       jar.apply(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.split("\n").grep(/ENV\['BUNDLE_FROZEN'\] = '1'/).should_not be_empty
+      expect(contents.split("\n").grep(/ENV\['BUNDLE_FROZEN'\] = '1'/)).to_not be_empty
     end
 
     context "with the runnable feature" do
@@ -215,16 +215,16 @@ describe Warbler::Jar, "with Bundler" do
       end
 
       it "adds WarMain and JarMain to file" do
-        file_list(%r{^WarMain\.class$}).should_not be_empty
-        file_list(%r{^JarMain\.class$}).should_not be_empty
+        expect(file_list(%r{^WarMain\.class$})).to_not be_empty
+        expect(file_list(%r{^JarMain\.class$})).to_not be_empty
       end
 
       it "can run commands in the generated warfile" do
         jar.create('foo.war')
         stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake test_task')
-        wait_thr.value.success?.should be(true)
-        stderr.readlines.join.should eq("")
-        stdout.readlines.join.should eq("success\n")
+        expect(wait_thr.value.success?).to be(true)
+        expect(stderr.readlines.join).to eq("")
+        expect(stdout.readlines.join).to eq("success\n")
       end
     end
   end
@@ -235,9 +235,9 @@ describe Warbler::Jar, "with Bundler" do
     it "includes the bundler gem" do
       bundle_install '--deployment'
       jar.apply(config)
-      file_list(%r{gems/rake-12.3.3/lib}).should_not be_empty
-      file_list(%r{gems/bundler-}).should_not be_empty
-      file_list(%r{gems/bundler-.*/lib}).should_not be_empty
+      expect(file_list(%r{gems/rake-12.3.3/lib})).to_not be_empty
+      expect(file_list(%r{gems/bundler-})).to_not be_empty
+      expect(file_list(%r{gems/bundler-.*/lib})).to_not be_empty
     end
   end
 
@@ -248,7 +248,7 @@ describe Warbler::Jar, "with Bundler" do
     it "should have default load path" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ /\$LOAD_PATH\.unshift \$servlet_context\.getRealPath\('\/WEB-INF'\) if \$servlet_context/
+      expect(contents).to match /\$LOAD_PATH\.unshift \$servlet_context\.getRealPath\('\/WEB-INF'\) if \$servlet_context/
     end
   end
 end

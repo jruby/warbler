@@ -49,45 +49,45 @@ describe Warbler::Task do
     touch war_file
 
     run_task "warble:clean"
-    File.exist?(war_file).should == false
+    expect(File.exist?(war_file)).to eq false
   end
 
   it "should define a make_gemjar task for storing gems in a jar file" do
     silence { run_task "warble:gemjar"; run_task "warble:files" }
-    File.exist?("tmp/gems.jar").should == true
-    warble_task.jar.files.keys.should_not include(%r{WEB-INF\/gems})
-    warble_task.jar.files.keys.should include("WEB-INF/lib/gems.jar")
+    expect(File.exist?("tmp/gems.jar")).to eq true
+    expect(warble_task.jar.files.keys).to_not include(%r{WEB-INF\/gems})
+    expect(warble_task.jar.files.keys).to include("WEB-INF/lib/gems.jar")
   end
 
   it "should define a war task for bundling up everything" do
     files_ran = false; task "warble:files" do; files_ran = true; end
     jar_ran = false; task "warble:jar" do; jar_ran = true; end
     silence { run_task "warble" }
-    files_ran.should == true
-    jar_ran.should == true
+    expect(files_ran).to eq true
+    expect(jar_ran).to eq true
   end
 
   it "should define a jar task for creating the .war" do
     touch "file.txt"
     warble_task.jar.files["file.txt"] = "file.txt"
     silence { run_task "warble:jar" }
-    File.exist?("#{config.jar_name}.war").should == true
+    expect(File.exist?("#{config.jar_name}.war")).to eq true
   end
 
   it "should invoke feature tasks configured in config.features" do
     config.features << "gemjar"
     silence { run_task "warble" }
-    warble_task.jar.files.keys.should include("WEB-INF/lib/gems.jar")
+    expect(warble_task.jar.files.keys).to include("WEB-INF/lib/gems.jar")
   end
 
   it "should warn and skip unknown features configured in config.features" do
     config.features << "bogus"
-    capture { run_task "warble" }.should =~ /unknown feature `bogus'/
+    expect(capture { run_task "warble" }).to match /unknown feature `bogus'/
   end
 
   it "should define an executable task for embedding a server in the war file" do
     silence { run_task "warble:executable"; run_task "warble:files" }
-    warble_task.jar.files.keys.should include('WEB-INF/webserver.jar')
+    expect(warble_task.jar.files.keys).to include('WEB-INF/webserver.jar')
   end
 
   it "should be able to define all tasks successfully" do
@@ -104,8 +104,8 @@ describe Warbler::Task do
       java_class_header     = zf.get_input_stream('WEB-INF/app/helpers/application_helper.class') {|io| io.read }[0..3]
       ruby_class_definition = zf.get_input_stream('WEB-INF/app/helpers/application_helper.rb') {|io| io.read }
 
-      java_class_header.should == java_class_magic_number
-      ruby_class_definition.should == %{load __FILE__.sub(/.rb$/, '.class')}
+      expect(java_class_header).to eq java_class_magic_number
+      expect(ruby_class_definition).to eq %{load __FILE__.sub(/.rb$/, '.class')}
     end
   end
 
@@ -119,8 +119,8 @@ describe Warbler::Task do
       java_class_header     = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.class') {|io| io.read }[0..3]
       ruby_class_definition = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.rb') {|io| io.read }
 
-      java_class_header.should == java_class_magic_number
-      ruby_class_definition.should == %{load __FILE__.sub(/.rb$/, '.class')}
+      expect(java_class_header).to eq java_class_magic_number
+      expect(ruby_class_definition).to eq %{load __FILE__.sub(/.rb$/, '.class')}
     end
   end
 
@@ -133,15 +133,15 @@ describe Warbler::Task do
     Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
       class_file_bytes = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.class') {|io| io.read }
 
-      class_file_bytes[0..3].should == [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
-      class_file_bytes[6..7].should == bytecode_version.map { |magic_char| magic_char.chr }.join
+      expect(class_file_bytes[0..3]).to eq [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
+      expect(class_file_bytes[6..7]).to eq bytecode_version.map { |magic_char| magic_char.chr }.join
     end
   end
 
   it "should delete .class files after finishing the jar" do
     config.features << "compiled"
     silence { run_task "warble" }
-    File.exist?('app/helpers/application_helper.class').should be false
+    expect(File.exist?('app/helpers/application_helper.class')).to be false
   end
 
   context "where symlinks are available" do
@@ -155,7 +155,7 @@ describe Warbler::Task do
         Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
           special = zf.get_input_stream('WEB-INF/config/special.txt') {|io| io.read }
           link = zf.get_input_stream('WEB-INF/config/link.txt') {|io| io.read }
-          link.should == special
+          expect(link).to eq special
         end
       end
 
@@ -163,9 +163,9 @@ describe Warbler::Task do
         Dir.chdir("lib") { FileUtils.ln_s "tasks", "rakelib" }
         silence { run_task "warble" }
         Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
-          zf.find_entry("WEB-INF/lib/tasks/utils.rake").should_not be nil
-          zf.find_entry("WEB-INF/lib/rakelib/").should_not be nil
-          zf.find_entry("WEB-INF/lib/rakelib/utils.rake").should_not be nil if defined?(JRUBY_VERSION)
+          expect(zf.find_entry("WEB-INF/lib/tasks/utils.rake")).to_not be nil
+          expect(zf.find_entry("WEB-INF/lib/rakelib/")).to_not be nil
+          expect(zf.find_entry("WEB-INF/lib/rakelib/utils.rake")).to_not be nil if defined?(JRUBY_VERSION)
         end
       end
 
@@ -198,8 +198,8 @@ describe Warbler::Task do
 
       Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
         rspec = config.gems.keys.detect { |spec| spec.name == 'rspec' }
-        rspec.should_not be(nil), "expected rspec gem among: #{config.gems.keys.join(' ')}"
-        zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec.version}.gemspec").should_not be nil
+        expect(rspec).to_not be(nil), "expected rspec gem among: #{config.gems.keys.join(' ')}"
+        expect(zf.find_entry("WEB-INF/gems/specifications/rspec-#{rspec.version}.gemspec")).to_not be nil
       end
     end
   end
@@ -216,8 +216,8 @@ describe "Debug targets" do
   end
 
   it "should print out lists of files" do
-    capture { Rake::Task["war:debug:includes"].invoke }.should =~ /include/
-    capture { Rake::Task["war:debug:excludes"].invoke }.should =~ /exclude/
-    capture { Rake::Task["war:debug"].invoke }.should =~ /Config/
+    expect(capture { Rake::Task["war:debug:includes"].invoke }).to match /include/
+    expect(capture { Rake::Task["war:debug:excludes"].invoke }).to match /exclude/
+    expect(capture { Rake::Task["war:debug"].invoke }).to match /Config/
   end
 end
