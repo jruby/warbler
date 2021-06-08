@@ -2,18 +2,3 @@ ENV['BUNDLE_WITHOUT'] = '<%= config.bundle_without.join(':') %>'
 <% if config.bundler[:frozen] -%>
 ENV['BUNDLE_FROZEN'] = '1'
 <% end -%>
-
-module Bundler
-  module Patch
-    def clean_load_path
-      # nothing to be done for embedded JRuby
-    end
-  end
-  module SharedHelpers
-    def included(bundler)
-      bundler.send :include, Patch
-    end
-  end
-end
-
-require 'bundler/shared_helpers'
