@@ -24,8 +24,10 @@ jobs:
       fail-fast: false
 
     steps:
-      - name: checkout
+      - name: Checkout warbler
         uses: actions/checkout@v2
+        with:
+          path: warbler
 
       - name: Set up java ${{ matrix.java-version }}
         uses: actions/setup-java@v2
@@ -51,11 +53,27 @@ jobs:
 
       - name: Install dependencies
         run: bundle _1.17.3_ install --jobs=3 --retry=3
+        working-directory: warbler
+
+      - name: Checkout jbundler
+        uses: actions/checkout@v2
+        with:
+          repository: deivid-rodriguez/jbundler
+          ref: add_rake_install
+          path: jbundler
+
+      - name: Install jbundler
+        run: |
+          bundle install --jobs=3 --retry=3
+          bundle exec rake install
+        working-directory: jbundler
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.TASK }}
         if: matrix.ruby-version !=  'jruby-head'
+        working-directory: warbler
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.TASK }} || exit 0
         if: matrix.ruby-version ==  'jruby-head'
+        working-directory: warbler
