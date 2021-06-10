@@ -1,5 +1,4 @@
 rvm:
-  - jruby-9.1.17.0
   - jruby-9.2.0.0
   - jruby-head
 jdk:
@@ -14,13 +13,13 @@ env:
 script: bundle exec rake $TASK
 matrix:
   include:
-    - rvm: jruby-9.1.17.0
+    - rvm: jruby-9.2.0.0
       env: TASK=integration
-    - rvm: jruby-9.1.16.0
+    - rvm: jruby-9.2.0.0
       env: RAKE_VERSION="~>10.1"
-    - rvm: jruby-9.1.16.0
+    - rvm: jruby-9.2.0.0
       env: RAKE_VERSION="~>11.2"
-    - rvm: jruby-9.1.16.0
+    - rvm: jruby-9.2.0.0
       env: RAKE_VERSION="~>12.3"
   allow_failures:
     - rvm: jruby-head
