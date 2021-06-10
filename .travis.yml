@@ -1,6 +1,7 @@
 rvm:
   - jruby-9.1.17.0
   - jruby-9.2.0.0
+  - jruby-head
 jdk:
   - openjdk8
 branches:
@@ -13,7 +14,6 @@ env:
 script: bundle exec rake $TASK
 matrix:
   include:
-    - rvm: jruby-head
     - rvm: jruby-9.1.17.0
       env: TASK=integration
     - rvm: jruby-9.1.16.0
