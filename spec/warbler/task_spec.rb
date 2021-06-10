@@ -134,7 +134,6 @@ describe Warbler::Task do
       class_file_bytes = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.class') {|io| io.read }
 
       class_file_bytes[0..3].should == [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
-      skip('Broken in JRuby <= 9.2.0.0') if JRUBY_VERSION < '9.2.0.1' # NOTE: (9.1 has V1_7 hardcoded)
       class_file_bytes[6..7].should == bytecode_version.map { |magic_char| magic_char.chr }.join
     end
   end

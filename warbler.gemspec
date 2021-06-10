@@ -26,7 +26,7 @@ bundle up all of your application files for deployment to a Java environment.}
 
   gem.rdoc_options = ["--main", "README.rdoc", "-H", "-f", "darkfish"]
 
-  gem.required_ruby_version = ">= 2.1"
+  gem.required_ruby_version = ">= 2.5"
 
   gem.add_runtime_dependency 'rake', ['>= 10.1.0']
   gem.add_runtime_dependency 'jruby-jars', ['>= 9.0.0']
