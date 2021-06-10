@@ -16,7 +16,7 @@ Rails, or Rack application. Warbler provides a minimal, flexible, Ruby-like way 
 bundle up all of your application files for deployment to a Java environment.}
 
   gem.files         = `git ls-files`.split("\n").
-    reject { |file| file =~ /^\./ }. # .gitignore, .travis.yml
+    reject { |file| file =~ /^\./ }. # .gitignore, .github
     reject { |file| file =~ /^spec|test\// }. # spec/**/*.spec
     reject { |file| file =~ /^integration\// }. # (un-used) *.rake files
     reject { |file| file =~ /^rakelib\// } # (un-used) *.rake files
