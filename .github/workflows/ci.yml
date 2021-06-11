@@ -17,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        java-version: [8]
+        java-version: [8, 15]
         ruby-version: [jruby-9.2.18.0, jruby-head]
         rake-version: ['']
         task: ['']
@@ -27,7 +27,16 @@ jobs:
             ruby-version: jruby-9.2.18.0
             task: integration
 
+          - java-version: 15
+            ruby-version: jruby-9.2.18.0
+            task: integration
+
           - java-version: 8
+            ruby-version: jruby-9.2.18.0
+            rake-version: ~>12.3
+            task: ''
+
+          - java-version: 15
             ruby-version: jruby-9.2.18.0
             rake-version: ~>12.3
             task: ''
@@ -39,8 +48,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up java ${{ matrix.java-version }}
-        uses: actions/setup-java@v1.4.3
+        uses: actions/setup-java@v2
         with:
+          distribution: zulu
           java-version: ${{ matrix.java-version }}
 
       - name: Set up ${{ matrix.ruby-version }}
