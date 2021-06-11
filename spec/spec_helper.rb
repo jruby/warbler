@@ -90,6 +90,7 @@ module ExampleGroupHelpers
         `git init`
         `git config user.email "warbler-test@null.com"`
         `git config user.name  "Warbler Test"`
+        `git config --global init.defaultBranch main`
 
         # `bundle install --local`
         `git add .`
