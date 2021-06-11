@@ -29,16 +29,6 @@ jobs:
 
           - java-version: 8
             ruby-version: jruby-9.2.18.0
-            rake-version: ~>10.1
-            task: ''
-
-          - java-version: 8
-            ruby-version: jruby-9.2.18.0
-            rake-version: ~>11.2
-            task: ''
-
-          - java-version: 8
-            ruby-version: jruby-9.2.18.0
             rake-version: ~>12.3
             task: ''
 
