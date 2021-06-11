@@ -87,7 +87,7 @@ module ExampleGroupHelpers
   def create_git_gem(gem_name)
     before do
       @gem_dir = generate_gem(gem_name) do |gem_dir|
-        `git init`
+        `git init -b master`
         `git config user.email "warbler-test@null.com"`
         `git config user.name  "Warbler Test"`
 
