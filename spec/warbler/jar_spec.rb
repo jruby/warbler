@@ -568,12 +568,12 @@ describe Warbler::Jar do
 
     it "allows specification of dependency by Gem::Dependency" do
       spec = double "gem spec"
-      spec.stub(:name).and_return "hpricot"
-      spec.stub(:full_name).and_return "hpricot-0.6.157"
-      spec.stub(:full_gem_path).and_return "hpricot-0.6.157"
-      spec.stub(:loaded_from).and_return "hpricot.gemspec"
-      spec.stub(:files).and_return ["Rakefile"]
-      spec.stub(:dependencies).and_return []
+      allow(spec).to receive(:name).and_return "hpricot"
+      allow(spec).to receive(:full_name).and_return "hpricot-0.6.157"
+      allow(spec).to receive(:full_gem_path).and_return "hpricot-0.6.157"
+      allow(spec).to receive(:loaded_from).and_return "hpricot.gemspec"
+      allow(spec).to receive(:files).and_return ["Rakefile"]
+      allow(spec).to receive(:dependencies).and_return []
       dep = Gem::Dependency.new("hpricot", "> 0.6")
       expect(dep).to receive(:to_spec).and_return spec
       use_config do |config|
@@ -735,7 +735,7 @@ describe Warbler::Jar do
         expect(config.gems).to be_empty
 
         rm_rf "vendor/rails"
-        @rails.stub(:vendor_rails?).and_return true
+        allow(@rails).to receive(:vendor_rails?).and_return true
         config = Warbler::Config.new
         expect(config.gems).to be_empty
       end
@@ -743,11 +743,11 @@ describe Warbler::Jar do
       it "automatically adds Rails.configuration.gems to the list of gems" do
         task :environment do
           config = double "config"
-          @rails.stub(:configuration).and_return(config)
+          allow(@rails).to receive(:configuration).and_return(config)
           gem = double "gem"
-          gem.stub(:name).and_return "hpricot"
-          gem.stub(:requirement).and_return Gem::Requirement.new("=0.6")
-          config.stub(:gems).and_return [gem]
+          allow(gem).to receive(:name).and_return "hpricot"
+          allow(gem).to receive(:requirement).and_return Gem::Requirement.new("=0.6")
+          allow(config).to receive(:gems).and_return [gem]
         end
 
         expect(config.webxml.booter).to eq :rails
@@ -884,7 +884,7 @@ describe Warbler::Jar do
       let(:manifest_files) { %w(public/packs/manifest.json public/packs/manifest.json.gz) }
 
       before do
-        Warbler::Traits::Rails.stub(:detect?).and_return(true)
+        allow(Warbler::Traits::Rails).to receive(:detect?).and_return(true)
         mkdir_p File.dirname(manifest_files.first)
         manifest_files.each { |f| touch f }
       end
