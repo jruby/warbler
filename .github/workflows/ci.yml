@@ -19,7 +19,6 @@ jobs:
       matrix:
         java-version: [8, 15]
         ruby-version: [jruby-9.2.18.0, jruby-head]
-        rake-version: ['']
         task: ['']
 
         include:
@@ -30,16 +29,6 @@ jobs:
           - java-version: 15
             ruby-version: jruby-9.2.18.0
             task: integration
-
-          - java-version: 8
-            ruby-version: jruby-9.2.18.0
-            rake-version: ~>12.3
-            task: ''
-
-          - java-version: 15
-            ruby-version: jruby-9.2.18.0
-            rake-version: ~>12.3
-            task: ''
 
       fail-fast: false
 
@@ -64,17 +53,11 @@ jobs:
 
       - name: Install dependencies
         run: bundle install --jobs=3 --retry=3
-        env:
-          RAKE_VERSION: ${{ matrix.rake-version }}
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.TASK }}
-        env:
-          RAKE_VERSION: ${{ matrix.rake-version }}
         if: matrix.ruby-version !=  'jruby-head'
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.TASK }} || exit 0
-        env:
-          RAKE_VERSION: ${{ matrix.rake-version }}
         if: matrix.ruby-version ==  'jruby-head'
