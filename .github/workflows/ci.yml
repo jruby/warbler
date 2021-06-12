@@ -39,7 +39,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler: 1.17.3
+          bundler-cache: true
 
       - name: Install fixed rubygems version
         run: gem update --system 3.2.20
