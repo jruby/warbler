@@ -26,7 +26,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        path: warbler
+        with:
+          path: warbler
 
       - name: Set up java ${{ matrix.java-version }}
         uses: actions/setup-java@v2
