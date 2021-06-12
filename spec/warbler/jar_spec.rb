@@ -563,7 +563,7 @@ describe Warbler::Jar do
       expect(lambda {
         Warbler::Task.new "warble", config
         jar.apply(config)
-      }).to raise_error
+      }).to raise_error(Gem::MissingSpecError)
     end
 
     it "allows specification of dependency by Gem::Dependency" do
