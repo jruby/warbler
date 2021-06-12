@@ -125,13 +125,11 @@ module ExampleGroupHelpers
       end
     end
 
-    let(:drb_helper_args) { ["-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')] }
-
     if defined?(JRUBY_VERSION)
       require 'jruby'
       let(:drb) do
         drb_thread = Thread.new do
-          ruby *(drb_helper_args)
+          ruby "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')
         end
         drb_thread.run
         drb_thread
@@ -143,7 +141,7 @@ module ExampleGroupHelpers
     else
       require 'childprocess'
       let(:drb) do
-        ChildProcess.build(FileUtils::RUBY, *drb_helper_args).tap {|d| d.start }
+        ChildProcess.build(FileUtils::RUBY, "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')).tap {|d| d.start }
       end
       after :each do
         drb.stop
@@ -154,8 +152,8 @@ module ExampleGroupHelpers
   def use_test_webserver
     before :each do
       webserver = double('server').as_null_object
-      webserver.stub(:main_class).and_return 'WarMain.class'
-      webserver.stub(:add) do |jar|
+      allow(webserver).to receive(:main_class).and_return 'WarMain.class'
+      allow(webserver).to receive(:add) do |jar|
         jar.files['WEB-INF/webserver.jar'] = StringIO.new
       end
       Warbler::WEB_SERVERS['test'] = webserver
@@ -214,6 +212,8 @@ RSpec.configure do |config|
   config.include Warbler::RakeHelper
   config.extend ExampleGroupHelpers
   config.include ExampleGroupHelpers::InstanceMethods
+
+  config.example_status_persistence_file_path = '.rspec_status'
 
   class << ::Object
     public :remove_const

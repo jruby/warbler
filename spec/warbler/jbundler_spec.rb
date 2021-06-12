@@ -33,7 +33,7 @@ describe Warbler::Jar, "with JBundler" do
     end
 
     it "detects a JBundler trait" do
-      config.traits.should include(Warbler::Traits::JBundler)
+      expect(config.traits).to include(Warbler::Traits::JBundler)
     end
 
     it "detects a Jarfile and process only its jars" do
@@ -41,26 +41,26 @@ describe Warbler::Jar, "with JBundler" do
         config.java_libs << "local.jar"
       end
       jar.apply(config)
-      file_list(%r{WEB-INF/libs/local.jar}).should be_empty
+      expect(file_list(%r{WEB-INF/libs/local.jar})).to be_empty
     end
 
     it "copies jars from jbundler classpath into the war" do
       File.open(".jbundler/classpath.rb", "w") {|f| f << "JBUNDLER_CLASSPATH = ['some.jar']"}
       File.open("some.jar", "w") {|f| f << ""}
       jar.apply(config)
-      file_list(%r{WEB-INF/lib/some.jar}).should_not be_empty
+      expect(file_list(%r{WEB-INF/lib/some.jar})).to_not be_empty
     end
 
     it "adds JBUNDLE_SKIP to init.rb" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      contents.should =~ /ENV\['JBUNDLE_SKIP'\] = 'true'/
+      expect(contents).to match /ENV\['JBUNDLE_SKIP'\] = 'true'/
     end
 
     it "uses ENV['JBUNDLE_JARFILE'] if set" do
       mv "Jarfile", "Special-Jarfile"
       ENV['JBUNDLE_JARFILE'] = "Special-Jarfile"
-      config.traits.should include(Warbler::Traits::JBundler)
+      expect(config.traits).to include(Warbler::Traits::JBundler)
     end
   end
 
@@ -70,14 +70,14 @@ describe Warbler::Jar, "with JBundler" do
     it "does not include the jbundler gem (as it is in the development group)" do
       pending( "needs JRuby to work" ) unless defined? JRUBY_VERSION
       jar.apply(config)
-      config.gems.detect{|k,v| k.name == 'jbundler'}.should be nil
-      file_list(/jbundler-/).should be_empty
+      expect(config.gems.detect{|k,v| k.name == 'jbundler'}).to be nil
+      expect(file_list(/jbundler-/)).to be_empty
     end
 
     it "does not include the jbundler runtime config" do
       pending( "needs JRuby to work" ) unless defined? JRUBY_VERSION
       jar.apply(config)
-      file_list(%r{WEB-INF/.jbundler}).should be_empty
+      expect(file_list(%r{WEB-INF/.jbundler})).to be_empty
     end
   end
 end

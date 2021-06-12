@@ -29,13 +29,13 @@ describe Warbler::WebServer::Artifact do
   it "uses default (maven) local repository" do
     ENV['HOME'] = '/home/borg'
     ENV.delete('M2_HOME'); ENV.delete('MAVEN_HOME')
-    sample_artifact.local_repository.should == "/home/borg/.m2/repository"
+    expect(sample_artifact.local_repository).to eq "/home/borg/.m2/repository"
   end
 
   it "detects a custom maven repository setting" do
     ENV['HOME'] = '/home/borg'
     ENV['M2_HOME'] = File.expand_path('../m2_home', File.dirname(__FILE__))
-    sample_artifact.local_repository.should == '/usr/local/maven/repo'
+    expect(sample_artifact.local_repository).to eq '/usr/local/maven/repo'
   end
 
 end

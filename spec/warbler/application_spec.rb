@@ -34,34 +34,34 @@ describe Warbler::Application do
     output = capture do
       Warbler::Application.new.run
     end
-    output.should =~ /warble war\s/
-    output.should =~ /warble war:clean/
-    output.should =~ /warble war:debug/
+    expect(output).to match /warble war\s/
+    expect(output).to match /warble war:clean/
+    expect(output).to match /warble war:debug/
   end
 
   it "should display the version" do
     ARGV.unshift "version"
-    capture { Warbler::Application.new.run }.should =~ /#{Warbler::VERSION}/
+    expect(capture { Warbler::Application.new.run }).to match /#{Warbler::VERSION}/
   end
 
   it "should copy a fresh config file into place" do
-    File.exists?("config/warble.rb").should_not be true
+    expect(File.exists?("config/warble.rb")).to_not be true
     ARGV.unshift "config"
     silence { Warbler::Application.new.run }
-    File.exists?("config/warble.rb").should be true
+    expect(File.exists?("config/warble.rb")).to be true
   end
 
   it "should refuse to copy over an existing config file" do
     touch "config/warble.rb"
     ARGV.unshift "config"
-    capture { Warbler::Application.new.run }.should =~ /already exists/
+    expect(capture { Warbler::Application.new.run }).to match /already exists/
   end
 
   it "should complain if the config directory is missing" do
     begin
       mv "config", "config-tmp"
       ARGV.unshift "config"
-      capture { Warbler::Application.new.run }.should =~ /missing/
+      expect(capture { Warbler::Application.new.run }).to match /missing/
     ensure
       mv "config-tmp", "config"
     end
@@ -71,13 +71,13 @@ describe Warbler::Application do
     mkdir_p "lib/tasks/warbler"
     ARGV.unshift "pluginize"
     silence { Warbler::Application.new.run }
-    File.exist?("lib/tasks/warbler/warbler.rake").should_not be true
+    expect(File.exist?("lib/tasks/warbler/warbler.rake")).to_not be true
   end
 
   it "should define a pluginize task for adding the tasks to a Rails application" do
     ARGV.unshift "pluginize"
     silence { Warbler::Application.new.run }
-    File.exist?("lib/tasks/warbler/warbler.rake").should be true
+    expect(File.exist?("lib/tasks/warbler/warbler.rake")).to be true
   end
 
   it "should provide a means to load the project Rakefile" do
@@ -88,7 +88,7 @@ end
 describe Warbler::Application do
   it "should report Warbler version with --version" do
     output = `#{RUBY_EXE} -Ilib -S bin/warble --version`
-    output.should =~ /warbler/i
-    output.should =~ /#{Warbler::VERSION}/
+    expect(output).to match /warbler/i
+    expect(output).to match /#{Warbler::VERSION}/
   end
 end
