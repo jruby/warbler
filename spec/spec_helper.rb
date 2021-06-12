@@ -125,13 +125,11 @@ module ExampleGroupHelpers
       end
     end
 
-    let(:drb_helper_args) { ["-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')] }
-
     if defined?(JRUBY_VERSION)
       require 'jruby'
       let(:drb) do
         drb_thread = Thread.new do
-          ruby *(drb_helper_args)
+          ruby "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')
         end
         drb_thread.run
         drb_thread
@@ -143,7 +141,7 @@ module ExampleGroupHelpers
     else
       require 'childprocess'
       let(:drb) do
-        ChildProcess.build(FileUtils::RUBY, *drb_helper_args).tap {|d| d.start }
+        ChildProcess.build(FileUtils::RUBY, "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')).tap {|d| d.start }
       end
       after :each do
         drb.stop
