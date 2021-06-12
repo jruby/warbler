@@ -19,16 +19,7 @@ jobs:
       matrix:
         java-version: [8, 15]
         ruby-version: [jruby-9.2.18.0, jruby-head]
-        task: ['']
-
-        include:
-          - java-version: 8
-            ruby-version: jruby-9.2.18.0
-            task: integration
-
-          - java-version: 15
-            ruby-version: jruby-9.2.18.0
-            task: integration
+        task: ['', integration]
 
       fail-fast: false
 
