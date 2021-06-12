@@ -39,10 +39,14 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true
+          bundler: none
+          working-directory: warbler
 
       - name: Install fixed rubygems version
         run: gem update --system 3.2.20
+
+      - name: Install fixed bundler version
+        run: gem install bundler:2.2.20
 
       - name: Install dependencies
         run: bundle install --jobs=3 --retry=3
