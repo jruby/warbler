@@ -42,7 +42,7 @@ jobs:
           bundler: 1.17.3
 
       - name: Install fixed rubygems version
-        run: gem update --system 2.7.11
+        run: gem update --system 3.2.20
 
       - name: Install dependencies
         run: bundle install --jobs=3 --retry=3
