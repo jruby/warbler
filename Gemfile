@@ -5,9 +5,6 @@ gemspec
 rubyzip_version = ENV['RUBYZIP_VERSION']
 gem 'rubyzip', rubyzip_version if rubyzip_version && !rubyzip_version.empty?
 
-rake_version = ENV['RAKE_VERSION']
-gem 'rake', rake_version, :require => nil if rake_version && !rake_version.empty?
-
 group :development, :test do
   gem 'rdoc', ['>= 3.10', '< 4.3'], :require => nil
 end
