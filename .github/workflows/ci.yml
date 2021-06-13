@@ -10,7 +10,6 @@ on:
 
 env:
   JRUBY_OPTS: -J-Xmx896M
-  JAVA_OPTS: -Djavax.net.ssl.trustStoreType=JKS
 
 jobs:
   ci:
