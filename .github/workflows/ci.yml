@@ -10,6 +10,7 @@ on:
 
 env:
   JRUBY_OPTS: -J-Xmx896M
+  JAVA_OPTS: -Djavax.net.ssl.trustStoreType=JKS
 
 jobs:
   ci:
@@ -17,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        java-version: [8, 15]
+        java-version: [8, 11, 15]
         ruby-version: [jruby-9.3.7.0, jruby-head]
         task: ['', integration]
 
