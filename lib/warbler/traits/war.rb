@@ -182,33 +182,13 @@ module Warbler
         end
 
         def [](key)
-          new_ostruct_member(key)
+          new_ostruct_member!(key)
           send(key)
         end
 
         def []=(key, value)
-          new_ostruct_member(key)
+          new_ostruct_member!(key)
           send("#{key}=", value)
-        end
-
-        def method_missing(mid, *args)
-          len = args.length
-          if mname = mid[/.*(?==\z)/m]
-            if len != 1
-              raise ArgumentError, "wrong number of arguments (#{len} for 1)", caller(1)
-            end
-            modifiable[new_ostruct_member(mname)] = args[0]
-          elsif len == 0
-            @table[mid]
-          else
-            err = NoMethodError.new "undefined method `#{mid}' for #{self}", mid, args
-            err.set_backtrace caller(1)
-            raise err
-          end
-        end
-
-        def respond_to_missing?(mid, include_private = false)
-          @table.key?(mid.to_s.chomp('=').to_sym) || super
         end
 
         def servlet_filter; @servlet_filter ||= 'org.jruby.rack.RackFilter' end
@@ -258,6 +238,28 @@ module Warbler
 
         def to_s
           "No value for '#@key' found"
+        end
+
+        private
+
+        def method_missing(mid, *args)
+          len = args.length
+          if mname = mid[/.*(?==\z)/m]
+            if len != 1
+              raise ArgumentError, "wrong number of arguments (#{len} for 1)", caller(1)
+            end
+            modifiable[new_ostruct_member!(mname)] = args[0]
+          elsif len == 0
+            @table[mid]
+          else
+            err = NoMethodError.new "undefined method `#{mid}' for #{self}", mid, args
+            err.set_backtrace caller(1)
+            raise err
+          end
+        end
+
+        def respond_to_missing?(mid, include_private = false)
+          @table.key?(mid.to_s.chomp('=').to_sym) || super
         end
       end
     end
