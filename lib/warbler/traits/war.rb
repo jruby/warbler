@@ -176,7 +176,10 @@ module Warbler
 
         def initialize(key = 'webxml')
           @key = key
-          @table = Hash.new { |h, k| h[k] = WebxmlOpenStruct.new(k) }
+          @table = Hash.new { |h, k|
+            new_ostruct_member!(k)
+            h[k] = WebxmlOpenStruct.new(k)
+          }
 
           @servlet_filter_async = nil # true/false
         end
