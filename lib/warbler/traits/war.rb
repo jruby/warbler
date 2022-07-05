@@ -181,16 +181,6 @@ module Warbler
           @servlet_filter_async = nil # true/false
         end
 
-        def [](key)
-          new_ostruct_member!(key)
-          send(key)
-        end
-
-        def []=(key, value)
-          new_ostruct_member!(key)
-          send("#{key}=", value)
-        end
-
         def servlet_filter; @servlet_filter ||= 'org.jruby.rack.RackFilter' end
         attr_writer :servlet_filter
 
@@ -248,7 +238,7 @@ module Warbler
             if len != 1
               raise ArgumentError, "wrong number of arguments (#{len} for 1)", caller(1)
             end
-            modifiable[new_ostruct_member!(mname)] = args[0]
+            self[mname] = args[0]
           elsif len == 0
             @table[mid]
           else
