@@ -171,7 +171,7 @@ module ExampleGroupHelpers
         # create the gemspec and Gemfile
         File.open("Gemfile", "w") do |f|
           f << <<-RUBY
-          source "http://rubygems.org/"
+          source "https://rubygems.org/"
           gemspec
           RUBY
         end

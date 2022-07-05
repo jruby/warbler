@@ -33,7 +33,7 @@ describe Warbler::Jar, "with Bundler" do
     cleanup_temp_files
 
     before :each do
-      File.open("Gemfile", "w") {|f| f << "gem 'rspec'"}
+      File.open("Gemfile", "w") {|f| f << "source 'https://rubygems.org'\ngem 'rspec'"}
     end
 
     it "detects a Bundler trait" do
@@ -69,7 +69,7 @@ describe Warbler::Jar, "with Bundler" do
       create_git_gem("tester")
 
       it "works with :git entries in Gemfiles" do
-        File.open("Gemfile", "w") {|f| f << "gem 'tester', :git => '#{@gem_dir}'\n"}
+        File.open("Gemfile", "w") {|f| f << "source 'file://#{@gem_dir}'\ngem 'tester', :git => '#{@gem_dir}'\n"}
         bundle_install '--local'
         jar.apply(config)
         expect(file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb})).to_not be_empty
@@ -77,7 +77,7 @@ describe Warbler::Jar, "with Bundler" do
       end
 
       it "bundles only the gemspec for :git entries that are excluded" do
-        File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'tester', :git => '#{@gem_dir}'\nend\n"}
+        File.open("Gemfile", "w") {|f| f << "source 'https://rubygems.org'\ngem 'rake'\ngroup :test do\ngem 'tester', :git => '#{@gem_dir}'\nend\n"}
         bundle_install '--local'
         jar.apply(config)
         expect(file_list(%r{WEB-INF/gems/bundler/gems/tester[^/]*/lib/tester/version\.rb})).to be_empty
@@ -92,7 +92,7 @@ describe Warbler::Jar, "with Bundler" do
 
       it "does not work with absolute :path" do
         @gem_dir = generate_gem('tester', Dir.mktmpdir("gems-#{Time.now.to_i}"))
-        File.open("Gemfile", "w") {|f| f << "gem 'tester', :path => '#{@gem_dir}'\n"}
+        File.open("Gemfile", "w") {|f| f << "source 'file://#{@gem_dir}'\ngem 'tester', :path => '#{@gem_dir}'\n"}
         bundle_install '--local'
         silence { jar.apply(config) }
         expect(file_list(%r{tester})).to be_empty
@@ -103,7 +103,7 @@ describe Warbler::Jar, "with Bundler" do
         #begin
           Dir.mkdir(gem_dir)
           @gem_dir = generate_gem('tester', 'gems/tester') # spec/sample_war/gems
-          File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngem 'tester', :path => 'gems/tester'\n"}
+          File.open("Gemfile", "w") {|f| f << "source 'https://rubygems.org'\ngem 'rake'\ngem 'tester', :path => 'gems/tester'\n"}
           bundle_install '--local'
           jar.apply(config)
           expect(file_list(%r{tester})).to_not be_empty # included from :path as is
@@ -117,7 +117,7 @@ describe Warbler::Jar, "with Bundler" do
     end
 
     it "does not bundle dependencies in the test group by default" do
-      File.open("Gemfile", "w") {|f| f << "gem 'rake'\ngroup :test do\ngem 'rspec'\nend\n"}
+      File.open("Gemfile", "w") {|f| f << "source 'https://rubygems.org'\ngem 'rake'\ngroup :test do\ngem 'rspec'\nend\n"}
       jar.apply(config)
       expect(file_list(%r{WEB-INF/gems/gems/rake[^/]*/})).to_not be_empty
       expect(file_list(%r{WEB-INF/gems/gems/rspec[^/]*/})).to be_empty
@@ -153,7 +153,7 @@ describe Warbler::Jar, "with Bundler" do
       create_git_gem("tester")
 
       it "works with :git entries in Gemfiles" do
-        File.open("Gemfile", "w") {|f| f << "gem 'tester', :git => '#{@gem_dir}'\n"}
+        File.open("Gemfile", "w") {|f| f << "source 'file://#{@gem_dir}'\ngem 'tester', :git => '#{@gem_dir}'\n"}
         bundle_install '--local'
         jar.apply(config)
         expect(file_list(%r{^bundler/gems/tester[^/]*/lib/tester/version\.rb})).to_not be_empty
@@ -165,7 +165,7 @@ describe Warbler::Jar, "with Bundler" do
     end
 
     it "adds BUNDLE_GEMFILE to init.rb" do
-      File.open("Gemfile", "w") {|f| f << "source 'http://rubygems.org/'" }
+      File.open("Gemfile", "w") {|f| f << "source 'https://rubygems.org/'" }
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
       expect(contents).to match /ENV\['BUNDLE_GEMFILE'\] = File.expand_path(.*, __FILE__)/
