@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         java-version: [8, 15]
-        ruby-version: [jruby-9.2.18.0, jruby-head]
+        ruby-version: [jruby-9.3.7.0, jruby-head]
         task: ['', integration]
 
       fail-fast: false
