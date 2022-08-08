@@ -179,6 +179,12 @@ describe Warbler::Jar, "with Bundler" do
   context "when frozen" do
     run_in_directory "spec/sample_bundler"
 
+    before do
+      bundle_config "set --local frozen true"
+      bundle_config "set --local path vendor/bundle"
+      bundle_install
+    end
+
     it "includes the bundler gem" do
       bundle_install
       jar.apply(config)
