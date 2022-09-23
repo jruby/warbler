@@ -40,13 +40,20 @@ public class JarMain implements Runnable {
     JarMain(String[] args) {
         this.args = args;
         URL mainClass = getClass().getResource(MAIN);
+        URI uri;
+        File file;
+
         try {
             this.path = mainClass.toURI().getSchemeSpecificPart();
+            uri = new URI(this.path.replace("!" + MAIN, ""));
         }
         catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        archive = this.path.replace("!" + MAIN, "").replace("file:", "");
+
+        file = new File(uri.getPath());
+
+        archive = file.getAbsolutePath();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this));
     }
