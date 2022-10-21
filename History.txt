@@ -1,37 +1,21 @@
-== 2.1.0
+== Unreleased
 
-- #429 Let's properly require ruby >= 2.1
-- #433 Added Gem.reload_paths to fix issue with deploying with 9.2.x
-- #434 Revert "[fix] gem path reloading when delpoying on 9.2.x (#433)"
+- #429 maintenance Properly require ruby >= 2.1
 - #439 Include gem_build_complete_path in jar
-- #440 Don't overwrite user-specified webserver.properties file
-- #442 Display the Travis CI build badge in SVG format
-- #450 Update warble.rb doc  documentation
-- #466 Update default maven url
-- #470 Bump rake from 10.5.0 to 12.3.3 in /spec/sample_bundler  dependencies
-- #471 Bump rake from 12.3.1 to 13.0.1 in /spec/rails4_stub  dependencies
-- #474 Rakefile: Drop rubyforge-related tasks
-- #475 Rakefile: fix typo JRUBY_VERISON
-- #476 Travis: Ensure the JRUBY_OPTS set is global
-- #477 Travis: gem uninstall bundler, sans rvm prefix, too
-- #479 Bump rack from 1.6.10 to 1.6.13 in /spec/rails4_stub  dependencies
-- #480 Bump loofah from 2.2.2 to 2.5.0 in /spec/rails4_stub  dependencies
-- #485 Bump junit from 4.8.1 to 4.13.1 in /integration  dependencies java
+- #440 Don't overwrite user-specified `webserver.properties` file
+- #450 Update `warble.rb` documentation
+- #466 Update default Maven URL
 - #491 Relax version requirement for rubyzip
-- #495 Bump nokogiri from 1.10.9 to 1.11.4 in /spec/rails4_stub  dependencies ruby
-- #497 Migrate CI to Github Actions
+- #497 CI: Migrate to Github Actions
 - #499 Drop jruby 9.1 support
-- #500 Spec: Configure a git default branch name, silences warning
-- #501 Also test against java 15
+- #500 test: Configure a git default branch name, silences warning
+- #501 CI: Also test against java 15
 - #502 Update vendored dummy repos to our support matrix
 - #503 Drop support for old rake versions
 - #504 Migrate the spec suite to use RSpec 3
-- #505 Drop rake 12 support too
-- #507 Bump nokogiri from 1.11.4 to 1.12.5 in /spec/rails4_stub  dependencies ruby
-- #513 Fix helper class used for config.webxml values
+- #505 Drop rake 12 support
+- #513 Fix helper class used for `config.webxml` values
 - #514 CI: Install a RubyGems 3.2.x for jruby-head, and ensure a Bundler 1.17.3 is available and used
-- #515 Bump nokogiri from 1.12.5 to 1.13.4 in /spec/rails4_stub  dependencies ruby
-- #516 Bump nokogiri from 1.13.4 to 1.13.6 in /spec/rails4_stub  dependencies ruby
 
 == 2.0.5
 
