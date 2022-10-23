@@ -51,9 +51,7 @@ public class JarMain implements Runnable {
             throw new RuntimeException(e);
         }
 
-        file = new File(uri.getPath());
-
-        archive = file.getAbsolutePath();
+        archive = new File(uri.getPath()).getAbsolutePath();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this));
     }
