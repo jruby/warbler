@@ -120,4 +120,4 @@ DEPENDENCIES
   rails-api (~> 0.4)
 
 BUNDLED WITH
-   1.16.1
+   2.3.20

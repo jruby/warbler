@@ -52,8 +52,6 @@ module Warbler
     # Add a single gem to WEB-INF/gems
     def find_single_gem_files(gem_dependencies, gem_pattern, version = nil)
       gem_spec_class = Gem::Specification
-      gem_spec_class = Gem::BasicSpecification if Gem.const_defined?(:BasicSpecification)
-      # Gem::Specification < Gem::BasicSpecification (since RGs 2.1)
       case gem_pattern
       when gem_spec_class
         return BundlerHelper.to_spec(gem_pattern)

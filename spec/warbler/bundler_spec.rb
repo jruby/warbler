@@ -25,6 +25,10 @@ describe Warbler::Jar, "with Bundler" do
     `cd #{Dir.pwd} && #{RUBY_EXE} -S bundle install #{args.join(' ')}`
   end
 
+  def bundle_config(*args)
+    `cd #{Dir.pwd} && #{RUBY_EXE} -S bundle config #{args.join(' ')}`
+  end
+
   let(:config) { drbclient.config(@extra_config) }
   let(:jar) { drbclient.jar }
 
@@ -175,6 +179,12 @@ describe Warbler::Jar, "with Bundler" do
   context "when frozen" do
     run_in_directory "spec/sample_bundler"
 
+    before do
+      bundle_config "set --local frozen true"
+      bundle_config "set --local path vendor/bundle"
+      bundle_install
+    end
+
     it "includes the bundler gem" do
       bundle_install
       jar.apply(config)
@@ -233,7 +243,8 @@ describe Warbler::Jar, "with Bundler" do
     run_in_directory "spec/sample_bundler"
 
     it "includes the bundler gem" do
-      bundle_install '--deployment'
+      bundle_config "set --local deployment true"
+      bundle_install
       jar.apply(config)
       expect(file_list(%r{gems/rake-12.3.3/lib})).to_not be_empty
       expect(file_list(%r{gems/bundler-})).to_not be_empty
