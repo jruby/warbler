@@ -41,21 +41,21 @@ jobs:
 
       - name: Install fixed rubygems version
         run: gem update --system 2.7.11
-        if: matrix.ruby-version !=  'jruby-head'
+        if: ${{ matrix.ruby-version != 'jruby-head' }}
 
       # rubygems 2.7.11 is not supported on Ruby 3.1.0 (jruby-head).
       # The oldest version supported by this ruby is 3.2.3.
       - name: Install fixed rubygems version
-        run: gem update --system 3.2.11 && gem install bundler:1.17.3
-        if: matrix.ruby-version ==  'jruby-head'
+        run: gem update --system 3.2.3 && gem install bundler:1.17.3
+        if: ${{ matrix.ruby-version == 'jruby-head' }}
 
       - name: Install dependencies
         run: bundle _1.17.3_ install --jobs=3 --retry=3
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.TASK }}
-        if: matrix.ruby-version !=  'jruby-head'
+        if: ${{ matrix.ruby-version != 'jruby-head' }}
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.TASK }} || exit 0
-        if: matrix.ruby-version ==  'jruby-head'
+        if: ${{ matrix.ruby-version == 'jruby-head' }}
