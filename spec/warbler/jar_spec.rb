@@ -560,10 +560,10 @@ describe Warbler::Jar do
       use_config do |config|
         config.gems = ["nonexistent-gem"]
       end
-      expect(lambda {
+      expect {
         Warbler::Task.new "warble", config
         jar.apply(config)
-      }).to raise_error(Gem::MissingSpecError)
+      }.to raise_error(Gem::MissingSpecError)
     end
 
     it "allows specification of dependency by Gem::Dependency" do
