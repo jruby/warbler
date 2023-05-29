@@ -67,6 +67,8 @@ public class WarMain extends JarMain {
     static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
     static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
     static final String WEBSERVER_CONFIG = "/WEB-INF/webserver.xml";
+    static final String WEB_INF = "WEB-INF";
+    static final String META_INF = "META-INF";
 
     /**
      *  jruby arguments, consider the following command :
@@ -208,17 +210,20 @@ public class WarMain extends JarMain {
     @Override
     protected String getExtractEntryPath(final JarEntry entry) {
         final String name = entry.getName();
-        final String start = "WEB-INF";
-        if ( name.startsWith(start) ) {
+        final String res;
+        if ( name.startsWith(WEB_INF) ) {
             // WEB-INF/app/controllers/application_controller.rb ->
             // app/controllers/application_controller.rb
-            return name.substring(start.length());
-        }
-        if ( name.indexOf('/') == -1 ) {
+            res = name.substring(WEB_INF.length());
+        } else if (name.startsWith(META_INF)) {
+            // Keep them where they are.
+            res = name;
+        } else {
             // 404.html -> public/404.html
-            return "/public/" + name;
+            // javascripts -> public/javascripts
+            res = "/public/" + name;
         }
-        return '/' + name;
+        return res;
     }
 
     @Override
