@@ -17,9 +17,13 @@ jobs:
 
     strategy:
       matrix:
-        java-version: [8, 15]
-        ruby-version: [jruby-9.2.18.0, jruby-head]
+        java-version: [8, 11, 15]
+        ruby-version: [jruby-9.2.21.0, jruby-9.3.13.0, jruby-9.4.5.0, jruby-head]
+        bundler-version: [1.17.3, 2.3.26, 2.4.21]
         task: ['', integration]
+        exclude:
+          - ruby-version: jruby-9.2.21.0
+            bundler-version: 2.4.21
 
       fail-fast: false
 
@@ -37,20 +41,17 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler: 1.17.3
 
-      - name: Install fixed rubygems version for non-jruby-head
-        run: gem update --system 2.7.11
-        if: ${{ matrix.ruby-version != 'jruby-head' }}
+      - name: Install bundler ${{ matrix.bundler-version }}
+        run: gem install bundler:${{ matrix.bundler-version }}
+        if: ${{ matrix.ruby-version == 'jruby-9.2.21.0' }}
 
-      # rubygems 2.7.11 is not supported on Ruby 3.1.0 (jruby-head).
-      # The oldest version supported by this ruby is 3.3.3.
-      - name: Install fixed rubygems version for jruby-head
-        run: gem update --system 3.3.3 && gem install bundler:1.17.3
-        if: ${{ matrix.ruby-version == 'jruby-head' }}
+      - name: Install latest rubygems version with bundler ${{ matrix.bundler-version }}
+        run: gem update --system && gem install bundler:${{ matrix.bundler-version }}
+        if: ${{ matrix.ruby-version != 'jruby-9.2.21.0' }}
 
       - name: Install dependencies
-        run: bundle _1.17.3_ install --jobs=3 --retry=3
+        run: bundle _${{ matrix.bundler-version }}_ install --jobs=3 --retry=3
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.TASK }}
