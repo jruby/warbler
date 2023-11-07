@@ -22,7 +22,7 @@ describe Warbler::Jar, "with Bundler" do
   end
 
   def bundle_install(*args)
-    `cd #{Dir.pwd} && #{RUBY_EXE} -S bundle install #{args.join(' ')}`
+    `cd #{Dir.pwd} && #{RUBY_EXE} -S bundle _#{::Bundler::VERSION}_ install #{args.join(' ')}`
   end
 
   let(:config) { drbclient.config(@extra_config) }
