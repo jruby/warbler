@@ -8,7 +8,7 @@ end
 
 describe Warbler::WebServer::Artifact do
 
-  @@_env = ENV.dup
+  @@_env = ENV.to_h
 
   after(:all) { ENV.clear; ENV.update @@_env }
 
