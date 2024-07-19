@@ -1,4 +1,6 @@
 require File.expand_path('../../spec_helper', __FILE__)
+require 'dotenv'
+
 
 class Warbler::WebServer::Artifact
   def self.reset_local_repository
@@ -8,9 +10,19 @@ end
 
 describe Warbler::WebServer::Artifact do
 
-  @@_env = ENV.to_h
+  #@@_env = ENV.to_h
+  Dotenv.load
+ 
+  before(:all) do
+    @original_env = ENV.to_h
+  end
 
-  after(:all) { ENV.clear; ENV.update @@_env }
+  after(:all) do
+    ENV.clear
+    @original_env.each { |k, v| ENV[k] = v }
+  end
+
+  # after(:all) { ENV.clear; ENV.update @@_env }
 
   before do
     Warbler::WebServer::Artifact.reset_local_repository
