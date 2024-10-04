@@ -20,7 +20,7 @@ module Warbler
           FileUtils.mkdir_p File.dirname(cached_path) #:nocov:
           require 'open-uri'                    #:nocov:
           begin
-            open(download_url) do |stream|        #:nocov:
+            URI.open(download_url) do |stream|        #:nocov:
               File.open(cached_path, "wb") do |f| #:nocov:
                 while buf = stream.read(4096) #:nocov:
                   f << buf                    #:nocov:
