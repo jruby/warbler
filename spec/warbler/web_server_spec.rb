@@ -8,9 +8,9 @@ end
 
 describe Warbler::WebServer::Artifact do
 
-  @@_env = ENV.to_h
-
-  after(:all) { ENV.clear; ENV.update @@_env }
+  before(:all) do
+    @_env = ENV.to_h
+  end
 
   before do
     Warbler::WebServer::Artifact.reset_local_repository
@@ -18,6 +18,8 @@ describe Warbler::WebServer::Artifact do
 
   after(:all) do
     Warbler::WebServer::Artifact.reset_local_repository
+    ENV.clear
+    ENV.update @_env
   end
 
   let(:sample_artifact) do
