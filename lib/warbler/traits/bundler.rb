@@ -45,7 +45,7 @@ module Warbler
             while ! full_gem_path.join('bundler.gemspec').exist?
               full_gem_path = full_gem_path.dirname
               # if at top of the path, meaning we cannot find bundler.gemspec, abort.
-              if full_gem_path.to_s =~ /^[\.\/]$/
+              if full_gem_path.root?
                 warn("Unable to detect bundler spec under '#{spec.full_gem_path}'' and its sub-dirs")
                 exit
               end
