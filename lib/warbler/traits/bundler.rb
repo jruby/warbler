@@ -38,6 +38,7 @@ module Warbler
 
         bundler_specs.each do |spec|
           spec = to_spec(spec)
+
           # Bundler HAX -- fixup bad #loaded_from attribute in fake
           # bundler gemspec from bundler/source.rb
           if spec.name == 'bundler'
@@ -45,12 +46,11 @@ module Warbler
             while ! full_gem_path.join('bundler.gemspec').exist?
               full_gem_path = full_gem_path.dirname
               # if at top of the path, meaning we cannot find bundler.gemspec, abort.
-              if full_gem_path.root?
+              if full_gem_path.root? || full_gem_path.to_s == '.'
                 warn("Unable to detect bundler spec under '#{spec.full_gem_path}'' and its sub-dirs")
                 exit
               end
             end
-
             spec.loaded_from = full_gem_path.join('bundler.gemspec').to_s
             spec.full_gem_path = full_gem_path.to_s
           end
