@@ -45,10 +45,10 @@ describe Warbler::Application do
   end
 
   it "should copy a fresh config file into place" do
-    expect(File.exists?("config/warble.rb")).to_not be true
+    expect(File.exist?("config/warble.rb")).to_not be true
     ARGV.unshift "config"
     silence { Warbler::Application.new.run }
-    expect(File.exists?("config/warble.rb")).to be true
+    expect(File.exist?("config/warble.rb")).to be true
   end
 
   it "should refuse to copy over an existing config file" do

@@ -56,9 +56,9 @@ module Warbler
         if ! @spec.executables.empty?
           exe_script = @spec.executables.first
           exe_path = File.join(@spec.bindir, exe_script) # bin/script
-          if File.exists?(exe_path)
+          if File.exist?(exe_path)
             exe_path
-          elsif File.exists?("bin/#{exe_script}") # compatibility
+          elsif File.exist?("bin/#{exe_script}") # compatibility
             "bin/#{exe_script}" # ... should probably remove this
           else
             raise "no `#{exe_script}` executable script found"

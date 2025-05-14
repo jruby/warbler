@@ -32,7 +32,7 @@ module Warbler
       def add_jbundler_jars
         require 'jbundler/config'
         classpath = ::JBundler::Config.new.classpath_file
-        if File.exists?( classpath )
+        if File.exist?( classpath )
           require File.expand_path( classpath )
         else
           raise 'jbundler support needs jruby to create a local config: jruby -S jbundle install'
