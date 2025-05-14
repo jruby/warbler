@@ -42,7 +42,7 @@ module Warbler
 
     def initialize(name = nil, config = nil)
       @config = config
-      if @config.nil? && File.exists?(Config::FILE)
+      if @config.nil? && File.exist?(Config::FILE)
         @config = eval(File.read(Config::FILE), binding, Config::FILE, 0)
       end
       @config ||= Config.new
@@ -148,7 +148,7 @@ module Warbler
 
     def define_config_task
       task "config" do
-        if File.exists?(Warbler::Config::FILE) && ENV["FORCE"].nil?
+        if File.exist?(Warbler::Config::FILE) && ENV["FORCE"].nil?
           puts "There's another bird sitting on my favorite branch"
           puts "(file '#{Warbler::Config::FILE}' already exists. Pass argument FORCE=1 to override)"
         elsif !File.directory?("config")
