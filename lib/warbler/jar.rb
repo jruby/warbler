@@ -285,7 +285,7 @@ module Warbler
 
     def expand_erb(file, config)
       require 'erb'
-      erb = ERB.new(File.read(file), nil, '-')
+      erb = ERB.new(File.read(file), trim_mode: '-')
       StringIO.new(erb.result(erb_binding(config)))
     end
 
