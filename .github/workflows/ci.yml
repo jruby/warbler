@@ -19,7 +19,7 @@ jobs:
       matrix:
         java-version: [8, 21]
         ruby-version: [jruby-9.4, jruby-head]
-        bundler-version: [1.17.3, 2.3.26, 2.4.21]
+        bundler-version: [2.6.3]
         task: ['', integration]
         exclude:
           # JRuby head (10) requires Java 21 minimum
