@@ -28,6 +28,10 @@ jobs:
 
       fail-fast: false
 
+    env:
+      # speed up all those subprocesses
+      JRUBY_OPTS: --dev
+
     steps:
       - name: checkout
         uses: actions/checkout@v3
