@@ -88,7 +88,7 @@ module Warbler
     private :jrubyc_options
 
     def java_version(config)
-      config.bytecode_version ? "-Djava.specification.version=#{config.bytecode_version}" : ''
+      config.bytecode_version ? "-Djruby.bytecode.version=#{config.bytecode_version}" : ''
     end
 
     def replace_compiled_ruby_files(config, compiled_ruby_files)
