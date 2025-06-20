@@ -48,8 +48,6 @@ jobs:
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.TASK }}
-        if: ${{ matrix.ruby-version != 'jruby-head' }}
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.TASK }} || exit 0
-        if: ${{ matrix.ruby-version == 'jruby-head' }}
