@@ -126,15 +126,15 @@ describe Warbler::Task do
 
   it "should allow bytecode version in config" do
     config.features << "compiled"
-    config.bytecode_version = ENV_JAVA['java.version'] < '1.8' ? '1.7' : '1.8'
-    bytecode_version = [0x00, ENV_JAVA['java.version'] < '1.8' ?  0x33 :  0x34] # 0x33 -> version 51 (Java 7)
+    config.bytecode_version = JRUBY_VERSION > "10" ? 21 : 8
+    bytecode_version = [0x00, JRUBY_VERSION > "10"  ? 0x41 : 0x34]
     silence { run_task "warble" }
 
     Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
       class_file_bytes = zf.get_input_stream('WEB-INF/lib/ruby_one_nine.class') {|io| io.read }
 
       expect(class_file_bytes[0..3]).to eq [0xCA,0xFE,0xBA,0xBE].map { |magic_char| magic_char.chr }.join
-      expect(class_file_bytes[6..7]).to eq bytecode_version.map { |magic_char| magic_char.chr }.join
+      expect(class_file_bytes[6..7]).to eq bytecode_version.map { |magic_char| magic_char.chr }.join.force_encoding("ASCII-8BIT")
     end
   end
 
