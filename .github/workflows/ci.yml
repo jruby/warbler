@@ -17,13 +17,14 @@ jobs:
 
     strategy:
       matrix:
-        java-version: [8, 11, 15]
-        ruby-version: [jruby-9.2.21.0, jruby-9.3.15.0, jruby-9.4.12.0, jruby-head]
+        java-version: [8, 21]
+        ruby-version: [jruby-9.4, jruby-head]
         bundler-version: [1.17.3, 2.3.26, 2.4.21]
         task: ['', integration]
         exclude:
-          - ruby-version: jruby-9.2.21.0
-            bundler-version: 2.4.21
+          # JRuby head (10) requires Java 21 minimum
+          - ruby-version: jruby-head
+            java-version: 8
 
       fail-fast: false
 
@@ -41,14 +42,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-
-      - name: Install bundler ${{ matrix.bundler-version }}
-        run: gem install bundler:${{ matrix.bundler-version }}
-        if: ${{ matrix.ruby-version == 'jruby-9.2.21.0' }}
-
-      - name: Install latest rubygems version with bundler ${{ matrix.bundler-version }}
-        run: gem update --system && gem install bundler:${{ matrix.bundler-version }}
-        if: ${{ matrix.ruby-version != 'jruby-9.2.21.0' }}
 
       - name: Install dependencies
         run: bundle _${{ matrix.bundler-version }}_ install --jobs=3 --retry=3
