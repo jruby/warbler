@@ -836,7 +836,7 @@ describe Warbler::Jar do
 
         context "when rails version is found in Gemfile.lock" do
           before :each do
-            ENV['BUNDLE_GEMFILE'] = File.expand_path('../rails4_stub/Gemfile', File.dirname(__FILE__))
+            ENV['BUNDLE_GEMFILE'] = File.expand_path('../rails7_stub/Gemfile', File.dirname(__FILE__))
           end
 
           it_should_behave_like "threaded environment"
