@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         java-version: [8, 21]
-        ruby-version: [jruby-9.4, jruby-head]
+        ruby-version: [jruby-9.4, jruby-10]
         bundler-version: [2.6.3]
         task: ['', integration]
         exclude:
