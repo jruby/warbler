@@ -22,8 +22,8 @@ jobs:
         bundler-version: [2.6.3]
         task: ['', integration]
         exclude:
-          # JRuby head (10) requires Java 21 minimum
-          - ruby-version: jruby-head
+          # JRuby 10 requires Java 21 minimum
+          - ruby-version: jruby-10
             java-version: 8
 
       fail-fast: false
