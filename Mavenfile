@@ -23,7 +23,7 @@ plugin :invoker, '1.8' do
                  :properties => { 'warbler.version' => '${project.version}',
                                   'jruby.version' => '${jruby.version}',
                                   'jetty.version' => '${jetty.version}',
-                                  'bundler.version' => '1.12.5',
+                                  'bundler.version' => '2.6.3',
                                   'jruby.plugins.version' => '${jruby.plugins.version}' },
 
                  :goals => ['verify'],
