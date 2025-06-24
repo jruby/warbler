@@ -20,7 +20,7 @@
   <repositories>
     <repository>
       <id>rubygems</id>
-      <url>https://rubygems.org</url>
+      <url>mavengem:https://rubygems.org</url>
     </repository>
   </repositories>
 
@@ -52,6 +52,13 @@
   </dependencies>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.jruby.maven</groupId>
+        <artifactId>mavengem-wagon</artifactId>
+        <version>2.0.2</version>
+      </extension>
+    </extensions>
     <defaultGoal>verify</defaultGoal>
     <resources>
       <resource>
