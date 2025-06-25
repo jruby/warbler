@@ -5,7 +5,18 @@
 gemspec( :jar => 'warbler_jar.jar',
          :source => 'ext' )
 
-properties( 'jruby.plugins.version' => '3.0.5',
+plugin_repository( :url => 'https://central.sonatype.com/repository/maven-snapshots/',
+                   :id => 'central-snapshots' ) do
+  releases 'false'
+  snapshots 'true'
+end
+repository( :url => 'https://central.sonatype.com/repository/maven-snapshots/',
+            :id => 'central-snapshots' ) do
+  releases 'false'
+  snapshots 'true'
+end
+
+properties( 'jruby.plugins.version' => '3.0.6-SNAPSHOT',
             'jruby.version' => '9.4.13.0',
             'jetty.version' => '9.4.31.v20200723' )
 
