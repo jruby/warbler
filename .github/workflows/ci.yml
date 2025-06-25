@@ -46,6 +46,9 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
 
+      - name: Remove jruby-launcher # not sure where this is coming from but causes some specs to fail
+        run: gem uninstall -a jruby-launcher
+
       - name: Install dependencies
         run: bundle install --jobs=3 --retry=3
 
