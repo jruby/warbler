@@ -126,8 +126,9 @@ describe Warbler::Task do
 
   it "should allow bytecode version in config" do
     config.features << "compiled"
-    config.bytecode_version = JRUBY_VERSION > "10" ? 21 : 8
-    bytecode_version = [0x00, JRUBY_VERSION > "10"  ? 0x41 : 0x34]
+    java_version = org.jruby.RubyInstanceConfig::JAVA_VERSION
+    config.bytecode_version = java_version - 44
+    bytecode_version = [0x00, java_version]
     silence { run_task "warble" }
 
     Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
