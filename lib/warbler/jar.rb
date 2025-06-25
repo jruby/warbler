@@ -88,7 +88,7 @@ module Warbler
     private :jrubyc_options
 
     def java_version(config)
-      config.bytecode_version ? "-Djava.specification.version=#{config.bytecode_version}" : ''
+      config.bytecode_version ? "-Djruby.bytecode.version=#{config.bytecode_version}" : ''
     end
 
     def replace_compiled_ruby_files(config, compiled_ruby_files)
@@ -285,7 +285,7 @@ module Warbler
 
     def expand_erb(file, config)
       require 'erb'
-      erb = ERB.new(File.read(file), nil, '-')
+      erb = ERB.new(File.read(file), trim_mode: '-')
       StringIO.new(erb.result(erb_binding(config)))
     end
 

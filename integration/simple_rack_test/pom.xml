@@ -16,7 +16,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>de.saumya.mojo</groupId>
+        <groupId>org.jruby.maven</groupId>
         <artifactId>jruby-maven-plugin</artifactId>
         <executions>
           <execution>

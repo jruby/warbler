@@ -8,19 +8,19 @@
   <packaging>pom</packaging>
 
   <properties>
-    <jruby.plugins.version>1.1.5</jruby.plugins.version>
+    <jruby.plugins.version>3.0.6</jruby.plugins.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jruby.version>9.1.6.0</jruby.version>
+    <jruby.version>9.4.13.0</jruby.version>
     <warbler.version>2.0.4</warbler.version>
-    <bundler.version>1.12.5</bundler.version>
+    <bundler.version>2.6.3</bundler.version>
     <gem.home>${basedir}/../../pkg/rubygems</gem.home>
     <gem.path>${basedir}/../../pkg/rubygems</gem.path>
   </properties>
 
   <repositories>
     <repository>
-      <id>rubygems-releases</id>
-      <url>http://rubygems-proxy.torquebox.org/releases</url>
+      <id>rubygems</id>
+      <url>mavengem:https://rubygems.org</url>
     </repository>
   </repositories>
 
@@ -52,6 +52,13 @@
   </dependencies>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.jruby.maven</groupId>
+        <artifactId>mavengem-wagon</artifactId>
+        <version>2.0.2</version>
+      </extension>
+    </extensions>
     <defaultGoal>verify</defaultGoal>
     <resources>
       <resource>
@@ -73,7 +80,7 @@
         </executions>
       </plugin>
         <plugin>
-          <groupId>de.saumya.mojo</groupId>
+          <groupId>org.jruby.maven</groupId>
           <artifactId>gem-maven-plugin</artifactId>
           <version>${jruby.plugins.version}</version>
 	  <executions>
@@ -89,8 +96,8 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
+            <source>8</source>
+            <target>8</target>
           </configuration>
         </plugin>
         <plugin>
@@ -129,7 +136,7 @@
           <version>1.2.1</version>
         </plugin>
         <plugin>
-          <groupId>de.saumya.mojo</groupId>
+          <groupId>org.jruby.maven</groupId>
           <artifactId>jruby-maven-plugin</artifactId>
           <version>${jruby.plugins.version}</version>
           <configuration>

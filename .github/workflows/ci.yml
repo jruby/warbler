@@ -17,15 +17,19 @@ jobs:
 
     strategy:
       matrix:
-        java-version: [8, 11, 15]
-        ruby-version: [jruby-9.2.21.0, jruby-9.3.15.0, jruby-9.4.12.0, jruby-head]
-        bundler-version: [1.17.3, 2.3.26, 2.4.21]
+        java-version: [8, 21]
+        ruby-version: [jruby-9.4, jruby-10]
         task: ['', integration]
         exclude:
-          - ruby-version: jruby-9.2.21.0
-            bundler-version: 2.4.21
+          # JRuby 10 requires Java 21 minimum
+          - ruby-version: jruby-10
+            java-version: 8
 
       fail-fast: false
+
+    env:
+      # speed up all those subprocesses
+      JRUBY_OPTS: --dev
 
     steps:
       - name: checkout
@@ -42,21 +46,11 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
 
-      - name: Install bundler ${{ matrix.bundler-version }}
-        run: gem install bundler:${{ matrix.bundler-version }}
-        if: ${{ matrix.ruby-version == 'jruby-9.2.21.0' }}
-
-      - name: Install latest rubygems version with bundler ${{ matrix.bundler-version }}
-        run: gem update --system && gem install bundler:${{ matrix.bundler-version }}
-        if: ${{ matrix.ruby-version != 'jruby-9.2.21.0' }}
+      - name: Remove jruby-launcher # not sure where this is coming from but causes some specs to fail
+        run: gem uninstall -a jruby-launcher
 
       - name: Install dependencies
-        run: bundle _${{ matrix.bundler-version }}_ install --jobs=3 --retry=3
+        run: bundle install --jobs=3 --retry=3
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.TASK }}
-        if: ${{ matrix.ruby-version != 'jruby-head' }}
-
-      - name: Run tests
-        run: bundle exec rake ${{ matrix.TASK }} || exit 0
-        if: ${{ matrix.ruby-version == 'jruby-head' }}

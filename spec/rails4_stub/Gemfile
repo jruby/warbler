@@ -1,6 +1,0 @@
-source 'https://rubygems.org'
-
-gem 'rails', '~> 4.2'
-gem 'rails-api', '~> 0.4'
-
-gem 'activerecord-jdbcpostgresql-adapter', '~> 1.3'

@@ -235,9 +235,9 @@ describe Warbler::Jar, "with Bundler" do
     it "includes the bundler gem" do
       bundle_install '--deployment'
       jar.apply(config)
-      expect(file_list(%r{gems/rake-12.3.3/lib})).to_not be_empty
+      expect(file_list(%r{gems/rake-13.3.0/lib})).to_not be_empty
       expect(file_list(%r{gems/bundler-})).to_not be_empty
-      expect(file_list(%r{gems/bundler-.*/lib})).to_not be_empty
+      expect(file_list(%r{gems/bundler-.*/exe})).to_not be_empty
     end
   end
 
