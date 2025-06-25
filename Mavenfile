@@ -16,7 +16,7 @@ repository( :url => 'https://central.sonatype.com/repository/maven-snapshots/',
   snapshots 'true'
 end
 
-properties( 'jruby.plugins.version' => '3.0.6-SNAPSHOT',
+properties( 'jruby.plugins.version' => '3.0.6',
             'jruby.version' => '9.4.13.0',
             'jetty.version' => '9.4.31.v20200723' )
 
