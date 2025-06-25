@@ -186,6 +186,7 @@ GEM
     zeitwerk (2.7.3)
 
 PLATFORMS
+  universal-java-1.8
   universal-java-21
 
 DEPENDENCIES
