@@ -42,10 +42,12 @@ public class JarMain implements Runnable {
         URL mainClass = getClass().getResource(MAIN);
         URI uri;
         File file;
+        String pathWithoutMain;
 
         try {
             this.path = mainClass.toURI().getSchemeSpecificPart();
-            uri = new URI(this.path.replace("!" + MAIN, ""));
+            pathWithoutMain = mainClass.toURI().getRawSchemeSpecificPart().replace("!" + MAIN, "");
+            uri = new URI(pathWithoutMain);
         }
         catch (URISyntaxException e) {
             throw new RuntimeException(e);
