@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>rails7_test</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>rails7_test</name>
 
