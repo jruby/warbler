@@ -12,7 +12,7 @@ import org.hamcrest.Matchers;
  */
 public class AppTestIT
 {
-    private static String appName = "simple_rack_test";
+    private static String appName = "simple_rack_test-1.0";
 
     /**
      * Hit the web app and test the response
