@@ -36,17 +36,20 @@ end
 
 desc 'compile java sources and build jar'
 task :jar do
-  mvn.prepare_package
+  success = mvn.prepare_package
+  exit(1) unless success
 end
 
 desc 'run some integration test'
 task :integration do
-  mvn.verify
+  success = mvn.verify
+  exit(1) unless success
 end
 
 desc 'generate the pom.xml from the Mavenfile'
 task :pom do
-  mvn.validate('-Dpolyglot.dump.pom=pom.xml')
+  success = mvn.validate('-Dpolyglot.dump.pom=pom.xml')
+  exit(1) unless success
 end
 
 # Make sure jar gets compiled before the gem is built
