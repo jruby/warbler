@@ -16,9 +16,12 @@ repository( :url => 'https://central.sonatype.com/repository/maven-snapshots/',
   snapshots 'true'
 end
 
-properties( 'jruby.plugins.version' => '3.0.6',
+properties( 'bundler.version' => '2.6.3',
+            'jruby.plugins.version' => '3.0.6',
             'jruby.version' => '9.4.13.0',
             'jetty.version' => '9.4.31.v20200723' )
+
+gem 'bundler', '${bundler.version}'
 
 # dependencies needed for compilation
 scope :provided do
@@ -34,7 +37,7 @@ plugin :invoker, '1.8' do
                  :properties => { 'warbler.version' => '${project.version}',
                                   'jruby.version' => '${jruby.version}',
                                   'jetty.version' => '${jetty.version}',
-                                  'bundler.version' => '2.6.3',
+                                  'bundler.version' => '${bundler.version}',
                                   'jruby.plugins.version' => '${jruby.plugins.version}' },
 
                  :goals => ['verify'],
