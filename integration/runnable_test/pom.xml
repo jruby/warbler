@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>runnable_test</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>runnable_test</name>
 

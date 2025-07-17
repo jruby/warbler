@@ -3,7 +3,8 @@ pkg
 doc
 .bundle
 nbproject
-target
+**/target/*
+!**/target/.keep
 Gemfile.lock
 .idea
 warbler.iml
@@ -15,3 +16,4 @@ integration/**/*.iml
 build.log
 .ruby-version
 .rspec_status
+/integration/rails7_test/src/main/ruby/db/*.sqlite3*

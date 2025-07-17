@@ -79,16 +79,16 @@
           </execution>
         </executions>
       </plugin>
-        <plugin>
-          <groupId>org.jruby.maven</groupId>
-          <artifactId>gem-maven-plugin</artifactId>
-          <version>${jruby.plugins.version}</version>
-	  <executions>
-            <execution>
-	      <goals><goal>initialize</goal></goals>
-	    </execution>
-	  </executions>
-	</plugin>
+      <plugin>
+        <groupId>org.jruby.maven</groupId>
+        <artifactId>gem-maven-plugin</artifactId>
+        <version>${jruby.plugins.version}</version>
+        <executions>
+          <execution>
+            <goals><goal>initialize</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -102,12 +102,25 @@
         </plugin>
         <plugin>
           <groupId>org.mortbay.jetty</groupId>
-          <artifactId>maven-jetty-plugin</artifactId>
-          <version>6.1.26</version>
+          <artifactId>jetty-maven-plugin</artifactId>
+          <version>${jetty.version}</version>
           <configuration>
-            <webApp>${project.build.directory}/test.war</webApp>
+            <webAppConfig>
+              <contextPath>/</contextPath>
+              <configurationClasses>
+                <configurationClass>org.eclipse.jetty.webapp.WebXmlConfiguration</configurationClass>
+                <configurationClass>org.eclipse.jetty.webapp.WebInfConfiguration</configurationClass>
+                <configurationClass>org.eclipse.jetty.webapp.TagLibConfiguration</configurationClass>
+                <configurationClass>org.eclipse.jetty.webapp.MetaInfConfiguration</configurationClass>
+                <configurationClass>org.eclipse.jetty.webapp.FragmentConfiguration</configurationClass>
+                <configurationClass>org.eclipse.jetty.webapp.JettyWebXmlConfiguration</configurationClass>
+                <!-- intentionally no AnnotationConfiguration -->
+              </configurationClasses>
+            </webAppConfig>
             <stopPort>9966</stopPort>
             <stopKey>warbler_stop</stopKey>
+            <scanIntervalSeconds>0</scanIntervalSeconds>
+            <daemon>true</daemon>
           </configuration>
           <executions>
             <execution>
@@ -116,10 +129,6 @@
               <goals>
                 <goal>run-war</goal>
               </goals>
-              <configuration>
-                <scanIntervalSeconds>0</scanIntervalSeconds>
-                <daemon>true</daemon>
-              </configuration>
             </execution>
             <execution>
               <id>stop-jetty</id>
@@ -146,7 +155,7 @@
           <executions>
             <execution>
               <id>bundle-install</id>
-	      <goals><goal>jruby</goal></goals>
+              <goals><goal>jruby</goal></goals>
               <configuration>
                 <args>-C ${basedir}/src/main/ruby -S ${gem.home}/bin/bundle install</args>
               </configuration>
