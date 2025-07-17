@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>runnable_w_bundler_test</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>runnable_w_bundler_test</name>
 

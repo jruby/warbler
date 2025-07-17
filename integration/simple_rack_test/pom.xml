@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>simple_rack_test</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>simple_rack_test</name>
 
