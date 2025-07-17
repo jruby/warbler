@@ -48,6 +48,10 @@
         <artifactId>jruby-maven-plugin</artifactId>
         <executions>
           <execution>
+            <id>bundle-install</id>
+            <phase>initialize</phase>
+          </execution>
+          <execution>
             <id>warble</id>
             <phase>pre-integration-test</phase>
           </execution>
