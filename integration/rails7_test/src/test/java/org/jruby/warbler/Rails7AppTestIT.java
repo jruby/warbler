@@ -12,7 +12,7 @@ import org.hamcrest.Matchers;
  */
 public class Rails7AppTestIT
 {
-    private static String appName = "rails7_test";
+    private static String appName = "rails7_test-1.0";
 
     /**
      * Hit the web app and test the response

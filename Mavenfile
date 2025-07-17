@@ -18,7 +18,7 @@ end
 
 properties( 'jruby.plugins.version' => '3.0.6',
             'jruby.version' => '9.4.13.0',
-            'jetty.version' => '9.4.31.v20200723' )
+            'jetty.version' => '8.1.16.v20140903' )
 
 # dependencies needed for compilation
 scope :provided do
