@@ -15,3 +15,4 @@ integration/**/*.iml
 build.log
 .ruby-version
 .rspec_status
+/integration/rails7_test/src/main/ruby/db/*.sqlite3*
