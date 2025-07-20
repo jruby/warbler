@@ -222,8 +222,8 @@ describe Warbler::Jar, "with Bundler" do
       it "can run commands in the generated warfile" do
         jar.create('foo.war')
         stdin, stdout, stderr, wait_thr = Open3.popen3('java -jar foo.war -S rake test_task')
-        expect(wait_thr.value.success?).to be(true)
         expect(stderr.readlines.join).to eq("")
+        expect(wait_thr.value.success?).to be(true)
         expect(stdout.readlines.join).to eq("success\n")
       end
     end
