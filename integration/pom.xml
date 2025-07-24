@@ -38,6 +38,12 @@
       <type>gem</type>
     </dependency>
     <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>jruby-jars</artifactId>
+      <version>${jruby.version}</version>
+      <type>gem</type>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.13.1</version>
