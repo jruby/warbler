@@ -7,6 +7,7 @@
 
 require File.expand_path('../../spec_helper', __FILE__)
 require 'open3'
+require 'bundler'
 
 describe Warbler::Jar, "with Bundler" do
   use_fresh_rake_application
