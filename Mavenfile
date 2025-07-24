@@ -18,7 +18,8 @@ end
 
 properties( 'jruby.plugins.version' => '3.0.6',
             'jruby.version' => '9.4.13.0',
-            'jetty.version' => '8.1.16.v20140903' )
+            'jetty.version' => '8.1.16.v20140903',
+            'bundler.version' => '2.6.3')
 
 # dependencies needed for compilation
 scope :provided do
@@ -28,13 +29,15 @@ end
 
 plugin :compiler, '3.1', :source => '8', :target => '8'
 
+gem 'bundler', '${bundler.version}'
+
 plugin :invoker, '1.8' do
   execute_goals( :install, :run,
                  :id => 'integration-test',
                  :properties => { 'warbler.version' => '${project.version}',
                                   'jruby.version' => '${jruby.version}',
                                   'jetty.version' => '${jetty.version}',
-                                  'bundler.version' => '2.6.3',
+                                  'bundler.version' => '${bundler.version}',
                                   'jruby.plugins.version' => '${jruby.plugins.version}' },
 
                  :goals => ['verify'],
