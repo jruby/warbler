@@ -30,6 +30,7 @@ end
 plugin :compiler, '3.1', :source => '8', :target => '8'
 
 gem 'bundler', '${bundler.version}'
+gem 'jruby-jars', '${jruby.version}'
 
 plugin :invoker, '1.8' do
   execute_goals( :install, :run,
