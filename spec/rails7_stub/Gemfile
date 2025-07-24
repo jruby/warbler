@@ -2,4 +2,4 @@ source 'https://rubygems.org'
 
 gem 'rails', '~> 7.0'
 
-gem 'activerecord-jdbcpostgresql-adapter', '~> 70'
+gem 'activerecord-jdbcpostgresql-adapter', '~> 70.0'
