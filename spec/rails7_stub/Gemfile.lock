@@ -192,7 +192,7 @@ PLATFORMS
   universal-java-21
 
 DEPENDENCIES
-  activerecord-jdbcpostgresql-adapter (~> 70)
+  activerecord-jdbcpostgresql-adapter (~> 70.0)
   rails (~> 7.0)
 
 BUNDLED WITH
