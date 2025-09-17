@@ -3,6 +3,14 @@ ENV['BUNDLE_WITHOUT'] = '<%= config.bundle_without.join(':') %>'
 ENV['BUNDLE_FROZEN'] = '1'
 <% end -%>
 
+# Fix for JRuby 9.4+ and Rails 7+ gem path resolution
+if defined?(Gem) && Gem.respond_to?(:paths=)
+  Gem.paths = {
+    'GEM_HOME' => ENV['GEM_HOME'],
+    'GEM_PATH' => ENV['GEM_PATH']
+  }
+end
+
 module Bundler
   module Patch
     def clean_load_path
