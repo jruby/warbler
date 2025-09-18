@@ -7,7 +7,7 @@ ENV['BUNDLE_FROZEN'] = '1'
 if defined?(Gem) && Gem.respond_to?(:paths=)
   Gem.paths = {
     'GEM_HOME' => ENV['GEM_HOME'],
-    'GEM_PATH' => ENV['GEM_PATH']
+    'GEM_PATH' => nil
   }
 end
 
