@@ -4,12 +4,7 @@ ENV['BUNDLE_FROZEN'] = '1'
 <% end -%>
 
 # Fix for JRuby 9.4+ and Rails 7+ gem path resolution
-puts "helooo"
 if defined?(Gem) && Gem.respond_to?(:paths=)
-  puts "setting gem paths"
-  puts ENV
-  puts Gem.paths
-  
   Gem.paths = {
     'GEM_HOME' => ENV['GEM_HOME'],
     'GEM_PATH' => ENV['GEM_PATH']
