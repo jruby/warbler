@@ -22,8 +22,12 @@ describe Warbler::Jar, "with Bundler" do
     @extra_config = block
   end
 
+  def bundle(*args)
+    `cd #{Dir.pwd} && #{RUBY_EXE} -S bundle _#{::Bundler::VERSION}_ #{args.join(' ')}`
+  end
+
   def bundle_install(*args)
-    `cd #{Dir.pwd} && #{RUBY_EXE} -S bundle install #{args.join(' ')}`
+    bundle('install', *args)
   end
 
   let(:config) { drbclient.config(@extra_config) }
@@ -233,12 +237,20 @@ describe Warbler::Jar, "with Bundler" do
   context "when deployment" do
     run_in_directory "spec/sample_bundler"
 
+    before do
+      bundle 'config', 'deployment', 'true'
+    end
+
     it "includes the bundler gem" do
-      bundle_install '--deployment'
+      bundle_install
       jar.apply(config)
       expect(file_list(%r{gems/rake-13.3.0/lib})).to_not be_empty
       expect(file_list(%r{gems/bundler-})).to_not be_empty
       expect(file_list(%r{gems/bundler-.*/exe})).to_not be_empty
+    end
+
+    after do
+      bundle 'config', 'deployment', 'false'
     end
   end
 
