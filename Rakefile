@@ -26,9 +26,7 @@ mvn << "-Djruby.version=#{JRUBY_VERSION}"
 mvn << "-Dbundler.version=#{Bundler::VERSION}"
 mvn << '--no-transfer-progress'
 
-if defined?(JRUBY_VERSION) && !JRUBY_VERSION.start_with?('9.0')
-  mvn.inherit_jruby_version
-end
+mvn.inherit_jruby_version
 
 desc 'compile java sources and build jar'
 task :jar do
