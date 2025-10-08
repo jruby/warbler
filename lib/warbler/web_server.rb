@@ -90,7 +90,7 @@ module Warbler
     def initialize
       @artifact = Artifact.new(ENV["MAVEN_REPO"] || "https://repo1.maven.org/maven2",
                                "org.eclipse.jetty", "jetty-runner",
-                               ENV["WEBSERVER_VERSION"] || "9.2.9.v20150224")
+                               ENV["WEBSERVER_VERSION"] || "9.4.58.v20250814")
     end
 
     def add(jar)
