@@ -10,11 +10,14 @@
   <properties>
     <jruby.plugins.version>3.0.6</jruby.plugins.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jruby.version>${jruby.version}</jruby.version>
-    <warbler.version>2.0.4</warbler.version>
-    <bundler.version>${bundler.version}</bundler.version>
     <gem.home>${basedir}/../../pkg/rubygems</gem.home>
     <gem.path>${basedir}/../../pkg/rubygems</gem.path>
+
+    <!-- Default versions, overridden from parent when running tests acros env -->
+    <warbler.version>2.0.5</warbler.version>
+    <jruby.version>9.4.14.0</jruby.version>
+    <bundler.version>2.6.3</bundler.version>
+    <jetty.version>9.4.58.v20250814</jetty.version>
   </properties>
 
   <repositories>
