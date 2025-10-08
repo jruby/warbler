@@ -6,14 +6,8 @@
 # See the file LICENSE.txt for details.
 #++
 
-begin
-  require 'bundler'
-rescue LoadError
-  warn "\nPlease `gem install bundler' and run `bundle install' to ensure you have all dependencies.\n\n"
-else
-  require 'bundler/gem_helper'
-  Bundler::GemHelper.install_tasks :dir => File.dirname(__FILE__)
-end
+require 'bundler/gem_helper'
+Bundler::GemHelper.install_tasks :dir => File.dirname(__FILE__)
 
 require 'rake/clean'
 CLEAN << "pkg" << "doc" << Dir['integration/**/target']

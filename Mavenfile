@@ -20,7 +20,6 @@ properties(
   'project.build.sourceEncoding' => 'UTF-8',
   'jruby.plugins.version' => '3.0.6',
   'jetty.version' => '9.4.58.v20250814',
-  'bundler.version' => '2.6.3',
 )
 
 # dependencies needed for compilation
