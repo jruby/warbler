@@ -149,33 +149,26 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.mortbay.jetty</groupId>
+          <groupId>org.eclipse.jetty</groupId>
           <artifactId>jetty-maven-plugin</artifactId>
           <version>${jetty.version}</version>
           <configuration>
             <webAppConfig>
               <contextPath>/</contextPath>
-              <configurationClasses>
-                <configurationClass>org.eclipse.jetty.webapp.WebXmlConfiguration</configurationClass>
-                <configurationClass>org.eclipse.jetty.webapp.WebInfConfiguration</configurationClass>
-                <configurationClass>org.eclipse.jetty.webapp.TagLibConfiguration</configurationClass>
-                <configurationClass>org.eclipse.jetty.webapp.MetaInfConfiguration</configurationClass>
-                <configurationClass>org.eclipse.jetty.webapp.FragmentConfiguration</configurationClass>
-                <configurationClass>org.eclipse.jetty.webapp.JettyWebXmlConfiguration</configurationClass>
-                <!-- intentionally no AnnotationConfiguration -->
-              </configurationClasses>
             </webAppConfig>
             <stopPort>9966</stopPort>
             <stopKey>warbler_stop</stopKey>
             <scanIntervalSeconds>0</scanIntervalSeconds>
             <daemon>true</daemon>
+            <supportedPackagings>jar</supportedPackagings>
           </configuration>
           <executions>
             <execution>
               <id>start-jetty</id>
               <phase>pre-integration-test</phase>
               <goals>
-                <goal>run-war</goal>
+                <!-- Change to run-war to interactively play with the server without running tests -->
+                <goal>deploy-war</goal>
               </goals>
             </execution>
             <execution>

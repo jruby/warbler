@@ -1,9 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '7.1.5.1'
-
-gem 'puma'
+gem 'rails', '~> 7.1.0'
+gem 'rack', '~> 2.2.19'
 
 gem 'activerecord-jdbcsqlite3-adapter', '~> 71.0'
-
-gem 'jbuilder'
