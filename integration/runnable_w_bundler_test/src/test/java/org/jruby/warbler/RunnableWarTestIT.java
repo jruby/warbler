@@ -1,22 +1,20 @@
 package org.jruby.warbler;
 
+import org.junit.jupiter.api.Test;
+
 import java.net.*;
 import java.io.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test for simple runnable war.
  */
-public class RunnableWarTestIT
-{
+public class RunnableWarTestIT {
     @Test
-    public void testApp() throws Exception
-    {
+    public void testApp() {
         String testFilename = System.getProperty("testFilename");
         File f = new File(testFilename);
-        Assert.assertTrue(testFilename + "should exist", f.exists());
+        assertTrue(f.exists(), testFilename + "should exist");
     }
 }

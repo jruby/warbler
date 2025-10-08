@@ -9,8 +9,6 @@
   </parent>
 
   <artifactId>runnable_w_bundler_test</artifactId>
-  <packaging>pom</packaging>
-
   <name>runnable_w_bundler_test</name>
 
   <properties>
@@ -20,8 +18,8 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>2.5</version>
         <executions>
           <execution>
             <id>auto-clean</id>

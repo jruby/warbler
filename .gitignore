@@ -3,8 +3,8 @@ pkg
 doc
 .bundle
 nbproject
-**/target/*
-!**/target/.keep
+target/
+out/
 Gemfile.lock
 .idea
 warbler.iml

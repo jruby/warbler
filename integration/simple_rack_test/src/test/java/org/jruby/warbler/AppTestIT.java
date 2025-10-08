@@ -1,36 +1,33 @@
 package org.jruby.warbler;
 
+import org.junit.jupiter.api.Test;
+
 import java.net.*;
 import java.io.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * Unit test for simple App.
  */
-public class AppTestIT
-{
-    private static String appName = "simple_rack_test-1.0";
-
+public class AppTestIT {
     /**
      * Hit the web app and test the response
      */
     @Test
-    public void testApp() throws Exception
-    {
-        URL url = new URL("http://localhost:8080/" + appName);
-        URLConnection conn = url.openConnection();
-        BufferedReader in = new BufferedReader( new InputStreamReader( conn.getInputStream()));
+    public void testApp() throws Exception {
+        assertEquals("Hello, World", contentFrom("http://localhost:8080/"));
+    }
 
-        String inputLine;
-        String content = "";
-
-        while ((inputLine = in.readLine()) != null)
-            content = inputLine;
-        in.close();
-
-        Assert.assertEquals("Hello, World", content);
+    private static String contentFrom(@SuppressWarnings("SameParameterValue") String url) throws IOException {
+        URL route = new URL(url);
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(route.openStream()))) {
+            while (in.ready()) {
+                content.append(in.readLine());
+            }
+        }
+        return content.toString();
     }
 }

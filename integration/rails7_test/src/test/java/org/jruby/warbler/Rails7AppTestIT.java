@@ -1,9 +1,9 @@
 package org.jruby.warbler;
 
+import org.junit.jupiter.api.Test;
+
 import java.net.*;
 import java.io.*;
-
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
