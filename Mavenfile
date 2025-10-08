@@ -16,10 +16,12 @@ repository( :url => 'https://central.sonatype.com/repository/maven-snapshots/',
   snapshots 'true'
 end
 
-properties( 'jruby.plugins.version' => '3.0.6',
-            'jruby.version' => '9.4.13.0',
-            'jetty.version' => '8.1.16.v20140903',
-            'bundler.version' => '2.6.3')
+properties(
+  'project.build.sourceEncoding' => 'UTF-8',
+  'jruby.plugins.version' => '3.0.6',
+  'jetty.version' => '9.4.58.v20250814',
+  'bundler.version' => '2.6.3',
+)
 
 # dependencies needed for compilation
 scope :provided do
@@ -27,12 +29,15 @@ scope :provided do
   jar 'org.eclipse.jetty:jetty-webapp', '${jetty.version}'
 end
 
-plugin :compiler, '3.1', :source => '8', :target => '8'
+plugin :compiler, '3.14.1', :release => '8'
+plugin :resources, '3.3.1'
+plugin :jar, '2.6'
+plugin :install, '3.1.4'
 
 gem 'bundler', '${bundler.version}'
 gem 'jruby-jars', '${jruby.version}'
 
-plugin :invoker, '1.8' do
+plugin :invoker, '3.9.1' do
   execute_goals( :install, :run,
                  :id => 'integration-test',
                  :properties => { 'warbler.version' => '${project.version}',
