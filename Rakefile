@@ -25,6 +25,7 @@ mvn = Maven::Ruby::Maven.new
 mvn << "-Djruby.version=#{JRUBY_VERSION}"
 mvn << "-Dbundler.version=#{Bundler::VERSION}"
 mvn << '--no-transfer-progress'
+mvn << '--color=always'
 
 mvn.inherit_jruby_version
 
