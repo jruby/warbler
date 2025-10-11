@@ -1,21 +1,21 @@
 == Unreleased
 
-- #429 maintenance Properly require ruby >= 2.1
-- #439 Include gem_build_complete_path in jar
-- #440 Don't overwrite user-specified `webserver.properties` file
-- #450 Update `warble.rb` documentation
-- #466 Update default Maven URL
-- #491 Relax version requirement for rubyzip
-- #497 CI: Migrate to Github Actions
-- #499 Drop jruby 9.1 support
-- #500 test: Configure a git default branch name, silences warning
-- #501 CI: Also test against java 15
-- #502 Update vendored dummy repos to our support matrix
-- #503 Drop support for old rake versions
-- #504 Migrate the spec suite to use RSpec 3
-- #505 Drop rake 12 support
-- #513 Fix helper class used for `config.webxml` values
-- #514 CI: Install a RubyGems 3.2.x for jruby-head, and ensure a Bundler 1.17.3 is available and used
+== 2.1.0
+
+Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
+
+- #439: Include gem_build_complete_path in jar for RubyGems 2.5+ extension support
+- #440: Don't overwrite user-specified `webserver.properties` file
+- #513, #521: Fix issues with openstruct used for `config.webxml` values on JRuby 9.3+
+- #527: Fix war file path as argument for Jetty runner on Jetty 9.4.32+
+- #538: Put public folders inside public for executable war
+- #552, #553: Use URI.open instead of open
+- #557: Replace File.exists? with File.exist? for Ruby 3.2.0+ compatibility
+- #559, 575: Fixes to update Warbler to modern libs and JRuby, removing old Bundler 1.x hacks
+- #562: Fix problems with spaces in path names under windows
+- #571: Use newer keyword argument rubyzip 3.0 API (drops support for JRuby 9.3)
+- #575: Fix Gem path issues on JRuby 9.4.x
+- #574: Bump default Jetty version for executables to 9.4.58.v20250814
 
 == 2.0.5
 
