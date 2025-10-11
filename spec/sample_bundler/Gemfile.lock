@@ -6,6 +6,7 @@ GEM
 PLATFORMS
   universal-java-1.8
   universal-java-21
+  universal-java-8
 
 DEPENDENCIES
   rake (= 13.3.0)

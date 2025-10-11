@@ -190,6 +190,7 @@ GEM
 PLATFORMS
   universal-java-1.8
   universal-java-21
+  universal-java-8
 
 DEPENDENCIES
   activerecord-jdbcpostgresql-adapter (~> 70.0)
