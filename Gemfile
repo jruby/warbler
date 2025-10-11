@@ -7,7 +7,7 @@ gem 'maven-tools', '1.2.3'
 
 
 group :development, :test do
-  gem 'rdoc', ['>= 3.10', '< 4.3'], :require => nil
+  gem 'rdoc', ['>= 3.10', '< 7'], :require => nil
 
   # force jruby-jars to use current JRuby version for testing
   gem 'jruby-jars', '~> ' + JRUBY_VERSION.split('.')[0..1].join('.')

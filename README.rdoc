@@ -1,4 +1,5 @@
-= Warbler {rdoc-image:https://badge.fury.io/rb/warbler.svg}[http://badge.fury.io/rb/warbler] {rdoc-image:https://github.com/jruby/warbler/actions/workflows/ci.yml/badge.svg}[https://github.com/jruby/warbler/actions/workflows/ci.yml]
+= Warbler
+{rdoc-image:https://badge.fury.io/rb/warbler.svg}[http://badge.fury.io/rb/warbler] {rdoc-image:https://github.com/jruby/warbler/actions/workflows/ci.yml/badge.svg}[https://github.com/jruby/warbler/actions/workflows/ci.yml]
 
 Warbler is a gem to make a Java jar or war file out of any Ruby, Rails or Rack
 application. Warbler provides a minimal, flexible, Ruby-like way to bundle up
