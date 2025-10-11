@@ -14,7 +14,7 @@
     <gem.path>${basedir}/../../pkg/rubygems</gem.path>
 
     <!-- Default versions, overridden from parent when running tests acros env -->
-    <warbler.version>2.0.5</warbler.version>
+    <warbler.version>2.1.0</warbler.version>
     <jruby.version>9.4.14.0</jruby.version>
     <bundler.version>2.6.3</bundler.version>
     <jetty.version>9.4.58.v20250814</jetty.version>
