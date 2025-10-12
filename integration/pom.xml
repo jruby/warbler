@@ -10,11 +10,14 @@
   <properties>
     <jruby.plugins.version>3.0.6</jruby.plugins.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jruby.version>${jruby.version}</jruby.version>
-    <warbler.version>2.0.4</warbler.version>
-    <bundler.version>${bundler.version}</bundler.version>
     <gem.home>${basedir}/../../pkg/rubygems</gem.home>
     <gem.path>${basedir}/../../pkg/rubygems</gem.path>
+
+    <!-- Default versions, overridden from parent when running tests acros env -->
+    <warbler.version>2.0.5</warbler.version>
+    <jruby.version>9.4.14.0</jruby.version>
+    <bundler.version>2.6.3</bundler.version>
+    <jetty.version>9.4.58.v20250814</jetty.version>
   </properties>
 
   <repositories>
@@ -44,15 +47,15 @@
       <type>gem</type>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.14.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <version>1.3</version>
+      <artifactId>hamcrest</artifactId>
+      <version>3.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -74,8 +77,55 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.5.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.6.2</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.6.3</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.14.1</version>
+        <configuration>
+          <release>8</release>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.9</version>
+        <version>3.5.4</version>
+        <configuration>
+          <failIfNoTests>true</failIfNoTests>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -99,41 +149,26 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <source>8</source>
-            <target>8</target>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.mortbay.jetty</groupId>
+          <groupId>org.eclipse.jetty</groupId>
           <artifactId>jetty-maven-plugin</artifactId>
           <version>${jetty.version}</version>
           <configuration>
             <webAppConfig>
               <contextPath>/</contextPath>
-              <configurationClasses>
-                <configurationClass>org.eclipse.jetty.webapp.WebXmlConfiguration</configurationClass>
-                <configurationClass>org.eclipse.jetty.webapp.WebInfConfiguration</configurationClass>
-                <configurationClass>org.eclipse.jetty.webapp.TagLibConfiguration</configurationClass>
-                <configurationClass>org.eclipse.jetty.webapp.MetaInfConfiguration</configurationClass>
-                <configurationClass>org.eclipse.jetty.webapp.FragmentConfiguration</configurationClass>
-                <configurationClass>org.eclipse.jetty.webapp.JettyWebXmlConfiguration</configurationClass>
-                <!-- intentionally no AnnotationConfiguration -->
-              </configurationClasses>
             </webAppConfig>
             <stopPort>9966</stopPort>
             <stopKey>warbler_stop</stopKey>
             <scanIntervalSeconds>0</scanIntervalSeconds>
             <daemon>true</daemon>
+            <supportedPackagings>jar</supportedPackagings>
           </configuration>
           <executions>
             <execution>
               <id>start-jetty</id>
               <phase>pre-integration-test</phase>
               <goals>
-                <goal>run-war</goal>
+                <!-- Change to run-war to interactively play with the server without running tests -->
+                <goal>deploy-war</goal>
               </goals>
             </execution>
             <execution>
@@ -148,7 +183,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>1.2.1</version>
+          <version>3.6.1</version>
         </plugin>
         <plugin>
           <groupId>org.jruby.maven</groupId>
@@ -174,6 +209,14 @@
               </configuration>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>2.19.1</version>
+          <configuration>
+            <ignoredVersions>.*-(alpha|beta|M)[-0-9]+</ignoredVersions>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

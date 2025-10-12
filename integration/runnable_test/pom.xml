@@ -9,8 +9,6 @@
   </parent>
 
   <artifactId>runnable_test</artifactId>
-  <packaging>pom</packaging>
-
   <name>runnable_test</name>
 
   <properties>
@@ -21,7 +19,6 @@
     <plugins>
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>2.5</version>
         <executions>
           <execution>
             <id>auto-clean</id>

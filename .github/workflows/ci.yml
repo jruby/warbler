@@ -21,15 +21,11 @@ jobs:
       matrix:
         java-version: [8, 21]
         ruby-version: [jruby-9.4, jruby-10]
-        bundler-version: [2.6.3, 2.7.1]
         task: ['', integration]
         exclude:
           # JRuby 10 requires Java 21 minimum
           - ruby-version: jruby-10
             java-version: 8
-          # Bundler 2.7.1 requires Ruby 3.2
-          - ruby-version: jruby-9.4
-            bundler-version: 2.7.1
 
       fail-fast: false
 
@@ -44,7 +40,7 @@ jobs:
       - name: Set up java ${{ matrix.java-version }}
         uses: actions/setup-java@v3
         with:
-          distribution: zulu
+          distribution: temurin
           java-version: ${{ matrix.java-version }}
 
       - name: Set up ${{ matrix.ruby-version }}
@@ -55,11 +51,8 @@ jobs:
       - name: Remove jruby-launcher # not sure where this is coming from but causes some specs to fail
         run: gem uninstall -a jruby-launcher
 
-      - name: Remove jruby-launcher # not sure where this is coming from but causes some specs to fail
-        run: gem install bundler -v ${{ matrix.bundler-version }}
-
       - name: Install dependencies
-        run: bundle _${{ matrix.bundler-version }}_ install --jobs=3 --retry=3
+        run: bundle install
 
       - name: Run tests
-        run: bundle _${{ matrix.bundler-version }}_ exec rake ${{ matrix.task }}
+        run: bundle exec rake ${{ matrix.task }}

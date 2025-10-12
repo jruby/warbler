@@ -6,14 +6,8 @@
 # See the file LICENSE.txt for details.
 #++
 
-begin
-  require 'bundler'
-rescue LoadError
-  warn "\nPlease `gem install bundler' and run `bundle install' to ensure you have all dependencies.\n\n"
-else
-  require 'bundler/gem_helper'
-  Bundler::GemHelper.install_tasks :dir => File.dirname(__FILE__)
-end
+require 'bundler/gem_helper'
+Bundler::GemHelper.install_tasks :dir => File.dirname(__FILE__)
 
 require 'rake/clean'
 CLEAN << "pkg" << "doc" << Dir['integration/**/target']
@@ -31,10 +25,9 @@ mvn = Maven::Ruby::Maven.new
 mvn << "-Djruby.version=#{JRUBY_VERSION}"
 mvn << "-Dbundler.version=#{Bundler::VERSION}"
 mvn << '--no-transfer-progress'
+mvn << '--color=always'
 
-if defined?(JRUBY_VERSION) && !JRUBY_VERSION.start_with?('9.0')
-  mvn.inherit_jruby_version
-end
+mvn.inherit_jruby_version
 
 desc 'compile java sources and build jar'
 task :jar do
