@@ -28,9 +28,12 @@ scope :provided do
   jar 'org.eclipse.jetty:jetty-webapp', '${jetty.version}'
 end
 
+plugin :clean, '3.5.0'
 plugin :compiler, '3.14.1', :release => '8'
 plugin :resources, '3.3.1'
-plugin :jar, '2.6'
+plugin :jar, '3.4.2' do
+  execute_goals(:phase => 'none') # Avoid a duplicate execution with that defined by the :gemspec directive
+end
 plugin :install, '3.1.4'
 
 gem 'bundler', '${bundler.version}'
