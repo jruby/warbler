@@ -10,16 +10,13 @@ on:
 
   pull_request:
 
-env:
-  JRUBY_OPTS: -J-Xmx896M
-
 jobs:
   ci:
     runs-on: ubuntu-22.04
 
     strategy:
       matrix:
-        java-version: [8, 21]
+        java-version: [8, 21, 25]
         ruby-version: [jruby-9.4, jruby-10]
         task: ['', integration]
         exclude:
