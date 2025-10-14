@@ -18,6 +18,7 @@ end
 
 properties(
   'project.build.sourceEncoding' => 'UTF-8',
+  'mavengem.wagon.version' => '2.0.2',
   'jruby.plugins.version' => '3.0.6',
   'jetty.version' => '9.4.58.v20250814',
 )
