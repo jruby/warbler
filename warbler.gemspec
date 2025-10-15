@@ -20,6 +20,8 @@ bundle up all of your application files for deployment to a Java environment.}
     reject { |file| file =~ /^spec|test\// }. # spec/**/*.spec
     reject { |file| file =~ /^integration\// }. # (un-used) *.rake files
     reject { |file| file =~ /^rakelib\// } # (un-used) *.rake files
+  gem.files << "lib/warbler_jar.jar"
+  
   gem.test_files    = [] # tests and specs add 700k to the gem, so don't include them
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.require_paths = ["lib"]

@@ -10,12 +10,14 @@ require 'bundler/gem_helper'
 Bundler::GemHelper.install_tasks :dir => File.dirname(__FILE__)
 
 require 'rake/clean'
-CLEAN << "pkg" << "doc" << Dir['integration/**/target']
+CLEAN << "pkg" << "doc" << Dir['integration/**/target'] << "lib/warbler_jar.jar"
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.rspec_opts = ['--color', "--format documentation"]
 end
+
+task :spec => :jar
 
 task :default => :spec
 
@@ -36,7 +38,7 @@ task :jar do
 end
 
 desc 'run some integration test'
-task :integration do
+task :integration => :jar do
   success = mvn.verify
   exit(1) unless success
 end
