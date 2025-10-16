@@ -1,0 +1,47 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions-deps:
+        patterns: [ "*" ]
+    commit-message:
+      prefix: "chore(deps): "
+  - package-ecosystem: maven
+    directories:
+      - "/integration/*"
+    schedule:
+      interval: weekly
+    groups:
+      maven-test-deps:
+        patterns: [ "*" ]
+    commit-message:
+      prefix: "test(deps): "
+    ignore:
+      - dependency-name: "rubygems:*" # Versions only specified for local convenience
+      - dependency-name: "org.eclipse.jetty:*"
+        update-types: [ "version-update:semver-major" ] # Major update requires dropping Java < 11 compat
+      - dependency-name: "org.junit.jupiter:*"
+        update-types: [ "version-update:semver-major" ] # Major update requires dropping Java < 17 compat
+  - package-ecosystem: bundler
+    directories:
+      - "/"
+    schedule:
+      interval: weekly
+    allow:
+      - dependency-type: all
+    groups:
+      ruby-deps:
+        dependency-type: "production"
+      ruby-dev-deps:
+        dependency-type: "development"
+    commit-message:
+      prefix: "build(deps): "
+      prefix-development: "chore(deps): "
+    ignore:
+      - dependency-name: "rails"
+        update-types: [ "version-update:semver-major", "version-update:semver-minor" ]
+      - dependency-name: "rack"
+        update-types: [ "version-update:semver-major", "version-update:semver-minor" ]
