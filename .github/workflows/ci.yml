@@ -39,6 +39,7 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ matrix.java-version }}
+          cache: maven
 
       - name: Set up ${{ matrix.ruby-version }}
         uses: ruby/setup-ruby@v1
