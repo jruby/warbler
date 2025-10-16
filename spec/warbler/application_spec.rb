@@ -57,12 +57,13 @@ describe Warbler::Application do
     expect(capture { Warbler::Application.new.run }).to match /already exists/
   end
 
-  it "should complain if the config directory is missing" do
+  it "should create the config dir if it is missing" do
     begin
       mv "config", "config-tmp"
       ARGV.unshift "config"
-      expect(capture { Warbler::Application.new.run }).to match /missing/
+      expect(capture { Warbler::Application.new.run }).to match /missing, creating/
     ensure
+      rm_r "config"
       mv "config-tmp", "config"
     end
   end

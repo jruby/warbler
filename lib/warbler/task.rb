@@ -151,12 +151,15 @@ module Warbler
         if File.exist?(Warbler::Config::FILE) && ENV["FORCE"].nil?
           puts "There's another bird sitting on my favorite branch"
           puts "(file '#{Warbler::Config::FILE}' already exists. Pass argument FORCE=1 to override)"
-        elsif !File.directory?("config")
-          puts "I'm confused; my favorite branch is missing"
-          puts "(directory 'config' is missing)"
-        else
-          cp "#{Warbler::WARBLER_HOME}/warble.rb", Warbler::Config::FILE
+          next
         end
+
+        if !File.directory?(Warbler::Config::CONFIG_DIR)
+          puts "config dir is missing, creating it"
+          mkdir_p Warbler::Config::CONFIG_DIR
+        end
+
+        cp "#{Warbler::WARBLER_HOME}/warble.rb", Warbler::Config::FILE
       end
     end
 

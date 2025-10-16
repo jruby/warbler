@@ -15,7 +15,8 @@ module Warbler
     include RakeHelper
 
     TOP_DIRS = %w(app db config lib log script vendor)
-    FILE = "config/warble.rb"
+    CONFIG_DIR = "config"
+    FILE = "#{CONFIG_DIR}/warble.rb"
     BUILD_GEMS = %w(warbler rake rcov)
 
     include Traits
