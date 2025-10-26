@@ -213,7 +213,7 @@ public class JarMain implements Closeable {
 
     @Override
     public void close() {
-        closeables.forEach(closeableResource -> {
+        closeables.reversed().forEach(closeableResource -> {
             try {
                 closeableResource.close();
             } catch (Exception e) {
