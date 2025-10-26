@@ -106,7 +106,6 @@ CONFIG
       jar.files["WEB-INF/webserver.properties"] ||= StringIO.new(<<-PROPS)
 mainclass = org.eclipse.jetty.runner.Runner
 args = args0,args1,args2,args3,args4,args5,args6
-props = jetty.home
 args0 = --host
 args1 = {{host}}
 args2 = --port
@@ -114,7 +113,9 @@ args3 = {{port}}
 args4 = --config
 args5 = {{config}}
 args6 = {{warfile}}
+props = jetty.home,org.eclipse.jetty.util.log.class
 jetty.home = {{webroot}}
+org.eclipse.jetty.util.log.class = org.eclipse.jetty.util.log.StdErrLog
 PROPS
     end
   end
