@@ -1,5 +1,7 @@
 == Unreleased
 
+- fix: NullPointerException during shutdown with executable war files
+
 == 2.1.0
 
 Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
