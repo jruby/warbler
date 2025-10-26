@@ -41,3 +41,30 @@ describe Warbler::WebServer::Artifact do
   end
 
 end
+
+
+describe Warbler::JettyServer do
+
+  it "creates default configuration for jetty" do
+    files = {}
+    jar = double('jar file')
+    allow(jar).to receive(:files).and_return files
+
+    def server = Warbler::JettyServer.new
+
+    server.add(jar)
+    expect(files['WEB-INF/webserver.jar']).to match /org\/eclipse\/jetty\/jetty-runner\/9\.4.*\/jetty-runner-9\.4.*.jar/
+    expect(files['WEB-INF/webserver.xml'].string).to include 'org.eclipse.jetty.server.Server'
+
+    props = files['WEB-INF/webserver.properties']
+              .string
+              .each_line(chomp: true)
+              .to_h { |line| line.split(' = ', 2) }
+
+    expect(props.keys.to_set).to eql Set.new(['mainclass', 'args', 'args0', 'args1', 'args2', 'args3', 'args4', 'args5', 'args6', 'props', 'jetty.home', 'org.eclipse.jetty.util.log.class'])
+
+    expect(props['mainclass']).to eq 'org.eclipse.jetty.runner.Runner'
+    expect(props['props']).to eq 'jetty.home,org.eclipse.jetty.util.log.class'
+    expect(props['org.eclipse.jetty.util.log.class']).to eq 'org.eclipse.jetty.util.log.StdErrLog'
+  end
+end
