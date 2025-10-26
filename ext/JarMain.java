@@ -5,10 +5,12 @@
  * See the file LICENSE.txt for details.
  */
 
+import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,10 +24,12 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class JarMain implements Runnable {
+public class JarMain implements Closeable {
 
     static final String MAIN = '/' + JarMain.class.getName().replace('.', '/') + ".class";
 
@@ -34,66 +38,61 @@ public class JarMain implements Runnable {
     private final String path;
 
     protected File extractRoot;
-
-    protected URLClassLoader classLoader;
+    final List<Closeable> closeables = new ArrayList<>();
 
     JarMain(String[] args) {
         this.args = args;
-        URL mainClass = getClass().getResource(MAIN);
+        URL mainClass = Objects.requireNonNull(getClass().getResource(MAIN), MAIN + " not found!");
         URI uri;
-        File file;
         String pathWithoutMain;
 
         try {
             this.path = mainClass.toURI().getSchemeSpecificPart();
             pathWithoutMain = mainClass.toURI().getRawSchemeSpecificPart().replace("!" + MAIN, "");
             uri = new URI(pathWithoutMain);
-        }
-        catch (URISyntaxException e) {
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
 
         archive = new File(uri.getPath()).getAbsolutePath();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(this));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close, "Warbler-Shutdown"));
     }
 
     protected URL[] extractArchive() throws Exception {
-        final JarFile jarFile = new JarFile(archive);
-        try {
-            Map<String, JarEntry> jarNames = new HashMap<String, JarEntry>();
+        try (JarFile jarFile = new JarFile(archive)) {
+            Map<String, JarEntry> jarNames = new HashMap<>();
             for (Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); ) {
                 JarEntry entry = e.nextElement();
                 String extractPath = getExtractEntryPath(entry);
-                if ( extractPath != null ) jarNames.put(extractPath, entry);
+                if (extractPath != null) jarNames.put(extractPath, entry);
             }
 
             extractRoot = File.createTempFile("jruby", "extract");
-            extractRoot.delete(); extractRoot.mkdirs();
+            extractRoot.delete();
+            extractRoot.mkdirs();
+            closeables.add(() -> deleteAll(extractRoot));
 
-            final List<URL> urls = new ArrayList<URL>(jarNames.size());
+            final List<URL> urls = new ArrayList<>(jarNames.size());
             for (Map.Entry<String, JarEntry> e : jarNames.entrySet()) {
                 URL entryURL = extractEntry(e.getValue(), e.getKey());
-                if (entryURL != null) urls.add( entryURL );
+                if (entryURL != null) urls.add(entryURL);
             }
-            return urls.toArray(new URL[urls.size()]);
-        }
-        finally {
-            jarFile.close();
+            return urls.toArray(new URL[0]);
         }
     }
 
     protected String getExtractEntryPath(final JarEntry entry) {
         final String name = entry.getName();
-        if ( name.startsWith("META-INF/lib") && name.endsWith(".jar") ) {
+        if (name.startsWith("META-INF/lib") && name.endsWith(".jar")) {
             return name.substring(name.lastIndexOf('/') + 1);
         }
         return null; // do not extract entry
     }
 
-    protected URL extractEntry(final JarEntry entry, final String path) throws Exception {
-        final File file = new File(extractRoot, path);
-        if ( entry.isDirectory() ) {
+    protected URL extractEntry(final JarEntry entry, String path) throws Exception {
+        File file = new File(extractRoot, path);
+        if (entry.isDirectory()) {
             file.mkdirs();
             return null;
         }
@@ -101,44 +100,34 @@ public class JarMain implements Runnable {
         final InputStream entryStream;
         try {
             entryStream = new URI("jar", entryPath, null).toURL().openStream();
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             // TODO gems '%' file name "encoding" ?!
             debug("failed to open jar:" + entryPath + " skipping entry: " + entry.getName(), e);
             return null;
         }
         final File parent = file.getParentFile();
-        if ( parent != null ) parent.mkdirs();
-        FileOutputStream outStream = new FileOutputStream(file);
-        final byte[] buf = new byte[65536];
-        try {
-            int bytesRead;
-            while ((bytesRead = entryStream.read(buf)) != -1) {
-                outStream.write(buf, 0, bytesRead);
-            }
-        }
-        finally {
-            entryStream.close();
-            outStream.close();
-            file.deleteOnExit();
-        }
+        if (parent != null) parent.mkdirs();
+
+        transferAndClose(() -> entryStream, () -> new FileOutputStream(file));
+        file.deleteOnExit();
         // if (false) debug(entry.getName() + " extracted to " + file.getPath());
         return file.toURI().toURL();
     }
 
     protected String entryPath(String name) {
-        if ( ! name.startsWith("/") ) name = "/" + name;
+        if (!name.startsWith("/")) name = "/" + name;
         return path.replace(MAIN, name);
     }
 
     protected Object newScriptingContainer(final URL[] jars) throws Exception {
         setSystemProperty("org.jruby.embed.class.path", "");
-        classLoader = new URLClassLoader(jars);
-        Class scriptingContainerClass = Class.forName("org.jruby.embed.ScriptingContainer", true, classLoader);
+        URLClassLoader scriptingClassLoader = new URLClassLoader(jars);
+        closeables.add(scriptingClassLoader);
+        Class<?> scriptingContainerClass = Class.forName("org.jruby.embed.ScriptingContainer", true, scriptingClassLoader);
         Object scriptingContainer = scriptingContainerClass.newInstance();
         debug("scripting container class loader urls: " + Arrays.toString(jars));
         invokeMethod(scriptingContainer, "setArgv", (Object) args);
-        invokeMethod(scriptingContainer, "setClassLoader", new Class[] { ClassLoader.class }, classLoader);
+        invokeMethod(scriptingContainer, "setClassLoader", new Class[]{ClassLoader.class}, scriptingClassLoader);
         return scriptingContainer;
     }
 
@@ -146,18 +135,18 @@ public class JarMain implements Runnable {
         final Object scriptingContainer = newScriptingContainer(jars);
         debug("invoking " + archive + " with: " + Arrays.deepToString(args));
         Object outcome = invokeMethod(scriptingContainer, "runScriptlet", launchScript());
-        return ( outcome instanceof Number ) ? ( (Number) outcome ).intValue() : 0;
+        return (outcome instanceof Number) ? ((Number) outcome).intValue() : 0;
     }
 
     protected String launchScript() {
         return
-        "begin\n" +
-        "  require 'META-INF/init.rb'\n" +
-        "  require 'META-INF/main.rb'\n" +
-        "  0\n" +
-        "rescue SystemExit => e\n" +
-        "  e.status\n" +
-        "end";
+            "begin\n" +
+                "  require 'META-INF/init.rb'\n" +
+                "  require 'META-INF/main.rb'\n" +
+                "  0\n" +
+                "rescue SystemExit => e\n" +
+                "  e.status\n" +
+                "end";
     }
 
     protected int start() throws Exception {
@@ -170,8 +159,8 @@ public class JarMain implements Runnable {
     }
 
     protected void debug(String msg, Throwable t) {
-        if ( isDebug() ) System.out.println(msg);
-        if ( isDebug() && t != null ) t.printStackTrace(System.out);
+        if (isDebug()) System.out.println(msg);
+        if (isDebug() && t != null) t.printStackTrace(System.out);
     }
 
     protected static void debug(Throwable t) {
@@ -179,7 +168,7 @@ public class JarMain implements Runnable {
     }
 
     private static void debug(Throwable t, PrintStream out) {
-        if ( isDebug() ) t.printStackTrace(out);
+        if (isDebug()) t.printStackTrace(out);
     }
 
     protected void warn(String msg) {
@@ -195,41 +184,42 @@ public class JarMain implements Runnable {
         debug(t, System.err);
     }
 
-    protected void delete(File f) {
+    protected void deleteAll(File f) {
         try {
-          if (f.isDirectory() && !isSymlink(f)) {
-              File[] children = f.listFiles();
-              for (int i = 0; i < children.length; i++) {
-                  delete(children[i]);
-              }
-          }
-          f.delete();
+            if (f.isDirectory() && !isSymlink(f)) {
+                File[] children = f.listFiles();
+                if (children != null) {
+                    for (File child : children) {
+                        deleteAll(child);
+                    }
+                }
+            }
+            f.delete();
+        } catch (IOException e) {
+            error(e);
         }
-        catch (IOException e) { error(e); }
     }
 
     protected boolean isSymlink(File file) throws IOException {
         if (file == null) throw new NullPointerException("File must not be null");
         final File canonical;
-        if ( file.getParent() == null ) canonical = file;
+        if (file.getParent() == null) canonical = file;
         else {
             File parentDir = file.getParentFile().getCanonicalFile();
             canonical = new File(parentDir, file.getName());
         }
-        return ! canonical.getCanonicalFile().equals( canonical.getAbsoluteFile() );
+        return !canonical.getCanonicalFile().equals(canonical.getAbsoluteFile());
     }
 
-    public void run() {
-        // If the URLClassLoader isn't closed, on Windows, temp JARs won't be cleaned up
-        try {
-            if (classLoader != null) {
-                invokeMethod(classLoader, "close");
+    @Override
+    public void close() {
+        closeables.forEach(closeableResource -> {
+            try {
+                closeableResource.close();
+            } catch (Exception e) {
+                error("Error during shutdown", e);
             }
-        }
-        catch (NoSuchMethodException e) { } // We're not being run on Java >= 7
-        catch (Exception e) { error(e); }
-
-        if ( extractRoot != null ) delete(extractRoot);
+        });
     }
 
     public static void main(String[] args) {
@@ -240,38 +230,35 @@ public class JarMain implements Runnable {
         int exit;
         try {
             exit = main.start();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Throwable t = e;
-            while ( t.getCause() != null && t.getCause() != t ) {
+            while (t.getCause() != null && t.getCause() != t) {
                 t = t.getCause();
             }
             error(e.toString(), t);
             exit = 1;
         }
         try {
-            if ( isSystemExitEnabled() ) System.exit(exit);
-        }
-        catch (SecurityException e) {
+            if (isSystemExitEnabled()) System.exit(exit);
+        } catch (SecurityException e) {
             debug(e);
         }
     }
 
     protected static Object invokeMethod(final Object self, final String name, final Object... args)
-        throws NoSuchMethodException, IllegalAccessException, Exception {
+        throws Exception {
 
-        final Class[] signature = new Class[args.length];
-        for ( int i = 0; i < args.length; i++ ) signature[i] = args[i].getClass();
+        final Class<?>[] signature = new Class[args.length];
+        for (int i = 0; i < args.length; i++) signature[i] = args[i].getClass();
         return invokeMethod(self, name, signature, args);
     }
 
-    protected static Object invokeMethod(final Object self, final String name, final Class[] signature, final Object... args)
-        throws NoSuchMethodException, IllegalAccessException, Exception {
+    protected static Object invokeMethod(final Object self, final String name, final Class<?>[] signature, final Object... args)
+        throws Exception {
         Method method = self.getClass().getDeclaredMethod(name, signature);
         try {
             return method.invoke(self, args);
-        }
-        catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             Throwable target = e.getTargetException();
             if (target instanceof Exception) {
                 throw (Exception) target;
@@ -281,18 +268,21 @@ public class JarMain implements Runnable {
     }
 
     private static final boolean debug;
+
     static {
-        debug = Boolean.parseBoolean( getSystemProperty("warbler.debug", "false") );
+        debug = Boolean.parseBoolean(getSystemProperty("warbler.debug", "false"));
     }
 
-    static boolean isDebug() { return debug; }
+    static boolean isDebug() {
+        return debug;
+    }
 
     /**
      * if warbler.skip_system_exit system property is defined, we will not
      * call System.exit in the normal flow. System.exit can cause problems
      * for wrappers like procrun
      */
-    private static boolean isSystemExitEnabled(){
+    private static boolean isSystemExitEnabled() {
         return getSystemProperty("warbler.skip_system_exit") == null; //omission enables System.exit use
     }
 
@@ -303,8 +293,7 @@ public class JarMain implements Runnable {
     static String getSystemProperty(final String name, final String defaultValue) {
         try {
             return System.getProperty(name, defaultValue);
-        }
-        catch (SecurityException e) {
+        } catch (SecurityException e) {
             return defaultValue;
         }
     }
@@ -313,8 +302,7 @@ public class JarMain implements Runnable {
         try {
             System.setProperty(name, value);
             return true;
-        }
-        catch (SecurityException e) {
+        } catch (SecurityException e) {
             return false;
         }
     }
@@ -325,14 +313,23 @@ public class JarMain implements Runnable {
 
     static String getENV(final String name, final String defaultValue) {
         try {
-            if ( System.getenv().containsKey(name) ) {
+            if (System.getenv().containsKey(name)) {
                 return System.getenv().get(name);
             }
             return defaultValue;
-        }
-        catch (SecurityException e) {
+        } catch (SecurityException e) {
             return defaultValue;
         }
     }
 
+    // Can be replaced with InputStream.transferTo(OutputStream) in Java 11+
+    static void transferAndClose(Callable<InputStream> is, Callable<OutputStream> os) throws Exception {
+        try (InputStream input = is.call(); OutputStream output = os.call()) {
+            byte[] buf = new byte[16384];
+            int bytesRead;
+            while ((bytesRead = input.read(buf)) != -1) {
+                output.write(buf, 0, bytesRead);
+            }
+        }
+    }
 }

@@ -5,38 +5,39 @@
  * See the file LICENSE.txt for details.
  */
 
-import java.lang.reflect.Method;
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
-import java.io.SequenceInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.URLClassLoader;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.Map;
+import java.util.Properties;
 import java.util.jar.JarEntry;
 
 /**
  * Used as a Main-Class in the manifest for a .war file, so that you can run
  * a .war file with <tt>java -jar</tt>.
- *
+ * <p/>
  * WarMain can be used with different web server libraries. WarMain expects
  * to have two files present in the .war file,
  * <tt>WEB-INF/webserver.properties</tt> and <tt>WEB-INF/webserver.jar</tt>.
- *
+ * <p/>
  * When WarMain starts up, it extracts the webserver jar to a temporary
  * directory, and creates a temporary work directory for the webapp. Both
  * are deleted on exit.
- *
+ * <p/>
  * It then reads webserver.properties into a java.util.Properties object,
  * creates a URL classloader holding the jar, and loads and invokes the
  * <tt>main</tt> method of the main class mentioned in the properties.
- *
+ * <p/>
  * An example webserver.properties follows for Jetty. The <tt>args</tt>
  * property indicates the names and ordering of other properties to be used
  * as command-line arguments. The special tokens <tt>{{warfile}}</tt> and
@@ -63,7 +64,6 @@ import java.util.jar.JarEntry;
  */
 public class WarMain extends JarMain {
 
-    static final String MAIN = '/' + WarMain.class.getName().replace('.', '/') + ".class";
     static final String WEBSERVER_PROPERTIES = "/WEB-INF/webserver.properties";
     static final String WEBSERVER_JAR = "/WEB-INF/webserver.jar";
     static final String WEBSERVER_CONFIG = "/WEB-INF/webserver.xml";
@@ -84,8 +84,6 @@ public class WarMain extends JarMain {
      */
     private final String executable;
     private final String[] executableArgv;
-
-    private File webroot;
 
     WarMain(final String[] args) {
         super(args);
@@ -115,36 +113,40 @@ public class WarMain extends JarMain {
         }
     }
 
-    private URL extractWebserver() throws Exception {
-        this.webroot = File.createTempFile("warbler", "webroot");
-        this.webroot.delete();
-        this.webroot.mkdirs();
-        this.webroot = new File(this.webroot, new File(archive).getName());
-        debug("webroot directory is " + this.webroot.getPath());
-        InputStream jarStream = new URI("jar", entryPath(WEBSERVER_JAR), null).toURL().openStream();
-        File jarFile = File.createTempFile("webserver", ".jar");
-        jarFile.deleteOnExit();
-        FileOutputStream outStream = new FileOutputStream(jarFile);
-        try {
-            byte[] buf = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = jarStream.read(buf)) != -1) {
-                outStream.write(buf, 0, bytesRead);
-            }
-        } finally {
-            jarStream.close();
-            outStream.close();
-        }
-        debug("webserver.jar extracted to " + jarFile.getPath());
-        return jarFile.toURI().toURL();
+    private void launchWebServer() throws Exception {
+        File webroot = createWebRoot();
+        File jarFile = extractWebServerJar();
+
+        doLaunchWebServer(jarFile, webroot);
     }
 
-    private Properties getWebserverProperties() throws Exception {
+    private File createWebRoot() throws IOException {
+        File warblerRoot = File.createTempFile("warbler", "webroot");
+        warblerRoot.delete();
+        warblerRoot.mkdirs();
+        closeables.add(() -> deleteAll(warblerRoot));
+
+        File webroot = new File(warblerRoot, new File(archive).getName());
+        debug("webroot directory is " + webroot.getPath());
+        return webroot;
+    }
+
+    private File extractWebServerJar() throws Exception {
+        File jarFile = File.createTempFile("webserver", ".jar");
+        jarFile.deleteOnExit();
+
+        transferAndClose(
+            () -> new URI("jar", entryPath(WEBSERVER_JAR), null).toURL().openStream(),
+            () -> new FileOutputStream(jarFile));
+        debug("webserver.jar extracted to " + jarFile.getPath());
+        return jarFile;
+    }
+
+    private Properties getWebserverProperties(File webRoot) throws Exception {
         Properties props = new Properties();
-        try {
-            InputStream is = getClass().getResourceAsStream(WEBSERVER_PROPERTIES);
+        try (InputStream is = getClass().getResourceAsStream(WEBSERVER_PROPERTIES)) {
             if ( is != null ) props.load(is);
-        } catch (Exception e) { }
+        } catch (Exception ignore) { }
 
         String port = getSystemProperty("warbler.port", getENV("PORT"));
         port = port == null ? "8080" : port;
@@ -152,13 +154,13 @@ public class WarMain extends JarMain {
         String webserverConfig = getSystemProperty("warbler.webserver_config", getENV("WARBLER_WEBSERVER_CONFIG"));
         String embeddedWebserverConfig = new URI("jar", entryPath(WEBSERVER_CONFIG), null).toURL().toString();
         webserverConfig = webserverConfig == null ? embeddedWebserverConfig : webserverConfig;
-        for ( Map.Entry entry : props.entrySet() ) {
+        for ( Map.Entry<Object, Object> entry : props.entrySet() ) {
             String val = (String) entry.getValue();
             val = val.replace("{{warfile}}", archive).
                       replace("{{port}}", port).
                       replace("{{host}}", host).
                       replace("{{config}}", webserverConfig).
-                      replace("{{webroot}}", webroot.getAbsolutePath());
+                      replace("{{webroot}}", webRoot.getAbsolutePath());
             entry.setValue(val);
         }
 
@@ -172,10 +174,11 @@ public class WarMain extends JarMain {
         return props;
     }
 
-    private void launchWebServer(URL jar) throws Exception {
-        URLClassLoader loader = new URLClassLoader(new URL[] {jar});
+
+    private void doLaunchWebServer(File jar, File webRoot) throws Exception {
+        URLClassLoader loader = new URLClassLoader(new URL[] {jar.toURI().toURL()});
         Thread.currentThread().setContextClassLoader(loader);
-        Properties props = getWebserverProperties();
+        Properties props = getWebserverProperties(webRoot);
         String mainClass = props.getProperty("mainclass");
         if (mainClass == null) {
             throw new IllegalArgumentException("unknown webserver main class ("
@@ -183,7 +186,7 @@ public class WarMain extends JarMain {
                                                + " is missing 'mainclass' property)");
         }
         Class<?> klass = Class.forName(mainClass, true, loader);
-        Method main = klass.getDeclaredMethod("main", new Class[] { String[].class });
+        Method main = klass.getDeclaredMethod("main", String[].class);
         String[] newArgs = launchWebServerArguments(props);
         debug("invoking webserver with: " + Arrays.deepToString(newArgs));
         main.invoke(null, new Object[] { newArgs });
@@ -227,7 +230,7 @@ public class WarMain extends JarMain {
     }
 
     @Override
-    protected URL extractEntry(final JarEntry entry, final String path) throws Exception {
+    protected URL extractEntry(final JarEntry entry, String path) throws Exception {
         // always extract but only return class-path entry URLs :
         final URL entryURL = super.extractEntry(entry, path);
         return path.endsWith(".jar") && path.startsWith("/lib/") ? entryURL : null;
@@ -346,8 +349,7 @@ public class WarMain extends JarMain {
     protected int start() throws Exception {
         if ( executable == null ) {
             try {
-                URL server = extractWebserver();
-                launchWebServer(server);
+                launchWebServer();
             }
             catch (FileNotFoundException e) {
                 final String msg = e.getMessage();
@@ -360,12 +362,6 @@ public class WarMain extends JarMain {
             return 0;
         }
         return super.start();
-    }
-
-    @Override
-    public void run() {
-        super.run();
-        if ( webroot != null ) delete(webroot.getParentFile());
     }
 
     public static void main(String[] args) {
