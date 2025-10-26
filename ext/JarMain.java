@@ -20,12 +20,14 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -38,7 +40,7 @@ public class JarMain implements Closeable {
     private final String path;
 
     protected File extractRoot;
-    final List<Closeable> closeables = new ArrayList<>();
+    final Deque<Closeable> closeables = new ConcurrentLinkedDeque<>();
 
     JarMain(String[] args) {
         this.args = args;
@@ -213,7 +215,7 @@ public class JarMain implements Closeable {
 
     @Override
     public void close() {
-        closeables.reversed().forEach(closeableResource -> {
+        closeables.descendingIterator().forEachRemaining(closeableResource -> {
             try {
                 closeableResource.close();
             } catch (Exception e) {
