@@ -171,7 +171,7 @@ Warbler::Config.new do |config|
   #   is simply embedded in web.xml.
   # The script is evaluated in a Rack::Builder to load the application.
   # Examples:
-  # config.webxml.rackup.path = 'WEB-INF/hello.ru'
+  # config.webxml.rackup.path = '/WEB-INF/hello.ru'
   # config.webxml.rackup = %{require './lib/demo'; run Rack::Adapter::Camping.new(Demo)}
   # config.webxml.rackup = require 'cgi' && CGI::escapeHTML(File.read("config.ru"))
 
