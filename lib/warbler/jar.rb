@@ -70,8 +70,6 @@ module Warbler
       end
       @compiled = true
     end
-    # @deprecated only due compatibility
-    alias_method :run_javac, :run_jrubyc
 
     def sh_jrubyc(cmd)
       sh(cmd) do |ok, res|
@@ -336,13 +334,5 @@ module Warbler
     # Java-boosted jar creation for JRuby; replaces #create_jar and
     # #entry_in_jar with Java version
     require 'warbler_jar' if defined?(JRUBY_VERSION) && JRUBY_VERSION >= "1.5"
-  end
-
-  # Warbler::War is Deprecated. Please use Warbler::Jar.
-  class War < Jar
-    def initialize(*)
-      super
-      warn "Warbler::War is deprecated. Please replace all occurrences with Warbler::Jar."
-    end
   end
 end
