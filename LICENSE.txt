@@ -1,4 +1,4 @@
-= Warbler
+MIT License
 
 Warbler is provided under the terms of the MIT license.
 
