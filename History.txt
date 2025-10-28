@@ -2,6 +2,7 @@
 
 - fix: NullPointerException during shutdown with executable war files
 - fix: Jetty wars don't have console logging enabled by default
+- #592: chore: relax rubyzip requirement to allow rubyzip 2.x
 
 == 2.1.0
 
