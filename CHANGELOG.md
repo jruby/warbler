@@ -1,7 +1,9 @@
 == Unreleased
 
-- fix: NullPointerException during shutdown with executable war files
-- fix: Jetty wars don't have console logging enabled by default
+- #583: fix: Create config dir if it's missing for simpler usage
+- #588: fix: NullPointerException during shutdown with executable war files
+- #589: fix: Jetty wars don't have console logging enabled by default
+- #591: chore: clean up obsolete & deprecated code from 2.0.x and old Bundler versions
 - #592: chore: relax rubyzip requirement to allow rubyzip 2.x
 
 == 2.1.0
