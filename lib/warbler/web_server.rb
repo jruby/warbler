@@ -113,9 +113,10 @@ args3 = {{port}}
 args4 = --config
 args5 = {{config}}
 args6 = {{warfile}}
-props = jetty.home,org.eclipse.jetty.util.log.class
+props = jetty.home,org.eclipse.jetty.util.log.class,org.eclipse.jetty.util.log.stderr.ESCAPE
 jetty.home = {{webroot}}
 org.eclipse.jetty.util.log.class = org.eclipse.jetty.util.log.StdErrLog
+org.eclipse.jetty.util.log.stderr.ESCAPE = false
 PROPS
     end
   end

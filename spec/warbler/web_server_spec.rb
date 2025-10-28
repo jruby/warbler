@@ -61,10 +61,14 @@ describe Warbler::JettyServer do
               .each_line(chomp: true)
               .to_h { |line| line.split(' = ', 2) }
 
-    expect(props.keys.to_set).to eql Set.new(['mainclass', 'args', 'args0', 'args1', 'args2', 'args3', 'args4', 'args5', 'args6', 'props', 'jetty.home', 'org.eclipse.jetty.util.log.class'])
+    expect(props.keys.to_set).to eql Set.new(
+      ['mainclass', 'args', 'args0', 'args1', 'args2', 'args3', 'args4', 'args5', 'args6', 'props', 'jetty.home',
+       'org.eclipse.jetty.util.log.class', 'org.eclipse.jetty.util.log.stderr.ESCAPE']
+    )
 
     expect(props['mainclass']).to eq 'org.eclipse.jetty.runner.Runner'
-    expect(props['props']).to eq 'jetty.home,org.eclipse.jetty.util.log.class'
+    expect(props['props']).to eq 'jetty.home,org.eclipse.jetty.util.log.class,org.eclipse.jetty.util.log.stderr.ESCAPE'
     expect(props['org.eclipse.jetty.util.log.class']).to eq 'org.eclipse.jetty.util.log.StdErrLog'
+    expect(props['org.eclipse.jetty.util.log.stderr.ESCAPE']).to eq 'false'
   end
 end
