@@ -37,9 +37,6 @@ def capture(&block)
   io.string
 end
 
-require 'drb'
-require File.expand_path('drb_default_id_conv', File.dirname(__FILE__))
-
 module ExampleGroupHelpers
   def run_in_directory(dir)
     before :each do
@@ -106,6 +103,7 @@ module ExampleGroupHelpers
 
   def run_out_of_process_with_drb
     before :all do
+      require 'drb'
       DRb.start_service
       @orig_dir = Dir.pwd
     end
@@ -114,11 +112,11 @@ module ExampleGroupHelpers
       drb
       DRbObject.new(nil, 'druby://127.0.0.1:7890').tap do |drbclient|
         ready, error = nil, nil
-        300.times do # timeout 30 secs (300 * 0.1)
+        600.times do # timeout 30 secs (600 * 0.05)
           begin
             break if ready = drbclient.ready?
           rescue DRb::DRbConnError => e
-            error = e; sleep 0.1
+            error = e; sleep 0.05
           end
         end
         raise error unless ready
@@ -129,7 +127,7 @@ module ExampleGroupHelpers
       require 'jruby'
       let(:drb) do
         drb_thread = Thread.new do
-          ruby "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')
+          ruby '--dev', "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')
         end
         drb_thread.run
         drb_thread
@@ -146,6 +144,10 @@ module ExampleGroupHelpers
       after :each do
         drb.stop
       end
+    end
+
+    after :all do
+      DRb.stop_service
     end
   end
 
