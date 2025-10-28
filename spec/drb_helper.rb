@@ -5,7 +5,9 @@
 # See the file LICENSE.txt for details.
 #++
 
-require 'rubygems'
+# Prefer gem version we already have on GEM_PATH from parent to ensure using the same version
+# and avoid using outdated stdlib versions < 2.2.3
+gem 'drb'
 require 'drb'
 require 'stringio'
 require 'warbler'
