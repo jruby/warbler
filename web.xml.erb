@@ -5,7 +5,6 @@
   <!--
   <display-name>Uncomment and put name :here: for Tomcat Dashboard</display-name>-->
 
-  <%# NOTE: to be renamed to servlet_context_params %>
   <%- webxml.context_params.each do |name, value| -%>
   <context-param>
     <param-name><%= name %></param-name>
@@ -13,7 +12,6 @@
   </context-param>
   <%- end -%>
 
-  <%- if webxml.respond_to?(:servlet_filter) -%>
   <filter>
     <filter-name><%= webxml.servlet_filter_name %></filter-name>
     <filter-class><%= webxml.servlet_filter %></filter-class>
@@ -23,27 +21,10 @@
     <filter-name><%= webxml.servlet_filter_name %></filter-name>
     <url-pattern><%= webxml.servlet_filter_url_pattern %></url-pattern>
   </filter-mapping>
-  <%- else -%> <%# NOTE: due compatibility when warbler gets downgraded to 2.0.0 %>
-  <filter>
-    <filter-name>RackFilter</filter-name>
-    <filter-class>org.jruby.rack.RackFilter</filter-class>
-    <async-supported>true</async-supported>
-  </filter>
-  <filter-mapping>
-    <filter-name>RackFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <%- end -%>
 
-  <%- if webxml.respond_to?(:servlet_context_listeners) -%>
   <%- webxml.servlet_context_listeners.each do |listener| -%>
   <listener>
     <listener-class><%= listener %></listener-class>
-  </listener>
-  <%- end -%>
-  <%- else -%> <%# NOTE: due compatibility when warbler gets downgraded to 2.0.0 %>
-  <listener>
-    <listener-class><%= webxml.servlet_context_listener %></listener-class>
   </listener>
   <%- end -%>
 

@@ -51,9 +51,8 @@ module Warbler
 
     # Add a single gem to WEB-INF/gems
     def find_single_gem_files(gem_dependencies, gem_pattern, version = nil)
-      gem_spec_class = Gem::Specification
       case gem_pattern
-      when gem_spec_class
+      when Gem::Specification
         return BundlerHelper.to_spec(gem_pattern)
       when Gem::Dependency
         gem = gem_pattern
@@ -61,12 +60,9 @@ module Warbler
         gem = Gem::Dependency.new(gem_pattern, Gem::Requirement.create(version))
       end
       # skip development dependencies
-      return nil if gem.respond_to?(:type) and gem.type != :runtime
+      return nil if gem.type != :runtime
 
-      # Deal with deprecated Gem.source_index and #search
-      matched = gem.respond_to?(:to_spec) ? [ gem.to_spec ] : Gem.source_index.search(gem)
-      fail "gem '#{gem}' not installed" if matched.empty?
-      spec = matched.last
+      spec = gem.to_spec
       return spec unless gem_dependencies
       [spec] + spec.dependencies.map { |dependent_gem| find_single_gem_files(gem_dependencies, dependent_gem) }
     end

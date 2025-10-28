@@ -275,21 +275,6 @@ public class WarMain extends JarMain {
         return ( outcome instanceof Number ) ? ( (Number) outcome ).intValue() : 0;
     }
 
-    @Deprecated
-    protected String locateExecutable(final Object scriptingContainer) throws Exception {
-        if ( executable == null ) {
-            throw new IllegalStateException("no executable");
-        }
-        final File exec = new File(extractRoot, executable);
-        if ( exec.exists() ) {
-            return exec.getAbsolutePath();
-        }
-        else {
-            final String script = locateExecutableScript(executable, executableScriptEnvPrefix());
-            return (String) invokeMethod(scriptingContainer, "runScriptlet", script);
-        }
-    }
-
     protected String locateExecutable(final Object scriptingContainer, final CharSequence envPreScript)
         throws Exception {
         if ( executable == null ) {

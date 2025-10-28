@@ -33,9 +33,6 @@ module Warbler
     # configured.
     attr_accessor :traits
 
-    # Deprecated: No longer has any effect.
-    attr_accessor :staging_dir
-
     # Directory where the war file will be written. Can be used to direct
     # Warbler to place your war file directly in your application server's
     # autodeploy directory. Defaults to the root of the application directory.
