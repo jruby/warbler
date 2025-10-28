@@ -8,9 +8,11 @@ all of your application files for deployment to a Java environment.
 Warbler provides a sane set of out-of-the box defaults that should allow most
 Ruby applications to assemble and Just Work.
 
-Version 2.x of Warbler supports versions of JRuby from 9.2.0.0 and up.
+Version 2.1.x of Warbler supports versions of JRuby from 9.4 to 10.0.
 
-Version 1.4.x of Warbler supports versions of JRuby up to 1.7.x. The {1.x-dev branch}[https://github.com/jruby/warbler/tree/1.x-dev] is the working code for this.
+Version 2.0.x (EOL) of Warbler supports versions of JRuby from 9.2 to 9.3.
+
+Version 1.4.x (EOL) of Warbler supports versions of JRuby up to 1.7.x.
 
 == Getting Started
 
