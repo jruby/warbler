@@ -50,8 +50,6 @@ class WarblerDrbServer
   end
 end
 
-require File.expand_path('drb_default_id_conv', File.dirname(__FILE__))
-
 server = WarblerDrbServer.new
 service = DRb.start_service 'druby://127.0.0.1:7890', server
 service.thread.join
