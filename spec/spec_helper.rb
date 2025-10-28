@@ -145,6 +145,10 @@ module ExampleGroupHelpers
         drb.stop
       end
     end
+
+    after :all do
+      DRb.stop_service
+    end
   end
 
   def use_test_webserver
