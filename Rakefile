@@ -56,7 +56,7 @@ require 'rdoc/task'
 RDoc::Task.new(:docs) do |rd|
   gemspec = Gem::Specification.load(File.expand_path('warbler.gemspec', File.dirname(__FILE__)))
   rd.rdoc_dir = "doc"
-  rd.rdoc_files.include("README.rdoc", "History.txt", "LICENSE.txt")
+  rd.rdoc_files.include("README.rdoc", "CHANGELOG.md", "LICENSE.txt")
   rd.rdoc_files += gemspec.require_paths
   rd.options << '--title' << "#{gemspec.name}-#{gemspec.version} Documentation"
   rd.options += gemspec.rdoc_options

@@ -1,4 +1,4 @@
-== Unreleased
+## 2.1.1 (UNRELEASED)
 
 - #583: fix: Create config dir if it's missing for simpler usage
 - #588: fix: NullPointerException during shutdown with executable war files
@@ -6,7 +6,7 @@
 - #591: chore: clean up obsolete & deprecated code from 2.0.x and old Bundler versions
 - #592: chore: relax rubyzip requirement to allow rubyzip 2.x
 
-== 2.1.0
+## 2.1.0
 
 Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 
@@ -23,38 +23,38 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - #575: Fix Gem path issues on JRuby 9.4.x
 - #574: Bump default Jetty version for executables to 9.4.58.v20250814
 
-== 2.0.5
+## 2.0.5
 
 - #427: Check Java properties when looking up RAILS_ENV
 - #424: Rails Webpacker support
 - #397: Avoid warnings under JRuby 9K
 
-== 2.0.4
+## 2.0.4
 
 - fix: an instance variable name typo (@servlet_context_listeners)
 - #383: add bundler monkey patch
 
-== 2.0.3
+## 2.0.3
 
 - Remove test_files from gemspec to save 700k
 
-== 2.0.2
+## 2.0.2
 
 - #380: exclude spec/integration/rakelib and dot-files being packed into .gem
 - #379: 2.0.1 regression due forcing GEM_PATH = GEM_HOME
 
-== 2.0.1
+## 2.0.1
 
 - #367: avoid duplicate .jar copies in WEB-INF/lib
 - #364: support for compiling .rb files using jrubyc with options
 - #362: limit rubyzip version to not match too far
 - #363: [backport] support for running with (recent) rubyzip 1.2.0
 
-== 2.0.0
+## 2.0.0
 
 - Initial release with 9k support
 
-== 1.4.9
+## 1.4.9
 
 - Fixed a bug in detecting default PORT for executable WAR
 - #332: Warbler not picking up new Bundler convention of 'exe' directory for executables
@@ -62,11 +62,11 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - Added the ability to set custom port for Jetty launcher with
   warbler.port or PORT env var
 
-== 1.4.7
+## 1.4.7
 
 - #319: Adds capacity to use the jruby-jars gem version for JRuby 9k.
 
-== 1.4.6
+## 1.4.6
 - #318: polish *scripts/rails* - require_relative should no longer be used
 - #315: Removed custom Jetty launcher in favor of jetty-runner
 - #316: Sprockets manifest name change
@@ -74,7 +74,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - #311: Don't clear the environment if a java executable is found
 - #268: Compile's clearing of ENV vars makes it impossible to use custom compile vars
 
-== 1.4.5
+## 1.4.5
 - #282: Wrong default GEM_HOME in generated META-INF/init.rb
 - #305: warbler.rb: Document jar_extension, autodeploy_dir options
 - #304: enable ENV['RACK_ENV'] to honor command line environment variable
@@ -82,7 +82,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - #291: Include most current gem version in README
 - #280: config.webserver = 'jetty' (by default)
 
-== 1.4.4
+## 1.4.4
 - #271: LoadError while excute rake command with runnable .war archive
 - #273: filtering support with `config.move_jars_to_webinf_lib`
 - #270: don't swallow compiler errors with backticks
@@ -93,7 +93,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - #275: for jruby-1.7.13 we do not want to force load bouncy-castle jars
 - #276: unnecessary rubyzip dependency on "< 1.1"
 
-== 1.4.3
+## 1.4.3
 - Fixed a bug w/ symlinks that was introduced around jruby-1.7.10
 - #258: Bytecode version option for compiled class files
 - #259: Update README.rdoc to not require warbler in Gemfile
@@ -101,7 +101,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - #167: Excluding rb and class files when using compiled flag
 - #254: Fixes #167 by excluding config.excludes from compiled files
 
-== 1.4.2
+## 1.4.2
 - #241: jars from jruby.jar itself do not get copied over to WEB-INF/lib
 - #199: javascript_include_tag and stylesheet_link_tag not generating digestions
 - #247: better support for Rails 4 asset pipeline
@@ -109,7 +109,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - #243: Added the move_jars_to_webinf_lib method back in...
 - #249: Warbler 1.4.1 fails to compile on Windows
 
-== 1.4.1
+## 1.4.1
 - Support for JBundler
 - #165: Problem with bundler git gems
 - #239: Supresses a warning when using bundler
@@ -117,7 +117,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - #220: For Rack-only apps, WEB-INF should be added to $LOAD_PATH
 - #218: Invoke jrubyc using system to ensure that STDERR from jrubyc is shown
 
-== 1.4.0
+## 1.4.0
 
 - Support for Rails 4.x
 - Improved runnable so `rails` command works w/o script dir
@@ -136,14 +136,14 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - #204: Reset RubyGems gemspec cache between tests
 - #203: Test ordering issue when running with RubyGems 2.1.9
 
-== 1.3.8
+## 1.3.8
 
 - Numerous fixes related to -S option and local environment.
 - #162: Close the URLClassLoader before deleting tempJARs
 - #161: Comment out config.dirs to match default
 - #158: Warbler looking in the wrong directory for bundler gem
 
-== 1.3.7
+## 1.3.7
 
 - #154: Use #load in .rb shims
 - #153: Runnable war error
@@ -161,18 +161,18 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - #105: Pick executables deterministically and warn when doing so
 - #104: Default executable is system-dependent
 
-== 1.3.6
+## 1.3.6
 
 - #100: fix winstone URL
 
-== 1.3.5
+## 1.3.5
 
 - Add config.webserver to give choices for which lightweight Java
   webserver is used in an executable war.
 - Add jenkins-ci.winstone and jetty as embeddable servers
 - #76, #81: fix rubyzip "can't modify frozen string" issue
 
-== 1.3.4
+## 1.3.4
 
 - #77, #78: Handle the case when multiple gems exists in a git path
   (Patrick Cheng)
@@ -182,7 +182,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
   threadsafe (Joe Kutner)
 - #37, #64: Fix issues with Bundler and recent Rubygems/Rails
 
-== 1.3.3
+## 1.3.3
 
 - Note: 1.3.3 was YANKED due to #62
 - Move all jars to WEB-INF/lib, and leave an empty jar in the original
@@ -192,18 +192,18 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - GH #42: Tricks to allow Bundler to find git repo gems even when they
   are excluded form production
 
-== 1.3.2
+## 1.3.2
 
 - Compatibility with rake 0.9.x, avoid deprecation warnings and deal
   with new FileList exclusion behavior
 - Exclude config.bundle_without groups properly
 
-== 1.3.1
+## 1.3.1
 
 - Pin rake version to ~> 0.8.7 for now. Rake 0.9.0 compatibility will
   follow in a future release.
 
-== 1.3.0
+## 1.3.0
 
 - Warbler can now package regular Ruby projects as executable jar
   files. See the README.rdoc file for details.
@@ -217,7 +217,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - GH#8: Clean up compiled .class files after building war
 - GH#15: Simplify detection of thread-safe Rails
 
-== 1.2.1
+## 1.2.1
 
 - Add --directoryListings=false to Winstone launch by default. In some
   cases (sinatra) Winstone's directory listing masks application
@@ -227,7 +227,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
   environment initialization before the web framework is loaded. See
   config.init_contents in Warbler::Config for details.
 
-== 1.2.0
+## 1.2.0
 
 - Drop compatibility with earlier versions of Bundler -- Bundler has
   changed a lot in a short period of time, so I'm expecting the number
@@ -248,7 +248,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - Exclude 'tmp/war' directory so that people upgrading from 0.9 won't
   accidentally include it in their war file.
 
-== 1.1.0
+## 1.1.0
 
 - Add concept of "features" -- small Rake tasks that run before the
   creation of the war file and make manipulations to the war file
@@ -268,24 +268,24 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
   default. Instead, config.ru is included in the war file.
 - Bump jruby-rack version requirement to 0.9.8.
 
-== 1.0.3
+## 1.0.3
 
 - Tracking recent Bundler changes - handle locked Gemfiles differently
   than unlocked ones
 - Handle file-based symlinks, and warn about inoperational directory
   symlinks under non-JRuby versions of Ruby.
 
-== 1.0.2
+## 1.0.2
 
 - Add 'warble pluginize' task back. This task now just creates a
   vendor/plugins/warbler/tasks/warbler.rake file. There's no need to
   "vendor" all of Warbler into your application anymore.
 
-== 1.0.1
+## 1.0.1
 
 - Fix careless bug where Warbler doesn't work with JRuby 1.4
 
-== 1.0
+## 1.0
 
 - Warbler hits 1.0! There are enough structural changes in Warbler
   that I feel it's time to roll the major version over to 1.0.
@@ -301,7 +301,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - WARBLER-7: Add config.webinf_files option with more support for
   custom web.xml files
 
-== 0.9.14
+## 0.9.14
 
 - So, jruby-rack is bundled for one more release. 1.0 will not contain
   any jar files, I promise!
@@ -312,7 +312,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
   (this happened with the Authlogic gem on Edge Rails)
   (thanks Laszlo Bacsi)
 
-== 0.9.13
+## 0.9.13
 
 - RailsConf 2009 edition.
 - Only bundled JRuby and JRuby-Rack upgrades. Bug fixes will have to come in 0.9.14.
@@ -320,7 +320,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - Upgrade to JRuby 1.3.0RC1 and JRuby-Rack 0.9.4. The latter allows
   Rails 2.3 to work with Warbler.
 
-== 0.9.12
+## 0.9.12
 
 - Allow framework auto-detection to be disabled. Set
   `Warbler.framework_detection = false' at the top of config/warble.rb
@@ -338,7 +338,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - Ignore gem development dependencies
 - Upgrade to JRuby 1.1.6 and JRuby-Rack 0.9.3
 
-== 0.9.11
+## 0.9.11
 
 - Auto-detect Rails and Merb and configure appropriately
   - For Rails, set rails booter, determine max runtimes based on Rails.configuration.threadsafe!,
@@ -356,7 +356,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - Upgrade to JRuby 1.1.4 and JRuby-Rack 0.9.2
 - add [] as a way to specify non-identifier keys, example: config.webxml['!@#$%^'] = 'haha'
 
-== 0.9.10
+## 0.9.10
 
 - Upgraded to JRuby-Rack 0.9.1. Fixes JRUBY-2620, JRUBY-2594, JRUBY-2507.
 - Now verified to work with Camping and Sinatra. See
@@ -367,7 +367,7 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 - Fix #<Warbler::WebxmlOpenStruct ...> appearing in web.xml and document workarounds.
 - Add config.autodeploy_dir that, when specified, will create the war there.
 
-== 0.9.9
+## 0.9.9
 
 - Now shipping with JRuby-Rack 0.9!
 - Upgrade to JRuby 1.1.1
@@ -379,36 +379,36 @@ Requires JRuby >= 9.4 due to needing Ruby 3.0+ compatibility.
 -- config.webxml.pool.* have been replaced by config.webxml.jruby.(min|max).runtimes
 -- config.webxml.standalone and config.webxml.jruby_home no longer have any effect.
 
-== 0.9.5
+## 0.9.5
 
 - Fix bug in plugin warbler.rake task file that would favor loading warbler from gems before the version
   installed as a plugin
 - Upgrade to JRuby 1.1 final and Goldspike 1.6.1
 
-== 0.9.4
+## 0.9.4
 
 - Update bundled JRuby to 1.1RC3 and Goldspike to 1.6.
 - Fix inclusion of gems with platform-specific bits (e.g., Hpricot)
 
-== 0.9.3
+## 0.9.3
 
 - Update bundled JRuby to 1.1RC2, and Goldspike to 1.5.
 - The bundled JRuby and Goldspike now require JDK 5 or greater. If you wish to use JDK 1.4, use Warbler 0.9.2.
 
-== 0.9.2
+## 0.9.2
 
 - Update bundled JRuby to version 1.0.3 and Goldspike 1.4.
 - Add config.java_classes to allow you to copy loose Java classes into WEB-INF/classes.
 - Make jar command a single command string so that jar creation doesn't fail (works around bug in JRuby 1.0.2)
 - Use File.join to form staging directory, should produce the proper jar-command path in Windows
 
-== 0.9.1
+## 0.9.1
 
 - Add rake >= 0.7.3 as a dependency in the gem specification.
 - Add debug tasks: war:debug, war:debug:gems, war:debug:public, war:debug:app, war:debug:includes,
   war:debug:excludes, war:debug:java_libs gives you a breakdown of what Warbler expects to package.
 
-== 0.9
+## 0.9
 
 - Birthday! Warbler is a gem to make a .war file out of a Rails project. The intent is to provide a
   minimal, flexible, ruby-like way to bundle up all of your application files for deployment to a
