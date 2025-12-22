@@ -6,7 +6,7 @@ gemspec
 gem 'maven-tools', '1.2.3'
 
 group :development, :test do
-  gem 'rdoc', '~> 6.0', :require => nil
+  gem 'rdoc', '~> 7.0', :require => nil
 
   if defined?(JRUBY_VERSION)
     # force jruby-jars to use current JRuby version for testing
