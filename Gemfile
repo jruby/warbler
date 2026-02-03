@@ -2,11 +2,6 @@ source "https://rubygems.org/"
 
 gemspec
 
-# override default maven-tools used by bundler
-gem 'maven-tools', '1.2.3'
-# add bigdecimal missing from transitive dependency of maven-tools
-gem 'bigdecimal'
-
 group :development, :test do
   gem 'rdoc', '~> 7.0', :require => nil
 

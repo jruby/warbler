@@ -39,4 +39,5 @@ bundle up all of your application files for deployment to a Java environment.}
   gem.add_development_dependency 'rspec', '~> 3.0'
   gem.add_development_dependency 'drb', ['~> 2.2', '>= 2.2.3']
   gem.add_development_dependency 'jbundler', '~> 0.9.5'
+  gem.add_development_dependency 'bigdecimal', '< 5'  # Needed workaround jbundler > maven-tools > vertus > axiom-types lack of explicit bigdecimal dependency for for JRuby 10
 end
