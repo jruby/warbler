@@ -30,9 +30,9 @@ scope :provided do
 end
 
 plugin :clean, '3.5.0'
-plugin :compiler, '3.14.1', :release => '8'
-plugin :resources, '3.3.1'
-plugin :jar, '3.4.2' do
+plugin :compiler, '3.15.0', :release => '8'
+plugin :resources, '3.4.0'
+plugin :jar, '3.5.0' do
   execute_goals(:phase => 'none') # Avoid a duplicate execution with that defined by the :gemspec directive
 end
 plugin :install, '3.1.4'
