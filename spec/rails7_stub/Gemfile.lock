@@ -130,9 +130,9 @@ GEM
       net-protocol
     nio4r (2.7.4)
     nio4r (2.7.4-java)
-    nokogiri (1.18.10-java)
+    nokogiri (1.19.1-java)
       racc (~> 1.4)
-    nokogiri (1.18.10-x86_64-linux-gnu)
+    nokogiri (1.19.1-x86_64-linux-gnu)
       racc (~> 1.4)
     pp (0.6.3)
       prettyprint
