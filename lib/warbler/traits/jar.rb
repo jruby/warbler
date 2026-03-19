@@ -20,6 +20,10 @@ module Warbler
         !War.detect?
       end
 
+      def self.conflicts
+        [War]
+      end
+
       def before_configure
         config.gem_path      = '/'
         config.pathmaps      = default_pathmaps
