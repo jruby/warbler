@@ -18,7 +18,7 @@ end
 
 properties(
   'project.build.sourceEncoding' => 'UTF-8',
-  'mavengem.wagon.version' => '2.0.2',
+  'mavengem.wagon.version' => '2.0.3',
   'jruby.plugins.version' => '3.0.6',
   'jetty.version' => '9.4.58.v20250814',
 )
@@ -31,7 +31,7 @@ end
 
 plugin :clean, '3.5.0'
 plugin :compiler, '3.15.0', :release => '8'
-plugin :resources, '3.4.0'
+plugin :resources, '3.5.0'
 plugin :jar, '3.5.0' do
   execute_goals(:phase => 'none') # Avoid a duplicate execution with that defined by the :gemspec directive
 end
