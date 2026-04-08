@@ -18,7 +18,11 @@ module Warbler
       DEFAULT_GEM_PATH = '/WEB-INF/gems'
 
       def self.detect?
-        Traits::Rails.detect? || Traits::Rack.detect?
+        Rails.detect? || Rack.detect?
+      end
+
+      def self.conflicts
+        [Jar]
       end
 
       def before_configure

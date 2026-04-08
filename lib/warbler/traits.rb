@@ -15,14 +15,28 @@ module Warbler
   # the kind of project and how it should be packed into the jar or
   # war file.
   module Traits
-    attr_accessor :traits
-
-    def initialize
+    def initialize(forced_traits = [])
+      @forced_traits = forced_traits
       @traits = auto_detect_traits
     end
 
     def auto_detect_traits
-      TraitsDependencyArray.new(Traits.constants.map {|t| Traits.const_get(t)}).tsort.select {|tc| tc.detect? }
+      all_trait_classes = Traits.constants.map { |t| Traits.const_get(t) }
+      sorted = TraitsDependencyArray.new(all_trait_classes).tsort
+
+      conflicts = @forced_traits.flat_map { |ft| ft.conflicts }.uniq
+
+      sorted.select do |tc|
+        if @forced_traits.include?(tc)
+          true
+        elsif conflicts.include?(tc)
+          false
+        elsif tc.requirements.any? && tc.requirements.all? { |req| conflicts.include?(req) }
+          false
+        else
+          tc.detect?
+        end
+      end
     end
 
     def before_configure
@@ -51,6 +65,10 @@ module Warbler
   module Trait
     module ClassMethods
       def requirements
+        []
+      end
+
+      def conflicts
         []
       end
     end
