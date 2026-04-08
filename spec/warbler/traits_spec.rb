@@ -18,4 +18,36 @@ describe Warbler::Traits do
       end
     end
   end
+
+  describe "#auto_detect_traits" do
+    context "in a Rack project with Bundler" do
+      run_in_directory 'spec/sample_bundler'
+
+      it "auto-detects traits" do
+        config = Warbler::Config.new
+        expect(config.traits).to eq([Warbler::Traits::War, Warbler::Traits::Rack, Warbler::Traits::Bundler])
+      end
+    end
+  end
+
+  describe "forced_traits" do
+    context "with no forced traits" do
+      run_in_directory 'spec/sample_jar'
+
+      it "behaves identically to auto-detection" do
+        default_config = Warbler::Config.new
+        forced_config = Warbler::Config.new(forced_traits: [])
+        expect(forced_config.traits).to eq(default_config.traits)
+      end
+    end
+
+    context "in a Rack project with Bundler with Jar forced" do
+      run_in_directory 'spec/sample_bundler'
+
+      it "only has the Jar trait" do
+        config = Warbler::Config.new(forced_traits: [Warbler::Traits::Jar])
+        expect(config.traits).to eq([Warbler::Traits::Jar])
+      end
+    end
+  end
 end

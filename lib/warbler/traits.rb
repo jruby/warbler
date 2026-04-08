@@ -15,10 +15,12 @@ module Warbler
   # the kind of project and how it should be packed into the jar or
   # war file.
   module Traits
-    attr_accessor :traits
-
-    def initialize
-      @traits = auto_detect_traits
+    def initialize(forced_traits)
+      @traits = if forced_traits.nil? || forced_traits.empty?
+                  auto_detect_traits
+                else
+                  TraitsDependencyArray.new(forced_traits)
+                end
     end
 
     def auto_detect_traits
