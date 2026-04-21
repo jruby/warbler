@@ -259,7 +259,7 @@ public class WarMain extends JarMain {
 
         invokeMethod(rubyInstanceConfig, "processArguments", (Object) arguments);
 
-        Object runtime = invokeMethod(scriptingContainer, "getRuntime");
+        Object runtime = invokeMethod(provider, "getRuntime");
 
         debug("loading resource: " + executablePath);
         Object executableInput =
