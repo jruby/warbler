@@ -6,6 +6,7 @@
 - #591: chore: clean up obsolete & deprecated code from 2.0.x and old Bundler versions
 - #592: chore: relax rubyzip requirement to allow rubyzip 2.x
 - #593: chore: relax jruby-rack requirement to allow compatibility with upcoming 1.3.x
+- #624: chore: remove use of deprecated JRuby methods removed in JRuby 10.1
 
 ## 2.1.0
 
