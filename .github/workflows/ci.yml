@@ -51,7 +51,7 @@ jobs:
         run: gem uninstall -a jruby-launcher
 
       - name: Install dependencies
-        run: bundle install
+        run: BUNDLE_JOBS=1 bundle install
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.task }}

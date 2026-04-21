@@ -9,4 +9,6 @@ group :development, :test do
     # force jruby-jars to use current JRuby version for testing
     gem 'jruby-jars', '~> ' + JRUBY_VERSION.split('.')[0..2].join('.')
   end
+
+  gem 'jbundler', github: "jruby/jbundler", ref: "refs/pull/108/head" # FIXME needs jbundler 0.9.6 release
 end
