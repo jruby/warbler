@@ -16,7 +16,11 @@ module Warbler
       include ExecutableHelper
 
       def self.detect?
-        Jar.detect? && !Gemspec.detect?
+        Jar.detect? && !detect_any_conflicts?
+      end
+
+      def self.conflicts
+        [ Traits::Gemspec ]
       end
 
       def before_configure

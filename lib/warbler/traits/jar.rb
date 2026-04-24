@@ -17,7 +17,11 @@ module Warbler
       include Trait
 
       def self.detect?
-        !War.detect?
+        !detect_any_conflicts?
+      end
+
+      def self.conflicts
+        [ Traits::War ]
       end
 
       def before_configure

@@ -29,8 +29,8 @@ module Warbler
 
     # Traits: an array of trait classes corresponding to
     # characteristics of the project that are either auto-detected or
-    # configured.
-    attr_accessor :traits
+    # forced enabled during `Config.new(forced_traits: [...]) do |config|`
+    attr_reader :traits
 
     # Directory where the war file will be written. Can be used to direct
     # Warbler to place your war file directly in your application server's
@@ -182,8 +182,9 @@ module Warbler
     attr_reader :warbler_templates
     attr_reader :warbler_scripts
 
-    def initialize(warbler_home = WARBLER_HOME)
-      super()
+    # @param forced_traits [Array<Class>, nil] optional array of Warbler::Trait types to force rather than auto-detecting them
+    def initialize(warbler_home = WARBLER_HOME, forced_traits: nil)
+      super(forced_traits)
 
       @warbler_home      = warbler_home
       @warbler_templates = "#{WARBLER_HOME}/lib/warbler/templates"

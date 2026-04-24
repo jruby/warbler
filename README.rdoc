@@ -185,12 +185,11 @@ of how to configure Warbler to package Camping and Sinatra apps.
 
 If the default settings are not appropriate for your application, you can
 customize Warbler's behavior. To customize files, libraries, and gems included
-in the .war file, you'll need a config/warble.rb file. There a two ways of
-doing this. With the gem, simply run
+in the .war file, you'll need a +config/warble.rb+ file. To generate one:
 
     warble config
 
-Finally, edit the +config/warble.rb+ to your taste. The generated file is
+Edit the +config/warble.rb+ to your taste. The generated file is
 fully-documented with the available options and default values.
 
 === Archive Layout

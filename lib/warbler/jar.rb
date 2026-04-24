@@ -176,6 +176,7 @@ module Warbler
 
     # Invoke a hook to allow the project traits to add or modify the archive contents.
     def apply_traits(config)
+      puts "Applying traits #{config.traits}" unless silent?
       config.update_archive(self)
     end
 

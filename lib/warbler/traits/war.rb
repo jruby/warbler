@@ -21,6 +21,10 @@ module Warbler
         Traits::Rails.detect? || Traits::Rack.detect?
       end
 
+      def self.conflicts
+        [ Traits::Jar ]
+      end
+
       def before_configure
         config.gem_path      = DEFAULT_GEM_PATH
         config.pathmaps      = default_pathmaps

@@ -12,7 +12,11 @@ module Warbler
       include Trait
 
       def self.detect?
-        !Rails.detect? && (File.exist?("config.ru") || !Dir['*/config.ru'].empty?)
+        (File.exist?("config.ru") || !Dir['*/config.ru'].empty?) && !detect_any_conflicts?
+      end
+
+      def self.conflicts
+        [ Traits::Rails ]
       end
 
       def self.requirements

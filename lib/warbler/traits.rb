@@ -5,6 +5,7 @@
 # See the file LICENSE.txt for details.
 #++
 
+require 'set'
 require 'stringio'
 require 'tsort'
 
@@ -15,10 +16,13 @@ module Warbler
   # the kind of project and how it should be packed into the jar or
   # war file.
   module Traits
-    attr_accessor :traits
-
-    def initialize
-      @traits = auto_detect_traits
+    # @param forced_traits [Array<Class>, nil] array of Warbler::Trait types to force rather than auto-detecting them
+    def initialize(forced_traits)
+      @traits = if forced_traits.nil? || forced_traits.empty?
+                  auto_detect_traits
+                else
+                  validate_traits(forced_traits)
+                end
     end
 
     def auto_detect_traits
@@ -45,6 +49,18 @@ module Warbler
       @trait_objects = nil
       @traits.collect! {|t| t.name }
     end
+
+    private
+    def validate_traits(requested_traits)
+      conflicts = Set.new
+      requested_traits.each do |trait|
+        trait.conflicts.each do |conflict|
+          conflicts += [trait, conflict] if requested_traits.include?(conflict)
+        end
+      end
+      raise "Some forced traits declare conflicts with each other: #{conflicts.to_a}" unless conflicts.empty?
+      TraitsDependencyArray.new(requested_traits).tsort
+    end
   end
 
   # Each trait class includes this module to receive shared functionality.
@@ -52,6 +68,14 @@ module Warbler
     module ClassMethods
       def requirements
         []
+      end
+
+      def conflicts
+        []
+      end
+
+      def detect_any_conflicts?
+        conflicts.any? { |c| c.detect? }
       end
     end
 
@@ -108,7 +132,7 @@ module Warbler
 
     alias tsort_each_node each
     def tsort_each_child(node, &block)
-      node.requirements.each(&block)
+      node.requirements.select { |r| include?(r) }.each(&block)
     end
   end
 
