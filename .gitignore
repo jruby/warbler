@@ -18,6 +18,7 @@ pkg
 pom.warbler.gemspec.xml
 target/
 vendor/
+*.war
 warbler-*.gem
 warbler.iml
 warbler.ipr
