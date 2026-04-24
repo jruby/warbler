@@ -1,8 +1,25 @@
-# Disable Rake-environment-task framework detection by uncommenting/setting to false
+# Warbler is designed to auto-detect "traits" of your application based on the presence of various files.
+# In some cases this is ambiguous, or there is a desire to disable certain traits from being detected
+# and a list of traits can be supplied to override this.
+#
+# This is an advanced option, and must be a complete list of traits. Using this capability disables
+# some of Warbler's validation and conflict detection that causes traits to be automatically enabled and
+# disabled as required.
+# - `Warbler::Traits::Jar`       - package as a normal executable java archive (jar) application
+# - `Warbler::Traits::War`       - package as an executable web archive (war) application
+# - `Warbler::Traits::Bundler`   - package with the gems implied by a bundle Gemfile/Gemfile.lock
+# - `Warbler::Traits::Gemspec`   - package with the gems implied by a gemspec
+# - `Warbler::Traits::NoGemspec` - package only with the gems implied by that in a local `lib` folder
+# - `Warbler::Traits::JBundler`  - (experimental) package with the jars implied by a `Jarfile`
+# - `Warbler::Traits::Rails`     - package with the necessary startup logic to boot a Rails application
+# - `Warbler::Traits::Rack`      - package with the necessary startup logic to boot a standalone Rack (non-Rails) application
+# forced_traits = [Warbler::Traits::Jar]
+
+# Disable Rake-environment-task framework detection for Rails applications by uncommenting/setting to false
 # Warbler.framework_detection = false
 
-# Warbler web application assembly configuration file
-Warbler::Config.new do |config|
+# Configure a new Warbler application assembly
+Warbler::Config.new(forced_traits: defined?(forced_traits) ? forced_traits : nil) do |config|
   # Features: additional options controlling how the jar is built.
   # Currently the following features are supported:
   # - *gemjar*: package the gem repository in a jar file in WEB-INF/lib

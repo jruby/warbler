@@ -15,6 +15,7 @@ module Warbler
   # the kind of project and how it should be packed into the jar or
   # war file.
   module Traits
+    # @param forced_traits [Array<Class>, nil] array of Warbler::Trait types to force rather than auto-detecting them
     def initialize(forced_traits)
       @traits = if forced_traits.nil? || forced_traits.empty?
                   auto_detect_traits

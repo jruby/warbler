@@ -182,6 +182,7 @@ module Warbler
     attr_reader :warbler_templates
     attr_reader :warbler_scripts
 
+    # @param forced_traits [Array<Class>, nil] optional array of Warbler::Trait types to force rather than auto-detecting them
     def initialize(warbler_home = WARBLER_HOME, forced_traits: nil)
       super(forced_traits)
 
