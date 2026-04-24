@@ -26,6 +26,10 @@ describe Warbler::Jar do
   let(:config) { Warbler::Config.new {|c| apply_extra_config(c) } }
   let(:jar) { Warbler::Jar.new }
 
+  def apply_silently
+    silence { jar.apply(config) }
+  end
+
   before do
     # We repeatedly load the same gemspec, but we modify it between
     # loads. RubyGems treats the filename as the cache key, not taking
@@ -42,17 +46,17 @@ describe Warbler::Jar do
     end
 
     it "collects java libraries" do
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{^META-INF/lib/jruby-.*\.jar$})).to_not be_empty
     end
 
     it "adds a JarMain class" do
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{^JarMain\.class$})).to_not be_empty
     end
 
     it "adds an init.rb" do
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{^META-INF/init.rb$})).to_not be_empty
     end
 
@@ -76,13 +80,13 @@ describe Warbler::Jar do
     end
 
     it "adds a main.rb" do
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{^META-INF/main.rb$})).to_not be_empty
     end
 
     it "adds script_files" do
       config.script_files << __FILE__
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{^META-INF/#{File.basename(__FILE__)}$})).to_not be_empty
     end
 
@@ -91,13 +95,13 @@ describe Warbler::Jar do
       use_config do |config|
         config.manifest_file = 'manifest'
       end
-      jar.apply(config)
+      apply_silently
       expect(jar.files['META-INF/MANIFEST.MF']).to eq "manifest"
     end
 
     it "accepts a MANIFEST.MF file if it exists in the project root" do
       touch 'MANIFEST.MF'
-      jar.apply(config)
+      apply_silently
       expect(jar.files['META-INF/MANIFEST.MF']).to eq "MANIFEST.MF"
     end
 
@@ -135,7 +139,7 @@ describe Warbler::Jar do
       end
 
       it "detects gem dependencies" do
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{^gems/rubyzip.*/lib/(zip/)?zip.rb})).to_not be_empty
         expect(file_list(%r{^specifications/rubyzip.*\.gemspec})).to_not be_empty
       end
@@ -147,7 +151,7 @@ describe Warbler::Jar do
       end
 
       it "loads the default executable in main.rb" do
-        jar.apply(config)
+        apply_silently
         contents = jar.contents('META-INF/main.rb')
         expect(contents).to eq "load 'sample_jar/sbin/sample_jar'"
       end
@@ -155,7 +159,7 @@ describe Warbler::Jar do
       it "includes compiled .rb and .class files" do
         config.compiled_ruby_files = %w(lib/sample_jar.rb)
         jar.compile(config)
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{^sample_jar/lib/sample_jar\.class$})).to_not be_empty
         expect(jar.contents('sample_jar/lib/sample_jar.rb')).to match /load __FILE__\.sub/
       end
@@ -163,7 +167,7 @@ describe Warbler::Jar do
       it "includes only specified dirs" do
         config.dirs = %w(bin)
         jar.compile(config)
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{^sample_jar/lib$})).to be_empty
         expect(file_list(%r{^sample_jar/bin$})).to_not be_empty
       end
@@ -172,7 +176,7 @@ describe Warbler::Jar do
         config.compiled_ruby_files = %w(lib/sample_jar.rb)
         config.excludes += FileList["lib/sample_jar.*"]
         jar.compile(config)
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{^sample_jar/lib/sample_jar\.class$})).to be_empty
         expect(jar.contents('sample_jar/lib/sample_jar.rb')).to_not match /load __FILE__\.sub/
       end
@@ -181,7 +185,7 @@ describe Warbler::Jar do
         config.compile_gems = true
         config.compiled_ruby_files = %w(lib/sample_jar.rb)
         jar.compile(config)
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{sample_jar.*\.rb$}).size).to eq 2
         expect(file_list(%r{gems.*\.class$}).size).to be >= 45 # depending on RubyZip version
       end
@@ -189,7 +193,7 @@ describe Warbler::Jar do
       it "does not compile included gems by default" do
         config.compiled_ruby_files = %w(lib/sample_jar.rb)
         jar.compile(config)
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{sample_jar.*\.rb$}).size).to eq 2
         expect(file_list(%r{gems.*\.class$}).size).to eq 0
       end
@@ -198,7 +202,7 @@ describe Warbler::Jar do
         config.jrubyc_options = [ '--java' ]
         config.compiled_ruby_files = %w(lib/sample_jar.rb)
         jar.compile(config)
-        jar.apply(config)
+        apply_silently
         expect( FileList['*'] ).to include 'SampleJar.java'
       end
 
@@ -223,7 +227,7 @@ describe Warbler::Jar do
       end
 
       it "loads the first bin/executable in main.rb" do
-        silence { jar.apply(config) }
+        apply_silently
         contents = jar.contents('META-INF/main.rb')
         expect(contents).to match /load.*sample_jar\/bin\/another_jar/
       end
@@ -232,7 +236,7 @@ describe Warbler::Jar do
         use_config do |config|
           config.executable = 'bin/sample_jar'
         end
-        silence { jar.apply(config) }
+        apply_silently
         contents = jar.contents('META-INF/main.rb')
         expect(contents).to match /load.*sample_jar\/bin\/sample_jar/
       end
@@ -255,14 +259,14 @@ describe Warbler::Jar do
         use_config do |config|
           config.gems << "rake"
         end
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{^gems/rake.*/lib/rake.rb})).to_not be_empty
         expect(file_list(%r{^specifications/rake.*\.gemspec})).to_not be_empty
       end
 
       it "collects all project files in the directory" do
         touch "extra.foobar"
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{^sample_jar/bin$})).to_not be_empty
         expect(file_list(%r{^sample_jar/test$})).to_not be_empty
         expect(file_list(%r{^sample_jar/lib/sample_jar.rb$})).to_not be_empty
@@ -276,7 +280,7 @@ describe Warbler::Jar do
       end
 
       it "loads the first bin/executable in main.rb" do
-        jar.apply(config)
+        apply_silently
         contents = jar.contents('META-INF/main.rb')
         expect(contents).to match /load.*sample_jar\/bin\/sample_jar/
       end
@@ -285,7 +289,7 @@ describe Warbler::Jar do
         use_config do |config|
           config.executable = 'bin/sample_jar_extra'
         end
-        jar.apply(config)
+        apply_silently
         contents = jar.contents('META-INF/main.rb')
         expect(contents).to match /load.*sample_jar\/bin\/sample_jar_extra/
       end
@@ -295,13 +299,13 @@ describe Warbler::Jar do
           config.gems = [ "rake" ]
           config.executable = ['rake', 'bin/rake']
         end
-        jar.apply(config)
+        apply_silently
         contents = jar.contents('META-INF/main.rb')
         expect(contents).to match /load.*gems\/rake.*\/bin\/rake/
       end
 
       it "does not set parameters in main.rb" do
-        jar.apply(config)
+        apply_silently
         contents = jar.contents('META-INF/main.rb')
         expect(contents).to_not match /ARGV.*/m
       end
@@ -310,7 +314,7 @@ describe Warbler::Jar do
         use_config do |config|
           config.executable_params = 'do_something'
         end
-        jar.apply(config)
+        apply_silently
         contents = jar.contents('META-INF/main.rb')
         expect(contents).to match /ARGV\.unshift.*do_something/m
       end
@@ -332,7 +336,7 @@ describe Warbler::Jar do
     end
 
     it "collects files in public" do
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{^index\.html})).to_not be_empty
     end
 
@@ -340,7 +344,7 @@ describe Warbler::Jar do
       use_config do |config|
         config.gems << 'rake'
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/gems/gems/rake.*/lib/rake.rb})).to_not be_empty
       expect(file_list(%r{WEB-INF/gems/specifications/rake.*\.gemspec})).to_not be_empty
     end
@@ -350,7 +354,7 @@ describe Warbler::Jar do
         config.gems << 'virtus'
         config.gem_dependencies = true
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/gems/gems/axiom-types.*/lib})).to_not be_empty
       expect(file_list(%r{WEB-INF/gems/specifications/axiom-types.*\.gemspec})).to_not be_empty
       expect(file_list(%r{WEB-INF/gems/gems/equalizer.*/lib/equalizer/version.rb$})).to_not be_empty
@@ -359,7 +363,7 @@ describe Warbler::Jar do
       #  config.gems << "rdoc"
       #  config.gem_dependencies = true
       #end
-      #jar.apply(config)
+      #apply_silently
       #expect(file_list(%r{WEB-INF/gems/gems/json.*/lib/json.rb})).to_not be_empty
       #expect(file_list(%r{WEB-INF/gems/specifications/json.*\.gemspec})).to_not be_empty
     end
@@ -369,7 +373,7 @@ describe Warbler::Jar do
         config.gems << 'virtus'
         config.gem_dependencies = false
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/gems/gems/axiom-types.*/lib})).to be_empty
       expect(file_list(%r{WEB-INF/gems/specifications/axiom-types.*\.gemspec})).to be_empty
       expect(file_list(%r{WEB-INF/gems/gems/equalizer.*/lib/equalizer/version.rb$})).to be_empty
@@ -377,7 +381,7 @@ describe Warbler::Jar do
       #  config.gems << "rdoc"
       #  config.gem_dependencies = false
       #end
-      #jar.apply(config)
+      #apply_silently
       #expect(file_list(%r{WEB-INF/gems/gems/json.*/lib/json.rb})).to be_empty
       #expect(file_list(%r{WEB-INF/gems/specifications/json.*\.gemspec})).to be_empty
     end
@@ -397,13 +401,13 @@ describe Warbler::Jar do
     end
 
     it "does not include log files by default" do
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/log})).to_not be_empty
       expect(file_list(%r{WEB-INF/log/.*\.log})).to be_empty
     end
 
     def expand_webxml
-      jar.apply(config)
+      apply_silently
       expect(jar.files).to include("WEB-INF/web.xml")
       require 'rexml/document'
       REXML::Document.new(jar.files["WEB-INF/web.xml"]).root.elements
@@ -479,25 +483,25 @@ describe Warbler::Jar do
     it "uses a config/web.xml if it exists" do
       mkdir_p "config"
       touch "config/web.xml"
-      jar.apply(config)
+      apply_silently
       expect(jar.files["WEB-INF/web.xml"]).to eq "config/web.xml"
     end
 
     it "uses a config/web.xml.erb if it exists" do
       mkdir_p "config"
       File.open("config/web.xml.erb", "w") {|f| f << "Hi <%= webxml.public.root %>" }
-      jar.apply(config)
+      apply_silently
       expect(jar.files["WEB-INF/web.xml"]).to_not be nil
       expect(jar.files["WEB-INF/web.xml"].read).to eq "Hi /"
     end
 
     it "collects java libraries" do
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/lib/jruby-.*\.jar$})).to_not be_empty
     end
 
     it "collects application files" do
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/app$})).to_not be_empty
       expect(file_list(%r{WEB-INF/config$})).to_not be_empty
       expect(file_list(%r{WEB-INF/lib$})).to_not be_empty
@@ -530,7 +534,7 @@ describe Warbler::Jar do
       use_config do |config|
         config.excludes += FileList['lib/tasks/utils.rake']
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{lib/tasks/utils.rake})).to be_empty
     end
 
@@ -538,7 +542,7 @@ describe Warbler::Jar do
       use_config do |config|
         config.excludes += FileList['public/robots.txt']
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{robots.txt})).to be_empty
     end
 
@@ -562,7 +566,7 @@ describe Warbler::Jar do
       end
       expect {
         Warbler::Task.new "warble", config
-        jar.apply(config)
+        apply_silently
       }.to raise_error(Gem::MissingSpecError)
     end
 
@@ -579,14 +583,14 @@ describe Warbler::Jar do
       use_config do |config|
         config.gems = [dep]
       end
-      silence { jar.apply(config) }
+      apply_silently
     end
 
     it "copies loose java classes to WEB-INF/classes" do
       use_config do |config|
         config.java_classes = FileList["Rakefile"]
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/classes/Rakefile$})).to_not be_empty
     end
 
@@ -619,13 +623,13 @@ describe Warbler::Jar do
         end
 
         it "moves jar files to WEB-INF/lib" do
-          jar.apply(config)
+          apply_silently
           expect(file_list(%r{WEB-INF/lib/app-sample.jar})).to_not be_empty
           expect(file_list(%r{WEB-INF/app/sample.jar})).to_not be_empty
         end
 
         it "leaves jar files alone that are already in WEB-INF/lib" do
-          jar.apply(config)
+          apply_silently
           expect(file_list(%r{WEB-INF/lib/lib-existing.jar})).to be_empty
           expect(file_list(%r{WEB-INF/lib/existing.jar})).to_not be_empty
         end
@@ -633,7 +637,7 @@ describe Warbler::Jar do
 
       context "with move_jars_to_webinf_lib not set" do
         it "moves jar files to WEB-INF/lib" do
-          jar.apply(config)
+          apply_silently
           expect(file_list(%r{WEB-INF/lib/app-sample.jar})).to be_empty
           expect(file_list(%r{WEB-INF/app/sample.jar})).to_not be_empty
         end
@@ -654,14 +658,14 @@ describe Warbler::Jar do
         end
 
         it "moves jar files that match to WEB-INF/lib" do
-          jar.apply(config)
+          apply_silently
           expect(file_list(%r{WEB-INF/lib/app-sample.jar})).to_not be_empty
           expect(file_list(%r{WEB-INF/lib/app-sample2.jar})).to_not be_empty
           expect(file_list(%r{WEB-INF/lib/.*?another.jar})).to be_empty
         end
 
         it "removes default jars not matched by filter from WEB-INF/lib" do
-          jar.apply(config)
+          apply_silently
           expect(file_list(%r{WEB-INF/lib/jruby-rack.*\.jar})).to be_empty
           expect(file_list(%r{WEB-INF/lib/jruby-core.*\.jar})).to be_empty
         end
@@ -678,7 +682,7 @@ describe Warbler::Jar do
           config.webserver = "test"
           config.features << "executable"
         end
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{^WarMain\.class$})).to_not be_empty
         expect(file_list(%r{^JarMain\.class$})).to_not be_empty
       end
@@ -690,7 +694,7 @@ describe Warbler::Jar do
         use_config do |config|
           config.features << "runnable"
         end
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{^WarMain\.class$})).to_not be_empty
         expect(file_list(%r{^JarMain\.class$})).to_not be_empty
       end
@@ -894,7 +898,7 @@ describe Warbler::Jar do
       end
 
       it 'automatically adds webpack manifest files into WEB-INF/public/packs' do
-        jar.apply(config)
+        apply_silently
         expect(file_list(%r{^WEB-INF/public/packs/manifest\.json})).to_not be_empty
         expect(file_list(%r{^WEB-INF/public/packs/manifest\.json.gz})).to_not be_empty
       end
@@ -918,7 +922,7 @@ describe Warbler::Jar do
       end
 
       it "auto-detects a Rack application with a config.ru file" do
-        jar.apply(config)
+        apply_silently
         expect(jar.files['WEB-INF/config.ru']).to eq 'config.ru'
       end
 
@@ -935,7 +939,7 @@ describe Warbler::Jar do
       use_config do |config|
         config.dirs = %w(lib notexist)
       end
-      silence { jar.apply(config) }
+      apply_silently
       expect(file_list(%r{WEB-INF/lib})).to_not be_empty
       expect(file_list(%r{WEB-INF/notexist})).to be_empty
     end
@@ -946,7 +950,7 @@ describe Warbler::Jar do
       use_config do |config|
         config.dirs += ["tmp"]
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/tmp/war})).to be_empty
       expect(file_list(%r{WEB-INF/tmp/war/index\.html})).to be_empty
     end
@@ -969,7 +973,7 @@ describe Warbler::Jar do
       use_config do |config|
         config.webinf_files = FileList['myserver-web.xml']
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/myserver-web.xml})).to_not be_empty
     end
 
@@ -981,7 +985,7 @@ describe Warbler::Jar do
       use_config do |config|
         config.webinf_files = FileList['myserver-web.xml.erb']
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/myserver-web.xml})).to_not be_empty
       expect(jar.contents('WEB-INF/myserver-web.xml')).to match /web-app.*production/
     end
@@ -993,7 +997,7 @@ describe Warbler::Jar do
       use_config do |config|
         config.webinf_files = FileList['webserver.properties']
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/webserver\.properties})).to_not be_empty
       expect(jar.contents('WEB-INF/webserver.properties')).to eq 'foo'
     end
@@ -1002,12 +1006,12 @@ describe Warbler::Jar do
       use_config do |config|
         config.gem_excludes += [/^(test|spec)\//]
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/gems/gems/rake([^/]+)/test/test_rake.rb})).to be_empty
     end
 
     it "creates a META-INF/init.rb file with startup config" do
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{META-INF/init.rb})).to_not be_empty
     end
 
@@ -1032,7 +1036,7 @@ describe Warbler::Jar do
       use_config do |config|
         config.webxml.dummy = '<dummy/>'
       end
-      jar.apply(config)
+      apply_silently
       expect(jar.contents('META-INF/init.rb')).to match /<dummy\/>/
     end
   end

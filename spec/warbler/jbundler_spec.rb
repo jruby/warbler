@@ -23,6 +23,10 @@ describe Warbler::Jar, "with JBundler" do
   let(:config) { drbclient.config(@extra_config) }
   let(:jar) { drbclient.jar }
 
+  def apply_silently
+    silence { jar.apply(config) }
+  end
+
   context "in a war project" do
     run_in_directory "spec/sample_war"
     cleanup_temp_files
@@ -40,14 +44,14 @@ describe Warbler::Jar, "with JBundler" do
       use_config do |config|
         config.java_libs << "local.jar"
       end
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/libs/local.jar})).to be_empty
     end
 
     it "copies jars from jbundler classpath into the war" do
       File.open(".jbundler/classpath.rb", "w") {|f| f << "JBUNDLER_CLASSPATH = ['some.jar']"}
       File.open("some.jar", "w") {|f| f << ""}
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/lib/some.jar})).to_not be_empty
     end
 
@@ -69,14 +73,14 @@ describe Warbler::Jar, "with JBundler" do
 
     it "does not include the jbundler gem (as it is in the development group)" do
       pending( "needs JRuby to work" ) unless defined? JRUBY_VERSION
-      jar.apply(config)
+      apply_silently
       expect(config.gems.detect{|k,v| k.name == 'jbundler'}).to be nil
       expect(file_list(/jbundler-/)).to be_empty
     end
 
     it "does not include the jbundler runtime config" do
       pending( "needs JRuby to work" ) unless defined? JRUBY_VERSION
-      jar.apply(config)
+      apply_silently
       expect(file_list(%r{WEB-INF/.jbundler})).to be_empty
     end
   end
