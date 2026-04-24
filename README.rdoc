@@ -246,6 +246,48 @@ task to give you more insight into what's going on.
 If you think you found a bug, please file one at
 https://github.com/jruby/warbler/issues.
 
+=== Common issues with executable wars
+
+If your app isn't working or starting up correctly: 
+
+-  <b>Missing Logging:</b>
+   If your boot process is failing silently (or with a logging warning), try configuring the logger
+   manually:
+  
+    java "-Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.StdErrLog" -jar my_app.war
+
+-  <b>CompatVersion errors:</b>
+   If you are getting <tt>java.lang.NoClassDefFoundError: org/jruby/CompatVersion</tt> errors at start-up
+   you are probably running Warbler with a jruby-rack version which does not yet support JRuby 10+ - it 
+   swallows the true error making debugging impossible. Ensure you're on jruby-rack `1.2.7+`.
+   
+   If your app starts up OK, there is no other known change required in jruby-rack to support
+   JRuby 10.0.
+
+-  <b>Bundler `restart_with` errors:</b>
+   If you are getting <tt>org.jruby.rack.RackInitializationException: No such file or directory - java -cp...</tt>,
+   that probably means bundler is trying to switch versions dynamically during start-up because your
+   `Gemfile.lock` implies a different locked version of bundler to that packaged with JRuby by default.
+
+   JRuby/Bundler running embedded inside a jar like this does not support switching bundler versions dynamically.
+
+   This may happen due to
+   - system gems for jruby installation upgradingg bundler to a newer version than packaged by default
+   - running <tt>bundle update --bundler</tt>
+   - using `BUNDLE_VERSION` to override bundle version which generating/editing your `Gemfile.lock`
+
+   Options to address this
+   - use <tt>bundle config set version system</tt> / <tt>bundle config set disable_shared_gems</tt> to avoid bundler picking system versions
+   - ensure your `Gemfile.lock`'s <tt>BUNDLED WITH</tt> version matches the default bundler packaged with your `jruby-jars` version. 
+     You can check inside the relevant `jruby-stdlib` jar or inside a clean installation dir from your Ruby version manager of choice. 
+   - remove <tt>BUNDLED WITH</tt> entirely from `Gemfile.lock`. Sometimes bundler will add this back again; so not recommended in the longer term
+
+-  <b>Rack version compatibility<b>
+    An exception happened during JRuby-Rack startup
+    no such file to load -- rack/chunked
+   You are trying to use Rack 3.x with a jruby-rack version that does not yet support Rack 3. Try upgrading to a compatible
+   jruby-rack version, or lock rack at a compatibile version with <tt>gem 'rack', '~> 2.2.0'</tt>. Note that Rack `2.2` requires Rails < `8.1`.
+   
 == Source
 
 You can get the Warbler source using Git, in any of the following ways:
@@ -258,9 +300,9 @@ https://github.com/jruby/warbler/archive/master.zip.
 == Development
 
 You can develop Warbler with any implementation of Ruby. To write Warbler code
-and run specs, you need to have Bundler installed and run <tt>bundle</tt> once.
+and run specs, you need to have Bundler installed and run <tt>bundle install</tt> once.
 
-After that, simply run <tt>rake</tt>.
+After that, simply run +rake+.
 
 === Integration Tests
 
@@ -272,71 +314,10 @@ with Warbler, and run some basic smoke tests against them.  You can run these li
 
 You'll need to have Maven >= 3.1.1 installed, of course: http://maven.apache.org/
 
-== Common Errors and Fixes 
-(For Debugging Warbler@<2.1.1)
-
-While running the war file in executable mode <tt>java -jar my_app.war</tt>, if you get an 
-HTTP 503 error, you can follow the tips given below:
-
-1. Your boot process is failing silently since the jetty-runner doesn't have a logger
-   configured. you can add <tt>-Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.StdErrLog</tt> in the command. 
-  
-    java -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.StdErrLog -jar my_app.war
-
-   if running on powershell, quote the whole argument key-pair to make it work.
-
-    java "-Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.StdErrLog" -jar my_app.war
-
-2. Now, if you are getting <tt>java.lang.NoClassDefFoundError: org/jruby/CompatVersion</tt>,
-   that means you are running JRuby@10.x. 
-   The CompatVersion issue is only specifically an issue on start-up for jruby-rack under
-   JRuby 10 since the issue is in the start-up error handling itself. It swallows the true
-   error making debugging impossible. 
-   However if your app starts up OK, there is no other change required in jruby-rack 1.3
-   to make jruby-rack 1.2 work with JRuby 10.
-
-3. If you are getting <tt>org.jruby.rack.RackInitializationException: No such file or directory - ...</tt>,
-   that means you have likely upgraded bundler and/or other gems that came as default with 
-   jruby installation. The version of bundler used for packaging and the version with which 
-   the war file runs are not the same. 
-   The bundled jar/war has `jruby-rack.jar` that comes along with the default build of 
-   <tt>jruby-core-x.x.x.jar</tt> and <tt>jruby-complete-x.x.x.jar</tt>. These are used at runtime. 
-   So, your bundled code finds the older bundled version of bundler, not the one you 
-   used/provided in your jar/war file.
-
-   Assuming you are interacting with bundler via jruby, I recommend people do the following.
-   - use bundle config set version system
-     avoid interfering with/upgrading jruby system gems (this will cause bundler mismatch between
-     jruby-jars and your local install). 
-     using <tt>bundle config set disable_shared_gems true</tt> can also help here with standalone JRuby jar.
-  
-   Alternatively,
-   - ensure that your BUNDLED WITH is
-     - jruby 9.4.14.0: 2.6.3
-     - jruby 10.0.4.0: 2.6.9
-     - jruby 10.0.5.0: 2.7.2
-     - jruby 10.1.0.0-SNAPSHOT: 4.0.3
-   - remove BUNDLED WITH entirely from Gemfile.lock
-     - this is usually annoying, as bundler will tend to add it back again
-
-4. If you get the following error,
-    An exception happened during JRuby-Rack startup
-    no such file to load -- rack/chunked
-   This is because you are using Rails v7+ that comes with Rack v3+. Rack v3 differs from v2 a lot,
-   you can find more information in the changelog in Rack repository. The compatibility work is 
-   coming along nicely #325[https://github.com/jruby/jruby-rack/pull/325], it will be released soon.
-   Rigorous testing and adoption is required.
-
-   To solve this, add rack v2 in your Gemfile,
-    gem 'rack', '~> 2.2.0'
-
-
 == License
 
 Warbler is provided under the terms of the MIT license.
 
 Warbler (c) 2013-2018 The JRuby Team
-
 Warbler (c) 2010-2012 Engine Yard, Inc.
-
 Warbler (c) 2007-2009 Sun Microsystems, Inc.
