@@ -18,6 +18,10 @@ module Warbler
         !Dir['*.gemspec'].empty?
       end
 
+      def self.conflicts
+        [ Traits::NoGemspec ]
+      end
+
       def before_configure; require 'yaml'
         @spec_file = Dir['*.gemspec'].first
         @spec = File.open(@spec_file) { |f| Gem::Specification.from_yaml(f) } rescue Gem::Specification.load(@spec_file)

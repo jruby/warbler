@@ -15,6 +15,10 @@ module Warbler
         File.exist?('config/environment.rb')
       end
 
+      def self.conflicts
+        [ Traits::Rack ]
+      end
+
       def self.requirements
         [ Traits::War ]
       end

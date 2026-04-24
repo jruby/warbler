@@ -5,6 +5,7 @@
 # See the file LICENSE.txt for details.
 #++
 
+require 'set'
 require 'stringio'
 require 'tsort'
 
@@ -20,7 +21,7 @@ module Warbler
       @traits = if forced_traits.nil? || forced_traits.empty?
                   auto_detect_traits
                 else
-                  TraitsDependencyArray.new(forced_traits)
+                  validate_traits(forced_traits)
                 end
     end
 
@@ -48,6 +49,18 @@ module Warbler
       @trait_objects = nil
       @traits.collect! {|t| t.name }
     end
+
+    private
+    def validate_traits(requested_traits)
+      conflicts = Set.new
+      requested_traits.each do |trait|
+        trait.conflicts.each do |conflict|
+          conflicts += [trait, conflict] if requested_traits.include?(conflict)
+        end
+      end
+      raise "Some forced traits declare conflicts with each other: #{conflicts.to_a}" unless conflicts.empty?
+      TraitsDependencyArray.new(requested_traits).tsort
+    end
   end
 
   # Each trait class includes this module to receive shared functionality.
@@ -55,6 +68,14 @@ module Warbler
     module ClassMethods
       def requirements
         []
+      end
+
+      def conflicts
+        []
+      end
+
+      def detect_any_conflicts?
+        conflicts.any? { |c| c.detect? }
       end
     end
 
@@ -111,7 +132,7 @@ module Warbler
 
     alias tsort_each_node each
     def tsort_each_child(node, &block)
-      node.requirements.each(&block)
+      node.requirements.select { |r| include?(r) }.each(&block)
     end
   end
 
