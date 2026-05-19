@@ -259,9 +259,6 @@ If your app isn't working or starting up correctly:
    If you are getting <tt>java.lang.NoClassDefFoundError: org/jruby/CompatVersion</tt> errors at start-up
    you are probably running Warbler with a jruby-rack version which does not yet support JRuby 10+ - it 
    swallows the true error making debugging impossible. Ensure you're on jruby-rack `1.2.7+`.
-   
-   If your app starts up OK, there is no other known change required in jruby-rack to support
-   JRuby 10.0.
 
 -  <b>Bundler `restart_with` errors:</b>
    If you are getting <tt>org.jruby.rack.RackInitializationException: No such file or directory - java -cp...</tt>,
