@@ -40,6 +40,10 @@ describe Warbler::Jar, "with JBundler" do
       expect(config.traits).to include(Warbler::Traits::JBundler)
     end
 
+    it "logs deprecation" do
+      expect(capture { Warbler::Traits::JBundler.new(config).before_configure }).to match /JBundler support is deprecated/
+    end
+
     it "detects a Jarfile and process only its jars" do
       use_config do |config|
         config.java_libs << "local.jar"

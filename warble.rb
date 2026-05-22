@@ -10,7 +10,7 @@
 # - `Warbler::Traits::Bundler`   - package with the gems implied by a bundle Gemfile/Gemfile.lock
 # - `Warbler::Traits::Gemspec`   - package with the gems implied by a gemspec
 # - `Warbler::Traits::NoGemspec` - package only with the gems implied by that in a local `lib` folder
-# - `Warbler::Traits::JBundler`  - (experimental) package with the jars implied by a `Jarfile`
+# - `Warbler::Traits::JBundler`  - (deprecated, experimental) package with the jars implied by a `Jarfile`
 # - `Warbler::Traits::Rails`     - package with the necessary startup logic to boot a Rails application
 # - `Warbler::Traits::Rack`      - package with the necessary startup logic to boot a standalone Rack (non-Rails) application
 # forced_traits = [Warbler::Traits::Jar]
