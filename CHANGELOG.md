@@ -8,6 +8,7 @@
 - #592: chore: relax rubyzip requirement to allow rubyzip 2.x
 - #593: chore: relax jruby-rack requirement to allow compatibility with upcoming 1.3.x
 - #624: chore: remove use of deprecated JRuby methods removed in JRuby 10.1
+- #634: chore: deprecate JBundler trait for removal
 
 ## 2.1.0
 

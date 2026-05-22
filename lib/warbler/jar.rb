@@ -334,6 +334,6 @@ module Warbler
 
     # Java-boosted jar creation for JRuby; replaces #create_jar and
     # #entry_in_jar with Java version
-    require 'warbler_jar' if defined?(JRUBY_VERSION) && JRUBY_VERSION >= "1.5"
+    require 'warbler_jar' if defined?(JRUBY_VERSION)
   end
 end

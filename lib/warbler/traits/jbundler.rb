@@ -23,6 +23,7 @@ module Warbler
 
       def before_configure
         config.jbundler = true
+        warn "JBundler support is deprecated due to the EOL of JBundler. See https://github.com/jruby/warbler/issues/481 for discussion on replacement with jar-dependencies."
       end
 
       def after_configure
@@ -35,7 +36,7 @@ module Warbler
         if File.exist?( classpath )
           require File.expand_path( classpath )
         else
-          raise 'jbundler support needs jruby to create a local config: jruby -S jbundle install'
+          raise 'JBundler support needs JRuby to create a local config: jruby -S jbundle install'
         end
         # use only the jars from jbundler and jruby
         config.java_libs += jruby_jars
