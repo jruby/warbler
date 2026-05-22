@@ -123,27 +123,17 @@ module ExampleGroupHelpers
       end
     end
 
-    if defined?(JRUBY_VERSION)
-      require 'jruby'
-      let(:drb) do
-        drb_thread = Thread.new do
-          ruby '--dev', "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')
-        end
-        drb_thread.run
-        drb_thread
+    let(:drb) do
+      drb_thread = Thread.new do
+        ruby '--dev', "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')
       end
-      after :each do
-        drbclient.stop
-        drb.join
-      end
-    else
-      require 'childprocess'
-      let(:drb) do
-        ChildProcess.build(FileUtils::RUBY, "-I#{Warbler::WARBLER_HOME}/lib", File.join(@orig_dir, 'spec/drb_helper.rb')).tap {|d| d.start }
-      end
-      after :each do
-        drb.stop
-      end
+      drb_thread.run
+      drb_thread
+    end
+
+    after :each do
+      drbclient.stop
+      drb.join
     end
 
     after :all do
@@ -223,6 +213,6 @@ RSpec.configure do |config|
 
   config.after :each do
     Object.remove_const("Rails") if defined?(Rails)
-    rm_rf "vendor"
+    silence { rm_rf "vendor" }
   end
 end

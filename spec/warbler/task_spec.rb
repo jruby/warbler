@@ -166,7 +166,7 @@ describe Warbler::Task do
         Warbler::ZipSupport.open("#{config.jar_name}.war") do |zf|
           expect(zf.find_entry("WEB-INF/lib/tasks/utils.rake")).to_not be nil
           expect(zf.find_entry("WEB-INF/lib/rakelib/")).to_not be nil
-          expect(zf.find_entry("WEB-INF/lib/rakelib/utils.rake")).to_not be nil if defined?(JRUBY_VERSION)
+          expect(zf.find_entry("WEB-INF/lib/rakelib/utils.rake")).to_not be nil
         end
       end
 
