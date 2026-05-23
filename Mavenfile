@@ -1,4 +1,5 @@
 #-*- mode: ruby -*-
+warn "ruby-maven is running fixed JRuby version #{JRUBY_VERSION}"
 
 # tell the gem setup for maven where the java sources are
 # and how to name the jar file (default path for the jar: ./lib )
@@ -53,5 +54,7 @@ plugin :invoker, '3.9.1' do
                  },
                  :goals => ['verify'],
                  :projectsDirectory => 'integration',
+                 :pomIncludes => [ '*/pom.xml' ],
+                 :pomExcludes => Java::JavaLang::System.getProperty('jruby.version').start_with?('10.1') ? ['rails7_test/pom.xml'] : [],
                  :streamLogs => true )
 end

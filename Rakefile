@@ -29,8 +29,6 @@ mvn << "-Dbundler.version=#{Bundler::VERSION}"
 mvn << '--no-transfer-progress'
 mvn << '--color=always'
 
-mvn.inherit_jruby_version
-
 desc 'compile java sources and build jar'
 task :jar do
   success = mvn.prepare_package
