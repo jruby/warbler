@@ -252,7 +252,7 @@ describe Warbler::Jar, "with Bundler" do
     it "includes the bundler gem" do
       bundle_install
       apply_silently
-      expect(file_list(%r{gems/rake-13.3.0/lib})).to_not be_empty
+      expect(file_list(%r{gems/rake-13.4.2/lib})).to_not be_empty
       expect(file_list(%r{gems/bundler-})).to_not be_empty
       expect(file_list(%r{gems/bundler-.*/exe})).to_not be_empty
     end
