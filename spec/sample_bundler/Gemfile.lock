@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    rake (13.3.0)
+    rake (13.4.2)
 
 PLATFORMS
   universal-java-1.8
@@ -12,4 +12,4 @@ PLATFORMS
   universal-java-8
 
 DEPENDENCIES
-  rake (= 13.3.0)
+  rake (= 13.4.2)
