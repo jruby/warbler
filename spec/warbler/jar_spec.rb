@@ -351,39 +351,24 @@ describe Warbler::Jar do
 
     it "collects gem files with dependencies" do
       use_config do |config|
-        config.gems << 'virtus'
+        config.gems << 'rspec-expectations'
         config.gem_dependencies = true
       end
       apply_silently
-      expect(file_list(%r{WEB-INF/gems/gems/axiom-types.*/lib})).to_not be_empty
-      expect(file_list(%r{WEB-INF/gems/specifications/axiom-types.*\.gemspec})).to_not be_empty
-      expect(file_list(%r{WEB-INF/gems/gems/equalizer.*/lib/equalizer/version.rb$})).to_not be_empty
-      # NOTE: rdoc is tricky as its dependency json is a default gem
-      #use_config do |config|
-      #  config.gems << "rdoc"
-      #  config.gem_dependencies = true
-      #end
-      #apply_silently
-      #expect(file_list(%r{WEB-INF/gems/gems/json.*/lib/json.rb})).to_not be_empty
-      #expect(file_list(%r{WEB-INF/gems/specifications/json.*\.gemspec})).to_not be_empty
+      expect(file_list(%r{WEB-INF/gems/gems/rspec-support.*/lib})).to_not be_empty
+      expect(file_list(%r{WEB-INF/gems/specifications/rspec-support.*\.gemspec})).to_not be_empty
+      expect(file_list(%r{WEB-INF/gems/gems/diff-lcs.*/lib/diff/lcs/version.rb$})).to_not be_empty
     end
 
     it "collects gem files without dependencies" do
       use_config do |config|
-        config.gems << 'virtus'
+        config.gems << 'rspec-expectations'
         config.gem_dependencies = false
       end
       apply_silently
-      expect(file_list(%r{WEB-INF/gems/gems/axiom-types.*/lib})).to be_empty
-      expect(file_list(%r{WEB-INF/gems/specifications/axiom-types.*\.gemspec})).to be_empty
-      expect(file_list(%r{WEB-INF/gems/gems/equalizer.*/lib/equalizer/version.rb$})).to be_empty
-      #use_config do |config|
-      #  config.gems << "rdoc"
-      #  config.gem_dependencies = false
-      #end
-      #apply_silently
-      #expect(file_list(%r{WEB-INF/gems/gems/json.*/lib/json.rb})).to be_empty
-      #expect(file_list(%r{WEB-INF/gems/specifications/json.*\.gemspec})).to be_empty
+      expect(file_list(%r{WEB-INF/gems/gems/rspec-support.*/lib})).to be_empty
+      expect(file_list(%r{WEB-INF/gems/specifications/rspec-support.*\.gemspec})).to be_empty
+      expect(file_list(%r{WEB-INF/gems/gems/diff-lcs.*/lib/diff/lcs/version.rb$})).to be_empty
     end
 
     it "adds ENV['GEM_HOME'] to init.rb" do
