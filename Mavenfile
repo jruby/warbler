@@ -43,14 +43,14 @@ gem 'jruby-jars', '${jruby.version}'
 plugin :invoker, '3.9.1' do
   execute_goals( :install, :run,
                  :id => 'integration-test',
-                 :properties => { 'warbler.version' => '${project.version}',
-                                  'jruby.version' => '${jruby.version}',
-                                  'jetty.version' => '${jetty.version}',
-                                  'bundler.version' => '${bundler.version}',
-                                  'jruby.plugins.version' => '${jruby.plugins.version}',
-                                  'style.color' => 'always',
+                 :properties => {
+                   'warbler.version' => '${project.version}',
+                   'jruby.version' => '${jruby.version}',
+                   'jetty.version' => '${jetty.version}',
+                   'bundler.version' => '${bundler.version}',
+                   'jruby.plugins.version' => '${jruby.plugins.version}',
+                   'style.color' => 'always',
                  },
-
                  :goals => ['verify'],
                  :projectsDirectory => 'integration',
                  :streamLogs => true )
