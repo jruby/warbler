@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rails', '~> 7.2.0'
-gem 'rack', '~> 2.2.19'
+gem 'rack', '~> 2.2.0'
 
 platform :jruby do
   gem 'activerecord-jdbcsqlite3-adapter', '~> 72.1'

@@ -48,7 +48,8 @@ plugin :invoker, '3.9.1' do
                                   'jetty.version' => '${jetty.version}',
                                   'bundler.version' => '${bundler.version}',
                                   'jruby.plugins.version' => '${jruby.plugins.version}',
-                                  'style.color' => 'always' },
+                                  'style.color' => 'always',
+                 },
 
                  :goals => ['verify'],
                  :projectsDirectory => 'integration',
