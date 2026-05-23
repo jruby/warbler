@@ -7,7 +7,8 @@
 
 require File.expand_path('../../spec_helper', __FILE__)
 
-describe Warbler::Jar, "with JBundler" do
+should_skip = "JBundler is deprecated and not supported on Ruby 4.0 / JRuby 10.1" if RUBY_VERSION.to_f >= 4.0 || false
+describe Warbler::Jar, "with JBundler", skip: should_skip do
   use_fresh_rake_application
   use_fresh_environment
   run_out_of_process_with_drb
