@@ -33,11 +33,15 @@ bundle up all of your application files for deployment to a Java environment.}
   gem.add_runtime_dependency 'rake', ['~> 13.0', '>= 13.0.3']
   gem.add_runtime_dependency 'rexml', '~> 3.0'
   gem.add_runtime_dependency 'jruby-jars', ['>= 9.4', '< 10.1']
-  gem.add_runtime_dependency 'jruby-rack', ['>= 1.2.6', '< 1.4']
+  gem.add_runtime_dependency 'jruby-rack', ['>= 1.2.7', '< 1.4']
   gem.add_runtime_dependency 'rubyzip', ['>= 2.1.0', '< 4']
   gem.add_runtime_dependency 'ostruct', '~> 0.6.2'
+
   gem.add_development_dependency 'rspec', '~> 3.0'
   gem.add_development_dependency 'drb', ['~> 2.2', '>= 2.2.3']
-  gem.add_development_dependency 'jbundler', '~> 0.9.5'
-  gem.add_development_dependency 'bigdecimal', '< 5'  # Needed workaround jbundler > maven-tools > vertus > axiom-types lack of explicit bigdecimal dependency for for JRuby 10
+  gem.add_development_dependency 'ruby-maven', '~> 3.9'
+  gem.add_development_dependency 'bigdecimal' # Needed workaround for maven-tools > vertus > axiom-types lack of explicit bigdecimal dependency for JRuby 10
+
+  # JBundler is unsupported on JRuby 10.1
+  gem.add_development_dependency 'jbundler', '~> 0.9.5' if RUBY_VERSION.to_f < 4.0
 end
