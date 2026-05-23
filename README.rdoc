@@ -10,7 +10,7 @@ Ruby applications to assemble and Just Work.
 
 == Compatibility
 
-    Warbler  Status        JRuby     Java  Jruby-Rack    Rails      Notes
+    Warbler  Status        JRuby     Java  JRuby-Rack    Rails    Notes
     -------  ----------  ----------  ----  ----------  ---------  ----------------------------------------------
     2.1      Maintained  9.4 → 10.1  8+    1.2 → 1.3   5.0 → 8.0  Rails 8.1 may be OK with pure Ruby webservers.
     2.0      EOL         9.2 → 9.3   6+    1.1 → 1.2       → 6.1
