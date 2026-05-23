@@ -8,11 +8,18 @@ all of your application files for deployment to a Java environment.
 Warbler provides a sane set of out-of-the box defaults that should allow most
 Ruby applications to assemble and Just Work.
 
-Version 2.1.x of Warbler supports versions of JRuby from 9.4 to 10.0.
+== Compatibility
 
-Version 2.0.x (EOL) of Warbler supports versions of JRuby from 9.2 to 9.3.
+    Warbler  Status        JRuby     Java  Jruby-Rack    Rails      Notes
+    -------  ----------  ----------  ----  ----------  ---------  ----------------------------------------------
+    2.1      Maintained  9.4 → 10.1  8+    1.2 → 1.3   5.0 → 8.0  Rails 8.1 may be OK with pure Ruby webservers.
+    2.0      EOL         9.2 → 9.3   6+    1.1 → 1.2       → 6.1
+    1.4      EOL         1.1 → 1.7   5+        ?           ?
 
-Version 1.4.x (EOL) of Warbler supports versions of JRuby up to 1.7.x.
+For running wars with specific Java web servers, consult jruby-rack compatibility (
+{master}[https://github.com/jruby/jruby-rack/tree/master],
+{1.2-stable}[https://github.com/jruby/jruby-rack/tree/1.2-stable],
+{1.1-stable}[https://github.com/jruby/jruby-rack/tree/1.1-stable] ).
 
 == Getting Started
 
