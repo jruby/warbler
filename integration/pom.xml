@@ -175,6 +175,20 @@
                 <!-- Change to DEBUG to be overloaded as to what Jetty is doing -->
                 <value>INFO</value>
               </systemProperty>
+
+              <!-- Enable to get more detailed debugging traces if necessary https://github.com/jruby/jruby/wiki/JRuby-Options -->
+              <systemProperty>
+                <key>jruby.backtrace.style</key>
+                <value>full</value> <!-- normal|full|raw|mri -->
+              </systemProperty>
+              <systemProperty>
+                <key>jruby.log.exceptions</key>
+                <value>false</value> <!-- enable to find additional exceptions leading to another -->
+              </systemProperty>
+              <systemProperty>
+                <key>jruby.log.backtraces</key>
+                <value>false</value>
+              </systemProperty>
             </systemProperties>
           </configuration>
           <executions>
