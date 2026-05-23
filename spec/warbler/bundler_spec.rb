@@ -246,7 +246,7 @@ describe Warbler::Jar, "with Bundler" do
     run_in_directory "spec/sample_bundler"
 
     before do
-      bundle 'config', 'deployment', 'true'
+      bundle 'config', 'set', 'deployment', 'true'
     end
 
     it "includes the bundler gem" do
@@ -258,7 +258,7 @@ describe Warbler::Jar, "with Bundler" do
     end
 
     after do
-      bundle 'config', 'deployment', 'false'
+      bundle 'config', 'set', 'deployment', 'false'
     end
   end
 
