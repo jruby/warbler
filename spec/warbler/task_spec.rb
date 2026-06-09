@@ -127,7 +127,7 @@ describe Warbler::Task do
   it "should allow bytecode version in config" do
     config.features << "compiled"
     java_version = org.jruby.RubyInstanceConfig::JAVA_VERSION
-    config.bytecode_version = java_version - 44
+    config.bytecode_version = java_version == 52 ? '1.8' : java_version - 44
     bytecode_version = [0x00, java_version]
     silence { run_task "warble" }
 

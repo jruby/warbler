@@ -118,7 +118,7 @@ Warbler::Config.new(forced_traits: defined?(forced_traits) ? forced_traits : nil
   # config.compile_gems = false
 
   # When set it specify the bytecode version for compiled class files
-  # config.bytecode_version = "1.6"
+  # config.bytecode_version = "1.8"
 
   # When set to true, Warbler will override the value of ENV['GEM_HOME'] even it
   # has already been set. When set to false it will use any existing value of
