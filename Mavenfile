@@ -6,17 +6,6 @@ warn "ruby-maven is running fixed JRuby version #{JRUBY_VERSION}"
 gemspec( :jar => 'warbler_jar.jar',
          :source => 'ext' )
 
-plugin_repository( :url => 'https://central.sonatype.com/repository/maven-snapshots/',
-                   :id => 'central-snapshots' ) do
-  releases 'false'
-  snapshots 'true'
-end
-repository( :url => 'https://central.sonatype.com/repository/maven-snapshots/',
-            :id => 'central-snapshots' ) do
-  releases 'false'
-  snapshots 'true'
-end
-
 properties(
   'project.build.sourceEncoding' => 'UTF-8',
   'mavengem.wagon.version' => '2.0.3',
