@@ -41,7 +41,7 @@ plugin :install, '3.1.4'
 gem 'bundler', '${bundler.version}'
 gem 'jruby-jars', '${jruby.version}'
 
-plugin :invoker, '3.9.1' do
+plugin :invoker, '3.10.1' do
   execute_goals( :install, :run,
                  :id => 'integration-test',
                  :properties => {
