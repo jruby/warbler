@@ -92,10 +92,8 @@ module Warbler
             filenames = []
             gem_relative_path.each_filename { |f| filenames << f }
 
-            exclude_gems = true
             unless filenames.empty?
               full_gem_path = Pathname.new(::Bundler.install_path) + filenames.first
-              exclude_gems = false
             end
 
             if spec.groups.include?(:warbler_excluded)
@@ -106,7 +104,7 @@ module Warbler
 
             FileList[pattern].each do |src|
               f = Pathname.new(src).relative_path_from(full_gem_path).to_s
-              next if exclude_gems && config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
+              next if config.gem_excludes && config.gem_excludes.any? {|rx| f =~ rx }
               jar.files[apply_pathmaps(config, File.join(full_gem_path.basename, f), :git)] = src
             end
           end
