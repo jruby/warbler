@@ -177,7 +177,8 @@ describe Warbler::Task do
 
   context "with a Bundler Gemfile" do
 
-    run_out_of_process_with_drb if (DRB = true)
+    DRB = true
+    run_out_of_process_with_drb if DRB
 
     after do
       if DRB
