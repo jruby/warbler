@@ -44,6 +44,6 @@ plugin :invoker, '3.10.1' do
                  :goals => ['verify'],
                  :projectsDirectory => 'integration',
                  :pomIncludes => [ '*/pom.xml' ],
-                 :pomExcludes => Java::JavaLang::System.getProperty('jruby.version').start_with?('10.1') ? ['rails7_test/pom.xml'] : [],
+                 :pomExcludes => [],
                  :streamLogs => true )
 end
