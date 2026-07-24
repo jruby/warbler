@@ -289,7 +289,7 @@ If your app isn't working or starting up correctly:
      You can check inside the relevant `jruby-stdlib` jar or inside a clean installation dir from your Ruby version manager of choice. 
    - remove <tt>BUNDLED WITH</tt> entirely from `Gemfile.lock`. Sometimes bundler will add this back again; so not recommended in the longer term
 
--  <b>Rack version compatibility<b>
+-  <b>Rack version compatibility</b>
     An exception happened during JRuby-Rack startup
     no such file to load -- rack/chunked
    You are trying to use Rack 3.x with a jruby-rack version that does not yet support Rack 3. Try upgrading to a compatible
