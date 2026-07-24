@@ -1,4 +1,4 @@
-## 2.1.1 (UNRELEASED)
+## 2.1.1
 
 - #624, #635, #623: fix: ensure compatibility with JRuby 10.1
 - #583: fix: Create config dir if it's missing for simpler usage
