@@ -258,13 +258,7 @@ https://github.com/jruby/warbler/issues.
 
 === Common issues with executable wars
 
-If your app isn't working or starting up correctly: 
-
--  <b>Missing Logging:</b>
-   If your boot process is failing silently (or with a logging warning), try configuring the logger
-   manually:
-  
-    java "-Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.StdErrLog" -jar my_app.war
+If your app isn't working or starting up correctly:
 
 -  <b>CompatVersion errors:</b>
    If you are getting <tt>java.lang.NoClassDefFoundError: org/jruby/CompatVersion</tt> errors at start-up
