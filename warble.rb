@@ -21,7 +21,7 @@
 # Configure a new Warbler application assembly
 Warbler::Config.new(forced_traits: defined?(forced_traits) ? forced_traits : nil) do |config|
   # Features: additional options controlling how the jar is built.
-  # Currently the following features are supported:
+  # Currently, the following features are supported:
   # - *gemjar*: package the gem repository in a jar file in WEB-INF/lib
   # - *executable*: embed a web server and make the war executable
   # - *runnable*: allows to run bin scripts e.g. `java -jar my.war -S rake -T`
@@ -101,7 +101,7 @@ Warbler::Config.new(forced_traits: defined?(forced_traits) ? forced_traits : nil
   # File extension for the archive. Defaults to either 'jar' or 'war'.
   # config.jar_extension = "jar"
 
-  # Destionation for the created archive. Defaults to project's root directory.
+  # Destination for the created archive. Defaults to project's root directory.
   # config.autodeploy_dir = "dist/"
 
   # Name of the MANIFEST.MF template for the war file. Defaults to a simple
