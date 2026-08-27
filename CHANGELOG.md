@@ -1,6 +1,7 @@
 ## 2.1.2
 
 - #648: fix: further improve isolation of warbled jars/wars from user/host gem paths
+- chore: relax jruby-rack requirement to allow compatibility with upcoming 2.0.x
 
 ## 2.1.1
 
