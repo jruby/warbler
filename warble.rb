@@ -120,9 +120,9 @@ Warbler::Config.new(forced_traits: defined?(forced_traits) ? forced_traits : nil
   # When set it specify the bytecode version for compiled class files
   # config.bytecode_version = "1.8"
 
-  # When set to true, Warbler will override the value of ENV['GEM_HOME'] even it
-  # has already been set. When set to false it will use any existing value of
-  # GEM_HOME if it is set.
+  # When set to true, Warbler will override the value of ENV['GEM_HOME'] even it has already been set.
+  # When set to false it will use any existing value of GEM_HOME if it is set. It's usually a bad idea to disable this;
+  # your built application will not be self-contained/isolated from the wider RubyGems environment of the machine.
   # config.override_gem_home = true
 
   # Specify executable
