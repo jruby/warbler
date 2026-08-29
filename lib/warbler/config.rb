@@ -60,8 +60,10 @@ module Warbler
     # Whether to include dependent gems (default true)
     attr_accessor :gem_dependencies
 
-    # Array of regular expressions matching relative paths in gems to
-    # be excluded from the war. Default contains no exclusions.
+    # Array of regular expressions matching paths *inside* packed gems to be
+    # excluded from the archive. Paths are matched relative to each gem's root
+    # (for git-sourced gems: the repository checkout root). Default contains no
+    # exclusions.
     attr_accessor :gem_excludes
 
     # Whether to exclude **/*.log files (default is true)
