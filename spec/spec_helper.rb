@@ -5,7 +5,6 @@
 # See the file LICENSE.txt for details.
 #++
 
-require 'rubygems'
 require 'rspec'
 
 $LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'

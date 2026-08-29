@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
-require 'rubygems/dependency_installer'
-
 installer = Gem::DependencyInstaller.new(:force => true)
 
 installer.install( 'bouncy-castle-java', '1.5.0147' )

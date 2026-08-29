@@ -32,10 +32,6 @@ module Warbler
         config.init_contents << "#{config.warbler_templates}/jar.erb"
       end
 
-      def after_configure
-        config.init_contents << StringIO.new("require 'rubygems' unless defined?(Gem)\n")
-      end
-
       def update_archive(jar)
         unless config.manifest_file
           manifest = Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: JarMain\n"

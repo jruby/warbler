@@ -1,3 +1,7 @@
+## 2.1.2
+
+- #648: fix: further improve isolation of warbled jars/wars from user/host gem paths
+
 ## 2.1.1
 
 - #624, #635, #623: fix: ensure compatibility with JRuby 10.1
