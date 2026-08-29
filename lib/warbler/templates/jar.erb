@@ -4,10 +4,12 @@ ENV['GEM_HOME'] <%= config.override_gem_home ? '=' : '||=' %> File.expand_path(F
 ENV['GEM_HOME'] <%= config.override_gem_home ? '=' : '||=' %> File.expand_path(File.join('..', '..', '<%= config.relative_gem_path %>'), __FILE__)
 <% end -%>
 <% if config.override_gem_home -%>
-ENV['GEM_PATH'] = nil # RGs sets Gem.paths.path = Gem.default_path + [ GEM_HOME ]
+<%# GEM_HOME (the packed gems) is always on Gem.path; adding only the runtime's own default %>
+<%# gem dir (Ruby's "bundled gems") excludes host gem paths (e.g. Gem.user_dir aka ~/.gem) %>
+ENV['GEM_PATH'] = Gem.default_dir
 <% end -%>
 <% if config.bundler && config.bundler[:gemfile_path] -%>
 ENV['BUNDLE_GEMFILE'] = File.expand_path(File.join('..', '..', '<%= config.bundler[:gemfile_path] %>'), __FILE__)
 <% end -%>
 <%# Ensure any cached paths are cleared; otherwise behaviour can be indeterminate if the paths have already been read %>
-# Gem.clear_paths
+Gem.clear_paths

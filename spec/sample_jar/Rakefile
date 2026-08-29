@@ -1,7 +1,5 @@
 # -*- ruby -*-
 
-require 'rubygems'
-
 spec = Gem::Specification.new do |s|
   s.name        = "sample_jar"
   s.version     = "1.0"

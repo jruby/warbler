@@ -304,22 +304,21 @@ public class WarMain extends JarMain {
 
     protected String locateExecutableScript(final String executable, final CharSequence envPreScript) {
         return ( envPreScript == null ? "" : envPreScript + " \n" ) +
-        "begin\n" + // locate the executable within gemspecs :
-        "  require 'rubygems' unless defined?(Gem) \n" +
-          "  begin\n" + // add bundled gems to load path :
-          "    require 'bundler' \n" +
-          "  rescue LoadError\n" + // bundler not used
-          "  else\n" +
-          "    env = ENV['RAILS_ENV'] || ENV['RACK_ENV'] \n" + // init.rb sets ENV['RAILS_ENV'] ||= ...
-          "    env ? Bundler.setup(:default, env) : Bundler.setup(:default) \n" +
-          "  end if ENV_JAVA['warbler.bundler.setup'] != 'false' \n" + // java -Dwarbler.bundler.setup=false -jar my.war -S pry
-        "  exec = '"+ executable +"' \n" +
-        "  spec = Gem::Specification.find { |s| s.executables.include?(exec) } \n" +
-        "  spec ? spec.bin_file(exec) : nil \n" +
-        // returns the full path to the executable
-        "rescue SystemExit => e\n" +
-        "  e.status\n" +
-        "end";
+            "begin\n" + // locate the executable within gemspecs :
+            "  begin\n" + // add bundled gems to load path :
+            "    require 'bundler' \n" +
+            "  rescue LoadError\n" + // bundler not used
+            "  else\n" +
+            "    env = ENV['RAILS_ENV'] || ENV['RACK_ENV'] \n" + // init.rb sets ENV['RAILS_ENV'] ||= ...
+            "    env ? Bundler.setup(:default, env) : Bundler.setup(:default) \n" +
+            "  end if ENV_JAVA['warbler.bundler.setup'] != 'false' \n" + // java -Dwarbler.bundler.setup=false -jar my.war -S pry
+            "  exec = '"+ executable +"' \n" +
+            "  spec = Gem::Specification.find { |s| s.executables.include?(exec) } \n" +
+            "  spec ? spec.bin_file(exec) : nil \n" +
+            // returns the full path to the executable
+            "rescue SystemExit => e\n" +
+            "  e.status\n" +
+            "end";
     }
 
     protected void initJRubyScriptingEnv(Object scriptingContainer) throws Exception {

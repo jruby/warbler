@@ -6,7 +6,9 @@ if $servlet_context.nil?
 else
   ENV['GEM_HOME'] <%= config.override_gem_home ? '=' : '||=' %> $servlet_context.getRealPath('<%= config.gem_path %>')
 <% if config.override_gem_home -%>
-  ENV['GEM_PATH'] = nil
+  <%# GEM_HOME (the packed gems) is always on Gem.path; adding only the runtime's own default %>
+  <%# gem dir (Ruby's "bundled gems") excludes host gem paths (e.g. Gem.user_dir aka ~/.gem) %>
+  ENV['GEM_PATH'] = Gem.default_dir
 <% end -%>
 <% if config.bundler && config.bundler[:gemfile_path] -%>
   ENV['BUNDLE_GEMFILE'] ||= $servlet_context.getRealPath('/<%= config.bundler[:gemfile_path] %>')

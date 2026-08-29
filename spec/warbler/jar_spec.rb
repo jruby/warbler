@@ -6,6 +6,7 @@
 #++
 
 require File.expand_path('../../spec_helper', __FILE__)
+require 'open3'
 
 describe Warbler::Jar do
   use_fresh_rake_application
@@ -50,6 +51,27 @@ describe Warbler::Jar do
       expect(file_list(%r{^META-INF/lib/jruby-.*\.jar$})).to_not be_empty
     end
 
+    it "creates an executable jar that runs, hermetically" do
+      apply_silently
+      silence { jar.create('sample_jar_test.jar') }
+      begin
+        # bogus host gem env must be overridden by the generated init.rb
+        # (override_gem_home) and must not leak into or break the jar (#344/#379)
+        _, stdout, stderr, wait_thr = Open3.popen3(
+          { 'GEM_HOME' => '/nonexistent/bogus-gem-home', 'GEM_PATH' => '/nonexistent/bogus-gem-path' },
+          'java ' \
+          '--enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow -XX:+IgnoreUnrecognizedVMOptions ' \
+          '-jar sample_jar_test.jar'
+        )
+        err = stderr.readlines.join
+        expect(err).to_not match /Ignoring .+ because its extensions are not built/ # host gems leaking in
+        expect(wait_thr.value.success?).to be(true)
+        expect(stdout.readlines.join).to match /Hello World!/
+      ensure
+        rm_f 'sample_jar_test.jar'
+      end
+    end
+
     it "adds a JarMain class" do
       apply_silently
       expect(file_list(%r{^JarMain\.class$})).to_not be_empty
@@ -60,10 +82,11 @@ describe Warbler::Jar do
       expect(file_list(%r{^META-INF/init.rb$})).to_not be_empty
     end
 
-    it "requires 'rubygems' in init.rb" do
+    it "sets up gem paths in init.rb (validate rubygems is always loaded)" do
       jar.add_init_file(config)
       contents = jar.contents('META-INF/init.rb')
-      expect(contents).to match /require 'rubygems'/
+      expect(contents).to include("ENV['GEM_PATH'] = Gem.default_dir")
+      expect(contents).to include("Gem.clear_paths")
     end
 
     it "does not override ENV['GEM_HOME'] by default" do
