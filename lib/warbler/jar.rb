@@ -219,7 +219,7 @@ module Warbler
           # OK if the gem does not exists as its un-packed on the "shared" path
           # ... at least gem spec.spec_file should exists although not crucial
           if JRUBY_VERSION != JRubyJars::VERSION
-            warn "skipping #{spec.name} default gem (assuming its part of jruby-jars #{JRubyJars::VERSION})" unless silent?
+            warn "skipping #{spec.name} default gem (assuming its part of jruby-jars #{JRubyJars::VERSION})"
           end
         else
           warn "skipping #{spec.name} gem (#{full_gem_path.to_s} does not exist)"

@@ -1,6 +1,9 @@
 ## 2.1.2
 
+- #649: fix: further improve isolation of warbled jars/wars from host bundler configuration
 - #648: fix: further improve isolation of warbled jars/wars from user/host gem paths
+- #465: fix: remove duplication of bundler path gems in warbled jars/wars
+- #331: fix: correct support for `gem_excludes` inside bundler git specs
 - chore: relax jruby-rack requirement to allow compatibility with upcoming 2.0.x
 
 ## 2.1.1
