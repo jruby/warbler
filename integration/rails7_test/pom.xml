@@ -28,8 +28,8 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
+        <groupId>${jetty-maven-plugin.group}</groupId>
+        <artifactId>${jetty-maven-plugin.artifact}</artifactId>
         <executions>
           <execution>
             <id>start-jetty</id>

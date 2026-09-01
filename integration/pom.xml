@@ -18,8 +18,32 @@
     <jruby.version>9.4.15.0</jruby.version>
     <bundler.version>2.6.3</bundler.version>
     <jruby-rack.version>[1.2,1.2.99999)</jruby-rack.version>
-    <jetty.version>9.4.58.v20250814</jetty.version>
   </properties>
+
+  <profiles>
+    <profile>
+      <id>ee8</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <jetty-maven-plugin.group>org.eclipse.jetty.ee8</jetty-maven-plugin.group>
+        <jetty-maven-plugin.artifact>jetty-ee8-maven-plugin</jetty-maven-plugin.artifact>
+        <jetty-maven-plugin.version>12.1.12</jetty-maven-plugin.version>
+      </properties>
+    </profile>
+    <profile>
+      <id>ee11</id>
+      <activation>
+        <property><name>jruby-rack.version</name><value>[2.0,2.0.99999)</value></property>
+      </activation>
+      <properties>
+        <jetty-maven-plugin.group>org.eclipse.jetty.ee11</jetty-maven-plugin.group>
+        <jetty-maven-plugin.artifact>jetty-ee11-maven-plugin</jetty-maven-plugin.artifact>
+        <jetty-maven-plugin.version>12.1.12</jetty-maven-plugin.version>
+      </properties>
+    </profile>
+  </profiles>
 
   <repositories>
     <repository>
@@ -156,17 +180,12 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.eclipse.jetty</groupId>
-          <artifactId>jetty-maven-plugin</artifactId>
-          <version>${jetty.version}</version>
+          <groupId>${jetty-maven-plugin.group}</groupId>
+          <artifactId>${jetty-maven-plugin.artifact}</artifactId>
+          <version>${jetty-maven-plugin.version}</version>
           <configuration>
-            <webAppConfig>
-              <contextPath>/</contextPath>
-            </webAppConfig>
             <stopPort>9966</stopPort>
             <stopKey>warbler_stop</stopKey>
-            <scanIntervalSeconds>0</scanIntervalSeconds>
-            <daemon>true</daemon>
             <supportedPackagings>jar</supportedPackagings>
             <systemProperties>
               <systemProperty>
@@ -204,7 +223,7 @@
               <phase>pre-integration-test</phase>
               <goals>
                 <!-- Change to run-war to interactively play with the server without running tests -->
-                <goal>deploy-war</goal>
+                <goal>start-war</goal>
               </goals>
             </execution>
             <execution>
@@ -257,4 +276,5 @@
       </plugins>
     </pluginManagement>
   </build>
+
 </project>

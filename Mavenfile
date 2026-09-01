@@ -10,14 +10,12 @@ properties(
   'project.build.sourceEncoding' => 'UTF-8',
   'mavengem.wagon.version' => '2.0.3',
   'jruby.plugins.version' => '3.0.6',
-  'jetty.version' => '9.4.58.v20250814',
   'jruby-rack.version' => '[1.2,1.2.99999)',
 )
 
 # dependencies needed for compilation
 scope :provided do
   jar 'org.jruby:jruby', '${jruby.version}'
-  jar 'org.eclipse.jetty:jetty-webapp', '${jetty.version}'
 end
 
 plugin :clean, '3.5.0'
@@ -41,7 +39,6 @@ plugin :invoker, '3.10.1' do
                    'jruby.version' => '${jruby.version}',
                    'bundler.version' => '${bundler.version}',
                    'jruby-rack.version' => '${jruby-rack.version}',
-                   'jetty.version' => '${jetty.version}',
                    'style.color' => 'always',
                  },
                  :goals => ['verify'],

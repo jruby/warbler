@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         task: ['', integration]
-        java-version: [8, 21, 25]
+        java-version: [8, 17, 21, 25]
         ruby-version: [jruby-9.4, jruby-10.0, jruby-10.1]
         jruby-rack-version: ['1.2', '1.3', '2.0']
         exclude:
@@ -26,12 +26,16 @@ jobs:
             java-version: 8
           - ruby-version: jruby-10.1  # JRuby 10 requires Java 21 minimum
             java-version: 8
+          - ruby-version: jruby-10.0  # JRuby 10 requires Java 21 minimum
+            java-version: 17
+          - ruby-version: jruby-10.1  # JRuby 10 requires Java 21 minimum
+            java-version: 17
+          - task: 'integration'       # War integration tests require Java 17
+            java-version: 8
           - jruby-rack-version: '1.3' # No need to vary jruby-rack version for non-integration
             task: ''
           - jruby-rack-version: '2.0' # No need to vary jruby-rack version for non-integration
             task: ''
-          - jruby-rack-version: '2.0' # Integration tests not yet compatible with JRuby-Rack 2.0 (jakarta.servlet-api)
-            task: 'integration'
           - jruby-rack-version: '1.3' # JRuby-Rack 1.3+ requires JRuby 10
             ruby-version: jruby-9.4
           - jruby-rack-version: '2.0' # JRuby-Rack 1.3+ requires JRuby 10
