@@ -12,14 +12,13 @@ Ruby applications to assemble and Just Work.
 
     Warbler  Status        JRuby     Java  JRuby-Rack    Rails    Notes
     -------  ----------  ----------  ----  ----------  ---------  ----------------------------------------------
-    2.1      Maintained  9.4 → 10.1  8+    1.2 → 1.3   5.0 → 8.0  Rails 8.1 may be OK with pure Ruby webservers.
+    2.1      Maintained  9.4 → 10.1  8+    1.2 → 2.0   5.0 → 8.0  Rails 8.1 may be OK with pure Ruby webservers.
     2.0      EOL         9.2 → 9.3   6+    1.1 → 1.2       → 6.1
     1.4      EOL         1.1 → 1.7   5+        ?           ?
 
-For running wars with specific Java web servers, consult jruby-rack compatibility (
-{master}[https://github.com/jruby/jruby-rack/tree/master],
-{1.2-stable}[https://github.com/jruby/jruby-rack/tree/1.2-stable],
-{1.1-stable}[https://github.com/jruby/jruby-rack/tree/1.1-stable] ).
+For running wars with specific Java web servers, consult {JRuby-Rack compatibility}[https://github.com/jruby/jruby-rack#compatibility]
+to decide which JRuby-Rack version you may need to use. While warbler is compatible with multiple jruyb-rackversions, it does not
+know your target webserver, so you may need to further restrict your JRuby-Rack version
 
 == Getting Started
 
@@ -177,7 +176,7 @@ script for your Rack-based application. You will probably need to specify
 framework and application gems in +config/warble.rb+ unless you're using Bundler
 to manage your gems. <tt>ENV['RACK_ENV']</tt> will be set to +production+.
 
-See {the examples in the jruby-rack project}[http://github.com/jruby/jruby-rack/tree/master/examples/]
+See {the examples in the JRuby-Rack project}[http://github.com/jruby/jruby-rack/tree/master/examples/]
 of how to configure Warbler to package Camping and Sinatra apps.
 
 === Configuration Notes
@@ -256,39 +255,48 @@ task to give you more insight into what's going on.
 If you think you found a bug, please file one at
 https://github.com/jruby/warbler/issues.
 
-=== Common issues with executable wars
+=== Common issues with wars
 
 If your app isn't working or starting up correctly:
 
+-  <b>Jruby-Rack version not compatible with JRuby version</b>
+    jruby-rack-2.0.0 requires Ruby version >= 3.4.0. The current ruby version is 3.1.7.
+    jruby-rack-1.3.0 requires Ruby version >= 3.4.0. The current ruby version is 3.1.7.
+   Warbler is compatible with multiple JRuby-Rack versions which have different JRuby requirements. You are trying to use
+   a JRuby-Rack version which does not support your JRuby version; without using bundler to resolve dependencies.
+   - Consult {JRuby-Rack compatibility}[https://github.com/jruby/jruby-rack#compatibility]
+   - Use a bundler `:development` group to install warbler, and ensure bundler is running with your intended runtime
+     JRuby version so the JRuby-Rack dependency is resolved correctly.
+
+-  <b>Rack version compatibility</b>
+    An exception happened during JRuby-Rack startup
+    no such file to load -- rack/chunked
+   You are trying to use Rack 3.x with a JRuby-Rack version that does not yet support Rack 3. Try upgrading to a compatible
+   JRuby-Rack version, or lock rack at a compatibile version with <tt>gem 'rack', '~> 2.2.0'</tt>. Note that Rack `2.2` requires Rails < `8.1`.
+
+-  <b>Rack missing at runtime</b>
+    org.jruby.exceptions.LoadError: (LoadError) cannot load such file -- rack
+    JRuby-Rack no longer vendors Rack - make sure the rack gem is available to the application (e.g. add it to the Gemfile or install it into the gem path)
+   You are trying to use JRuby-Rack 1.3+, without a bundle or gem path that resolves an appropriate Rack version via the
+   `jruby-rack` gem's runtime dependency. Try one of (with appropriate rack version):
+   - Bundler: add <tt>gem 'rack', '~> 2.2.0'</tt> or similar as a default/runtime dependency to your `Gemfile`
+   - Rubygems: add <tt>config.gems['rack'] = '~> 2.2.0'</tt> to your `config/warble.rb`
+
 -  <b>CompatVersion errors:</b>
    If you are getting <tt>java.lang.NoClassDefFoundError: org/jruby/CompatVersion</tt> errors at start-up
-   you are probably running Warbler with a jruby-rack version which does not yet support JRuby 10+ - it 
-   swallows the true error making debugging impossible. Ensure you're on jruby-rack `1.2.7+`.
+   you are probably running Warbler with a JRuby-Rack version which does not yet support JRuby 10+ - it
+   swallows the true error making debugging impossible. Ensure you're on JRuby-Rack `1.2.7+`.
 
 -  <b>Bundler `restart_with` errors:</b>
    If you are getting <tt>org.jruby.rack.RackInitializationException: No such file or directory - java -cp...</tt>,
    that probably means bundler is trying to switch versions dynamically during start-up because your
    `Gemfile.lock` implies a different locked version of bundler to that packaged with JRuby by default.
 
-   JRuby/Bundler running embedded inside a jar like this does not support switching bundler versions dynamically.
+   JRuby/Bundler running embedded inside a jar like this does not support switching bundler versions dynamically
+   - Ensure you're on warbler `2.1.2+` and/or JRuby-Rack `1.2.8+` which attempts to workaround this issue
+   - If that doesn't help, ensure you are using `BUNDLE_VERSION=system` when bundling/warbling your application to ensure
+     the identical embedded JRuby bundler version is used during warbling and runtime.
 
-   This may happen due to
-   - system gems for jruby installation upgradingg bundler to a newer version than packaged by default
-   - running <tt>bundle update --bundler</tt>
-   - using `BUNDLE_VERSION` to override bundle version which generating/editing your `Gemfile.lock`
-
-   Options to address this
-   - use <tt>bundle config set version system</tt> / <tt>bundle config set disable_shared_gems</tt> to avoid bundler picking system versions
-   - ensure your `Gemfile.lock`'s <tt>BUNDLED WITH</tt> version matches the default bundler packaged with your `jruby-jars` version. 
-     You can check inside the relevant `jruby-stdlib` jar or inside a clean installation dir from your Ruby version manager of choice. 
-   - remove <tt>BUNDLED WITH</tt> entirely from `Gemfile.lock`. Sometimes bundler will add this back again; so not recommended in the longer term
-
--  <b>Rack version compatibility</b>
-    An exception happened during JRuby-Rack startup
-    no such file to load -- rack/chunked
-   You are trying to use Rack 3.x with a jruby-rack version that does not yet support Rack 3. Try upgrading to a compatible
-   jruby-rack version, or lock rack at a compatibile version with <tt>gem 'rack', '~> 2.2.0'</tt>. Note that Rack `2.2` requires Rails < `8.1`.
-   
 == Source
 
 You can get the Warbler source using Git, in any of the following ways:
