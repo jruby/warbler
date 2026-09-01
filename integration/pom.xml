@@ -17,6 +17,7 @@
     <warbler.version>2.1.3.pre</warbler.version>
     <jruby.version>9.4.15.0</jruby.version>
     <bundler.version>2.6.3</bundler.version>
+    <jruby-rack.version>[1.2,1.2.99999)</jruby-rack.version>
     <jetty.version>9.4.58.v20250814</jetty.version>
   </properties>
 
@@ -30,20 +31,26 @@
   <dependencies>
     <dependency>
       <groupId>rubygems</groupId>
-      <artifactId>bundler</artifactId>
-      <version>${bundler.version}</version>
-      <type>gem</type>
-    </dependency>
-    <dependency>
-      <groupId>rubygems</groupId>
       <artifactId>warbler</artifactId>
       <version>${warbler.version}</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
+      <artifactId>bundler</artifactId>
+      <version>${bundler.version}</version>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
       <artifactId>jruby-jars</artifactId>
       <version>${jruby.version}</version>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>jruby-rack</artifactId>
+      <version>${jruby-rack.version}</version>
       <type>gem</type>
     </dependency>
     <dependency>
