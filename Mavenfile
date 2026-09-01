@@ -10,13 +10,12 @@ properties(
   'project.build.sourceEncoding' => 'UTF-8',
   'mavengem.wagon.version' => '2.0.3',
   'jruby.plugins.version' => '3.0.6',
-  'jetty.version' => '9.4.58.v20250814',
+  'jruby-rack.version' => '[1.2,1.2.99999)',
 )
 
 # dependencies needed for compilation
 scope :provided do
   jar 'org.jruby:jruby', '${jruby.version}'
-  jar 'org.eclipse.jetty:jetty-webapp', '${jetty.version}'
 end
 
 plugin :clean, '3.5.0'
@@ -29,16 +28,17 @@ plugin :install, '3.1.4'
 
 gem 'bundler', '${bundler.version}'
 gem 'jruby-jars', '${jruby.version}'
+gem 'jruby-rack', '${jruby-rack.version}'
 
 plugin :invoker, '3.10.1' do
   execute_goals( :install, :run,
                  :id => 'integration-test',
                  :properties => {
+                   'jruby.plugins.version' => '${jruby.plugins.version}',
                    'warbler.version' => '${project.version}',
                    'jruby.version' => '${jruby.version}',
-                   'jetty.version' => '${jetty.version}',
                    'bundler.version' => '${bundler.version}',
-                   'jruby.plugins.version' => '${jruby.plugins.version}',
+                   'jruby-rack.version' => '${jruby-rack.version}',
                    'style.color' => 'always',
                  },
                  :goals => ['verify'],

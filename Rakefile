@@ -25,6 +25,7 @@ task :default => :spec
 require 'maven/ruby/maven'
 mvn = Maven::Ruby::Maven.new
 mvn << "-Djruby.version=#{JRUBY_VERSION}"
+mvn << "-Djruby-rack.version=#{ENV['JRUBY_RACK_VERSION']}" if ENV['JRUBY_RACK_VERSION']
 mvn << "-Dbundler.version=#{Bundler::VERSION}"
 mvn << '--no-transfer-progress'
 mvn << '--color=always'
