@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.net.*;
 import java.io.*;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test for simple App.
@@ -18,8 +17,8 @@ public class Rails7AppTestIT {
     @Test
     public void testApp() throws Exception {
         String content = contentFrom("http://localhost:8080/posts/");
-        assertThat(content, containsString("Rails7App"));
-        assertThat(content, containsString("Listing posts"));
+        assertTrue(content.contains("Rails7App"), () -> "expected response to contain 'Rails7App' but was: " + content);
+        assertTrue(content.contains("Listing posts"), () -> "expected response to contain 'Listing posts' but was: " + content);
     }
 
     private static String contentFrom(String url) throws IOException {

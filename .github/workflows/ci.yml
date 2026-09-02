@@ -70,4 +70,4 @@ jobs:
         run: BUNDLE_JOBS=1 bundle install
 
       - name: Run tests
-        run: bundle exec rake ${{ matrix.task }} "JRUBY_RACK_VERSION='[${{ matrix.jruby-rack-version }},${{ matrix.jruby-rack-version }}.99999)'"
+        run: bundle exec rake ${{ matrix.task }} "JRUBY_RACK_VERSION=${{ matrix.jruby-rack-version }}"

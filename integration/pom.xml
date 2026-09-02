@@ -10,14 +10,18 @@
   <properties>
     <jruby.plugins.version>3.0.6</jruby.plugins.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <gem.home>${basedir}/../../pkg/rubygems</gem.home>
-    <gem.path>${basedir}/../../pkg/rubygems</gem.path>
+    <maven.compiler.release>8</maven.compiler.release>
 
     <!-- Default versions, overridden from parent when running tests acros env -->
     <warbler.version>2.1.3.pre</warbler.version>
     <jruby.version>9.4.15.0</jruby.version>
-    <bundler.version>2.6.3</bundler.version>
-    <jruby-rack.version>[1.2,1.2.99999)</jruby-rack.version>
+    <!-- jruby-rack series to test against: 1.2, 1.3 or 2.0 (expanded to a `~> x.y.0` gem requirement) -->
+    <jruby-rack.version>1.2</jruby-rack.version>
+    <warbler.gem>${basedir}/../../pkg/warbler-${warbler.version}.gem</warbler.gem>
+
+    <!-- Test locations -->
+    <gem.home>${basedir}/../../pkg/rubygems-jruby-${jruby.version}-rack-${jruby-rack.version}</gem.home>
+    <gem.path>${basedir}/../../pkg/rubygems-jruby-${jruby.version}-rack-${jruby-rack.version}</gem.path>
   </properties>
 
   <profiles>
@@ -35,7 +39,7 @@
     <profile>
       <id>ee11</id>
       <activation>
-        <property><name>jruby-rack.version</name><value>[2.0,2.0.99999)</value></property>
+        <property><name>jruby-rack.version</name><value>2.0</value></property>
       </activation>
       <properties>
         <jetty-maven-plugin.group>org.eclipse.jetty.ee11</jetty-maven-plugin.group>
@@ -45,60 +49,16 @@
     </profile>
   </profiles>
 
-  <repositories>
-    <repository>
-      <id>rubygems</id>
-      <url>mavengem:https://rubygems.org</url>
-    </repository>
-  </repositories>
-
   <dependencies>
-    <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>warbler</artifactId>
-      <version>${warbler.version}</version>
-      <type>gem</type>
-    </dependency>
-    <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>bundler</artifactId>
-      <version>${bundler.version}</version>
-      <type>gem</type>
-    </dependency>
-    <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>jruby-jars</artifactId>
-      <version>${jruby.version}</version>
-      <type>gem</type>
-    </dependency>
-    <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>jruby-rack</artifactId>
-      <version>${jruby-rack.version}</version>
-      <type>gem</type>
-    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <version>5.14.4</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest</artifactId>
-      <version>3.0</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.jruby.maven</groupId>
-        <artifactId>mavengem-wagon</artifactId>
-        <version>2.0.3</version>
-      </extension>
-    </extensions>
     <defaultGoal>verify</defaultGoal>
     <resources>
       <resource>
@@ -135,11 +95,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.15.0</version>
-        <configuration>
-          <release>8</release>
-        </configuration>
       </plugin>
       <plugin>
+        <!-- these modules use jar packaging only for the java IT lifecycle; suppress the
+             meaningless default jar so only warble's artifact appears in target/ -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.5.1</version>
@@ -163,16 +122,6 @@
               <goal>integration-test</goal>
               <goal>verify</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.jruby.maven</groupId>
-        <artifactId>gem-maven-plugin</artifactId>
-        <version>${jruby.plugins.version}</version>
-        <executions>
-          <execution>
-            <goals><goal>initialize</goal></goals>
           </execution>
         </executions>
       </plugin>
@@ -250,10 +199,30 @@
           </configuration>
           <executions>
             <execution>
+              <id>install-tool-gems</id>
+              <phase>initialize</phase>
+              <goals><goal>jruby</goal></goals>
+              <configuration>
+                <args>-S gem install --no-document --conservative jruby-jars:${jruby.version} jruby-rack:~&gt;${jruby-rack.version}.0</args>
+              </configuration>
+            </execution>
+            <execution>
+              <id>install-warbler</id>
+              <phase>initialize</phase>
+              <goals><goal>jruby</goal></goals>
+              <configuration>
+                <args>-S gem install --no-document ${warbler.gem}</args>
+              </configuration>
+            </execution>
+            <execution>
               <id>bundle-install</id>
               <goals><goal>jruby</goal></goals>
               <configuration>
-                <args>-C ${basedir}/src/main/ruby -S ${gem.home}/bin/bundle install</args>
+                <env>
+                  <BUNDLE_VERSION>system</BUNDLE_VERSION>
+                  <BUNDLE_DISABLE_SHARED_GEMS>true</BUNDLE_DISABLE_SHARED_GEMS>
+                </env>
+                <args>-C ${basedir}/src/main/ruby -S bundle install</args>
               </configuration>
             </execution>
             <execution>
