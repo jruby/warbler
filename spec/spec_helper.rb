@@ -61,7 +61,9 @@ module ExampleGroupHelpers
   def use_fresh_environment
     before(:each) do
       @env_save = {}
-      (ENV.keys.grep(/BUNDLE/) + ["RUBYOPT"]).each {|k| @env_save[k] = ENV[k]; ENV.delete(k)}
+      # BUNDLE_GLOBAL_GEM_CACHE is kept: it only relocates bundler's download cache
+      # (useful for CI caching) and does not affect the bundler behaviour under test
+      (ENV.keys.grep(/BUNDLE/) - ["BUNDLE_GLOBAL_GEM_CACHE"] + ["RUBYOPT"]).each {|k| @env_save[k] = ENV[k]; ENV.delete(k)}
     end
 
     after(:each) do

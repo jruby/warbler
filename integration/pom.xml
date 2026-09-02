@@ -221,6 +221,7 @@
                 <env>
                   <BUNDLE_VERSION>system</BUNDLE_VERSION>
                   <BUNDLE_DISABLE_SHARED_GEMS>true</BUNDLE_DISABLE_SHARED_GEMS>
+                  <BUNDLE_GLOBAL_GEM_CACHE>true</BUNDLE_GLOBAL_GEM_CACHE>
                 </env>
                 <args>-C ${basedir}/src/main/ruby -S bundle install</args>
               </configuration>

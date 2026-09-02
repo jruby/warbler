@@ -17,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        task: ['', integration]
+        task: [spec, integration]
         ruby-version: [jruby-9.4, jruby-10.0, jruby-10.1]
         java-version: [8, 17, 21, 25]
         jruby-rack-version: ['1.2', '1.3', '2.0']
@@ -33,9 +33,9 @@ jobs:
           - task: 'integration'       # War integration tests require Java 17
             java-version: 8
           - jruby-rack-version: '1.3' # No need to vary jruby-rack version for non-integration
-            task: ''
+            task: spec
           - jruby-rack-version: '2.0' # No need to vary jruby-rack version for non-integration
-            task: ''
+            task: spec
           - jruby-rack-version: '1.3' # JRuby-Rack 1.3+ requires JRuby 10
             ruby-version: jruby-9.4
           - jruby-rack-version: '2.0' # JRuby-Rack 1.3+ requires JRuby 10
@@ -44,8 +44,9 @@ jobs:
       fail-fast: false
 
     env:
-      # speed up all those subprocesses
-      JRUBY_OPTS: --dev
+      JRUBY_OPTS: --dev               # speed up all those subprocesses
+      BUNDLE_JOBS: "1"                # serial installs: parallel installs race the jar-dependencies post-install hook needed by psych: see https://github.com/ruby/rubygems/issues/9386
+      BUNDLE_GLOBAL_GEM_CACHE: "true" # keep downloaded .gem archives in ~/.bundle/cache so they can be cached across runs
 
     steps:
       - name: checkout
@@ -56,18 +57,35 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ matrix.java-version }}
-          cache: maven
 
       - name: Set up ${{ matrix.ruby-version }}
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
 
-      - name: Remove jruby-launcher # not sure where this is coming from but causes some specs to fail
-        run: gem uninstall -a jruby-launcher
+      - name: Set up dependency cache
+        uses: actions/cache@v6
+        with:
+          # ~/.m2/repository: maven artifacts - vary by jruby version (jruby-complete),
+          #   jruby-rack series (jetty ee8 vs ee11) and task (integration resolves more).
+          # ~/.bundle/cache: bundler's global gem cache (BUNDLE_GLOBAL_GEM_CACHE above)
+          #   of downloaded .gem archives - avoids re-downloads while gems still install
+          #   into the system gem home the specs require.
+          path: |
+            ~/.m2/repository
+            ~/.bundle/cache
+          key: deps-${{ runner.os }}-${{ matrix.ruby-version }}-rack${{ matrix.jruby-rack-version }}-${{ matrix.task }}-${{ hashFiles('warbler.gemspec', 'Gemfile', 'Mavenfile', 'integration/pom.xml', 'integration/*/src/main/ruby/Gemfile') }}
+          restore-keys: |
+            deps-${{ runner.os }}-${{ matrix.ruby-version }}-rack${{ matrix.jruby-rack-version }}-${{ matrix.task }}-
+            deps-${{ runner.os }}-${{ matrix.ruby-version }}-rack${{ matrix.jruby-rack-version }}-
+            deps-${{ runner.os }}-${{ matrix.ruby-version }}-
+            deps-${{ runner.os }}-
 
       - name: Install dependencies
-        run: BUNDLE_JOBS=1 bundle install
+        run: bundle install # Manage our own cache, as some specs need a clean bundler environment which setup-ruby would dirty
+
+      - name: Remove jruby-launcher # not sure where this is coming from but causes some specs to fail
+        run: gem uninstall -a jruby-launcher
 
       - name: Run tests
         run: bundle exec rake ${{ matrix.task }} "JRUBY_RACK_VERSION=${{ matrix.jruby-rack-version }}"
