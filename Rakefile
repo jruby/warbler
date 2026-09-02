@@ -10,11 +10,11 @@ require 'bundler/gem_helper'
 Bundler::GemHelper.install_tasks :dir => File.dirname(__FILE__)
 
 require 'rake/clean'
-CLEAN << "pkg" << "doc" << Dir['integration/**/target'] << "lib/warbler_jar.jar"
+CLEAN << "pkg" << "doc" << "target" << Dir['integration/**/target'] << "lib/warbler_jar.jar"
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |t|
-  t.rspec_opts = ['--color', "--format documentation"]
+  t.rspec_opts = ['--force-color', "--format documentation"]
 end
 
 task :spec => :jar
@@ -26,7 +26,6 @@ require 'maven/ruby/maven'
 mvn = Maven::Ruby::Maven.new
 mvn << "-Djruby.version=#{JRUBY_VERSION}"
 mvn << "-Djruby-rack.version=#{ENV['JRUBY_RACK_VERSION']}" if ENV['JRUBY_RACK_VERSION']
-mvn << "-Dbundler.version=#{Bundler::VERSION}"
 mvn << '--no-transfer-progress'
 mvn << '--color=always'
 
@@ -37,7 +36,7 @@ task :jar do
 end
 
 desc 'run some integration test'
-task :integration => :jar do
+task :integration => :build do
   success = mvn.verify
   exit(1) unless success
 end
