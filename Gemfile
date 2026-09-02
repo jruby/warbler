@@ -3,7 +3,7 @@ source "https://rubygems.org/"
 gemspec
 
 group :development, :test do
-  gem 'rdoc', '~> 7.0', :require => nil
+  gem 'rdoc', :require => nil
   gem 'rspec', '~> 3.0'
   gem 'drb', '~> 2.2', '>= 2.2.3'
   gem 'ruby-maven', '~> 3.9'
