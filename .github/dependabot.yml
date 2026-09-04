@@ -11,8 +11,7 @@ updates:
       prefix: "chore(deps): "
   - package-ecosystem: maven
     directories:
-      - "/"
-      - "/integration/*"
+      - "**/*"
     schedule:
       interval: weekly
     groups:
@@ -23,6 +22,9 @@ updates:
     commit-message:
       prefix: "build(deps): "
       prefix-development: "chore(deps): "
+    ignore:
+      - dependency-name: "org.jruby:jruby"
+        update-types: [ "version-update:semver-major", "version-update:semver-minor" ]
   - package-ecosystem: bundler
     directories:
       - "/"
