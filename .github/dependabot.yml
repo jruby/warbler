@@ -11,7 +11,7 @@ updates:
       prefix: "chore(deps): "
   - package-ecosystem: maven
     directories:
-      - "/*"
+      - "/"
     schedule:
       interval: weekly
     groups:
