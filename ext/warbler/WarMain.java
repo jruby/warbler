@@ -5,6 +5,8 @@
  * See the file LICENSE.txt for details.
  */
 
+package warbler;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -122,7 +124,9 @@ public class WarMain extends JarMain {
 
     private File createWebRoot() throws IOException {
         File warblerRoot = File.createTempFile("warbler", "webroot");
+        //noinspection ResultOfMethodCallIgnored
         warblerRoot.delete();
+        //noinspection ResultOfMethodCallIgnored
         warblerRoot.mkdirs();
         closeables.add(() -> deleteAll(warblerRoot));
 
@@ -148,10 +152,10 @@ public class WarMain extends JarMain {
             if ( is != null ) props.load(is);
         } catch (Exception ignore) { }
 
-        String port = getSystemProperty("warbler.port", getENV("PORT"));
+        String port = System.getProperty("warbler.port", System.getenv().get("PORT"));
         port = port == null ? "8080" : port;
-        String host = getSystemProperty("warbler.host", "0.0.0.0");
-        String webserverConfig = getSystemProperty("warbler.webserver_config", getENV("WARBLER_WEBSERVER_CONFIG"));
+        String host = System.getProperty("warbler.host", "0.0.0.0");
+        String webserverConfig = System.getProperty("warbler.webserver_config", System.getenv().get("WARBLER_WEBSERVER_CONFIG"));
         String embeddedWebserverConfig = new URI("jar", entryPath(WEBSERVER_CONFIG), null).toURL().toString();
         webserverConfig = webserverConfig == null ? embeddedWebserverConfig : webserverConfig;
         for ( Map.Entry<Object, Object> entry : props.entrySet() ) {
@@ -167,7 +171,7 @@ public class WarMain extends JarMain {
         if (props.getProperty("props") != null) {
             String[] propsToSet = props.getProperty("props").split(",");
             for ( String key : propsToSet ) {
-                setSystemProperty(key, props.getProperty(key));
+                System.setProperty(key, props.getProperty(key));
             }
         }
 

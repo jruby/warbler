@@ -104,21 +104,19 @@ module Warbler
         end
       end
 
-      def add_runnables(jar, main_class = 'WarMain')
-        main_class = main_class.sub('.class', '') # handles WarMain.class
+      def add_runnables(jar, main_path_to_class = WebServer::Artifact::MAIN_PATH_TO_CLASS)
         unless config.manifest_file
-          manifest = Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: #{main_class}\n"
-          jar.files['META-INF/MANIFEST.MF'] = StringIO.new(manifest)
+          jar.files[Warbler::Jar::MANIFEST_PATH] = StringIO.new(Warbler::Jar.manifest_with_main(main_path_to_class))
         end
-        [ 'JarMain', 'WarMain', main_class ].uniq.each do |klass|
-          jar.files["#{klass}.class"] = jar.entry_in_jar(WARBLER_JAR, "#{klass}.class")
+        [ Warbler::Traits::Jar::MAIN_PATH_TO_CLASS, WebServer::Artifact::MAIN_PATH_TO_CLASS, main_path_to_class ].uniq.each do |path_to_class|
+          jar.files["#{path_to_class}"] = jar.entry_in_jar(WARBLER_JAR, "#{path_to_class}")
         end
       end
 
       def add_executables(jar)
         webserver = WEB_SERVERS[config.webserver.to_s]
         webserver.add(jar)
-        add_runnables jar, webserver.main_class || 'WarMain'
+        add_runnables jar, webserver.main_class || WebServer::Artifact::MAIN_PATH_TO_CLASS
       end
 
       def add_gemjar(jar)

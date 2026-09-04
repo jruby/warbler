@@ -5,9 +5,10 @@
  * See the file LICENSE.txt for details.
  */
 
+package warbler;
+
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,6 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
@@ -71,7 +73,9 @@ public class JarMain implements Closeable {
             }
 
             extractRoot = File.createTempFile("jruby", "extract");
+            //noinspection ResultOfMethodCallIgnored
             extractRoot.delete();
+            //noinspection ResultOfMethodCallIgnored
             extractRoot.mkdirs();
             closeables.add(() -> deleteAll(extractRoot));
 
@@ -95,6 +99,7 @@ public class JarMain implements Closeable {
     protected URL extractEntry(final JarEntry entry, String path) throws Exception {
         File file = new File(extractRoot, path);
         if (entry.isDirectory()) {
+            //noinspection ResultOfMethodCallIgnored
             file.mkdirs();
             return null;
         }
@@ -108,9 +113,12 @@ public class JarMain implements Closeable {
             return null;
         }
         final File parent = file.getParentFile();
-        if (parent != null) parent.mkdirs();
+        if (parent != null) {
+            //noinspection ResultOfMethodCallIgnored
+            parent.mkdirs();
+        }
 
-        transferAndClose(() -> entryStream, () -> new FileOutputStream(file));
+        transferAndClose(() -> entryStream, () -> Files.newOutputStream(file.toPath()));
         file.deleteOnExit();
         // if (false) debug(entry.getName() + " extracted to " + file.getPath());
         return file.toURI().toURL();
@@ -122,7 +130,7 @@ public class JarMain implements Closeable {
     }
 
     protected Object newScriptingContainer(final URL[] jars) throws Exception {
-        setSystemProperty("org.jruby.embed.class.path", "");
+        System.setProperty("org.jruby.embed.class.path", "");
         URLClassLoader scriptingClassLoader = new URLClassLoader(jars);
         closeables.add(scriptingClassLoader);
         Class<?> scriptingContainerClass = Class.forName("org.jruby.embed.ScriptingContainer", true, scriptingClassLoader);
@@ -196,6 +204,7 @@ public class JarMain implements Closeable {
                     }
                 }
             }
+            //noinspection ResultOfMethodCallIgnored
             f.delete();
         } catch (IOException e) {
             error(e);
@@ -272,7 +281,7 @@ public class JarMain implements Closeable {
     private static final boolean debug;
 
     static {
-        debug = Boolean.parseBoolean(getSystemProperty("warbler.debug", "false"));
+        debug = Boolean.parseBoolean(System.getProperty("warbler.debug", "false"));
     }
 
     static boolean isDebug() {
@@ -285,43 +294,7 @@ public class JarMain implements Closeable {
      * for wrappers like procrun
      */
     private static boolean isSystemExitEnabled() {
-        return getSystemProperty("warbler.skip_system_exit") == null; //omission enables System.exit use
-    }
-
-    static String getSystemProperty(final String name) {
-        return getSystemProperty(name, null);
-    }
-
-    static String getSystemProperty(final String name, final String defaultValue) {
-        try {
-            return System.getProperty(name, defaultValue);
-        } catch (SecurityException e) {
-            return defaultValue;
-        }
-    }
-
-    static boolean setSystemProperty(final String name, final String value) {
-        try {
-            System.setProperty(name, value);
-            return true;
-        } catch (SecurityException e) {
-            return false;
-        }
-    }
-
-    static String getENV(final String name) {
-        return getENV(name, null);
-    }
-
-    static String getENV(final String name, final String defaultValue) {
-        try {
-            if (System.getenv().containsKey(name)) {
-                return System.getenv().get(name);
-            }
-            return defaultValue;
-        } catch (SecurityException e) {
-            return defaultValue;
-        }
+        return System.getProperty("warbler.skip_system_exit") == null; //omission enables System.exit use
     }
 
     // Can be replaced with InputStream.transferTo(OutputStream) in Java 11+

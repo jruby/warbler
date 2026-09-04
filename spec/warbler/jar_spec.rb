@@ -74,7 +74,7 @@ describe Warbler::Jar do
 
     it "adds a JarMain class" do
       apply_silently
-      expect(file_list(%r{^JarMain\.class$})).to_not be_empty
+      expect(file_list(%r{^warbler/JarMain\.class$})).to_not be_empty
     end
 
     it "adds an init.rb" do
@@ -691,8 +691,8 @@ describe Warbler::Jar do
           config.features << "executable"
         end
         apply_silently
-        expect(file_list(%r{^WarMain\.class$})).to_not be_empty
-        expect(file_list(%r{^JarMain\.class$})).to_not be_empty
+        expect(file_list(%r{^warbler/WarMain\.class$})).to_not be_empty
+        expect(file_list(%r{^warbler/JarMain\.class$})).to_not be_empty
       end
     end
 
@@ -703,8 +703,8 @@ describe Warbler::Jar do
           config.features << "runnable"
         end
         apply_silently
-        expect(file_list(%r{^WarMain\.class$})).to_not be_empty
-        expect(file_list(%r{^JarMain\.class$})).to_not be_empty
+        expect(file_list(%r{^warbler/WarMain\.class$})).to_not be_empty
+        expect(file_list(%r{^warbler/JarMain\.class$})).to_not be_empty
       end
 
     end

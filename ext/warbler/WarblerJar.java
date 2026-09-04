@@ -5,13 +5,15 @@
  * See the file LICENSE.txt for details.
  */
 
-import java.io.Closeable;
+package warbler;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -46,15 +48,8 @@ public class WarblerJar {
         }
 
         RubyHash hash = (RubyHash) entries;
-        try {
-            FileOutputStream file = newFile(jar_path);
-            try {
-                ZipOutputStream zip = new ZipOutputStream(file);
-                addEntries(context, zip, hash);
-                zip.finish();
-            } finally {
-                close(file);
-            }
+        try (ZipOutputStream zip = new ZipOutputStream(newFile(jar_path))) {
+            addEntries(context, zip, hash);
         } catch (IOException e) {
             if (runtime.isDebug()) {
                 e.printStackTrace(runtime.getOut());
@@ -69,21 +64,16 @@ public class WarblerJar {
     public static IRubyObject entry_in_jar(ThreadContext context, IRubyObject self,
         IRubyObject jar_path, IRubyObject entry) {
         final Ruby runtime = context.runtime;
-        try {
-            InputStream entryStream = getStream(jar_path.convertToString().getUnicodeValue(),
-                                                entry.convertToString().getUnicodeValue());
-            try {
-                byte[] buf = new byte[16384];
-                ByteList bytes = new ByteList();
-                int bytesRead;
-                while ((bytesRead = entryStream.read(buf)) != -1) {
-                    bytes.append(buf, 0, bytesRead);
-                }
-                IRubyObject stringio = runtime.getModule("StringIO");
-                return stringio.callMethod(context, "new", runtime.newString(bytes));
-            } finally {
-                close(entryStream);
+        try (InputStream entryStream = getStream(jar_path.convertToString().getUnicodeValue(),
+                                                entry.convertToString().getUnicodeValue())) {
+            byte[] buf = new byte[16384];
+            ByteList bytes = new ByteList();
+            int bytesRead;
+            while ((bytesRead = entryStream.read(buf)) != -1) {
+                bytes.append(buf, 0, bytesRead);
             }
+            IRubyObject stringio = runtime.getModule("StringIO");
+            return stringio.callMethod(context, "new", runtime.newString(bytes));
         } catch (IOException e) {
             if (runtime.isDebug()) {
                 e.printStackTrace(runtime.getOut());
@@ -93,7 +83,7 @@ public class WarblerJar {
     }
 
     private static void addEntries(ThreadContext context, ZipOutputStream zip, RubyHash entries) throws IOException {
-        RubyArray keys = entries.keys().sort(context, Block.NULL_BLOCK);
+        RubyArray<?> keys = entries.keys().sort(context, Block.NULL_BLOCK);
         for (int i = 0; i < keys.getLength(); i++) {
             IRubyObject key = keys.entry(i);
             IRubyObject value = entries.op_aref(context, key);
@@ -118,17 +108,12 @@ public class WarblerJar {
                     path = value.convertToString().getUnicodeValue();
                 }
 
-                try {
-                    InputStream inFile = getStream(path, null);
-                    try {
-                        zip.putNextEntry(new ZipEntry(entryName));
-                        byte[] buf = new byte[16384];
-                        int bytesRead;
-                        while ((bytesRead = inFile.read(buf)) != -1) {
-                            zip.write(buf, 0, bytesRead);
-                        }
-                    } finally {
-                        close(inFile);
+                try (InputStream inFile = getStream(path, null)) {
+                    zip.putNextEntry(new ZipEntry(entryName));
+                    byte[] buf = new byte[16384];
+                    int bytesRead;
+                    while ((bytesRead = inFile.read(buf)) != -1) {
+                        zip.write(buf, 0, bytesRead);
                     }
                 } catch (IOException e) {
                     System.err.println("File not found; " + path + " not in archive");
@@ -146,13 +131,6 @@ public class WarblerJar {
                                 path.convertToString().getUnicodeValue());
     }
 
-    private static void close(Closeable c) {
-        try {
-            c.close();
-        } catch (Exception e) {
-        }
-    }
-
     private static final Pattern PROTOCOL = Pattern.compile("^[a-z][a-z0-9]+:");
 
     private static InputStream getStream(String jar, String entry) throws IOException {
@@ -163,7 +141,7 @@ public class WarblerJar {
         }
 
         String[] path = jar.split("!/");
-        InputStream stream = new FileInputStream(path[0]);
+        InputStream stream = Files.newInputStream(Paths.get(path[0]));
         for (int i = 1; i < path.length; i++) {
             stream = entryInJar(stream, path[i]);
         }
