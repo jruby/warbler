@@ -156,6 +156,7 @@
           <configuration>
             <gemHome>${gem.home}</gemHome>
             <jrubyVersion>${jruby.version}</jrubyVersion>
+            <jrubyJvmArgs>--enable-native-access=ALL-UNNAMED</jrubyJvmArgs>
           </configuration>
           <executions>
             <execution>
