@@ -10,15 +10,17 @@ updates:
     commit-message:
       prefix: "chore(deps): "
   - package-ecosystem: maven
-    directories:
-      - "/integration/*"
+    directory: "/"
     schedule:
       interval: weekly
     groups:
-      maven-test-deps:
-        patterns: [ "*" ]
+      maven-deps:
+        dependency-type: "production"
+      maven-dev-deps:
+        dependency-type: "development"
     commit-message:
-      prefix: "test(deps): "
+      prefix: "build(deps): "
+      prefix-development: "chore(deps): "
     ignore:
       - dependency-name: "rubygems:*" # Versions only specified for local convenience
       - dependency-name: "org.eclipse.jetty:*"
