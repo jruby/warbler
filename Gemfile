@@ -6,7 +6,6 @@ group :development, :test do
   gem 'rdoc', :require => nil
   gem 'rspec', '~> 3.0'
   gem 'drb', '~> 2.2', '>= 2.2.3'
-  gem 'ruby-maven', '~> 3.9'
 
   # JBundler is unsupported on JRuby 10.1
   gem 'jbundler', '~> 0.9.5' if RUBY_VERSION.to_f < 4.0
