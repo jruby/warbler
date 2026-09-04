@@ -2,7 +2,6 @@
 *.sqlite3-*
 .bundle
 .idea
-.polyglot.Mavenfile
 .rspec_status
 .ruby-version
 Gemfile.lock
@@ -15,7 +14,6 @@ log
 nbproject
 out/
 pkg
-pom.warbler.gemspec.xml
 target/
 vendor/
 *.war

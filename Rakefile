@@ -10,7 +10,7 @@ require 'bundler/gem_helper'
 Bundler::GemHelper.install_tasks :dir => File.dirname(__FILE__)
 
 require 'rake/clean'
-CLEAN << "pkg" << "doc" << "target" << Dir['integration/**/target'] << "lib/warbler_jar.jar"
+CLEAN << "pkg" << "doc" << Dir['**/target'] << "lib/warbler_jar.jar"
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |t|
@@ -21,30 +21,26 @@ task :spec => :jar
 
 task :default => :spec
 
-# use Mavenfile to define :jar task
-require 'maven/ruby/maven'
-mvn = Maven::Ruby::Maven.new
-mvn << "-Djruby.version=#{JRUBY_VERSION}"
-mvn << "-Djruby-rack.version=#{ENV['JRUBY_RACK_VERSION']}" if ENV['JRUBY_RACK_VERSION']
-mvn << '--no-transfer-progress'
-mvn << '--color=always'
+# drive the java build (pom.xml) with regular maven
+require File.expand_path('lib/warbler/version', File.dirname(__FILE__))
+
+def mvn(*goals)
+  args = %W[mvn -B --no-transfer-progress -Dstyle.color=always
+            -Drevision=#{Warbler::VERSION} -Djruby.version=#{JRUBY_VERSION}]
+  args << "-Djruby-rack.version=#{ENV['JRUBY_RACK_VERSION']}" if ENV['JRUBY_RACK_VERSION']
+  # scrub the outer bundler env (RUBYOPT/BUNDLE_*) so JRuby subprocesses inside the
+  # maven build don't try to load this project's Gemfile
+  Bundler.with_unbundled_env { sh(*args, *goals) }
+end
 
 desc 'compile java sources and build jar'
 task :jar do
-  success = mvn.prepare_package
-  exit(1) unless success
+  mvn 'prepare-package'
 end
 
 desc 'run some integration test'
 task :integration => :build do
-  success = mvn.verify
-  exit(1) unless success
-end
-
-desc 'generate the pom.xml from the Mavenfile'
-task :pom do
-  success = mvn.validate('-Dpolyglot.dump.pom=pom.xml')
-  exit(1) unless success
+  mvn 'verify'
 end
 
 # Make sure jar gets compiled before the gem is built

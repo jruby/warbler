@@ -6,6 +6,7 @@
     <groupId>org.jruby.warbler</groupId>
     <artifactId>integration-tests</artifactId>
     <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>runnable_w_bundler_test</artifactId>
