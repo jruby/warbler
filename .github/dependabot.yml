@@ -11,7 +11,8 @@ updates:
       prefix: "chore(deps): "
   - package-ecosystem: maven
     directories:
-      - "/*"
+      - "/"
+      - "/integration/*"
     groups:
       ruby-deps:
         dependency-type: "production"
