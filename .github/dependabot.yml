@@ -10,8 +10,16 @@ updates:
     commit-message:
       prefix: "chore(deps): "
   - package-ecosystem: maven
-    directory: "/"
-    schedule:
+    directories:
+      - "/*"
+    groups:
+      ruby-deps:
+        dependency-type: "production"
+      ruby-dev-deps:
+        dependency-type: "development"
+    commit-message:
+      prefix: "build(deps): "
+      prefix-development: "chore(deps): ":
       interval: weekly
     groups:
       maven-deps:
