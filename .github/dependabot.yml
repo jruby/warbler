@@ -12,6 +12,7 @@ updates:
   - package-ecosystem: maven
     directories:
       - "/"
+      - "/integration/*"
     schedule:
       interval: weekly
     groups:
