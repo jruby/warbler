@@ -305,8 +305,8 @@ describe Warbler::Jar, "with Bundler" do
       end
 
       it "adds WarMain and JarMain to file" do
-        expect(file_list(%r{^WarMain\.class$})).to_not be_empty
-        expect(file_list(%r{^JarMain\.class$})).to_not be_empty
+        expect(file_list(%r{^warbler/WarMain\.class$})).to_not be_empty
+        expect(file_list(%r{^warbler/JarMain\.class$})).to_not be_empty
       end
 
       it "can run commands in the generated warfile" do

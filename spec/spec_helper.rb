@@ -145,7 +145,7 @@ module ExampleGroupHelpers
   def use_test_webserver
     before :each do
       webserver = double('server').as_null_object
-      allow(webserver).to receive(:main_class).and_return 'WarMain.class'
+      allow(webserver).to receive(:main_class).and_return 'warbler/WarMain.class'
       allow(webserver).to receive(:add) do |jar|
         jar.files['WEB-INF/webserver.jar'] = StringIO.new
       end

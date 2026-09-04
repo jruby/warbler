@@ -16,6 +16,8 @@ module Warbler
     class Jar
       include Trait
 
+      MAIN_PATH_TO_CLASS = 'warbler/JarMain.class'.freeze
+
       def self.detect?
         !detect_any_conflicts?
       end
@@ -34,10 +36,9 @@ module Warbler
 
       def update_archive(jar)
         unless config.manifest_file
-          manifest = Warbler::Jar::DEFAULT_MANIFEST.chomp + "Main-Class: JarMain\n"
-          jar.files['META-INF/MANIFEST.MF'] = StringIO.new(manifest)
+          jar.files[Warbler::Jar::MANIFEST_PATH] = StringIO.new(Warbler::Jar.manifest_with_main(MAIN_PATH_TO_CLASS))
         end
-        jar.files['JarMain.class'] = jar.entry_in_jar(WARBLER_JAR, "JarMain.class")
+        jar.files[MAIN_PATH_TO_CLASS] = jar.entry_in_jar(WARBLER_JAR, MAIN_PATH_TO_CLASS)
       end
 
       def default_pathmaps

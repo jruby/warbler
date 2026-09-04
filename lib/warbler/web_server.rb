@@ -2,6 +2,8 @@ module Warbler
   class WebServer
     class Artifact < Struct.new(:repo, :group_id, :artifact_id, :version)
 
+      MAIN_PATH_TO_CLASS = 'warbler/WarMain.class'.freeze
+
       def path_fragment
         @path_fragment ||= "#{group_id.gsub('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.jar"
       end
@@ -82,7 +84,7 @@ module Warbler
     end
 
     def main_class
-      'WarMain.class'
+      Artifact::MAIN_PATH_TO_CLASS
     end
   end
 

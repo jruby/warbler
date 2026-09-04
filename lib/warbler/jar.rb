@@ -21,7 +21,12 @@ module Warbler
     include RakeHelper
     include PlatformHelper
 
+    MANIFEST_PATH = 'META-INF/MANIFEST.MF'
     DEFAULT_MANIFEST = %{Manifest-Version: 1.0\nCreated-By: Warbler #{Warbler::VERSION}\n\n}
+
+    def self.manifest_with_main(main_path_to_class)
+      DEFAULT_MANIFEST.chomp + "Main-Class: #{main_path_to_class.sub('.class', '').tr('/', '.')}\n"
+    end
 
     attr_reader :files
     attr_reader :app_filelist
@@ -334,6 +339,10 @@ module Warbler
 
     # Java-boosted jar creation for JRuby; replaces #create_jar and
     # #entry_in_jar with Java version
-    require 'warbler_jar' if defined?(JRUBY_VERSION)
+    if defined?(JRUBY_VERSION)
+      require 'jruby'
+      require 'warbler_jar'
+      Java::Warbler::WarblerJar.create(JRuby.runtime)
+    end
   end
 end
