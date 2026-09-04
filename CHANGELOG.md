@@ -1,3 +1,7 @@
+## 2.1.3
+
+- #656: fix: correct compatibility with RubyZip 3.6 defaults
+
 ## 2.1.2
 
 - #649: fix: further improve isolation of warbled jars/wars from host bundler configuration
