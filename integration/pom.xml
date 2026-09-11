@@ -31,7 +31,7 @@
       <properties>
         <jetty-maven-plugin.group>org.eclipse.jetty.ee8</jetty-maven-plugin.group>
         <jetty-maven-plugin.artifact>jetty-ee8-maven-plugin</jetty-maven-plugin.artifact>
-        <jetty-maven-plugin.version>12.1.12</jetty-maven-plugin.version>
+        <jetty-maven-plugin.version>12.1.13</jetty-maven-plugin.version>
       </properties>
     </profile>
     <profile>
