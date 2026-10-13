@@ -18,6 +18,16 @@
         <groupId>org.jruby.maven</groupId>
         <artifactId>jruby-maven-plugin</artifactId>
         <executions>
+          <!-- config/warble.rb packages rack, but jruby-rack 1.2 (unlike 1.3+) does not depend on it,
+               and we must not rely on another integration project having installed it into the shared gem home -->
+          <execution>
+            <id>install-rack</id>
+            <phase>initialize</phase>
+            <goals><goal>jruby</goal></goals>
+            <configuration>
+              <args>-S gem install --no-document --conservative rack:~&gt;2.2.0</args>
+            </configuration>
+          </execution>
           <execution>
             <id>warble</id>
             <phase>pre-integration-test</phase>
