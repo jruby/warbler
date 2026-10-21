@@ -25,7 +25,7 @@ task :default => :spec
 require File.expand_path('lib/warbler/version', File.dirname(__FILE__))
 
 def mvn(*goals)
-  args = %W[mvn -B --no-transfer-progress -Dstyle.color=always
+  args = %W[./mvnw -B --no-transfer-progress -Dstyle.color=always
             -Drevision=#{Warbler::VERSION} -Djruby.version=#{JRUBY_VERSION}]
   args << "-Djruby-rack.version=#{ENV['JRUBY_RACK_VERSION']}" if ENV['JRUBY_RACK_VERSION']
   # scrub the outer bundler env (RUBYOPT/BUNDLE_*) so JRuby subprocesses inside the

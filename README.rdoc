@@ -318,10 +318,7 @@ After that, simply run +rake+.
 There are a few integration tests in the `integration` directory that build WAR file
 with Warbler, and run some basic smoke tests against them.  You can run these like so:
 
-    cd integration
-    mvn verify
-
-You'll need to have Maven >= 3.1.1 installed, of course: http://maven.apache.org/
+    ./mvnw verify
 
 == License
 
